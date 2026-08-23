@@ -1,0 +1,22 @@
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.text-gradient {
+  background: linear-gradient(90deg, #c9c6c5 0%, #e5e2e1 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #2ff801 0%, #0f6d00 100%);
+}
+
+.progress-glow {
+  box-shadow: 0 0 10px #2ff801;
+}
+
+body {
+  min-height: max(884px, 100dvh);
+}

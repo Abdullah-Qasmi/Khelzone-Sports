@@ -1,0 +1,41 @@
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #353434;
+  border-radius: 4px;
+}
+
+/* Gradient Button Animation */
+.btn-gradient {
+  background: linear-gradient(135deg, #2ff801 0%, #2ae500 100%);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-gradient:active {
+  transform: scale(0.98);
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+body {
+  min-height: max(884px, 100dvh);
+}
+
+/* 3D kit render placeholder background image */
+.kit-render-bg {
+  background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAI-ADl2YS87gJVrZ28UkOnlrUO82DuVJckPdFUq7G8WgnwjNU2knJZk95AfGpPHocg_d8ZwSz8CSydMvAGXur4CXkBz2pLISwH7K8dWPEdMAPfySkL3UZr02HiMslzqtGSeYzZfouW4AT25QBPf5S2i27YCtC-76LfXZHrwKPuSz90YLm3gb3FIUlQVlKuMWSooWSsTJaCGUbtgi7p-UiFANyO9kK3BvzKiJj-dwc0U4W2zQvGhqoqDA');
+}

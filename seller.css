@@ -1,0 +1,60 @@
+body {
+  background-color: #141313;
+  color: #e5e2e1;
+  min-height: max(884px, 100dvh);
+}
+
+/* Custom styles for gradients and glows */
+.btn-primary {
+  background: linear-gradient(135deg, #FF4D00 0%, #cc3d00 100%);
+  box-shadow: 0 4px 15px rgba(255, 77, 0, 0.4);
+}
+.btn-primary:hover {
+  box-shadow: 0 6px 20px rgba(255, 77, 0, 0.6);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  border: 2px solid #2ff801;
+  color: #2ff801;
+}
+.btn-secondary:hover {
+  background: rgba(47, 248, 1, 0.1);
+}
+
+.card-hover:hover {
+  transform: scale(1.02);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 0 0 1px #444748;
+}
+
+.input-glow:focus {
+  border-bottom-color: #2ff801;
+  box-shadow: 0 4px 15px rgba(47, 248, 1, 0.2);
+  outline: none;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #FF4D00 0%, #2ff801 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Background images (moved out of inline style attributes) */
+.hero-bg {
+  background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBRJx0KY5UR-HOc8TQGgRtpamRsmpgvBWPT3Np0ohqXRyFQO9gNztaHA6VUJW8PsamSRqVweRiHTGfYhf8BOPRAq_uwhGSGIlB1d1gIyY7dcMPNJOzmQxA2D8iaG9IPOjIImd_KkJFkuJXKtfev4GrxfXtKoAaQMQFovti7Nmb1BKBqVDsvJd7Smr4ujZyVUMW4I9pf3LoPrdbHnWkTeoSsaJ-syqive5L-NVYdy-mAzr-tS1QLsVPa_A');
+}
+.seller1-bg {
+  background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCPkdnwUmsSuAO7iGcGLIqysRim_MaN6NHkc1v0zc-Rjd-bAqmFiiqb4UOJSvvjlb2VrQFcg_wiIog4dboyn7ZPfsqrhzDq-V_sIuxSWjndGgC4PO2qXFHTJdaxiqC6SbuFuKHb717-z6fsc9vwh3XhBSyJL3UBsWbHZGbILVuwcurAiBw5cJBO0liMxPrUBQ1qTeLHmzrB07knzbAqq50nx19YeU86y6a7pg6eNntI5PYe8VNCkU5p-w');
+}
+.seller2-bg {
+  background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDzWdmLLzM7OddAjG3XGsxmmLm7K2jtqywQaV2sbzg5X4ts4D6GYA2hFxpQ48fMWm3zBFr3CVz1fpVjIO0-MmN0zAWVnbnMHQj6Kmmwp-iHQpIFqgyf_vS6EeAiIX1zdd2NTc1XIXs1Qjl250DOYgWFoafAwxBtNozow7qIHk7rRZuTt5jiKm0wmRbZyJdM4PhlUm7hmnvxEDuHMzLtVN8K4W3PdtSLwl9PYOtc9m2_VIPvw76H3wqLxg');
+}

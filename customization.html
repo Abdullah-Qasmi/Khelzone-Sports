@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KHELZONE - Complete Kit Customizer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="customization.tailwind.config.js"></script>
+<link rel="stylesheet" href="customization.css"/>
+<style>
+  /* Font overrides - Bebas Neue for display/headline, Poppins for body/labels */
+  body, .font-body-md { font-family: 'Poppins', sans-serif !important; }
+  .font-display-xl, .font-headline-md, #preview-name, #preview-number {
+    font-family: 'Bebas Neue', sans-serif !important;
+    letter-spacing: 0.03em;
+  }
+  .font-label-caps { font-family: 'Poppins', sans-serif !important; font-weight: 600 !important; }
+  .font-price-display { font-family: 'Bebas Neue', sans-serif !important; letter-spacing: 0.02em; }
+
+  /* Rotate stage - no clipping, image sits fully visible */
+  #jersey-stage { overflow: visible; }
+  #jersey-render.spinning { transition: transform 1.4s cubic-bezier(0.65,0,0.35,1); }
+  #jersey-render.grabbing { cursor: grabbing !important; transition: none !important; }
+</style>
+</head>
+<body class="bg-background text-on-surface font-body-md h-screen flex flex-col overflow-hidden">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-gutter h-16 z-50 bg-background/95 backdrop-blur-md border-b border-outline-variant dark:border-outline-variant full-width top-0 sticky shrink-0">
+<button class="text-on-surface-variant dark:text-on-surface-variant hover:text-vibrant-orange transition-colors duration-200 active:scale-95 duration-150">
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
+</button>
+<h1 class="font-display-xl text-headline-md text-vibrant-orange tracking-tighter uppercase">KHELZONE</h1>
+<button class="text-on-surface-variant dark:text-on-surface-variant hover:text-vibrant-orange transition-colors duration-200 active:scale-95 duration-150 flex items-center gap-2">
+<span class="font-label-caps text-label-caps hidden sm:block">Become a Seller</span>
+<span class="material-symbols-outlined text-[24px]">shopping_cart</span>
+</button>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col overflow-hidden relative">
+<!-- 3D Preview Area (Visual Canvas) -->
+<section class="flex-[1.6] relative bg-surface-container-lowest flex flex-col p-2 overflow-visible">
+<div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-surface-container-high/30 via-background to-background pointer-events-none"></div>
+<!-- Item Selection Bar (Top of preview) -->
+<div class="relative z-20 w-full overflow-x-auto hide-scrollbar mb-2">
+<div class="flex gap-4 px-2 pb-2">
+<button class="flex flex-col items-center min-w-[70px] gap-2 opacity-100 transition-opacity">
+<div class="w-14 h-14 rounded-full bg-surface-container-high border-2 border-vibrant-orange flex items-center justify-center">
+<span class="material-symbols-outlined text-vibrant-orange">apparel</span>
+</div>
+<span class="font-label-caps text-[10px] text-vibrant-orange">JERSEY</span>
+</button>
+<button class="flex flex-col items-center min-w-[70px] gap-2 opacity-60 hover:opacity-100 transition-opacity">
+<div class="w-14 h-14 rounded-full bg-surface-container-high border-2 border-transparent flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface">laundry</span>
+</div>
+<span class="font-label-caps text-[10px] text-on-surface">SHORTS</span>
+</button>
+<button class="flex flex-col items-center min-w-[70px] gap-2 opacity-60 hover:opacity-100 transition-opacity">
+<div class="w-14 h-14 rounded-full bg-surface-container-high border-2 border-transparent flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface">footprints</span>
+</div>
+<span class="font-label-caps text-[10px] text-on-surface">SOCKS</span>
+</button>
+<button class="flex flex-col items-center min-w-[70px] gap-2 opacity-60 hover:opacity-100 transition-opacity">
+<div class="w-14 h-14 rounded-full bg-surface-container-high border-2 border-transparent flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface">sports_and_outdoors</span>
+</div>
+<span class="font-label-caps text-[10px] text-on-surface">SHOES</span>
+</button>
+<button class="flex flex-col items-center min-w-[70px] gap-2 opacity-60 hover:opacity-100 transition-opacity">
+<div class="w-14 h-14 rounded-full bg-surface-container-high border-2 border-transparent flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface">backpack</span>
+</div>
+<span class="font-label-caps text-[10px] text-on-surface">KIT BAG</span>
+</button>
+<button class="flex flex-col items-center min-w-[70px] gap-2 opacity-60 hover:opacity-100 transition-opacity">
+<div class="w-14 h-14 rounded-full bg-surface-container-high border-2 border-transparent flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface">sports_cricket</span>
+</div>
+<span class="font-label-caps text-[10px] text-on-surface">BAT</span>
+</button>
+<button class="flex flex-col items-center min-w-[70px] gap-2 opacity-60 hover:opacity-100 transition-opacity">
+<div class="w-14 h-14 rounded-full bg-surface-container-high border-2 border-transparent flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface">back_hand</span>
+</div>
+<span class="font-label-caps text-[10px] text-on-surface">GLOVES</span>
+</button>
+<button class="flex flex-col items-center min-w-[70px] gap-2 opacity-60 hover:opacity-100 transition-opacity">
+<div class="w-14 h-14 rounded-full bg-surface-container-high border-2 border-transparent flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface">sports_motorsports</span>
+</div>
+<span class="font-label-caps text-[10px] text-on-surface">HELMET</span>
+</button>
+<button class="flex flex-col items-center min-w-[70px] gap-2 opacity-60 hover:opacity-100 transition-opacity">
+<div class="w-14 h-14 rounded-full bg-surface-container-high border-2 border-transparent flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface">face</span>
+</div>
+<span class="font-label-caps text-[10px] text-on-surface">CAP</span>
+</button>
+</div>
+</div>
+<div class="relative w-full h-full flex-1 flex items-center justify-center overflow-visible" id="jersey-stage" style="perspective:1200px;">
+<!-- Placeholder for 3D Kit Render -->
+<div class="bg-contain bg-center bg-no-repeat w-full h-full drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)] kit-render-bg" id="jersey-render" style="transform-style:preserve-3d; transition: transform 0.05s linear; cursor: grab;"></div>
+</div>
+<!-- View Controls -->
+<div class="absolute bottom-6 right-6 flex flex-col gap-3 z-20">
+<button class="bg-surface-container-high text-on-surface p-3 rounded-full border border-outline-variant hover:border-vibrant-orange transition-colors shadow-lg" title="Zoom In/Out" id="btn-zoom">
+<span class="material-symbols-outlined">zoom_in</span>
+</button>
+<button class="bg-surface-container-high text-on-surface p-3 rounded-full border border-outline-variant hover:border-vibrant-orange transition-colors shadow-lg" title="Rotate" id="btn-rotate">
+<span class="material-symbols-outlined">360</span>
+</button>
+<button class="bg-surface-container-high text-on-surface p-3 rounded-full border border-outline-variant hover:border-vibrant-orange transition-colors shadow-lg" title="Front/Back View" id="btn-flip">
+<span class="material-symbols-outlined">flip_camera_android</span>
+</button>
+<button class="bg-surface-container-high text-on-surface p-3 rounded-full border border-outline-variant hover:border-vibrant-orange transition-colors shadow-lg" title="Reset View" id="btn-reset">
+<span class="material-symbols-outlined">restart_alt</span>
+</button>
+</div>
+</section>
+<!-- Configurator Panel -->
+<section class="bg-surface-container-low border-t border-outline-variant rounded-t-[24px] shadow-[0_-10px_40px_rgba(0,0,0,0.5)] flex flex-col h-[38%] min-h-[340px] shrink-0 z-10">
+<!-- Drag Handle indicator -->
+<div class="w-full flex justify-center pt-3 pb-2">
+<div class="w-12 h-1 bg-surface-variant rounded-full"></div>
+</div>
+<!-- Global Controls -->
+<div class="px-6 pb-4 flex items-center justify-between border-b border-surface-variant">
+<div class="flex items-center gap-3">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-vibrant-orange"></div>
+</label>
+<span class="font-label-caps text-label-caps text-on-surface">MATCH COMPLETE KIT COLORS</span>
+</div>
+</div>
+<!-- Tabs -->
+<div class="flex overflow-x-auto custom-scrollbar px-6 pt-3 pb-3 gap-6 border-b border-surface-variant">
+<button class="text-vibrant-orange font-label-caps text-label-caps border-b-2 border-vibrant-orange pb-3 whitespace-nowrap px-1">COLOR</button>
+<button class="text-on-surface-variant font-label-caps text-label-caps border-b-2 border-transparent pb-3 whitespace-nowrap px-1 hover:text-on-surface">DETAILS</button>
+<button class="text-on-surface-variant font-label-caps text-label-caps border-b-2 border-transparent pb-3 whitespace-nowrap px-1 hover:text-on-surface">LOGOS</button>
+</div>
+<!-- Control Content Area -->
+<div class="flex-1 overflow-y-auto p-6 custom-scrollbar">
+<div class="space-y-6">
+<!-- Color Selection -->
+<div>
+<label class="font-label-caps text-label-caps text-on-surface-variant mb-2 block">BASE COLOR (JERSEY)</label>
+<div class="flex gap-3">
+<button class="w-10 h-10 rounded-full bg-vibrant-orange border-2 border-vibrant-orange ring-2 ring-background"></button>
+<button class="w-10 h-10 rounded-full bg-[#1A1A1A] border-2 border-outline-variant hover:border-vibrant-orange"></button>
+<button class="w-10 h-10 rounded-full bg-electric-blue border-2 border-outline-variant hover:border-vibrant-orange"></button>
+<button class="w-10 h-10 rounded-full bg-secondary-container border-2 border-outline-variant hover:border-vibrant-orange"></button>
+</div>
+</div>
+<!-- Input Fields -->
+<div class="grid grid-cols-3 gap-6">
+<div class="col-span-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant mb-2 block">PLAYER NAME</label>
+<input class="w-full bg-[#1E1E1E] text-on-surface font-headline-md text-headline-md border-0 border-b-2 border-outline-variant focus:border-vibrant-orange focus:ring-0 px-0 py-2 transition-colors uppercase" type="text" value="MALIK"/>
+</div>
+<div class="col-span-1">
+<label class="font-label-caps text-label-caps text-on-surface-variant mb-2 block">NUMBER</label>
+<input class="w-full bg-[#1E1E1E] text-on-surface font-headline-md text-headline-md border-0 border-b-2 border-outline-variant focus:border-vibrant-orange focus:ring-0 px-0 py-2 transition-colors text-center" type="text" value="07"/>
+</div>
+</div>
+<!-- Logo Upload placeholder -->
+<div>
+<label class="font-label-caps text-label-caps text-on-surface-variant mb-2 block">TEAM CREST</label>
+<button class="w-full border-2 border-dashed border-outline-variant rounded-xl p-6 flex flex-col items-center justify-center gap-2 text-on-surface-variant hover:text-vibrant-orange hover:border-vibrant-orange transition-colors bg-[#1E1E1E]">
+<span class="material-symbols-outlined">upload_file</span>
+<span class="font-label-caps text-label-caps">UPLOAD LOGO (PNG/SVG)</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Sticky Summary & Action Bar -->
+<div class="bg-surface-container-highest p-4 border-t border-outline-variant flex flex-col gap-4 shrink-0">
+<div class="flex justify-between items-center px-2">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-on-surface-variant">COMPLETE KIT TOTAL</span>
+<span class="text-[12px] text-on-surface-variant">9 Items Customized</span>
+</div>
+<span class="font-price-display text-price-display text-on-surface">Rs. 5,100</span>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<button class="bg-transparent text-on-surface border border-outline-variant font-label-caps text-[11px] py-3 rounded-[12px] flex items-center justify-center gap-1 uppercase hover:border-vibrant-orange transition-colors">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+<span>PREVIEW KIT</span>
+</button>
+<button class="bg-surface-elevated text-on-surface border border-outline-variant font-label-caps text-[11px] py-3 rounded-[12px] flex items-center justify-center gap-1 uppercase hover:border-vibrant-orange transition-colors">
+<span class="material-symbols-outlined text-[16px]">save</span>
+<span>SAVE DESIGN</span>
+</button>
+</div>
+<div class="flex gap-3">
+<button class="bg-surface-container-low text-error border border-error/50 font-label-caps text-[11px] px-4 py-3 rounded-[12px] flex items-center justify-center gap-1 uppercase hover:bg-error/10 transition-colors">
+<span class="material-symbols-outlined text-[16px]">restart_alt</span>
+</button>
+<button class="btn-gradient text-background font-label-caps text-label-caps flex-1 py-3 rounded-[12px] flex items-center justify-center gap-2 uppercase font-bold tracking-widest shadow-[0_4px_14px_rgba(47,248,1,0.4)]">
+<span>ADD KIT TO CART</span>
+<span class="material-symbols-outlined text-[18px]">shopping_bag</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<script>
+(function () {
+  var render = document.getElementById('jersey-render');
+  var stage = document.getElementById('jersey-stage');
+  var rotateY = 0;
+  var isDragging = false;
+  var lastX = 0;
+  var autoSpin = null;
+
+  function applyTransform() {
+    render.style.transform = 'rotateY(' + rotateY + 'deg)';
+  }
+
+  // Drag to rotate
+  function startDrag(x) {
+    isDragging = true;
+    lastX = x;
+    render.classList.add('grabbing');
+    stopAutoSpin();
+  }
+  function moveDrag(x) {
+    if (!isDragging) return;
+    var delta = x - lastX;
+    lastX = x;
+    rotateY += delta * 0.6;
+    applyTransform();
+  }
+  function endDrag() {
+    isDragging = false;
+    render.classList.remove('grabbing');
+  }
+
+  stage.addEventListener('mousedown', function (e) { startDrag(e.clientX); });
+  window.addEventListener('mousemove', function (e) { moveDrag(e.clientX); });
+  window.addEventListener('mouseup', endDrag);
+
+  stage.addEventListener('touchstart', function (e) { startDrag(e.touches[0].clientX); }, { passive: true });
+  window.addEventListener('touchmove', function (e) { moveDrag(e.touches[0].clientX); }, { passive: true });
+  window.addEventListener('touchend', endDrag);
+
+  // 360 button - smooth full spin
+  function stopAutoSpin() {
+    if (autoSpin) { clearTimeout(autoSpin); autoSpin = null; }
+    render.classList.remove('spinning');
+  }
+  document.getElementById('btn-rotate').addEventListener('click', function () {
+    render.classList.add('spinning');
+    rotateY += 360;
+    applyTransform();
+    autoSpin = setTimeout(function () { render.classList.remove('spinning'); }, 1450);
+  });
+
+  // Flip front/back
+  document.getElementById('btn-flip').addEventListener('click', function () {
+    render.classList.add('spinning');
+    rotateY += 180;
+    applyTransform();
+    autoSpin = setTimeout(function () { render.classList.remove('spinning'); }, 1450);
+  });
+
+  // Reset view
+  document.getElementById('btn-reset').addEventListener('click', function () {
+    render.classList.add('spinning');
+    rotateY = 0;
+    applyTransform();
+    autoSpin = setTimeout(function () { render.classList.remove('spinning'); }, 1450);
+  });
+
+  // Zoom toggle
+  var zoomed = false;
+  document.getElementById('btn-zoom').addEventListener('click', function () {
+    zoomed = !zoomed;
+    render.style.width = zoomed ? '130%' : '100%';
+    render.style.height = zoomed ? '130%' : '100%';
+    render.style.marginLeft = zoomed ? '-15%' : '0';
+  });
+})();
+</script>
+<script src="customization.js"></script>
+</body>
+</html>

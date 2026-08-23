@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KHELZONE - Cart</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="cart.tailwind.config.js"></script>
+<link rel="stylesheet" href="cart.css"/>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopAppBar -->
+<header class="bg-background dark:bg-background border-b border-outline-variant dark:border-outline-variant docked full-width top-0 sticky flex justify-between items-center w-full px-gutter h-16 z-50 bg-background/95 backdrop-blur-md">
+<div class="flex items-center gap-md">
+<button class="text-on-surface dark:text-on-surface hover:text-secondary-container transition-colors duration-200">
+<span class="material-symbols-outlined font-headline-md text-headline-md">menu</span>
+</button>
+<h1 class="font-display-xl text-headline-md text-on-surface tracking-tighter uppercase">KHELZONE</h1>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant dark:text-on-surface-variant hover:text-secondary-container transition-colors duration-200 flex items-center gap-base">
+<span class="font-label-caps text-label-caps hidden md:block">Become a Seller</span>
+<span class="material-symbols-outlined font-headline-md text-headline-md">shopping_cart</span>
+</button>
+</div>
+</header>
+<main class="flex-grow w-full max-w-container-max mx-auto px-gutter py-xl">
+<div class="flex flex-col md:flex-row gap-lg">
+<!-- Cart Items Section -->
+<section class="w-full md:w-2/3 flex flex-col gap-md">
+<div class="flex justify-between items-end border-b border-outline-variant pb-sm">
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background tracking-tight">YOUR CART</h2>
+<span class="font-label-caps text-label-caps text-on-surface-variant">7 ITEMS</span>
+</div>
+<!-- Bulk Tracker -->
+<div class="bg-surface-charcoal rounded-xl p-md border border-secondary-container/50 flex flex-col gap-sm shadow-xl relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-secondary-container/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+<div class="flex justify-between items-center relative z-10">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary-container" style="font-variation-settings: 'FILL' 1;">local_offer</span>
+<span class="font-headline-md text-headline-md text-on-background">BULK DISCOUNT TRACKER</span>
+</div>
+<span class="font-label-caps text-label-caps text-secondary-container border border-secondary-container px-sm py-xs rounded-full">7 / 10 ITEMS</span>
+</div>
+<div class="w-full bg-surface-container-highest h-3 rounded-full overflow-hidden mt-xs relative z-10">
+<div class="bg-secondary-container h-full rounded-full transition-all duration-500 progress-glow w-[70%]"></div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs relative z-10">Add 3 more for 20% OFF!</p>
+</div>
+<!-- Item List -->
+<div class="flex flex-col gap-sm mt-sm">
+<!-- Item 1 (Bat) -->
+<div class="bg-surface-container-low border border-surface-container-highest rounded-xl p-sm flex gap-md items-center hover:bg-surface-container-high transition-colors group">
+<div class="w-24 h-24 bg-surface-container-highest rounded-lg overflow-hidden flex-shrink-0 relative">
+<img class="w-full h-full object-cover" alt="Predator X1 Pro English Willow" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCF_p2VV9Q0Z2oZt4VqbndUa1VG3fyBBYWP3cVNz3u6gRy9nFeuXGreZGB-pXbtxiTC-bI0elFx1dAaYnkR436X588EJW0slueMw-Wj6vwIwO0xzqe8DdhF_JfRFq_pPwFGXJllyBbA5jXegKtvn2hf6LT0-Zboae6haiu9iBwH5moG8ksF5flXCfEJdcUyQS2PpvVyDPXaaqxDv61NTPXWmJ-5awl1KmDpPAn8fk4TevBapbSOXnlM1A"/>
+</div>
+<div class="flex-grow flex flex-col gap-xs">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-md text-body-lg font-bold text-on-background">Predator X1 Pro English Willow</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant">SELLER: SIALKOT SPORTS HUB</p>
+</div>
+<span class="font-price-display text-price-display text-secondary-container">PKR 45,000</span>
+</div>
+<div class="flex items-center gap-sm mt-auto">
+<div class="flex items-center border border-outline-variant rounded bg-surface">
+<button class="px-2 py-1 text-on-surface-variant hover:text-secondary-container material-symbols-outlined text-sm">remove</button>
+<span class="px-3 font-label-caps text-label-caps">1</span>
+<button class="px-2 py-1 text-on-surface-variant hover:text-secondary-container material-symbols-outlined text-sm">add</button>
+</div>
+<button class="text-error hover:text-error-container p-1 rounded-full transition-colors ml-auto">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Item 2 (Bat) -->
+<div class="bg-surface-container-low border border-surface-container-highest rounded-xl p-sm flex gap-md items-center hover:bg-surface-container-high transition-colors group">
+<div class="w-24 h-24 bg-surface-container-highest rounded-lg overflow-hidden flex-shrink-0 relative">
+<img class="w-full h-full object-cover" alt="Thunderbolt T20 Edition" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_wwZEy4ePFBWemT3A1dBPVEE-jXj-0p9847ApjbNEx2ZDZnnihlpIiQPn6lWXbCw1p-_xDl4-PJssk2o4WVN48IzwlOcDDR08nefmrY9eyStkhrBnwL0i2MHkNtj0Xwl09Zo81ir7tZaZ3fG1-ZwTkg72XfSlrUhBy44Y5y3L8UaNZRPwVsz-c4TKY4pYr1qxuP5Ny1eg6VvpNkuRsyeuMziOlW7gI7_TJxqA_CQuOrc0LpmsfUfyyA"/>
+</div>
+<div class="flex-grow flex flex-col gap-xs">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-md text-body-lg font-bold text-on-background">Thunderbolt T20 Edition</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant">SELLER: ELITE GEAR SIALKOT</p>
+</div>
+<span class="font-price-display text-price-display text-secondary-container">PKR 38,500</span>
+</div>
+<div class="flex items-center gap-sm mt-auto">
+<div class="flex items-center border border-outline-variant rounded bg-surface">
+<button class="px-2 py-1 text-on-surface-variant hover:text-secondary-container material-symbols-outlined text-sm">remove</button>
+<span class="px-3 font-label-caps text-label-caps">1</span>
+<button class="px-2 py-1 text-on-surface-variant hover:text-secondary-container material-symbols-outlined text-sm">add</button>
+</div>
+<button class="text-error hover:text-error-container p-1 rounded-full transition-colors ml-auto">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Item 3 (Bat) -->
+<div class="bg-surface-container-low border border-surface-container-highest rounded-xl p-sm flex gap-md items-center hover:bg-surface-container-high transition-colors group">
+<div class="w-24 h-24 bg-surface-container-highest rounded-lg overflow-hidden flex-shrink-0 relative">
+<img class="w-full h-full object-cover" alt="Classic Kashmir Strike" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1cfg4JyqB1CjFNYsibtY4l1TD6tEU0bd27Fr1RNDeS9IFXyeZQKmhfA7QuLVYq9JJ5wGSXcUrjiSubanaxuyRUs-WxLSF4NOtg5gK3-SRXIlrUM0IXBETLFsYaDQMMqykoLfoG-hE8vjCbPgRxHEg_TaSSvCBDhHdiXZV0Thcjyo7hqrX3mvcGqN-hC91JfKKTYDDixPiZ4NM6wCNRmEW-wdGWbV7S9xYCvWcthrudOGKTECSxH4Pmw"/>
+</div>
+<div class="flex-grow flex flex-col gap-xs">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-md text-body-lg font-bold text-on-background">Classic Kashmir Strike</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant">SELLER: HERITAGE SPORTS</p>
+</div>
+<span class="font-price-display text-price-display text-secondary-container">PKR 12,000</span>
+</div>
+<div class="flex items-center gap-sm mt-auto">
+<div class="flex items-center border border-outline-variant rounded bg-surface">
+<button class="px-2 py-1 text-on-surface-variant hover:text-secondary-container material-symbols-outlined text-sm">remove</button>
+<span class="px-3 font-label-caps text-label-caps">1</span>
+<button class="px-2 py-1 text-on-surface-variant hover:text-secondary-container material-symbols-outlined text-sm">add</button>
+</div>
+<button class="text-error hover:text-error-container p-1 rounded-full transition-colors ml-auto">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Item 4 (Gloves) -->
+<div class="bg-surface-container-low border border-surface-container-highest rounded-xl p-sm flex gap-md items-center hover:bg-surface-container-high transition-colors group">
+<div class="w-24 h-24 bg-surface-container-highest rounded-lg overflow-hidden flex-shrink-0 relative">
+<img class="w-full h-full object-cover" alt="AeroGrip Pro Gloves - M" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6_OY4Ubi0TveVJvc2cZNPqzm3w8bx0SgUOSUhLnTrHedQPnlVk9pO4EKEmTBD3pVOmzb8iN2y_himasfcr3ShIP-CjernJaC4dpmzK60jpvgBAUqF0kMgDBi5rtoeAWSJCWYPE2M-MiTn6rtUpIGfS6VoeOr_HCGb8TFop82WPfscEYF27yCzgU0HRojwUoWuglw3bBlic8ofdJAXeF_h304uvrQsluGkBqsFx4GFF8muyQ9cQJoqew"/>
+</div>
+<div class="flex-grow flex flex-col gap-xs">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-md text-body-lg font-bold text-on-background">AeroGrip Pro Gloves - M</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant">SELLER: SIALKOT SPORTS HUB</p>
+</div>
+<span class="font-price-display text-price-display text-secondary-container">PKR 8,500</span>
+</div>
+<div class="flex items-center gap-sm mt-auto">
+<div class="flex items-center border border-outline-variant rounded bg-surface">
+<button class="px-2 py-1 text-on-surface-variant hover:text-secondary-container material-symbols-outlined text-sm">remove</button>
+<span class="px-3 font-label-caps text-label-caps">1</span>
+<button class="px-2 py-1 text-on-surface-variant hover:text-secondary-container material-symbols-outlined text-sm">add</button>
+</div>
+<button class="text-error hover:text-error-container p-1 rounded-full transition-colors ml-auto">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Item 5 (Gloves) -->
+<div class="bg-surface-container-low border border-surface-container-highest rounded-xl p-sm flex gap-md items-center hover:bg-surface-container-high transition-colors group">
+<div class="w-24 h-24 bg-surface-container-highest rounded-lg overflow-hidden flex-shrink-0 relative">
+<img class="w-full h-full object-cover" alt="Impact Shield Gloves - L" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4Dg8T2Eoa7HwiDQyjaZ1UrFlc5jgktOG0f4gbIPh4LzjuCl8a3Wjfn6prtPAHIJmRqY8MhNWvzgRh4YUulDBQh2XASIomzKoOz38Ck4rZEWBdZIiYjH85axRoW89OEfqvOWtojuTlRy6wiWp0MUYMC7TqXHtKJwwEUQctsVqzCROyKiat4gDNErzR7DrglwSa82icujFi-SEBpMzmfoIzP7xEnQ19V_bbstW0QOlYWN1GufEbPZl1aQ"/>
+</div>
+<div class="flex-grow flex flex-col gap-xs">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-md text-body-lg font-bold text-on-background">Impact Shield Gloves - L</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant">SELLER: ELITE GEAR SIALKOT</p>
+</div>
+<span class="font-price-display text-price-display text-secondary-container">PKR 9,200</span>
+</div>
+<div class="flex items-center gap-sm mt-auto">
+<div class="flex items-center border border-outline-variant rounded bg-surface">
+<button class="px-2 py-1 text-on-surface-variant hover:text-secondary-container material-symbols-outlined text-sm">remove</button>
+<span class="px-3 font-label-caps text-label-caps">1</span>
+<button class="px-2 py-1 text-on-surface-variant hover:text-secondary-container material-symbols-outlined text-sm">add</button>
+</div>
+<button class="text-error hover:text-error-container p-1 rounded-full transition-colors ml-auto">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Item 6 (Ball) -->
+<div class="bg-surface-container-low border border-surface-container-highest rounded-xl p-sm flex gap-md items-center hover:bg-surface-container-high transition-colors group">
+<div class="w-24 h-24 bg-surface-container-highest rounded-lg overflow-hidden flex-shrink-0 relative">
+<img class="w-full h-full object-cover" alt="Test Match Red Leather Ball" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAalun1J5LBOt6pW1mnmus-998E_GTJTn0vWwH_2piazDPRhFoOZDi8_trGeaW3L_X8fcXgy1do7ZtTgT0KJrOtl5uuTl9jqVVTUd2jV9c7v3VfnV3OsNMzCAjSFyEhOSAvEq4PrHNwtIcKjPkSbiE7NBhW8prKk2gVAawR7iQUHSgVeI9lRGBqut1cES6Un8-aSDdRtgC5_6jNFt-v6hLvEeMVqC8rn7k_l05j7KXSe4FCMvQPy8mH0g"/>
+</div>
+<div class="flex-grow flex flex-col gap-xs">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-md text-body-lg font-bold text-on-background">Test Match Red Leather Ball</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant">SELLER: HERITAGE SPORTS</p>
+</div>
+<span class="font-price-display text-price-display text-secondary-container">PKR 3,500</span>
+</div>
+<div class="flex items-center gap-sm mt-auto">
+<div class="flex items-center border border-outline-variant rounded bg-surface">
+<button class="px-2 py-1 text-on-surface-variant hover:text-secondary-container material-symbols-outlined text-sm">remove</button>
+<span class="px-3 font-label-caps text-label-caps">1</span>
+<button class="px-2 py-1 text-on-surface-variant hover:text-secondary-container material-symbols-outlined text-sm">add</button>
+</div>
+<button class="text-error hover:text-error-container p-1 rounded-full transition-colors ml-auto">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Item 7 (Ball) -->
+<div class="bg-surface-container-low border border-surface-container-highest rounded-xl p-sm flex gap-md items-center hover:bg-surface-container-high transition-colors group">
+<div class="w-24 h-24 bg-surface-container-highest rounded-lg overflow-hidden flex-shrink-0 relative">
+<img class="w-full h-full object-cover" alt="ODI White Leather Ball" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZ4WWo0ckjddhQBAlR51dDvoAuaIwzJwy0Vz2SO37C7h-TOp30RE81cQon6j3PO1dCJlU09yIT-waN2a2Dpp5dX1QyxAowQPy9C-UZWZMUYuyAVr3HOID6dIPxJJhmFaFGVGFmAz5bWKbQNWYA07cgttFrb07Go9MWwILsL2C7oIGxb3q-gR_ATQmjOE5OHos6Jo7F6faVlaVNQfJMY-Kw5X1w4Y7r9xDubLQUTiiqfXj1MPCLUX9X0Q"/>
+</div>
+<div class="flex-grow flex flex-col gap-xs">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-md text-body-lg font-bold text-on-background">ODI White Leather Ball</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant">SELLER: SIALKOT SPORTS HUB</p>
+</div>
+<span class="font-price-display text-price-display text-secondary-container">PKR 3,800</span>
+</div>
+<div class="flex items-center gap-sm mt-auto">
+<div class="flex items-center border border-outline-variant rounded bg-surface">
+<button class="px-2 py-1 text-on-surface-variant hover:text-secondary-container material-symbols-outlined text-sm">remove</button>
+<span class="px-3 font-label-caps text-label-caps">1</span>
+<button class="px-2 py-1 text-on-surface-variant hover:text-secondary-container material-symbols-outlined text-sm">add</button>
+</div>
+<button class="text-error hover:text-error-container p-1 rounded-full transition-colors ml-auto">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Order Summary Section -->
+<section class="w-full md:w-1/3">
+<div class="bg-surface-charcoal border border-outline-variant/50 rounded-xl p-md flex flex-col gap-md sticky top-24 shadow-2xl">
+<h3 class="font-headline-md text-headline-md text-on-background border-b border-outline-variant pb-sm">ORDER SUMMARY</h3>
+<div class="flex flex-col gap-sm">
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="font-body-md text-body-md">Subtotal (7 items)</span>
+<span class="font-price-display text-[18px]">PKR 120,500</span>
+</div>
+<div class="flex justify-between items-center text-secondary-container">
+<span class="font-body-md text-body-md flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm">info</span>
+Bulk Discount
+</span>
+<span class="font-price-display text-[18px]">Pending</span>
+</div>
+<div class="flex justify-between items-center text-on-surface-variant border-b border-outline-variant pb-sm">
+<span class="font-body-md text-body-md">Estimated Delivery</span>
+<span class="font-price-display text-[18px]">PKR 1,500</span>
+</div>
+<div class="flex justify-between items-center pt-xs">
+<span class="font-headline-md text-headline-md text-on-background">TOTAL</span>
+<span class="font-price-display text-headline-md text-secondary-container font-bold tracking-tight">PKR 122,000</span>
+</div>
+</div>
+<button class="btn-primary w-full py-sm rounded-lg font-label-caps text-label-caps text-surface-container-lowest font-bold hover:scale-[1.02] transition-transform duration-200 mt-sm flex justify-center items-center gap-sm shadow-[0_4px_14px_0_rgba(47,248,1,0.2)]">
+PROCEED TO CHECKOUT
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<!-- Support Banner -->
+<div class="mt-md bg-secondary-container/5 border border-secondary-container/20 rounded-lg p-sm flex items-start gap-sm">
+<span class="material-symbols-outlined text-secondary-container mt-xs" style="font-variation-settings: 'FILL' 1;">handshake</span>
+<div>
+<h4 class="font-label-caps text-label-caps text-secondary-container">COMMUNITY IMPACT</h4>
+<p class="font-body-md text-[14px] text-on-surface-variant mt-xs leading-tight">By completing this purchase, you are directly supporting local Sialkot manufacturers and artisans.</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant full-width mt-auto">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-lg px-gutter py-xl max-w-container-max mx-auto flat no shadows">
+<div class="flex flex-col gap-md">
+<span class="font-display-xl text-on-surface text-headline-md uppercase tracking-tighter">KHELZONE</span>
+<p class="font-body-md text-body-md text-on-surface-variant">© 2024 KHELZONE. Engineered for Performance.</p>
+</div>
+<div class="flex flex-col gap-sm">
+<h4 class="font-label-caps text-label-caps text-on-surface-variant mb-xs">SHOP</h4>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="#">Cricket Gear</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="#">Football Kits</a>
+</div>
+<div class="flex flex-col gap-sm">
+<h4 class="font-label-caps text-label-caps text-on-surface-variant mb-xs">B2B</h4>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="#">Sialkot Manufacturers</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="#">Bulk Inquiries</a>
+</div>
+<div class="flex flex-col gap-sm">
+<h4 class="font-label-caps text-label-caps text-on-surface-variant mb-xs">LEGAL</h4>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="#">Terms of Service</a>
+</div>
+</div>
+</footer>
+<script src="cart.js"></script>
+</body>
+</html>

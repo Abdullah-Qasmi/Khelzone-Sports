@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Welcome to KHELZONE</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="welcome.tailwind.config.js"></script>
+<link rel="stylesheet" href="welcome.css"/>
+</head>
+<body class="bg-surface-charcoal text-on-surface min-h-screen flex flex-col relative font-body-md text-body-md">
+<!-- Background Atmospheric Effect -->
+<div class="absolute inset-0 z-0 pointer-events-none glow-overlay"></div>
+<div class="absolute inset-0 z-0 bg-cover bg-center opacity-30 mix-blend-overlay hero-bg"></div>
+<main class="relative z-10 w-full max-w-container-max mx-auto px-gutter py-section-desktop flex flex-col items-center flex-1">
+<!-- Header Section -->
+<div class="text-center mb-section-desktop space-y-gutter">
+<h1 class="font-display-xl text-display-xl text-on-surface uppercase tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">WELCOME TO KHELZONE</h1>
+<p class="font-headline-md text-headline-md text-on-surface-variant uppercase tracking-widest">What would you like to do?</p>
+</div>
+<!-- Role Selection Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter w-full max-w-5xl">
+<!-- Customer Card -->
+<button class="group card-hover customer-card-hover bg-surface-elevated rounded-xl flex flex-col items-start text-left relative overflow-hidden w-full focus:outline-none focus:ring-2 focus:ring-secondary-fixed-dim h-full">
+<div class="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-300 customer-bg"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-elevated via-surface-elevated/90 to-surface-elevated/50"></div>
+<div class="p-section-desktop flex flex-col h-full w-full relative z-10">
+<div class="absolute top-0 right-0 p-gutter opacity-10 group-hover:opacity-20 transition-opacity duration-300">
+<span class="material-symbols-outlined text-6xl text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">shopping_cart</span>
+</div>
+<div class="mb-section-desktop">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-container-high mb-gutter shadow-lg border border-surface-bright">
+<span class="material-symbols-outlined text-3xl text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">shopping_cart</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface uppercase mb-base">BECOME A CUSTOMER</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-sm">Discover sports equipment, customize your kits and shop from verified sellers across Pakistan.</p>
+</div>
+<div class="mt-auto w-full pt-gutter">
+<span class="inline-flex w-full items-center justify-center bg-secondary-fixed-dim text-surface font-label-caps text-label-caps py-base px-gutter rounded-DEFAULT uppercase tracking-wider hover:bg-secondary-container transition-all shadow-[0_4px_14px_0_rgba(42,229,0,0.2)]">
+CONTINUE AS CUSTOMER
+<span class="material-symbols-outlined ml-base text-xl">arrow_forward</span>
+</span>
+</div>
+</div>
+</button>
+<!-- Seller Card -->
+<button class="group card-hover seller-card-hover bg-surface-elevated rounded-xl flex flex-col items-start text-left relative overflow-hidden w-full focus:outline-none focus:ring-2 focus:ring-vibrant-orange h-full">
+<div class="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity duration-300 seller-bg"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-elevated via-surface-elevated/90 to-surface-elevated/50"></div>
+<div class="p-section-desktop flex flex-col h-full w-full relative z-10">
+<div class="absolute top-0 right-0 p-gutter opacity-10 group-hover:opacity-20 transition-opacity duration-300">
+<span class="material-symbols-outlined text-6xl text-vibrant-orange" style="font-variation-settings: 'FILL' 1;">storefront</span>
+</div>
+<div class="mb-section-desktop">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-container-high mb-gutter shadow-lg border border-surface-bright">
+<span class="material-symbols-outlined text-3xl text-vibrant-orange" style="font-variation-settings: 'FILL' 1;">storefront</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface uppercase mb-base">BECOME A SELLER</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-sm">Turn your sports business into an online store and reach customers across Pakistan.</p>
+</div>
+<div class="mt-auto w-full pt-gutter">
+<span class="inline-flex w-full items-center justify-center bg-vibrant-orange text-white font-label-caps text-label-caps py-base px-gutter rounded-DEFAULT uppercase tracking-wider hover:brightness-110 transition-all shadow-[0_4px_14px_0_rgba(255,77,0,0.3)]">
+START SELLING
+<span class="material-symbols-outlined ml-base text-xl">rocket_launch</span>
+</span>
+</div>
+</div>
+</button>
+</div>
+
+<!-- Divider with "OR" -->
+<div class="flex items-center gap-gutter w-full max-w-5xl mt-section-desktop mb-section-desktop">
+<div class="h-px flex-1 bg-outline-variant"></div>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">OR</span>
+<div class="h-px flex-1 bg-outline-variant"></div>
+</div>
+
+<!-- Direct Shop/Buy CTA Banner -->
+<a class="quick-shop-banner group w-full max-w-5xl rounded-xl relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-gutter p-section-desktop focus:outline-none focus:ring-2 focus:ring-electric-blue" href="../mobile-home/homepage.html">
+<div class="relative z-10 flex items-center gap-gutter text-left">
+<div class="inline-flex items-center justify-center w-14 h-14 shrink-0 rounded-full bg-surface-container-high shadow-lg border border-surface-bright">
+<span class="material-symbols-outlined text-3xl text-electric-blue">bolt</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface uppercase">JUST WANT TO SHOP?</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Skip the sign-up — browse and buy sports gear right away.</p>
+</div>
+</div>
+<span class="relative z-10 shrink-0 inline-flex items-center justify-center bg-electric-blue text-white font-label-caps text-label-caps py-base px-xl rounded-DEFAULT uppercase tracking-wider group-hover:brightness-110 transition-all shadow-[0_4px_14px_0_rgba(0,112,255,0.35)]">
+SHOP / BUY NOW
+<span class="material-symbols-outlined ml-base text-xl">shopping_bag</span>
+</span>
+</a>
+
+<!-- Popular Categories -->
+<div class="w-full max-w-5xl mt-section-desktop">
+<h3 class="font-headline-md text-headline-md text-on-surface uppercase mb-gutter text-center sm:text-left">POPULAR CATEGORIES</h3>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-sm">
+<a class="category-chip group" href="../mobile-home/homepage.html">
+<span class="material-symbols-outlined text-3xl text-secondary-fixed-dim">sports_cricket</span>
+<span class="font-label-caps text-label-caps text-on-surface uppercase mt-2">Cricket</span>
+</a>
+<a class="category-chip group" href="../mobile-home/homepage.html">
+<span class="material-symbols-outlined text-3xl text-vibrant-orange">sports_soccer</span>
+<span class="font-label-caps text-label-caps text-on-surface uppercase mt-2">Football</span>
+</a>
+<a class="category-chip group" href="../mobile-home/homepage.html">
+<span class="material-symbols-outlined text-3xl text-electric-blue">sports_hockey</span>
+<span class="font-label-caps text-label-caps text-on-surface uppercase mt-2">Hockey</span>
+</a>
+<a class="category-chip group" href="../mobile-home/homepage.html">
+<span class="material-symbols-outlined text-3xl text-secondary-fixed-dim">sports_tennis</span>
+<span class="font-label-caps text-label-caps text-on-surface uppercase mt-2">Badminton</span>
+</a>
+</div>
+</div>
+
+<!-- Trust Strip -->
+<div class="w-full max-w-5xl mt-section-desktop grid grid-cols-1 sm:grid-cols-3 gap-sm">
+<div class="trust-item">
+<span class="material-symbols-outlined text-2xl text-secondary-fixed-dim">verified</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Verified Sellers Only</span>
+</div>
+<div class="trust-item">
+<span class="material-symbols-outlined text-2xl text-secondary-fixed-dim">local_shipping</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Nationwide Delivery</span>
+</div>
+<div class="trust-item">
+<span class="material-symbols-outlined text-2xl text-secondary-fixed-dim">lock</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Secure Payments</span>
+</div>
+</div>
+</main>
+
+<!-- Footer -->
+<footer class="relative z-10 w-full border-t border-outline-variant bg-surface-container-lowest/60 mt-auto">
+<div class="max-w-container-max mx-auto px-gutter py-lg flex flex-col sm:flex-row items-center justify-between gap-sm">
+<span class="font-display-xl text-headline-md text-on-surface tracking-tighter uppercase">KHELZONE</span>
+<p class="font-body-md text-body-md text-on-surface-variant">© 2024 KHELZONE. Engineered for Performance.</p>
+</div>
+</footer>
+<script src="welcome.js"></script>
+</body>
+</html>

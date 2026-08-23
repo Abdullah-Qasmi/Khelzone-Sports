@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KHELZONE Seller Marketplace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,400..700;1,400..700&family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..800&display=swap" rel="stylesheet"/>
+<script src="seller.tailwind.config.js"></script>
+<link rel="stylesheet" href="seller.css"/>
+</head>
+<body class="font-body-md text-body-md antialiased overflow-x-hidden min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-gutter h-16 z-50 bg-background/95 backdrop-blur-md docked full-width top-0 sticky border-b border-surface-container-highest text-vibrant-orange">
+<button class="text-on-surface-variant hover:text-vibrant-orange transition-colors duration-200">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="font-display-xl text-headline-md text-vibrant-orange tracking-tighter uppercase font-headline-md text-headline-md flex-1 text-center">
+KHELZONE
+</div>
+<button class="text-on-surface-variant hover:text-vibrant-orange transition-colors duration-200 flex items-center gap-2">
+<span class="font-label-caps text-label-caps hidden md:block uppercase">Become a Seller</span>
+<span class="material-symbols-outlined">shopping_cart</span>
+</button>
+</header>
+<main class="flex-grow">
+<!-- Hero Section -->
+<section class="relative w-full min-h-[618px] flex items-center justify-center px-gutter py-section-desktop bg-surface-container-lowest border-b border-surface-container-highest overflow-hidden">
+<!-- Background Image -->
+<div class="absolute inset-0 z-0">
+<div class="bg-cover bg-center w-full h-full opacity-30 hero-bg"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
+</div>
+<div class="relative z-10 max-w-container-max mx-auto text-center flex flex-col items-center gap-8">
+<div class="space-y-6">
+<span class="font-label-caps text-label-caps text-secondary-fixed uppercase tracking-widest inline-block mb-2 border border-secondary-fixed px-3 py-1 rounded-full bg-secondary-fixed/10">Partner with the Best</span>
+<h1 class="font-display-xl text-display-xl text-on-surface uppercase md:font-display-xl text-headline-lg-mobile">
+SELL WITH <span class="text-vibrant-orange">KHELZONE</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mt-3">
+Connect your high-performance gear with athletes nationwide. Join Pakistan's premier sports marketplace and scale your business with engineered precision.
+</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-6 mt-6">
+<button class="btn-primary font-label-caps text-label-caps uppercase text-white px-8 py-4 rounded-lg transition-all duration-300">
+BECOME A SELLER
+</button>
+<button class="btn-secondary font-label-caps text-label-caps uppercase px-8 py-4 rounded-lg transition-all duration-300">
+VIEW SELLER GUIDE
+</button>
+</div>
+</div>
+</section>
+<!-- Trust Section (Bento Grid) -->
+<section class="w-full px-gutter py-section-desktop max-w-container-max mx-auto">
+<div class="mb-12">
+<h2 class="font-headline-lg text-headline-lg text-on-surface uppercase mb-2 md:font-headline-lg text-headline-lg-mobile">Why Sell with Us?</h2>
+<div class="h-1 w-24 bg-vibrant-orange mb-6"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Trust Card 1 -->
+<div class="bg-surface-container border border-outline-variant p-8 rounded-xl card-hover transition-all duration-300 flex flex-col items-start gap-6 group">
+<div class="w-16 h-16 rounded-full bg-surface-container-lowest flex items-center justify-center border border-outline-variant group-hover:border-vibrant-orange transition-colors">
+<span class="material-symbols-outlined text-[32px] text-secondary-fixed">verified</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">Verified Authority</h3>
+<p class="text-on-surface-variant">Earn the 'Verified Seller' badge, instilling immediate trust and highlighting your commitment to professional-grade quality.</p>
+</div>
+</div>
+<!-- Trust Card 2 -->
+<div class="bg-surface-container border border-outline-variant p-8 rounded-xl card-hover transition-all duration-300 flex flex-col items-start gap-6 group">
+<div class="w-16 h-16 rounded-full bg-surface-container-lowest flex items-center justify-center border border-outline-variant group-hover:border-secondary-fixed transition-colors">
+<span class="material-symbols-outlined text-[32px] text-secondary-fixed">public</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">Nationwide Reach</h3>
+<p class="text-on-surface-variant">Tap into a vast network of athletes, teams, and gear collectors across Pakistan, from Karachi to Sialkot.</p>
+</div>
+</div>
+<!-- Trust Card 3 -->
+<div class="bg-surface-container border border-outline-variant p-8 rounded-xl card-hover transition-all duration-300 flex flex-col items-start gap-6 group">
+<div class="w-16 h-16 rounded-full bg-surface-container-lowest flex items-center justify-center border border-outline-variant group-hover:border-electric-blue transition-colors">
+<span class="material-symbols-outlined text-[32px] text-secondary-fixed">lock</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">Secure Payments</h3>
+<p class="text-on-surface-variant">Experience frictionless, transparent financial transactions engineered for reliability and peace of mind.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Application Preview Section -->
+<section class="w-full bg-surface-container-low py-section-desktop">
+<div class="max-w-container-max mx-auto px-gutter grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+<div class="space-y-6">
+<h2 class="font-headline-lg text-headline-lg text-on-surface uppercase md:font-headline-lg text-headline-lg-mobile">Start Your Application</h2>
+<p class="text-on-surface-variant font-body-lg text-body-lg">Begin the onboarding process. We meticulously vet our partners to maintain the Kinetic Premium standard.</p>
+<div class="flex items-center gap-3 mt-6">
+<div class="w-8 h-8 rounded-full bg-vibrant-orange text-white font-label-caps flex items-center justify-center">1</div>
+<div class="h-1 flex-1 bg-surface-container-highest mx-3 relative overflow-hidden rounded-full">
+<div class="absolute top-0 left-0 h-full w-1/4 bg-vibrant-orange"></div>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container text-on-surface-variant font-label-caps flex items-center justify-center border border-outline-variant">2</div>
+<div class="w-8 h-8 rounded-full bg-surface-container text-on-surface-variant font-label-caps flex items-center justify-center border border-outline-variant">3</div>
+</div>
+</div>
+<!-- Form Card -->
+<div class="bg-surface border border-outline-variant p-8 rounded-xl shadow-2xl relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-vibrant-orange to-secondary-fixed"></div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-8">Business Information</h3>
+<form class="space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Full Name</label>
+<input class="bg-surface-container-high border-0 border-b-2 border-outline-variant text-on-surface px-4 py-3 w-full input-glow transition-colors focus:ring-0 rounded-t-DEFAULT" placeholder="Enter your name" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Email Address</label>
+<input class="bg-surface-container-high border-0 border-b-2 border-outline-variant text-on-surface px-4 py-3 w-full input-glow transition-colors focus:ring-0 rounded-t-DEFAULT" placeholder="athlete@example.com" type="email"/>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Phone Number</label>
+<input class="bg-surface-container-high border-0 border-b-2 border-outline-variant text-on-surface px-4 py-3 w-full input-glow transition-colors focus:ring-0 rounded-t-DEFAULT" placeholder="+92 300 1234567" type="tel"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Business/Brand Name</label>
+<input class="bg-surface-container-high border-0 border-b-2 border-outline-variant text-on-surface px-4 py-3 w-full input-glow transition-colors focus:ring-0 rounded-t-DEFAULT" placeholder="e.g. ABC Sports Sialkot" type="text"/>
+</div>
+<div class="pt-4 flex justify-end">
+<button class="btn-primary font-label-caps text-label-caps uppercase text-white px-8 py-3 rounded-lg flex items-center gap-2" type="button">
+Continue <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</section>
+<!-- Top Sellers Showcase -->
+<section class="w-full px-gutter py-section-desktop max-w-container-max mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-surface-container-highest pb-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface uppercase md:font-headline-lg text-headline-lg-mobile">Elite Partners</h2>
+<p class="text-on-surface-variant font-body-md text-body-md mt-2">Join the ranks of top-performing sports manufacturers.</p>
+</div>
+<button class="font-label-caps text-label-caps text-secondary-fixed uppercase hover:text-white transition-colors flex items-center gap-2 mt-4 md:mt-0">
+View All <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+<!-- Horizontal Scroll Shelf for Cards -->
+<div class="flex overflow-x-auto gap-6 pb-6 snap-x snap-mandatory hide-scrollbar -mx-gutter px-gutter md:mx-0 md:px-0">
+<!-- Seller Card 1 -->
+<div class="min-w-[300px] md:min-w-[350px] bg-surface-container-low border border-outline-variant rounded-xl overflow-hidden card-hover transition-all duration-300 snap-center flex-shrink-0 relative group">
+<div class="h-32 bg-surface-container-high relative overflow-hidden">
+<div class="bg-cover bg-center w-full h-full opacity-60 group-hover:opacity-80 transition-opacity duration-300 seller1-bg"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low to-transparent"></div>
+<div class="absolute top-3 right-3 bg-secondary-fixed text-on-secondary font-label-caps text-[10px] px-3 py-1 rounded-full flex items-center gap-1 font-bold uppercase shadow-lg">
+<span class="material-symbols-outlined text-[12px]">verified</span> VERIFIED
+</div>
+</div>
+<div class="p-6 relative pt-12">
+<div class="absolute -top-10 left-6 w-16 h-16 rounded-full border-4 border-surface-container-low bg-surface-container-high overflow-hidden shadow-lg">
+<img class="w-full h-full object-cover" alt="ABC Sports logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCF27Uel3cf-sqsbrc4-lXZ75ByNRIXuFXAO-5PtCmEXsFLoE2TxWB6zdL4g0fBhxdmM4TKImb4g21BBho_4uAAOrn-qr6qJNgWNd6kjPNvOSlXE_5Wqq_Pn6rJ-oRlLKzDOE54AiECXoVmKobSFaOwkFW62yKtdWA4A5JRQ6_vT-jlOkYmoLUu_KKrkrCdodF1JDQ_aysMVlBsIPC1JrLQcszuZR9mLIJTRhE9cRPBW4VdYRZzEaSigg"/>
+</div>
+<h4 class="font-headline-md text-headline-md text-on-surface mb-2">ABC Sports</h4>
+<p class="text-on-surface-variant text-sm flex items-center gap-1 mb-4">
+<span class="material-symbols-outlined text-[16px]">location_on</span> Sialkot, PK
+</p>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="px-3 py-1 border border-outline-variant rounded-full text-xs text-on-surface-variant bg-surface-container">Cricket</span>
+<span class="px-3 py-1 border border-outline-variant rounded-full text-xs text-on-surface-variant bg-surface-container">Accessories</span>
+</div>
+<div class="flex items-center justify-between border-t border-surface-container-high pt-4">
+<div class="flex items-center gap-1 text-secondary-fixed">
+<span class="material-symbols-outlined text-[16px]">star</span>
+<span class="font-bold">4.9</span>
+</div>
+<span class="text-xs text-on-surface-variant">1.2k Orders</span>
+</div>
+</div>
+</div>
+<!-- Seller Card 2 -->
+<div class="min-w-[300px] md:min-w-[350px] bg-surface-container-low border border-outline-variant rounded-xl overflow-hidden card-hover transition-all duration-300 snap-center flex-shrink-0 relative group">
+<div class="h-32 bg-surface-container-high relative overflow-hidden">
+<div class="bg-cover bg-center w-full h-full opacity-60 group-hover:opacity-80 transition-opacity duration-300 seller2-bg"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low to-transparent"></div>
+<div class="absolute top-3 right-3 bg-secondary-fixed text-on-secondary font-label-caps text-[10px] px-3 py-1 rounded-full flex items-center gap-1 font-bold uppercase shadow-lg">
+<span class="material-symbols-outlined text-[12px]">verified</span> VERIFIED
+</div>
+</div>
+<div class="p-6 relative pt-12">
+<div class="absolute -top-10 left-6 w-16 h-16 rounded-full border-4 border-surface-container-low bg-surface-container-high overflow-hidden shadow-lg">
+<img class="w-full h-full object-cover" alt="Lahore Athletics logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlZ018uVcoaltjYb4X1LsGX4dCDVTG5h4KUocZJVUvrvIChOefzxpk6jNLGxDfMOnTB6IzHqsinnnS5_Xph01Xo-D89AqBR5br1N4BbuMjsba1jX-Jp0DNIP4hYuyGEhffWhyoK88wmO8GJ50agPSXC_ztkU8z_sK6vhieVfxrZnDz23S2TqtxSMoPgMsQuMCn_uBIX87TKnHA4rh8Q7vFW4qTp4te9eFC2g33ZVng0oEBINCrLCIlLw"/>
+</div>
+<h4 class="font-headline-md text-headline-md text-on-surface mb-2">Lahore Athletics</h4>
+<p class="text-on-surface-variant text-sm flex items-center gap-1 mb-4">
+<span class="material-symbols-outlined text-[16px]">location_on</span> Lahore, PK
+</p>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="px-3 py-1 border border-outline-variant rounded-full text-xs text-on-surface-variant bg-surface-container">Apparel</span>
+<span class="px-3 py-1 border border-outline-variant rounded-full text-xs text-on-surface-variant bg-surface-container">Footwear</span>
+</div>
+<div class="flex items-center justify-between border-t border-surface-container-high pt-4">
+<div class="flex items-center gap-1 text-secondary-fixed">
+<span class="material-symbols-outlined text-[16px]">star</span>
+<span class="font-bold">4.8</span>
+</div>
+<span class="text-xs text-on-surface-variant">850 Orders</span>
+</div>
+</div>
+</div>
+<!-- Seller Card 3 (Placeholder for layout demonstration) -->
+<div class="min-w-[300px] md:min-w-[350px] bg-surface-container-low border border-outline-variant rounded-xl overflow-hidden card-hover transition-all duration-300 snap-center flex-shrink-0 relative group flex items-center justify-center opacity-70">
+<div class="text-center p-8">
+<div class="w-16 h-16 mx-auto rounded-full bg-surface-container-high border-2 border-dashed border-outline-variant flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-[24px] text-on-surface-variant">add_business</span>
+</div>
+<h4 class="font-headline-md text-headline-md text-on-surface mb-2">Your Brand Here</h4>
+<p class="text-on-surface-variant text-sm">Join the elite network today.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="full-width border-t border-outline-variant bg-surface-container-lowest grid grid-cols-1 md:grid-cols-4 gap-12 px-gutter py-section-desktop max-w-container-max mx-auto text-secondary-fixed dark:text-secondary-fixed">
+<!-- Brand Column -->
+<div class="flex flex-col gap-6 col-span-1 md:col-span-1">
+<div class="font-display-xl text-vibrant-orange text-headline-md uppercase tracking-tighter">
+KHELZONE
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant font-body-md text-body-md">
+Engineered for Performance. The ultimate marketplace for elite sports gear.
+</p>
+</div>
+<!-- Links Column 1 -->
+<div class="flex flex-col gap-3">
+<h4 class="font-label-caps text-label-caps text-on-surface uppercase mb-3">Marketplace</h4>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-fixed transition-colors duration-200" href="#">Cricket Gear</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-fixed transition-colors duration-200" href="#">Football Kits</a>
+</div>
+<!-- Links Column 2 -->
+<div class="flex flex-col gap-3">
+<h4 class="font-label-caps text-label-caps text-on-surface uppercase mb-3">For Sellers</h4>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-fixed transition-colors duration-200" href="#">Sialkot Manufacturers</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-fixed transition-colors duration-200" href="#">Bulk Inquiries</a>
+</div>
+<!-- Legal / Copyright -->
+<div class="flex flex-col justify-end gap-3 md:col-span-1">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-fixed transition-colors duration-200 mb-6" href="#">Terms of Service</a>
+<div class="font-label-caps text-label-caps text-on-surface-variant uppercase text-xs">
+© 2024 KHELZONE. Engineered for Performance.
+</div>
+</div>
+</footer>
+<script src="seller.js"></script>
+</body>
+</html>

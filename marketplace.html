@@ -1,0 +1,1919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>KHELZONE | Marketplace</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+    :root{
+        --bg:#0b0b0d;
+        --panel:#151517;
+        --panel2:#1c1c1f;
+        --orange:#ff5a1f;
+        --green:#39ff14;
+        --text:#f4f4f4;
+        --muted:#9b9b9f;
+        --border:#2b2b30;
+    }
+
+    *{
+        box-sizing:border-box;
+        margin:0;
+        padding:0;
+    }
+
+    body{
+        background:var(--bg);
+        color:var(--text);
+        font-family:Inter,Arial,sans-serif;
+        min-height:100vh;
+    }
+
+    button,
+    input,
+    select{
+        font-family:inherit;
+    }
+
+    /* ================= NAVBAR ================= */
+
+    header{
+        height:78px;
+        background:#101012;
+        border-bottom:1px solid var(--border);
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        padding:0 45px;
+        position:sticky;
+        top:0;
+        z-index:100;
+    }
+
+    .menu-btn{
+        width:45px;
+        height:45px;
+        border:1px solid #35231c;
+        background:#1c1310;
+        color:var(--orange);
+        border-radius:8px;
+        cursor:pointer;
+        font-size:25px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        transition:.2s;
+    }
+
+    .menu-btn:hover{
+        background:var(--orange);
+        color:#111;
+    }
+
+    .logo{
+        color:var(--orange);
+        font-family:"Arial Black",Impact,sans-serif;
+        font-size:30px;
+        letter-spacing:3px;
+        font-weight:900;
+    }
+
+    .nav-right{
+        display:flex;
+        align-items:center;
+        gap:25px;
+    }
+
+    .nav-link{
+        color:#eee;
+        text-decoration:none;
+        font-family:"JetBrains Mono",monospace;
+        font-size:13px;
+        font-weight:700;
+        letter-spacing:1px;
+    }
+
+    .nav-link:hover{
+        color:var(--orange);
+    }
+
+    .cart-btn{
+        position:relative;
+        border:0;
+        background:transparent;
+        color:white;
+        font-size:24px;
+        cursor:pointer;
+    }
+
+    .cart-count{
+        position:absolute;
+        top:-7px;
+        right:-9px;
+        background:var(--orange);
+        color:#111;
+        width:19px;
+        height:19px;
+        border-radius:50%;
+        font-size:11px;
+        font-weight:800;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    }
+
+    /* ================= DROPDOWN ================= */
+
+    .menu-dropdown{
+        position:fixed;
+        top:78px;
+        left:0;
+        width:100%;
+        background:rgba(11,11,13,.98);
+        border-bottom:1px solid var(--border);
+        z-index:90;
+        display:none;
+        padding:25px 7%;
+        box-shadow:0 15px 35px rgba(0,0,0,.5);
+    }
+
+    .menu-dropdown.show{
+        display:block;
+    }
+
+    .dropdown-grid{
+        max-width:1200px;
+        margin:auto;
+        display:grid;
+        grid-template-columns:repeat(4,1fr);
+        gap:12px;
+    }
+
+    .dropdown-grid a{
+        padding:20px;
+        border:1px solid var(--border);
+        color:#eee;
+        text-decoration:none;
+        font-family:"JetBrains Mono",monospace;
+        font-weight:700;
+        letter-spacing:1px;
+        transition:.2s;
+        border-radius:7px;
+    }
+
+    .dropdown-grid a:hover{
+        border-color:var(--orange);
+        color:var(--orange);
+        background:#181311;
+    }
+
+    /* ================= HERO ================= */
+
+    .hero{
+        max-width:1250px;
+        margin:auto;
+        padding:65px 25px 40px;
+    }
+
+    .eyebrow{
+        color:var(--green);
+        font-family:"JetBrains Mono",monospace;
+        font-size:12px;
+        letter-spacing:3px;
+        margin-bottom:13px;
+    }
+
+    .hero h1{
+        font-family:"Arial Black",Impact,sans-serif;
+        font-size:58px;
+        line-height:1;
+        text-transform:uppercase;
+    }
+
+    .hero h1 span{
+        color:var(--orange);
+    }
+
+    .hero p{
+        max-width:700px;
+        color:var(--muted);
+        margin-top:18px;
+        font-size:16px;
+        line-height:1.7;
+    }
+
+    /* ================= SEARCH ================= */
+
+    .tools{
+        max-width:1250px;
+        margin:auto;
+        padding:0 25px 35px;
+    }
+
+    .tools-inner{
+        background:var(--panel);
+        border:1px solid var(--border);
+        padding:18px;
+        border-radius:10px;
+        display:flex;
+        gap:12px;
+        align-items:center;
+    }
+
+    .search-box{
+        flex:1;
+        position:relative;
+    }
+
+    .search-box span{
+        position:absolute;
+        left:15px;
+        top:50%;
+        transform:translateY(-50%);
+        color:#777;
+    }
+
+    .search-box input{
+        width:100%;
+        background:#0f0f11;
+        border:1px solid var(--border);
+        color:white;
+        padding:13px 15px 13px 43px;
+        border-radius:6px;
+        outline:none;
+    }
+
+    .search-box input:focus{
+        border-color:var(--orange);
+    }
+
+    .category-select{
+        background:#0f0f11;
+        border:1px solid var(--border);
+        color:white;
+        padding:13px 15px;
+        border-radius:6px;
+        min-width:190px;
+        outline:none;
+    }
+
+    .category-select:focus{
+        border-color:var(--orange);
+    }
+
+    .add-btn{
+        background:var(--orange);
+        color:#101010;
+        border:0;
+        padding:14px 20px;
+        border-radius:6px;
+        font-family:"JetBrains Mono",monospace;
+        font-weight:700;
+        letter-spacing:1px;
+        cursor:pointer;
+        white-space:nowrap;
+    }
+
+    .add-btn:hover{
+        filter:brightness(1.1);
+    }
+
+    /* ================= PRODUCTS ================= */
+
+    .market{
+        max-width:1250px;
+        margin:auto;
+        padding:0 25px 80px;
+    }
+
+    .market-heading{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        margin-bottom:22px;
+    }
+
+    .market-heading h2{
+        font-family:"Arial Black",Impact,sans-serif;
+        font-size:28px;
+        text-transform:uppercase;
+    }
+
+    .product-count{
+        color:var(--muted);
+        font-family:"JetBrains Mono",monospace;
+        font-size:12px;
+    }
+
+    .products-grid{
+        display:grid;
+        grid-template-columns:repeat(4,1fr);
+        gap:20px;
+    }
+
+    .product-card{
+        background:var(--panel);
+        border:1px solid var(--border);
+        border-radius:9px;
+        overflow:hidden;
+        transition:.25s;
+    }
+
+    .product-card:hover{
+        transform:translateY(-4px);
+        border-color:#4b4b50;
+    }
+
+    .product-image{
+        height:240px;
+        background:#202024;
+        position:relative;
+        overflow:hidden;
+    }
+
+    .product-image img{
+        width:100%;
+        height:100%;
+        object-fit:cover;
+        display:block;
+    }
+
+    .category-badge{
+        position:absolute;
+        top:12px;
+        left:12px;
+        background:rgba(0,0,0,.75);
+        color:var(--green);
+        padding:6px 10px;
+        font-family:"JetBrains Mono",monospace;
+        font-size:10px;
+        letter-spacing:1px;
+        border:1px solid rgba(57,255,20,.25);
+        border-radius:4px;
+    }
+
+    .product-body{
+        padding:18px;
+    }
+
+    .product-name{
+        font-size:17px;
+        font-weight:700;
+        margin-bottom:8px;
+    }
+
+    .product-description{
+        color:var(--muted);
+        font-size:13px;
+        min-height:40px;
+        line-height:1.5;
+    }
+
+    .product-bottom{
+        margin-top:18px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+    }
+
+    .price{
+        color:var(--orange);
+        font-family:"JetBrains Mono",monospace;
+        font-size:18px;
+        font-weight:700;
+    }
+
+    .cart-add{
+        background:#252529;
+        border:1px solid #38383d;
+        color:white;
+        padding:9px 12px;
+        border-radius:5px;
+        cursor:pointer;
+        font-size:12px;
+        font-weight:700;
+    }
+
+    .cart-add:hover{
+        background:var(--orange);
+        color:#111;
+        border-color:var(--orange);
+    }
+
+    .product-actions{
+        display:flex;
+        gap:8px;
+        margin-top:13px;
+    }
+
+    .edit-btn,
+    .delete-btn{
+        flex:1;
+        padding:8px;
+        border-radius:5px;
+        cursor:pointer;
+        font-family:"JetBrains Mono",monospace;
+        font-size:10px;
+        font-weight:700;
+    }
+
+    .edit-btn{
+        background:#202024;
+        color:#fff;
+        border:1px solid #3a3a40;
+    }
+
+    .edit-btn:hover{
+        border-color:var(--green);
+        color:var(--green);
+    }
+
+    .delete-btn{
+        background:#211515;
+        color:#ff6c6c;
+        border:1px solid #482424;
+    }
+
+    .delete-btn:hover{
+        background:#361919;
+    }
+
+    /* ================= EMPTY ================= */
+
+    .empty{
+        display:none;
+        text-align:center;
+        padding:70px 20px;
+        border:1px dashed var(--border);
+        border-radius:10px;
+        color:var(--muted);
+    }
+
+    .empty h3{
+        color:white;
+        margin-bottom:8px;
+    }
+
+    /* ================= MODAL ================= */
+
+    .modal-overlay{
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,.78);
+        z-index:200;
+        display:none;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+    }
+
+    .modal-overlay.show{
+        display:flex;
+    }
+
+    .modal{
+        width:100%;
+        max-width:600px;
+        background:#171719;
+        border:1px solid var(--border);
+        border-radius:10px;
+        padding:30px;
+        max-height:90vh;
+        overflow:auto;
+    }
+
+    .modal-header{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        margin-bottom:25px;
+    }
+
+    .modal-header h2{
+        font-family:"Arial Black",Impact,sans-serif;
+        text-transform:uppercase;
+        font-size:25px;
+    }
+
+    .close-btn{
+        width:35px;
+        height:35px;
+        border:1px solid var(--border);
+        background:#222225;
+        color:white;
+        border-radius:5px;
+        cursor:pointer;
+        font-size:20px;
+    }
+
+    .form-group{
+        margin-bottom:17px;
+    }
+
+    .form-group label{
+        display:block;
+        font-family:"JetBrains Mono",monospace;
+        color:#aaa;
+        font-size:11px;
+        letter-spacing:1px;
+        margin-bottom:7px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea{
+        width:100%;
+        background:#0e0e10;
+        border:1px solid var(--border);
+        color:white;
+        padding:12px;
+        border-radius:5px;
+        outline:none;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus{
+        border-color:var(--orange);
+    }
+
+    .form-group textarea{
+        min-height:90px;
+        resize:vertical;
+    }
+
+    .image-preview{
+        width:100%;
+        height:180px;
+        border:1px dashed #3c3c40;
+        border-radius:6px;
+        margin-top:8px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        overflow:hidden;
+        color:#777;
+        background:#101012;
+    }
+
+    .image-preview img{
+        width:100%;
+        height:100%;
+        object-fit:cover;
+    }
+
+    .modal-actions{
+        display:flex;
+        gap:10px;
+        margin-top:22px;
+    }
+
+    .save-btn{
+        flex:1;
+        background:var(--orange);
+        border:0;
+        color:#111;
+        padding:14px;
+        border-radius:5px;
+        font-family:"JetBrains Mono",monospace;
+        font-weight:700;
+        cursor:pointer;
+    }
+
+    .cancel-btn{
+        flex:1;
+        background:#252529;
+        border:1px solid var(--border);
+        color:white;
+        padding:14px;
+        border-radius:5px;
+        font-family:"JetBrains Mono",monospace;
+        font-weight:700;
+        cursor:pointer;
+    }
+
+    /* ================= TOAST ================= */
+
+    .toast{
+        position:fixed;
+        right:25px;
+        bottom:25px;
+        background:#1e1e21;
+        border:1px solid var(--orange);
+        color:white;
+        padding:14px 20px;
+        border-radius:6px;
+        display:none;
+        z-index:300;
+        box-shadow:0 10px 30px rgba(0,0,0,.5);
+    }
+
+    .toast.show{
+        display:block;
+    }
+
+    /* ================= FOOTER ================= */
+
+    footer{
+        border-top:1px solid var(--border);
+        padding:30px;
+        text-align:center;
+        color:var(--muted);
+        font-family:"JetBrains Mono",monospace;
+        font-size:11px;
+        letter-spacing:1px;
+    }
+
+    /* ================= RESPONSIVE ================= */
+
+    @media(max-width:1000px){
+        .products-grid{
+            grid-template-columns:repeat(3,1fr);
+        }
+
+        .dropdown-grid{
+            grid-template-columns:repeat(2,1fr);
+        }
+    }
+
+    @media(max-width:750px){
+        header{
+            padding:0 18px;
+        }
+
+        .logo{
+            font-size:23px;
+        }
+
+        .nav-right{
+            gap:12px;
+        }
+
+        .nav-link{
+            display:none;
+        }
+
+        .hero{
+            padding-top:45px;
+        }
+
+        .hero h1{
+            font-size:40px;
+        }
+
+        .tools-inner{
+            flex-direction:column;
+        }
+
+        .search-box,
+        .category-select,
+        .add-btn{
+            width:100%;
+        }
+
+        .products-grid{
+            grid-template-columns:repeat(2,1fr);
+        }
+
+        .product-image{
+            height:190px;
+        }
+    }
+
+    @media(max-width:500px){
+        .products-grid{
+            grid-template-columns:1fr;
+        }
+
+        .product-image{
+            height:230px;
+        }
+
+        .dropdown-grid{
+            grid-template-columns:1fr;
+        }
+
+        .hero h1{
+            font-size:34px;
+        }
+
+        .modal{
+            padding:20px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<header>
+
+    <button class="menu-btn" id="menuBtn">☰</button>
+
+    <div class="logo">KHELZONE</div>
+
+    <div class="nav-right">
+
+        <a href="seller-guide.html" class="nav-link">
+            SELLER GUIDE
+        </a>
+
+        <a href="sellerinfo.html" class="nav-link">
+            BECOME A SELLER
+        </a>
+
+        <button class="cart-btn" onclick="showCart()">
+            🛒
+            <span class="cart-count" id="cartCount">0</span>
+        </button>
+
+    </div>
+
+</header>
+
+
+<!-- ================= DROPDOWN ================= -->
+
+<div class="menu-dropdown" id="menuDropdown">
+
+    <div class="dropdown-grid">
+
+        <a href="welcome.html">
+            HOME
+        </a>
+
+        <a href="sellerinfo.html">
+            BECOME A SELLER
+        </a>
+
+        <a href="market.html">
+            SHOP
+        </a>
+
+        <a href="seller-guide.html">
+            SELLER GUIDE
+        </a>
+
+        <a href="#">
+            CONTACT
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- ================= HERO ================= -->
+
+<section class="hero">
+
+    <div class="eyebrow">
+        KHELZONE MARKETPLACE
+    </div>
+
+    <h1>
+        SHOP <span>SPORTS GEAR</span>
+    </h1>
+
+    <p>
+        Discover quality sports equipment from sellers across Pakistan.
+        Search products, compare prices and add your favourite gear to your cart.
+    </p>
+
+</section>
+
+
+<!-- ================= SEARCH TOOLS ================= -->
+
+<section class="tools">
+
+    <div class="tools-inner">
+
+        <div class="search-box">
+
+            <span>🔎</span>
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search products..."
+            >
+
+        </div>
+
+
+        <select id="categoryFilter" class="category-select">
+
+            <option value="all">
+                All Categories
+            </option>
+
+            <option value="Cricket">
+                Cricket
+            </option>
+
+            <option value="Football">
+                Football
+            </option>
+
+            <option value="Gym">
+                Gym & Fitness
+            </option>
+
+            <option value="Running">
+                Running
+            </option>
+
+            <option value="Badminton">
+                Badminton
+            </option>
+
+            <option value="Hockey">
+                Hockey
+            </option>
+
+        </select>
+
+
+        <button class="add-btn" onclick="openAddModal()">
+            + ADD PRODUCT
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- ================= MARKETPLACE ================= -->
+
+<main class="market">
+
+    <div class="market-heading">
+
+        <h2>
+            Products
+        </h2>
+
+        <div class="product-count" id="productCount">
+            0 PRODUCTS
+        </div>
+
+    </div>
+
+
+    <div class="products-grid" id="productsGrid">
+    </div>
+
+
+    <div class="empty" id="emptyState">
+
+        <h3>
+            No products found
+        </h3>
+
+        <p>
+            Try another search or add a new product.
+        </p>
+
+    </div>
+
+</main>
+
+
+<!-- ================= PRODUCT MODAL ================= -->
+
+<div class="modal-overlay" id="productModal">
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <h2 id="modalTitle">
+                Add Product
+            </h2>
+
+            <button
+                class="close-btn"
+                onclick="closeModal()"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="productForm">
+
+            <input
+                type="hidden"
+                id="productId"
+            >
+
+
+            <div class="form-group">
+
+                <label>
+                    PRODUCT NAME
+                </label>
+
+                <input
+                    type="text"
+                    id="productName"
+                    placeholder="e.g. Professional Cricket Bat"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    PRICE (RS.)
+                </label>
+
+                <input
+                    type="number"
+                    id="productPrice"
+                    placeholder="15000"
+                    min="0"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    CATEGORY
+                </label>
+
+                <select id="productCategory" required>
+
+                    <option value="">
+                        Select category
+                    </option>
+
+                    <option value="Cricket">
+                        Cricket
+                    </option>
+
+                    <option value="Football">
+                        Football
+                    </option>
+
+                    <option value="Gym">
+                        Gym & Fitness
+                    </option>
+
+                    <option value="Running">
+                        Running
+                    </option>
+
+                    <option value="Badminton">
+                        Badminton
+                    </option>
+
+                    <option value="Hockey">
+                        Hockey
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    PRODUCT IMAGE
+                </label>
+
+                <input
+                    type="file"
+                    id="productImageFile"
+                    accept="image/*"
+                >
+
+                <div class="image-preview" id="imagePreview">
+                    Image preview
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    OR IMAGE URL
+                </label>
+
+                <input
+                    type="url"
+                    id="productImageUrl"
+                    placeholder="https://example.com/product.jpg"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    DESCRIPTION
+                </label>
+
+                <textarea
+                    id="productDescription"
+                    placeholder="Write a short product description..."
+                ></textarea>
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="cancel-btn"
+                    onclick="closeModal()"
+                >
+                    CANCEL
+                </button>
+
+                <button
+                    type="submit"
+                    class="save-btn"
+                >
+                    SAVE PRODUCT
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ================= TOAST ================= -->
+
+<div class="toast" id="toast">
+    Product saved successfully!
+</div>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+    © 2026 KHELZONE — PAKISTAN'S SPORTS MARKETPLACE
+
+</footer>
+
+
+<script>
+
+/* =========================================
+   DEFAULT PRODUCTS
+========================================= */
+
+const defaultProducts = [
+
+    {
+        id: 1,
+        name: "Professional Cricket Bat",
+        price: 18500,
+        category: "Cricket",
+        image: "https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&w=900&q=80",
+        description: "High-performance cricket bat for serious players."
+    },
+
+    {
+        id: 2,
+        name: "Football Match Ball",
+        price: 6500,
+        category: "Football",
+        image: "https://images.unsplash.com/photo-1553778263-73a83bab9b0c?auto=format&fit=crop&w=900&q=80",
+        description: "Durable match-quality football for training and games."
+    },
+
+    {
+        id: 3,
+        name: "Professional Dumbbells",
+        price: 12000,
+        category: "Gym",
+        image: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80",
+        description: "Heavy-duty dumbbells for strength training."
+    },
+
+    {
+        id: 4,
+        name: "Running Sports Shoes",
+        price: 9500,
+        category: "Running",
+        image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80",
+        description: "Comfortable sports shoes designed for running."
+    },
+
+    {
+        id: 5,
+        name: "Badminton Racket",
+        price: 7800,
+        category: "Badminton",
+        image: "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?auto=format&fit=crop&w=900&q=80",
+        description: "Lightweight badminton racket with excellent control."
+    },
+
+    {
+        id: 6,
+        name: "Hockey Stick",
+        price: 11500,
+        category: "Hockey",
+        image: "https://images.unsplash.com/photo-1580748141549-71748dbe0bdc?auto=format&fit=crop&w=900&q=80",
+        description: "Strong hockey stick suitable for competitive play."
+    }
+
+];
+
+
+/* =========================================
+   LOAD PRODUCTS
+========================================= */
+
+let products =
+    JSON.parse(localStorage.getItem("khelzoneProducts"))
+    || defaultProducts;
+
+
+/* =========================================
+   CART
+========================================= */
+
+let cart =
+    JSON.parse(localStorage.getItem("khelzoneCart"))
+    || [];
+
+
+/* =========================================
+   DOM
+========================================= */
+
+const productsGrid =
+    document.getElementById("productsGrid");
+
+const productCount =
+    document.getElementById("productCount");
+
+const emptyState =
+    document.getElementById("emptyState");
+
+const searchInput =
+    document.getElementById("searchInput");
+
+const categoryFilter =
+    document.getElementById("categoryFilter");
+
+const modal =
+    document.getElementById("productModal");
+
+const productForm =
+    document.getElementById("productForm");
+
+const productImageFile =
+    document.getElementById("productImageFile");
+
+const productImageUrl =
+    document.getElementById("productImageUrl");
+
+const imagePreview =
+    document.getElementById("imagePreview");
+
+const cartCount =
+    document.getElementById("cartCount");
+
+
+/* =========================================
+   SAVE PRODUCTS
+========================================= */
+
+function saveProducts(){
+
+    localStorage.setItem(
+        "khelzoneProducts",
+        JSON.stringify(products)
+    );
+
+}
+
+
+/* =========================================
+   RENDER PRODUCTS
+========================================= */
+
+function renderProducts(){
+
+    const search =
+        searchInput.value
+        .toLowerCase()
+        .trim();
+
+    const category =
+        categoryFilter.value;
+
+
+    const filtered =
+        products.filter(product => {
+
+            const matchesSearch =
+                product.name
+                    .toLowerCase()
+                    .includes(search)
+                ||
+                product.description
+                    .toLowerCase()
+                    .includes(search);
+
+
+            const matchesCategory =
+                category === "all"
+                ||
+                product.category === category;
+
+
+            return matchesSearch && matchesCategory;
+
+        });
+
+
+    productsGrid.innerHTML = "";
+
+
+    productCount.textContent =
+        filtered.length + " PRODUCTS";
+
+
+    if(filtered.length === 0){
+
+        emptyState.style.display = "block";
+
+        return;
+
+    }
+
+
+    emptyState.style.display = "none";
+
+
+    filtered.forEach(product => {
+
+        const card =
+            document.createElement("div");
+
+        card.className =
+            "product-card";
+
+
+        card.innerHTML = `
+
+            <div class="product-image">
+
+                <img
+                    src="${escapeHtml(product.image)}"
+                    alt="${escapeHtml(product.name)}"
+                    onerror="this.src='https://via.placeholder.com/900x600/202024/ffffff?text=KHELZONE'"
+                >
+
+                <div class="category-badge">
+                    ${escapeHtml(product.category)}
+                </div>
+
+            </div>
+
+
+            <div class="product-body">
+
+                <div class="product-name">
+                    ${escapeHtml(product.name)}
+                </div>
+
+                <div class="product-description">
+                    ${escapeHtml(product.description)}
+                </div>
+
+
+                <div class="product-bottom">
+
+                    <div class="price">
+                        Rs. ${Number(product.price).toLocaleString()}
+                    </div>
+
+                    <button
+                        class="cart-add"
+                        onclick="addToCart(${product.id})"
+                    >
+                        ADD TO CART
+                    </button>
+
+                </div>
+
+
+                <div class="product-actions">
+
+                    <button
+                        class="edit-btn"
+                        onclick="editProduct(${product.id})"
+                    >
+                        ✏ EDIT
+                    </button>
+
+                    <button
+                        class="delete-btn"
+                        onclick="deleteProduct(${product.id})"
+                    >
+                        🗑 DELETE
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        productsGrid.appendChild(card);
+
+    });
+
+}
+
+
+/* =========================================
+   ESCAPE HTML
+========================================= */
+
+function escapeHtml(value){
+
+    return String(value)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+}
+
+
+/* =========================================
+   ADD PRODUCT MODAL
+========================================= */
+
+function openAddModal(){
+
+    productForm.reset();
+
+    document.getElementById("productId").value = "";
+
+    document.getElementById("modalTitle").textContent =
+        "Add Product";
+
+    imagePreview.innerHTML =
+        "Image preview";
+
+    modal.classList.add("show");
+
+}
+
+
+/* =========================================
+   CLOSE MODAL
+========================================= */
+
+function closeModal(){
+
+    modal.classList.remove("show");
+
+}
+
+
+/* =========================================
+   EDIT PRODUCT
+========================================= */
+
+function editProduct(id){
+
+    const product =
+        products.find(p => p.id === id);
+
+
+    if(!product) return;
+
+
+    document.getElementById("productId").value =
+        product.id;
+
+    document.getElementById("productName").value =
+        product.name;
+
+    document.getElementById("productPrice").value =
+        product.price;
+
+    document.getElementById("productCategory").value =
+        product.category;
+
+    document.getElementById("productImageUrl").value =
+        product.image.startsWith("data:")
+        ? ""
+        : product.image;
+
+    document.getElementById("productDescription").value =
+        product.description;
+
+
+    imagePreview.innerHTML = `
+        <img
+            src="${escapeHtml(product.image)}"
+            alt="Preview"
+        >
+    `;
+
+
+    document.getElementById("modalTitle").textContent =
+        "Edit Product";
+
+
+    modal.classList.add("show");
+
+}
+
+
+/* =========================================
+   IMAGE FILE PREVIEW
+========================================= */
+
+productImageFile.addEventListener(
+    "change",
+    function(){
+
+        const file =
+            this.files[0];
+
+
+        if(!file) return;
+
+
+        const reader =
+            new FileReader();
+
+
+        reader.onload =
+            function(e){
+
+                imagePreview.innerHTML = `
+                    <img
+                        src="${e.target.result}"
+                        alt="Preview"
+                    >
+                `;
+
+            };
+
+
+        reader.readAsDataURL(file);
+
+    }
+);
+
+
+/* =========================================
+   IMAGE URL PREVIEW
+========================================= */
+
+productImageUrl.addEventListener(
+    "input",
+    function(){
+
+        const url =
+            this.value.trim();
+
+
+        if(!url) return;
+
+
+        imagePreview.innerHTML = `
+            <img
+                src="${escapeHtml(url)}"
+                alt="Preview"
+            >
+        `;
+
+    }
+);
+
+
+/* =========================================
+   SAVE PRODUCT
+========================================= */
+
+productForm.addEventListener(
+    "submit",
+    function(e){
+
+        e.preventDefault();
+
+
+        const id =
+            document.getElementById("productId").value;
+
+
+        const name =
+            document.getElementById("productName").value.trim();
+
+
+        const price =
+            Number(
+                document.getElementById("productPrice").value
+            );
+
+
+        const category =
+            document.getElementById("productCategory").value;
+
+
+        const description =
+            document.getElementById("productDescription").value.trim();
+
+
+        const url =
+            productImageUrl.value.trim();
+
+
+        const file =
+            productImageFile.files[0];
+
+
+        function finishSave(image){
+
+            if(!image){
+
+                alert("Please select a product image or enter an image URL.");
+
+                return;
+
+            }
+
+
+            if(id){
+
+                const index =
+                    products.findIndex(
+                        p => p.id == id
+                    );
+
+
+                if(index !== -1){
+
+                    products[index] = {
+
+                        ...products[index],
+
+                        name,
+                        price,
+                        category,
+                        image,
+                        description
+
+                    };
+
+                }
+
+            }else{
+
+                products.push({
+
+                    id:Date.now(),
+
+                    name,
+
+                    price,
+
+                    category,
+
+                    image,
+
+                    description
+
+                });
+
+            }
+
+
+            saveProducts();
+
+            renderProducts();
+
+            closeModal();
+
+            showToast(
+                id
+                ? "Product updated successfully!"
+                : "Product added successfully!"
+            );
+
+        }
+
+
+        if(file){
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                function(e){
+
+                    finishSave(
+                        e.target.result
+                    );
+
+                };
+
+
+            reader.readAsDataURL(file);
+
+        }else{
+
+            finishSave(url);
+
+        }
+
+    }
+);
+
+
+/* =========================================
+   DELETE PRODUCT
+========================================= */
+
+function deleteProduct(id){
+
+    const product =
+        products.find(
+            p => p.id === id
+        );
+
+
+    if(!product) return;
+
+
+    const confirmed =
+        confirm(
+            `Delete "${product.name}"?`
+        );
+
+
+    if(!confirmed) return;
+
+
+    products =
+        products.filter(
+            p => p.id !== id
+        );
+
+
+    saveProducts();
+
+    renderProducts();
+
+    showToast(
+        "Product deleted."
+    );
+
+}
+
+
+/* =========================================
+   CART
+========================================= */
+
+function addToCart(id){
+
+    const product =
+        products.find(
+            p => p.id === id
+        );
+
+
+    if(!product) return;
+
+
+    cart.push(product);
+
+    localStorage.setItem(
+        "khelzoneCart",
+        JSON.stringify(cart)
+    );
+
+
+    updateCartCount();
+
+    showToast(
+        product.name + " added to cart!"
+    );
+
+}
+
+
+function updateCartCount(){
+
+    cartCount.textContent =
+        cart.length;
+
+}
+
+
+function showCart(){
+
+    if(cart.length === 0){
+
+        alert(
+            "Your cart is empty."
+        );
+
+        return;
+
+    }
+
+
+    const names =
+        cart.map(
+            (item,index) =>
+                `${index + 1}. ${item.name} - Rs. ${Number(item.price).toLocaleString()}`
+        );
+
+
+    const total =
+        cart.reduce(
+            (sum,item) =>
+                sum + Number(item.price),
+            0
+        );
+
+
+    alert(
+        "KHELZONE CART\n\n"
+        +
+        names.join("\n")
+        +
+        "\n\nTOTAL: Rs. "
+        +
+        total.toLocaleString()
+    );
+
+}
+
+
+/* =========================================
+   TOAST
+========================================= */
+
+function showToast(message){
+
+    const toast =
+        document.getElementById("toast");
+
+
+    toast.textContent =
+        message;
+
+
+    toast.classList.add("show");
+
+
+    setTimeout(
+        () => {
+            toast.classList.remove("show");
+        },
+        2500
+    );
+
+}
+
+
+/* =========================================
+   SEARCH
+========================================= */
+
+searchInput.addEventListener(
+    "input",
+    renderProducts
+);
+
+
+categoryFilter.addEventListener(
+    "change",
+    renderProducts
+);
+
+
+/* =========================================
+   NAVBAR DROPDOWN
+========================================= */
+
+const menuBtn =
+    document.getElementById("menuBtn");
+
+const menuDropdown =
+    document.getElementById("menuDropdown");
+
+
+menuBtn.addEventListener(
+    "click",
+    function(){
+
+        menuDropdown.classList.toggle(
+            "show"
+        );
+
+
+        if(
+            menuDropdown.classList.contains("show")
+        ){
+
+            menuBtn.textContent = "×";
+
+        }else{
+
+            menuBtn.textContent = "☰";
+
+        }
+
+    }
+);
+
+
+/* Close dropdown when clicking outside */
+
+document.addEventListener(
+    "click",
+    function(e){
+
+        if(
+            !menuBtn.contains(e.target)
+            &&
+            !menuDropdown.contains(e.target)
+        ){
+
+            menuDropdown.classList.remove(
+                "show"
+            );
+
+            menuBtn.textContent = "☰";
+
+        }
+
+    }
+);
+
+
+/* =========================================
+   CLOSE MODAL OUTSIDE
+========================================= */
+
+modal.addEventListener(
+    "click",
+    function(e){
+
+        if(e.target === modal){
+
+            closeModal();
+
+        }
+
+    }
+);
+
+
+/* =========================================
+   INITIAL LOAD
+========================================= */
+
+renderProducts();
+
+updateCartCount();
+
+</script>
+
+</body>
+</html>

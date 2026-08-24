@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Become a Seller | KHELZONE</title>
+
 <style>
   :root{
     --bg:#0b0b0d;
@@ -16,51 +17,217 @@
     --text:#f2f2f0;
     --muted:#9a9a9f;
     --border:#2b2b2f;
-    --mono: 'Courier New', Consolas, monospace;
-    --display: 'Arial Black', Impact, sans-serif;
+    --mono:'Courier New', Consolas, monospace;
+    --display:'Arial Black', Impact, sans-serif;
   }
-  *{box-sizing:border-box; margin:0; padding:0;}
+
+  *{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+  }
+
+  html{
+    scroll-behavior:smooth;
+  }
+
   body{
     background:var(--bg);
     color:var(--text);
     font-family:'Segoe UI', Arial, sans-serif;
     line-height:1.5;
   }
-  a{color:inherit; text-decoration:none;}
 
-  /* NAV */
-  header{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:24px 60px;
-    border-bottom:1px solid var(--border);
-    position:sticky; top:0; background:rgba(11,11,13,0.92);
-    backdrop-filter: blur(6px);
-    z-index:50;
+  a{
+    color:inherit;
+    text-decoration:none;
   }
-  .menu-icon{font-size:22px; cursor:pointer; letter-spacing:2px;}
+
+  /* =========================
+     NAVBAR
+  ========================= */
+
+  header{
+    height:86px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 60px;
+    border-bottom:1px solid var(--border);
+    position:sticky;
+    top:0;
+    background:rgba(11,11,13,0.95);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    z-index:1000;
+  }
+
+  /* HAMBURGER */
+
+  .menu-button{
+    width:44px;
+    height:44px;
+    border:none;
+    background:transparent;
+    color:var(--orange);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    gap:5px;
+    border-radius:6px;
+    transition:background .2s ease;
+  }
+
+  .menu-button:hover{
+    background:rgba(255,90,31,.08);
+  }
+
+  .menu-line{
+    width:29px;
+    height:3px;
+    background:var(--orange);
+    border-radius:2px;
+    transition:transform .25s ease, opacity .2s ease;
+  }
+
+  /* Hamburger animation */
+
+  .menu-button.active .line1{
+    transform:translateY(8px) rotate(45deg);
+  }
+
+  .menu-button.active .line2{
+    opacity:0;
+  }
+
+  .menu-button.active .line3{
+    transform:translateY(-8px) rotate(-45deg);
+  }
+
+  /* LOGO */
+
   .logo{
     font-family:var(--display);
     font-size:26px;
     letter-spacing:2px;
     color:var(--orange);
     font-weight:900;
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
   }
-  .nav-right{display:flex; align-items:center; gap:24px;}
-  .nav-right .active{color:var(--orange); border-bottom:2px solid var(--orange); padding-bottom:4px;}
+
+  /* DESKTOP NAV */
+
+  .nav-right{
+    display:flex;
+    align-items:center;
+    gap:28px;
+    margin-left:auto;
+  }
+
   .nav-link{
     font-family:var(--mono);
-    font-size:13px; letter-spacing:1px; font-weight:700;
+    font-size:13px;
+    letter-spacing:1px;
+    font-weight:700;
+    transition:color .2s ease;
   }
-  .cart{font-size:20px;}
 
-  /* HERO */
+  .nav-link:hover{
+    color:var(--orange);
+  }
+
+  .nav-right .active{
+    color:var(--orange);
+  }
+
+  .cart{
+    font-size:20px;
+    margin-left:5px;
+  }
+
+  /* =========================
+     NAV DROPDOWN
+  ========================= */
+
+  .mobile-menu{
+    position:fixed;
+    top:86px;
+    left:0;
+    width:100%;
+    background:rgba(11,11,13,.98);
+    border-bottom:1px solid var(--border);
+    box-shadow:0 12px 30px rgba(0,0,0,.35);
+
+    opacity:0;
+    visibility:hidden;
+    transform:translateY(-12px);
+    transition:
+      opacity .25s ease,
+      transform .25s ease,
+      visibility .25s ease;
+
+    z-index:999;
+  }
+
+  .mobile-menu.show{
+    opacity:1;
+    visibility:visible;
+    transform:translateY(0);
+  }
+
+  .mobile-menu-inner{
+    max-width:1200px;
+    margin:auto;
+    padding:12px 60px 18px;
+  }
+
+  .mobile-menu a{
+    display:block;
+    padding:16px 4px;
+    border-bottom:1px solid var(--border);
+    font-family:var(--mono);
+    font-size:13px;
+    letter-spacing:1.5px;
+    font-weight:700;
+    color:var(--text);
+    transition:
+      color .2s ease,
+      padding-left .2s ease;
+  }
+
+  .mobile-menu a:last-child{
+    border-bottom:none;
+  }
+
+  .mobile-menu a:hover{
+    color:var(--orange);
+    padding-left:10px;
+  }
+
+  .mobile-menu .menu-active{
+    color:var(--orange);
+  }
+
+  /* =========================
+     HERO
+  ========================= */
+
   .hero{
     text-align:center;
     padding:90px 20px 60px;
     background:
-      radial-gradient(ellipse at center top, rgba(255,90,31,0.08), transparent 60%);
+      radial-gradient(
+        ellipse at center top,
+        rgba(255,90,31,.08),
+        transparent 60%
+      );
     border-bottom:1px solid var(--border);
   }
+
   .badge{
     display:inline-block;
     font-family:var(--mono);
@@ -72,13 +239,18 @@
     border-radius:20px;
     margin-bottom:28px;
   }
+
   h1.hero-title{
     font-family:var(--display);
     font-size:56px;
     letter-spacing:1px;
     line-height:1.05;
   }
-  h1.hero-title .accent{color:var(--orange);}
+
+  h1.hero-title .accent{
+    color:var(--orange);
+  }
+
   .hero-sub{
     max-width:640px;
     margin:24px auto 0;
@@ -86,18 +258,41 @@
     font-size:17px;
   }
 
-  /* STATS STRIP */
+  /* =========================
+     STATS
+  ========================= */
+
   .stats{
-    display:flex; justify-content:center; gap:70px;
+    display:flex;
+    justify-content:center;
+    gap:70px;
     padding:40px 20px;
     border-bottom:1px solid var(--border);
     flex-wrap:wrap;
   }
-  .stat{text-align:center;}
-  .stat .num{font-family:var(--display); font-size:32px; color:var(--orange);}
-  .stat .label{font-family:var(--mono); font-size:11px; letter-spacing:2px; color:var(--muted); margin-top:6px;}
 
-  /* MAIN LAYOUT */
+  .stat{
+    text-align:center;
+  }
+
+  .stat .num{
+    font-family:var(--display);
+    font-size:32px;
+    color:var(--orange);
+  }
+
+  .stat .label{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--muted);
+    margin-top:6px;
+  }
+
+  /* =========================
+     MAIN
+  ========================= */
+
   main{
     max-width:1100px;
     margin:0 auto;
@@ -106,36 +301,68 @@
     grid-template-columns:1fr 1.1fr;
     gap:60px;
   }
-  @media(max-width:900px){ main{grid-template-columns:1fr;} .hero-title{font-size:38px;} header{padding:18px 20px;} .nav-right{display:none;} }
 
-  .benefits h2, .form-panel h2{
+  .benefits h2,
+  .form-panel h2{
     font-family:var(--display);
     font-size:26px;
     margin-bottom:24px;
   }
+
   .eyebrow{
-    font-family:var(--mono); font-size:12px; color:var(--green); letter-spacing:2px; margin-bottom:10px; display:block;
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--green);
+    letter-spacing:2px;
+    margin-bottom:10px;
+    display:block;
   }
-  .benefit-list{list-style:none; margin-top:20px;}
+
+  .benefit-list{
+    list-style:none;
+    margin-top:20px;
+  }
+
   .benefit-list li{
-    display:flex; gap:16px;
+    display:flex;
+    gap:16px;
     padding:22px 0;
     border-bottom:1px solid var(--border);
   }
-  .benefit-list .mark{
-    font-family:var(--mono); color:var(--orange); font-weight:700; font-size:14px; min-width:28px;
-  }
-  .benefit-list h3{font-size:16px; margin-bottom:6px;}
-  .benefit-list p{color:var(--muted); font-size:14px;}
 
-  /* FORM */
+  .benefit-list .mark{
+    font-family:var(--mono);
+    color:var(--orange);
+    font-weight:700;
+    font-size:14px;
+    min-width:28px;
+  }
+
+  .benefit-list h3{
+    font-size:16px;
+    margin-bottom:6px;
+  }
+
+  .benefit-list p{
+    color:var(--muted);
+    font-size:14px;
+  }
+
+  /* =========================
+     FORM
+  ========================= */
+
   .form-panel{
     background:var(--panel);
     border:1px solid var(--border);
     border-radius:8px;
     padding:36px;
   }
-  .field{margin-bottom:20px;}
+
+  .field{
+    margin-bottom:20px;
+  }
+
   label{
     display:block;
     font-family:var(--mono);
@@ -144,7 +371,10 @@
     color:var(--muted);
     margin-bottom:8px;
   }
-  input, select, textarea{
+
+  input,
+  select,
+  textarea{
     width:100%;
     background:var(--bg-alt);
     border:1px solid var(--border);
@@ -154,12 +384,35 @@
     font-size:14px;
     font-family:inherit;
   }
-  input:focus, select:focus, textarea:focus{
+
+  input::placeholder,
+  textarea::placeholder{
+    color:#66666c;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus{
     outline:none;
     border-color:var(--orange);
+    box-shadow:0 0 0 2px rgba(255,90,31,.08);
   }
-  .row2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
-  textarea{resize:vertical; min-height:90px;}
+
+  select option{
+    background:var(--bg-alt);
+    color:var(--text);
+  }
+
+  .row2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+
+  textarea{
+    resize:vertical;
+    min-height:90px;
+  }
 
   .submit-btn{
     width:100%;
@@ -174,11 +427,31 @@
     border-radius:5px;
     cursor:pointer;
     margin-top:10px;
-    transition:opacity .15s;
+    transition:
+      opacity .15s ease,
+      transform .15s ease;
   }
-  .submit-btn:hover{opacity:0.88;}
-  .fine-print{font-size:12px; color:var(--muted); margin-top:14px; text-align:center;}
-  .fine-print a{color:var(--green); border-bottom:1px solid var(--green-dim);}
+
+  .submit-btn:hover{
+    opacity:.88;
+    transform:translateY(-1px);
+  }
+
+  .fine-print{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:14px;
+    text-align:center;
+  }
+
+  .fine-print a{
+    color:var(--green);
+    border-bottom:1px solid var(--green-dim);
+  }
+
+  /* =========================
+     FOOTER
+  ========================= */
 
   footer{
     text-align:center;
@@ -188,135 +461,649 @@
     font-size:12px;
     color:var(--muted);
   }
+
+  /* =========================
+     TABLET
+  ========================= */
+
+  @media(max-width:900px){
+
+    header{
+      padding:0 25px;
+      height:78px;
+    }
+
+    .mobile-menu{
+      top:78px;
+    }
+
+    .mobile-menu-inner{
+      padding:10px 25px 16px;
+    }
+
+    .nav-right{
+      display:none;
+    }
+
+    main{
+      grid-template-columns:1fr;
+      gap:50px;
+    }
+
+    h1.hero-title{
+      font-size:46px;
+    }
+
+    .stats{
+      gap:40px;
+    }
+  }
+
+  /* =========================
+     MOBILE
+  ========================= */
+
+  @media(max-width:600px){
+
+    header{
+      height:72px;
+      padding:0 18px;
+    }
+
+    .mobile-menu{
+      top:72px;
+    }
+
+    .mobile-menu-inner{
+      padding:8px 20px 14px;
+    }
+
+    .logo{
+      font-size:22px;
+    }
+
+    .menu-button{
+      width:42px;
+      height:42px;
+    }
+
+    .menu-line{
+      width:27px;
+    }
+
+    .hero{
+      padding:70px 18px 50px;
+    }
+
+    .badge{
+      font-size:10px;
+      letter-spacing:2px;
+      padding:7px 14px;
+      margin-bottom:22px;
+    }
+
+    h1.hero-title{
+      font-size:38px;
+      line-height:1.08;
+    }
+
+    .hero-sub{
+      font-size:15px;
+      line-height:1.6;
+    }
+
+    .stats{
+      gap:28px 45px;
+      padding:30px 15px;
+    }
+
+    .stat .num{
+      font-size:25px;
+    }
+
+    .stat .label{
+      font-size:9px;
+      letter-spacing:1.5px;
+    }
+
+    main{
+      padding:55px 18px 70px;
+      gap:45px;
+    }
+
+    .benefits h2,
+    .form-panel h2{
+      font-size:23px;
+    }
+
+    .benefit-list li{
+      padding:18px 0;
+      gap:12px;
+    }
+
+    .benefit-list p{
+      font-size:13px;
+    }
+
+    .form-panel{
+      padding:24px 18px;
+    }
+
+    .row2{
+      grid-template-columns:1fr;
+      gap:0;
+    }
+
+    footer{
+      padding:25px 15px;
+      font-size:10px;
+    }
+  }
 </style>
 </head>
+
 <body>
 
+<!-- =========================
+     NAVBAR
+========================= -->
+
 <header>
-  <div class="menu-icon">☰</div>
-  <div class="logo">KHELZONE</div>
-  <div class="nav-right">
-    <a href="seller-guide.html" class="nav-link">SELLER GUIDE</a>
-    <a href="become-a-seller.html" class="nav-link active">BECOME A SELLER</a>
+
+  <button
+    class="menu-button"
+    id="menuButton"
+    aria-label="Open navigation menu"
+    aria-expanded="false"
+  >
+    <span class="menu-line line1"></span>
+    <span class="menu-line line2"></span>
+    <span class="menu-line line3"></span>
+  </button>
+
+  <a href="seller.html" class="logo">
+    KHELZONE
+  </a>
+
+  <nav class="nav-right">
+    <a href="seller-guide.html" class="nav-link">
+      SELLER GUIDE
+    </a>
+
+    <a href="become-a-seller.html" class="nav-link active">
+      BECOME A SELLER
+    </a>
+
     <div class="cart">🛒</div>
-  </div>
+  </nav>
+
 </header>
 
+
+<!-- =========================
+     DROPDOWN MENU
+========================= -->
+
+<div class="mobile-menu" id="mobileMenu">
+
+  <div class="mobile-menu-inner">
+
+    <a href="index.html">
+      HOME
+    </a>
+
+    <a href="seller-guide.html">
+      SELLER GUIDE
+    </a>
+
+    <a href="become-a-seller.html" class="menu-active">
+      BECOME A SELLER
+    </a>
+
+    <a href="shop.html">
+      SHOP
+    </a>
+
+    <a href="contact.html">
+      CONTACT
+    </a>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     HERO
+========================= -->
+
 <section class="hero">
-  <span class="badge">PARTNER WITH THE BEST</span>
-  <h1 class="hero-title">SELL WITH <span class="accent">KHELZONE</span></h1>
-  <p class="hero-sub">Connect your high-performance gear with athletes nationwide. Join Pakistan's premier sports marketplace and scale your business with engineered precision.</p>
+
+  <span class="badge">
+    PARTNER WITH THE BEST
+  </span>
+
+  <h1 class="hero-title">
+    SELL WITH
+    <span class="accent">KHELZONE</span>
+  </h1>
+
+  <p class="hero-sub">
+    Connect your high-performance gear with athletes nationwide.
+    Join Pakistan's premier sports marketplace and scale your
+    business with engineered precision.
+  </p>
+
 </section>
+
+
+<!-- =========================
+     STATS
+========================= -->
 
 <section class="stats">
-  <div class="stat"><div class="num">50K+</div><div class="label">ACTIVE BUYERS</div></div>
-  <div class="stat"><div class="num">120+</div><div class="label">CITIES REACHED</div></div>
-  <div class="stat"><div class="num">7 DAYS</div><div class="label">AVG. PAYOUT</div></div>
-  <div class="stat"><div class="num">0%</div><div class="label">LISTING FEE</div></div>
+
+  <div class="stat">
+    <div class="num">50K+</div>
+    <div class="label">ACTIVE BUYERS</div>
+  </div>
+
+  <div class="stat">
+    <div class="num">120+</div>
+    <div class="label">CITIES REACHED</div>
+  </div>
+
+  <div class="stat">
+    <div class="num">7 DAYS</div>
+    <div class="label">AVG. PAYOUT</div>
+  </div>
+
+  <div class="stat">
+    <div class="num">0%</div>
+    <div class="label">LISTING FEE</div>
+  </div>
+
 </section>
 
+
+<!-- =========================
+     MAIN CONTENT
+========================= -->
+
 <main>
+
+  <!-- BENEFITS -->
+
   <div class="benefits">
-    <span class="eyebrow">WHY SELL HERE</span>
-    <h2>Built for serious gear brands</h2>
+
+    <span class="eyebrow">
+      WHY SELL HERE
+    </span>
+
+    <h2>
+      Built for serious gear brands
+    </h2>
+
     <ul class="benefit-list">
+
       <li>
         <span class="mark">01</span>
+
         <div>
-          <h3>Nationwide athlete reach</h3>
-          <p>Get discovered by verified buyers searching by sport, city, and skill level — not just generic shoppers.</p>
+          <h3>
+            Nationwide athlete reach
+          </h3>
+
+          <p>
+            Get discovered by verified buyers searching by sport,
+            city, and skill level — not just generic shoppers.
+          </p>
         </div>
       </li>
+
       <li>
         <span class="mark">02</span>
+
         <div>
-          <h3>Fast, predictable payouts</h3>
-          <p>Weekly settlements straight to your account, with full order and commission breakdowns.</p>
+          <h3>
+            Fast, predictable payouts
+          </h3>
+
+          <p>
+            Weekly settlements straight to your account,
+            with full order and commission breakdowns.
+          </p>
         </div>
       </li>
+
       <li>
         <span class="mark">03</span>
+
         <div>
-          <h3>Seller dashboard & analytics</h3>
-          <p>Track inventory, returns, and demand trends by category so you know what to stock next.</p>
+          <h3>
+            Seller dashboard & analytics
+          </h3>
+
+          <p>
+            Track inventory, returns, and demand trends by
+            category so you know what to stock next.
+          </p>
         </div>
       </li>
+
       <li>
         <span class="mark">04</span>
+
         <div>
-          <h3>Dedicated onboarding support</h3>
-          <p>A KHELZONE specialist walks you through listing setup, photography, and pricing benchmarks.</p>
+          <h3>
+            Dedicated onboarding support
+          </h3>
+
+          <p>
+            A KHELZONE specialist walks you through listing
+            setup, photography, and pricing benchmarks.
+          </p>
         </div>
       </li>
+
     </ul>
+
   </div>
+
+
+  <!-- FORM -->
 
   <div class="form-panel">
-    <h2>Apply to sell</h2>
+
+    <h2>
+      Apply to sell
+    </h2>
+
     <form>
-      <div class="row2">
-        <div class="field">
-          <label for="bname">BUSINESS NAME</label>
-          <input id="bname" type="text" placeholder="e.g. Champion Sports Co." required>
-        </div>
-        <div class="field">
-          <label for="oname">OWNER NAME</label>
-          <input id="oname" type="text" placeholder="Full name" required>
-        </div>
-      </div>
 
       <div class="row2">
+
         <div class="field">
-          <label for="email">EMAIL</label>
-          <input id="email" type="email" placeholder="you@business.com" required>
+
+          <label for="bname">
+            BUSINESS NAME
+          </label>
+
+          <input
+            id="bname"
+            type="text"
+            placeholder="e.g. Champion Sports Co."
+            required
+          >
+
         </div>
+
+
         <div class="field">
-          <label for="phone">PHONE</label>
-          <input id="phone" type="tel" placeholder="03XX-XXXXXXX" required>
+
+          <label for="oname">
+            OWNER NAME
+          </label>
+
+          <input
+            id="oname"
+            type="text"
+            placeholder="Full name"
+            required
+          >
+
         </div>
+
       </div>
 
+
       <div class="row2">
+
         <div class="field">
-          <label for="city">CITY</label>
-          <input id="city" type="text" placeholder="Karachi, Lahore, Islamabad..." required>
+
+          <label for="email">
+            EMAIL
+          </label>
+
+          <input
+            id="email"
+            type="email"
+            placeholder="you@business.com"
+            required
+          >
+
         </div>
+
+
         <div class="field">
-          <label for="category">PRIMARY CATEGORY</label>
+
+          <label for="phone">
+            PHONE
+          </label>
+
+          <input
+            id="phone"
+            type="tel"
+            placeholder="03XX-XXXXXXX"
+            required
+          >
+
+        </div>
+
+      </div>
+
+
+      <div class="row2">
+
+        <div class="field">
+
+          <label for="city">
+            CITY
+          </label>
+
+          <input
+            id="city"
+            type="text"
+            placeholder="Karachi, Lahore, Islamabad..."
+            required
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="category">
+            PRIMARY CATEGORY
+          </label>
+
           <select id="category" required>
-            <option value="">Select category</option>
-            <option>Cricket Gear</option>
-            <option>Football / Soccer</option>
-            <option>Gym & Fitness</option>
-            <option>Running & Athletics</option>
-            <option>Apparel & Footwear</option>
-            <option>Other</option>
+
+            <option value="">
+              Select category
+            </option>
+
+            <option>
+              Cricket Gear
+            </option>
+
+            <option>
+              Football / Soccer
+            </option>
+
+            <option>
+              Gym & Fitness
+            </option>
+
+            <option>
+              Running & Athletics
+            </option>
+
+            <option>
+              Apparel & Footwear
+            </option>
+
+            <option>
+              Other
+            </option>
+
           </select>
+
         </div>
+
       </div>
 
+
       <div class="field">
-        <label for="volume">MONTHLY SALES VOLUME (APPROX.)</label>
+
+        <label for="volume">
+          MONTHLY SALES VOLUME (APPROX.)
+        </label>
+
         <select id="volume">
-          <option>Just starting out</option>
-          <option>Rs. 50,000 – 200,000</option>
-          <option>Rs. 200,000 – 1,000,000</option>
-          <option>Rs. 1,000,000+</option>
+
+          <option>
+            Just starting out
+          </option>
+
+          <option>
+            Rs. 50,000 – 200,000
+          </option>
+
+          <option>
+            Rs. 200,000 – 1,000,000
+          </option>
+
+          <option>
+            Rs. 1,000,000+
+          </option>
+
         </select>
+
       </div>
+
 
       <div class="field">
-        <label for="message">TELL US ABOUT YOUR PRODUCTS</label>
-        <textarea id="message" placeholder="Brands you carry, product range, current sales channels..."></textarea>
+
+        <label for="message">
+          TELL US ABOUT YOUR PRODUCTS
+        </label>
+
+        <textarea
+          id="message"
+          placeholder="Brands you carry, product range, current sales channels..."
+        ></textarea>
+
       </div>
 
-      <button type="submit" class="submit-btn">SUBMIT APPLICATION →</button>
-      <p class="fine-print">By applying you agree to KHELZONE's <a href="seller-guide.html">Seller Guide</a> and terms of service.</p>
+
+      <button
+        type="submit"
+        class="submit-btn"
+      >
+        SUBMIT APPLICATION →
+      </button>
+
+
+      <p class="fine-print">
+        By applying you agree to KHELZONE's
+        <a href="seller-guide.html">
+          Seller Guide
+        </a>
+        and terms of service.
+      </p>
+
     </form>
+
   </div>
+
 </main>
 
-<footer>© 2026 KHELZONE — PAKISTAN'S SPORTS MARKETPLACE</footer>
+
+<!-- =========================
+     FOOTER
+========================= -->
+
+<footer>
+  © 2026 KHELZONE — PAKISTAN'S SPORTS MARKETPLACE
+</footer>
+
+
+<!-- =========================
+     JAVASCRIPT
+========================= -->
+
+<script>
+
+  const menuButton = document.getElementById("menuButton");
+  const mobileMenu = document.getElementById("mobileMenu");
+
+  menuButton.addEventListener("click", function(){
+
+    const isOpen = mobileMenu.classList.toggle("show");
+
+    menuButton.classList.toggle("active", isOpen);
+
+    menuButton.setAttribute(
+      "aria-expanded",
+      isOpen ? "true" : "false"
+    );
+
+  });
+
+
+  /* Close menu when a link is clicked */
+
+  const menuLinks = mobileMenu.querySelectorAll("a");
+
+  menuLinks.forEach(function(link){
+
+    link.addEventListener("click", function(){
+
+      mobileMenu.classList.remove("show");
+
+      menuButton.classList.remove("active");
+
+      menuButton.setAttribute(
+        "aria-expanded",
+        "false"
+      );
+
+    });
+
+  });
+
+
+  /* Close menu if user clicks outside */
+
+  document.addEventListener("click", function(event){
+
+    const clickedInsideMenu =
+      mobileMenu.contains(event.target);
+
+    const clickedButton =
+      menuButton.contains(event.target);
+
+    if(
+      !clickedInsideMenu &&
+      !clickedButton &&
+      mobileMenu.classList.contains("show")
+    ){
+
+      mobileMenu.classList.remove("show");
+
+      menuButton.classList.remove("active");
+
+      menuButton.setAttribute(
+        "aria-expanded",
+        "false"
+      );
+
+    }
+
+  });
+
+</script>
 
 </body>
 </html>

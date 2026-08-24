@@ -1,84 +1,1714 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Seller Guide | KHELZONE</title>
+
 <style>
-  :root{
-    --bg:#0b0b0d; --bg-alt:#141416; --panel:#1a1a1d;
-    --orange:#ff5a1f; --orange-dim:#ff5a1f33;
-    --green:#7CFC5A; --green-dim:#7CFC5A33;
-    --text:#f2f2f0; --muted:#9a9a9f; --border:#2b2b2f;
+
+/* =====================================================
+   ROOT
+===================================================== */
+
+:root{
+    --bg:#0b0b0d;
+    --bg-alt:#141416;
+    --panel:#1a1a1d;
+
+    --orange:#ff5a1f;
+    --orange-dim:#ff5a1f33;
+
+    --green:#7CFC5A;
+    --green-dim:#7CFC5A33;
+
+    --text:#f2f2f0;
+    --muted:#9a9a9f;
+    --border:#2b2b2f;
+
     --mono:'Courier New', Consolas, monospace;
     --display:'Arial Black', Impact, sans-serif;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;line-height:1.6;}
-  a{color:inherit;text-decoration:none;}
-  header{display:flex;align-items:center;justify-content:space-between;padding:24px 60px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(11,11,13,.92);backdrop-filter:blur(6px);z-index:50;}
-  .menu-icon{font-size:22px;cursor:pointer}.logo{font-family:var(--display);font-size:26px;letter-spacing:2px;color:var(--orange);font-weight:900}
-  .nav-right{display:flex;align-items:center;gap:24px}.nav-right .active{color:var(--orange);border-bottom:2px solid var(--orange);padding-bottom:4px}
-  .nav-link{font-family:var(--mono);font-size:13px;letter-spacing:1px;font-weight:700}.cart{font-size:20px}
-  .hero{text-align:center;padding:80px 20px 50px;background:radial-gradient(ellipse at center top,rgba(124,252,90,.06),transparent 60%);border-bottom:1px solid var(--border)}
-  .badge{display:inline-block;font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--green);border:1px solid var(--green-dim);padding:8px 18px;border-radius:20px;margin-bottom:28px}
-  h1.hero-title{font-family:var(--display);font-size:50px;letter-spacing:1px} h1.hero-title .accent{color:var(--orange)}
-  .hero-sub{max-width:620px;margin:22px auto 0;color:var(--muted);font-size:17px}
-  nav.toc{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:26px 20px;border-bottom:1px solid var(--border)}
-  nav.toc a{font-family:var(--mono);font-size:12px;letter-spacing:1px;color:var(--muted);border:1px solid var(--border);padding:8px 16px;border-radius:20px}
-  nav.toc a:hover{color:var(--orange);border-color:var(--orange-dim)}
-  main{max-width:900px;margin:0 auto;padding:70px 20px 100px}.step-track{position:relative;margin-bottom:90px}
-  .step{display:grid;grid-template-columns:70px 1fr;gap:26px;padding:34px 0;border-bottom:1px solid var(--border)}.step:last-child{border-bottom:none}
-  .step .num{font-family:var(--display);font-size:34px;color:var(--orange);opacity:.5}.step h3{font-size:20px;margin-bottom:10px}.step p{color:var(--muted);font-size:15px;max-width:600px}
-  .step ul{margin-top:14px;padding-left:20px;color:var(--muted);font-size:14px}.step ul li{margin-bottom:6px}
-  section.block{margin-bottom:90px}.eyebrow{font-family:var(--mono);font-size:12px;color:var(--green);letter-spacing:2px;margin-bottom:12px;display:block}
-  h2.block-title{font-family:var(--display);font-size:30px;margin-bottom:30px}.req-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-  @media(max-width:700px){.req-grid{grid-template-columns:1fr}.step{grid-template-columns:50px 1fr}h1.hero-title{font-size:34px}header{padding:18px 20px}.nav-right{display:none}}
-  .req-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:24px}.req-card h4{font-size:15px;margin-bottom:8px;color:var(--green)}.req-card p{font-size:13px;color:var(--muted)}
-  table.fees{width:100%;border-collapse:collapse;margin-top:10px}table.fees th,table.fees td{text-align:left;padding:16px 14px;border-bottom:1px solid var(--border);font-size:14px}
-  table.fees th{font-family:var(--mono);font-size:11px;letter-spacing:1px;color:var(--muted)}table.fees td.orange{color:var(--orange);font-weight:700}
-  .faq-item{border-bottom:1px solid var(--border);padding:22px 0}.faq-item h4{font-size:15px;margin-bottom:8px}.faq-item p{color:var(--muted);font-size:14px}
-  .cta-band{text-align:center;padding:60px 30px;background:var(--panel);border:1px solid var(--border);border-radius:10px}.cta-band h2{font-family:var(--display);font-size:28px;margin-bottom:14px}.cta-band p{color:var(--muted);margin-bottom:26px}
-  .cta-btn{display:inline-block;background:var(--orange);color:#0b0b0d;font-family:var(--mono);font-weight:700;letter-spacing:2px;font-size:13px;padding:16px 36px;border-radius:5px}
-  footer{text-align:center;padding:30px;border-top:1px solid var(--border);font-family:var(--mono);font-size:12px;color:var(--muted)}
+}
+
+
+/* =====================================================
+   RESET
+===================================================== */
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Segoe UI',Arial,sans-serif;
+    line-height:1.6;
+}
+
+body.menu-open{
+    overflow:hidden;
+}
+
+a{
+    color:inherit;
+    text-decoration:none;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+header{
+    height:86px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:0 60px;
+
+    border-bottom:1px solid var(--border);
+
+    position:sticky;
+    top:0;
+
+    background:rgba(11,11,13,.96);
+
+    backdrop-filter:blur(10px);
+
+    z-index:1000;
+}
+
+
+/* MENU BUTTON */
+
+.menu-button{
+    width:58px;
+    height:58px;
+
+    border:none;
+    border-radius:8px;
+
+    background:transparent;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+
+    transition:.2s ease;
+}
+
+.menu-button:hover{
+    background:rgba(255,90,31,.08);
+}
+
+
+/* HAMBURGER */
+
+.menu-lines{
+    width:30px;
+    height:22px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+}
+
+.menu-lines span{
+    display:block;
+
+    width:100%;
+    height:3px;
+
+    background:var(--orange);
+
+    border-radius:3px;
+
+    transition:.25s ease;
+}
+
+
+/* X */
+
+.menu-button.open .menu-lines span:nth-child(1){
+    transform:translateY(9.5px) rotate(45deg);
+}
+
+.menu-button.open .menu-lines span:nth-child(2){
+    opacity:0;
+}
+
+.menu-button.open .menu-lines span:nth-child(3){
+    transform:translateY(-9.5px) rotate(-45deg);
+}
+
+
+/* LOGO */
+
+.logo{
+    position:absolute;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    font-family:var(--display);
+
+    font-size:32px;
+
+    letter-spacing:3px;
+
+    color:var(--orange);
+
+    font-weight:900;
+}
+
+
+/* RIGHT NAV */
+
+.nav-right{
+    margin-left:auto;
+
+    display:flex;
+    align-items:center;
+
+    gap:38px;
+}
+
+.nav-link{
+    font-family:var(--mono);
+
+    font-size:13px;
+
+    letter-spacing:1.5px;
+
+    font-weight:700;
+
+    transition:.2s ease;
+}
+
+.nav-link:hover{
+    color:var(--orange);
+}
+
+.nav-link.active{
+    color:var(--orange);
+}
+
+
+/* CART */
+
+.cart{
+    width:30px;
+    height:30px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.cart svg{
+    width:25px;
+    height:25px;
+
+    stroke:var(--text);
+
+    fill:none;
+
+    stroke-width:1.7;
+}
+
+
+/* =====================================================
+   DROPDOWN MENU
+===================================================== */
+
+.menu-overlay{
+    position:fixed;
+
+    top:86px;
+    left:0;
+    right:0;
+    bottom:0;
+
+    background:rgba(5,5,7,.95);
+
+    backdrop-filter:blur(5px);
+
+    z-index:999;
+
+    opacity:0;
+
+    visibility:hidden;
+
+    transform:translateY(-10px);
+
+    transition:
+        opacity .25s ease,
+        visibility .25s ease,
+        transform .25s ease;
+
+    overflow-y:auto;
+}
+
+.menu-overlay.show{
+    opacity:1;
+
+    visibility:visible;
+
+    transform:translateY(0);
+}
+
+
+/* MENU INNER */
+
+.menu-inner{
+    max-width:1440px;
+
+    margin:0 auto;
+
+    padding:25px 7vw 80px;
+}
+
+
+/* MENU ITEMS */
+
+.menu-item{
+    display:flex;
+
+    align-items:center;
+
+    min-height:70px;
+
+    border-bottom:1px solid var(--border);
+
+    font-family:var(--mono);
+
+    font-size:15px;
+
+    font-weight:700;
+
+    letter-spacing:1.5px;
+
+    color:var(--text);
+
+    transition:
+        color .2s ease,
+        padding-left .2s ease;
+}
+
+.menu-item:hover{
+    color:var(--orange);
+
+    padding-left:8px;
+}
+
+.menu-item.active{
+    color:var(--orange);
+}
+
+
+/* =====================================================
+   HERO
+===================================================== */
+
+.hero{
+    text-align:center;
+
+    padding:80px 20px 50px;
+
+    background:
+        radial-gradient(
+            ellipse at center top,
+            rgba(124,252,90,.06),
+            transparent 60%
+        );
+
+    border-bottom:1px solid var(--border);
+}
+
+
+/* BADGE */
+
+.badge{
+    display:inline-block;
+
+    font-family:var(--mono);
+
+    font-size:12px;
+
+    letter-spacing:3px;
+
+    color:var(--green);
+
+    border:1px solid var(--green-dim);
+
+    padding:8px 18px;
+
+    border-radius:20px;
+
+    margin-bottom:28px;
+}
+
+
+/* TITLE */
+
+h1.hero-title{
+    font-family:var(--display);
+
+    font-size:50px;
+
+    letter-spacing:1px;
+
+    line-height:1.1;
+}
+
+h1.hero-title .accent{
+    color:var(--orange);
+}
+
+
+/* HERO TEXT */
+
+.hero-sub{
+    max-width:620px;
+
+    margin:22px auto 0;
+
+    color:var(--muted);
+
+    font-size:17px;
+}
+
+
+/* =====================================================
+   TABLE OF CONTENTS
+===================================================== */
+
+nav.toc{
+    display:flex;
+
+    justify-content:center;
+
+    gap:10px;
+
+    flex-wrap:wrap;
+
+    padding:26px 20px;
+
+    border-bottom:1px solid var(--border);
+}
+
+nav.toc a{
+    font-family:var(--mono);
+
+    font-size:12px;
+
+    letter-spacing:1px;
+
+    color:var(--muted);
+
+    border:1px solid var(--border);
+
+    padding:8px 16px;
+
+    border-radius:20px;
+
+    transition:.2s ease;
+}
+
+nav.toc a:hover{
+    color:var(--orange);
+
+    border-color:var(--orange);
+}
+
+
+/* =====================================================
+   MAIN
+===================================================== */
+
+main{
+    max-width:900px;
+
+    margin:0 auto;
+
+    padding:70px 20px 100px;
+}
+
+section.block{
+    margin-bottom:90px;
+}
+
+
+/* EYEBROW */
+
+.eyebrow{
+    font-family:var(--mono);
+
+    font-size:12px;
+
+    color:var(--green);
+
+    letter-spacing:2px;
+
+    margin-bottom:12px;
+
+    display:block;
+}
+
+
+/* TITLES */
+
+h2.block-title{
+    font-family:var(--display);
+
+    font-size:30px;
+
+    margin-bottom:30px;
+}
+
+
+/* =====================================================
+   STEPS
+===================================================== */
+
+.step-track{
+    position:relative;
+
+    margin-bottom:20px;
+}
+
+.step{
+    display:grid;
+
+    grid-template-columns:70px 1fr;
+
+    gap:26px;
+
+    padding:34px 0;
+
+    border-bottom:1px solid var(--border);
+}
+
+.step:last-child{
+    border-bottom:none;
+}
+
+.step .num{
+    font-family:var(--display);
+
+    font-size:34px;
+
+    color:var(--orange);
+
+    opacity:.6;
+}
+
+.step h3{
+    font-size:20px;
+
+    margin-bottom:10px;
+}
+
+.step p{
+    color:var(--muted);
+
+    font-size:15px;
+
+    max-width:600px;
+}
+
+.step ul{
+    margin-top:14px;
+
+    padding-left:20px;
+
+    color:var(--muted);
+
+    font-size:14px;
+}
+
+.step ul li{
+    margin-bottom:6px;
+}
+
+
+/* =====================================================
+   REQUIREMENTS
+===================================================== */
+
+.req-grid{
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:20px;
+}
+
+.req-card{
+    background:var(--panel);
+
+    border:1px solid var(--border);
+
+    border-radius:8px;
+
+    padding:24px;
+
+    transition:border-color .2s ease;
+}
+
+.req-card:hover{
+    border-color:var(--orange-dim);
+}
+
+.req-card h4{
+    font-size:15px;
+
+    margin-bottom:8px;
+
+    color:var(--green);
+}
+
+.req-card p{
+    font-size:13px;
+
+    color:var(--muted);
+}
+
+
+/* =====================================================
+   FEES TABLE
+===================================================== */
+
+table.fees{
+    width:100%;
+
+    border-collapse:collapse;
+
+    margin-top:10px;
+}
+
+table.fees th,
+table.fees td{
+    text-align:left;
+
+    padding:16px 14px;
+
+    border-bottom:1px solid var(--border);
+
+    font-size:14px;
+}
+
+table.fees th{
+    font-family:var(--mono);
+
+    font-size:11px;
+
+    letter-spacing:1px;
+
+    color:var(--muted);
+}
+
+table.fees td.orange{
+    color:var(--orange);
+
+    font-weight:700;
+}
+
+
+/* =====================================================
+   FAQ
+===================================================== */
+
+.faq-item{
+    border-bottom:1px solid var(--border);
+
+    padding:22px 0;
+}
+
+.faq-item h4{
+    font-size:15px;
+
+    margin-bottom:8px;
+}
+
+.faq-item p{
+    color:var(--muted);
+
+    font-size:14px;
+}
+
+
+/* =====================================================
+   CTA
+===================================================== */
+
+.cta-band{
+    text-align:center;
+
+    padding:60px 30px;
+
+    background:var(--panel);
+
+    border:1px solid var(--border);
+
+    border-radius:10px;
+}
+
+.cta-band h2{
+    font-family:var(--display);
+
+    font-size:28px;
+
+    margin-bottom:14px;
+}
+
+.cta-band p{
+    color:var(--muted);
+
+    margin-bottom:26px;
+}
+
+.cta-btn{
+    display:inline-block;
+
+    background:var(--orange);
+
+    color:#0b0b0d;
+
+    font-family:var(--mono);
+
+    font-weight:700;
+
+    letter-spacing:2px;
+
+    font-size:13px;
+
+    padding:16px 36px;
+
+    border-radius:5px;
+
+    transition:.2s ease;
+}
+
+.cta-btn:hover{
+    opacity:.9;
+
+    transform:translateY(-1px);
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+footer{
+    text-align:center;
+
+    padding:30px;
+
+    border-top:1px solid var(--border);
+
+    font-family:var(--mono);
+
+    font-size:12px;
+
+    color:var(--muted);
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media(max-width:900px){
+
+    header{
+        height:76px;
+
+        padding:0 20px;
+    }
+
+    .menu-overlay{
+        top:76px;
+    }
+
+    .logo{
+        font-size:26px;
+    }
+
+    .nav-right{
+        display:none;
+    }
+
+    .menu-inner{
+        padding-left:30px;
+        padding-right:30px;
+    }
+}
+
+
+@media(max-width:700px){
+
+    .req-grid{
+        grid-template-columns:1fr;
+    }
+
+    .step{
+        grid-template-columns:50px 1fr;
+
+        gap:18px;
+    }
+
+    h1.hero-title{
+        font-size:34px;
+    }
+
+    .hero-sub{
+        font-size:15px;
+    }
+
+    .menu-item{
+        min-height:65px;
+
+        font-size:13px;
+    }
+}
+
+
+@media(max-width:600px){
+
+    header{
+        height:70px;
+    }
+
+    .menu-overlay{
+        top:70px;
+    }
+
+    .logo{
+        font-size:22px;
+
+        letter-spacing:2px;
+    }
+
+    .menu-button{
+        width:48px;
+        height:48px;
+    }
+
+    .menu-lines{
+        width:27px;
+        height:20px;
+    }
+
+    .menu-inner{
+        padding:15px 22px 50px;
+    }
+
+    .hero{
+        padding:65px 18px 45px;
+    }
+
+    h1.hero-title{
+        font-size:32px;
+    }
+
+    .hero-sub{
+        font-size:14px;
+    }
+
+    nav.toc{
+        padding:20px 12px;
+    }
+
+    nav.toc a{
+        font-size:10px;
+
+        padding:7px 11px;
+    }
+
+    main{
+        padding:55px 18px 80px;
+    }
+
+    h2.block-title{
+        font-size:25px;
+    }
+
+    .step{
+        grid-template-columns:42px 1fr;
+
+        gap:14px;
+    }
+
+    .step .num{
+        font-size:27px;
+    }
+
+    .step h3{
+        font-size:17px;
+    }
+
+    table.fees{
+        font-size:12px;
+    }
+
+    table.fees th,
+    table.fees td{
+        padding:12px 8px;
+
+        font-size:12px;
+    }
+
+    .cta-band{
+        padding:45px 20px;
+    }
+}
+
 </style>
 </head>
+
+
 <body>
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
 <header>
-  <div class="menu-icon">☰</div><div class="logo">KHELZONE</div>
-  <div class="nav-right">
-    <a href="seller-guide.html" class="nav-link active">SELLER GUIDE</a>
-    <a href="sellerinfo.html" class="nav-link">BECOME A SELLER</a>
-    <div class="cart">🛒</div>
-  </div>
+
+
+    <!-- MENU BUTTON -->
+
+    <button
+        class="menu-button"
+        id="menuButton"
+        aria-label="Open navigation"
+        aria-expanded="false"
+    >
+
+        <div class="menu-lines">
+
+            <span></span>
+
+            <span></span>
+
+            <span></span>
+
+        </div>
+
+    </button>
+
+
+    <!-- LOGO -->
+
+    <a href="index.html" class="logo">
+        KHELZONE
+    </a>
+
+
+    <!-- RIGHT NAV -->
+
+    <div class="nav-right">
+
+        <a
+            href="seller-guide.html"
+            class="nav-link active"
+        >
+            SELLER GUIDE
+        </a>
+
+
+        <a
+            href="sellerinfo.html"
+            class="nav-link"
+        >
+            BECOME A SELLER
+        </a>
+
+
+        <!-- CART -->
+
+        <a
+            href="shop.html"
+            class="cart"
+            aria-label="Shop"
+        >
+
+            <svg
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+
+                <path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 1.9-1.4L21 8H6"/>
+
+                <circle cx="9" cy="20" r="1.2"/>
+
+                <circle cx="18" cy="20" r="1.2"/>
+
+            </svg>
+
+        </a>
+
+    </div>
+
 </header>
-<section class="hero"><span class="badge">SELLER RESOURCES</span><h1 class="hero-title">THE <span class="accent">SELLER GUIDE</span></h1><p class="hero-sub">Everything you need to know about listing, pricing, and getting paid on Pakistan's premier sports marketplace.</p></section>
-<nav class="toc"><a href="#steps">Onboarding Steps</a><a href="#requirements">Requirements</a><a href="#fees">Fees & Payouts</a><a href="#faq">FAQ</a></nav>
-<main>
-<section id="steps" class="block"><span class="eyebrow">GETTING STARTED</span><h2 class="block-title">Five steps to your first sale</h2><div class="step-track">
-<div class="step"><div class="num">01</div><div><h3>Submit your application</h3><p>Fill out the Become a Seller form with your business details, category, and product range. Takes about five minutes.</p></div></div>
-<div class="step"><div class="num">02</div><div><h3>Verification</h3><p>Our team reviews your business documents and product authenticity. Most applications are verified within 2–3 business days.</p><ul><li>CNIC or business registration</li><li>Bank account for payouts</li><li>Proof of product sourcing (invoices or brand authorization)</li></ul></div></div>
-<div class="step"><div class="num">03</div><div><h3>Set up your storefront</h3><p>Upload your logo, write a brand description, and configure shipping zones from your seller dashboard.</p></div></div>
-<div class="step"><div class="num">04</div><div><h3>List your products</h3><p>Add product photos, sizes, pricing, and stock levels. Use our pricing benchmark tool to stay competitive in your category.</p></div></div>
-<div class="step"><div class="num">05</div><div><h3>Start selling & get paid</h3><p>Once live, your products appear in search and category pages. Orders settle to your account on a weekly cycle.</p></div></div>
-</div></section>
-<section id="requirements" class="block"><span class="eyebrow">BEFORE YOU APPLY</span><h2 class="block-title">What you'll need</h2><div class="req-grid">
-<div class="req-card"><h4>Business identity</h4><p>A registered business name or sole-proprietor CNIC, plus a valid contact phone and email.</p></div>
-<div class="req-card"><h4>Product authenticity</h4><p>Proof of sourcing for branded gear — either brand authorization letters or supplier invoices.</p></div>
-<div class="req-card"><h4>Fulfillment capability</h4><p>Ability to pack and hand off orders within 24–48 hours of purchase confirmation.</p></div>
-<div class="req-card"><h4>Bank account</h4><p>A Pakistani bank account in the business or owner's name for weekly payout settlements.</p></div>
-</div></section>
-<section id="fees" class="block"><span class="eyebrow">TRANSPARENT PRICING</span><h2 class="block-title">Fees & payouts</h2><table class="fees">
-<tr><th>ITEM</th><th>DETAIL</th></tr><tr><td>Listing fee</td><td class="orange">Rs. 0 — free to list</td></tr><tr><td>Commission per sale</td><td>8–12%, depending on category</td></tr><tr><td>Payout cycle</td><td>Weekly, direct to bank account</td></tr><tr><td>Payment processing</td><td>Included in commission</td></tr><tr><td>Returns handling</td><td>Managed through your dashboard, no extra fee</td></tr>
-</table></section>
-<section id="faq" class="block"><span class="eyebrow">QUESTIONS</span><h2 class="block-title">Frequently asked</h2>
-<div class="faq-item"><h4>How long does verification take?</h4><p>Most applications are reviewed within 2–3 business days. You'll get an email once your account is approved.</p></div>
-<div class="faq-item"><h4>Can I sell in more than one category?</h4><p>Yes. Choose a primary category on your application, then add additional categories from your seller dashboard afterward.</p></div>
-<div class="faq-item"><h4>Who handles shipping?</h4><p>You pack and hand off orders to your chosen courier partner; KHELZONE provides pre-negotiated courier rates in the dashboard.</p></div>
-<div class="faq-item"><h4>What if a buyer requests a return?</h4><p>Returns are logged in your dashboard with the reason and photos. Approved returns are deducted from your next payout cycle.</p></div>
+
+
+
+<!-- =====================================================
+     DROPDOWN
+===================================================== -->
+
+<div
+    class="menu-overlay"
+    id="menuOverlay"
+>
+
+    <div class="menu-inner">
+
+
+        <a
+            href="index.html"
+            class="menu-item"
+        >
+            HOME
+        </a>
+
+
+        <a
+            href="seller-guide.html"
+            class="menu-item active"
+        >
+            SELLER GUIDE
+        </a>
+
+
+        <a
+            href="sellerinfo.html"
+            class="menu-item"
+        >
+            BECOME A SELLER
+        </a>
+
+
+        <a
+            href="shop.html"
+            class="menu-item"
+        >
+            SHOP
+        </a>
+
+
+        <a
+            href="contact.html"
+            class="menu-item"
+        >
+            CONTACT
+        </a>
+
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     HERO
+===================================================== -->
+
+<section class="hero">
+
+    <span class="badge">
+        SELLER RESOURCES
+    </span>
+
+
+    <h1 class="hero-title">
+
+        THE
+
+        <span class="accent">
+            SELLER GUIDE
+        </span>
+
+    </h1>
+
+
+    <p class="hero-sub">
+
+        Everything you need to know about listing,
+        pricing, and getting paid on Pakistan's
+        premier sports marketplace.
+
+    </p>
+
 </section>
-<section class="cta-band"><h2>Ready to get started?</h2><p>Applications typically take five minutes to complete.</p><a href="sellerinfo.html" class="cta-btn">BECOME A SELLER →</a></section>
+
+
+
+<!-- =====================================================
+     TABLE OF CONTENTS
+===================================================== -->
+
+<nav class="toc">
+
+    <a href="#steps">
+        Onboarding Steps
+    </a>
+
+    <a href="#requirements">
+        Requirements
+    </a>
+
+    <a href="#fees">
+        Fees & Payouts
+    </a>
+
+    <a href="#faq">
+        FAQ
+    </a>
+
+</nav>
+
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main>
+
+
+    <!-- =================================================
+         STEPS
+    ================================================== -->
+
+    <section
+        id="steps"
+        class="block"
+    >
+
+        <span class="eyebrow">
+            GETTING STARTED
+        </span>
+
+
+        <h2 class="block-title">
+            Five steps to your first sale
+        </h2>
+
+
+        <div class="step-track">
+
+
+            <!-- STEP 01 -->
+
+            <div class="step">
+
+                <div class="num">
+                    01
+                </div>
+
+                <div>
+
+                    <h3>
+                        Submit your application
+                    </h3>
+
+                    <p>
+                        Fill out the Become a Seller form
+                        with your business details, category,
+                        and product range. Takes about five
+                        minutes.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- STEP 02 -->
+
+            <div class="step">
+
+                <div class="num">
+                    02
+                </div>
+
+                <div>
+
+                    <h3>
+                        Verification
+                    </h3>
+
+                    <p>
+                        Our team reviews your business
+                        documents and product authenticity.
+                        Most applications are verified within
+                        2–3 business days.
+                    </p>
+
+
+                    <ul>
+
+                        <li>
+                            CNIC or business registration
+                        </li>
+
+                        <li>
+                            Bank account for payouts
+                        </li>
+
+                        <li>
+                            Proof of product sourcing
+                            (invoices or brand authorization)
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+
+            <!-- STEP 03 -->
+
+            <div class="step">
+
+                <div class="num">
+                    03
+                </div>
+
+                <div>
+
+                    <h3>
+                        Set up your storefront
+                    </h3>
+
+                    <p>
+                        Upload your logo, write a brand
+                        description, and configure shipping
+                        zones from your seller dashboard.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- STEP 04 -->
+
+            <div class="step">
+
+                <div class="num">
+                    04
+                </div>
+
+                <div>
+
+                    <h3>
+                        List your products
+                    </h3>
+
+                    <p>
+                        Add product photos, sizes, pricing,
+                        and stock levels. Use our pricing
+                        benchmark tool to stay competitive
+                        in your category.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- STEP 05 -->
+
+            <div class="step">
+
+                <div class="num">
+                    05
+                </div>
+
+                <div>
+
+                    <h3>
+                        Start selling & get paid
+                    </h3>
+
+                    <p>
+                        Once live, your products appear in
+                        search and category pages. Orders
+                        settle to your account on a weekly
+                        cycle.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         REQUIREMENTS
+    ================================================== -->
+
+    <section
+        id="requirements"
+        class="block"
+    >
+
+        <span class="eyebrow">
+            BEFORE YOU APPLY
+        </span>
+
+
+        <h2 class="block-title">
+            What you'll need
+        </h2>
+
+
+        <div class="req-grid">
+
+
+            <div class="req-card">
+
+                <h4>
+                    Business identity
+                </h4>
+
+                <p>
+                    A registered business name or
+                    sole-proprietor CNIC, plus a valid
+                    contact phone and email.
+                </p>
+
+            </div>
+
+
+            <div class="req-card">
+
+                <h4>
+                    Product authenticity
+                </h4>
+
+                <p>
+                    Proof of sourcing for branded gear —
+                    either brand authorization letters or
+                    supplier invoices.
+                </p>
+
+            </div>
+
+
+            <div class="req-card">
+
+                <h4>
+                    Fulfillment capability
+                </h4>
+
+                <p>
+                    Ability to pack and hand off orders
+                    within 24–48 hours of purchase
+                    confirmation.
+                </p>
+
+            </div>
+
+
+            <div class="req-card">
+
+                <h4>
+                    Bank account
+                </h4>
+
+                <p>
+                    A Pakistani bank account in the
+                    business or owner's name for weekly
+                    payout settlements.
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         FEES
+    ================================================== -->
+
+    <section
+        id="fees"
+        class="block"
+    >
+
+        <span class="eyebrow">
+            TRANSPARENT PRICING
+        </span>
+
+
+        <h2 class="block-title">
+            Fees & payouts
+        </h2>
+
+
+        <table class="fees">
+
+            <tr>
+
+                <th>
+                    ITEM
+                </th>
+
+                <th>
+                    DETAIL
+                </th>
+
+            </tr>
+
+
+            <tr>
+
+                <td>
+                    Listing fee
+                </td>
+
+                <td class="orange">
+                    Rs. 0 — free to list
+                </td>
+
+            </tr>
+
+
+            <tr>
+
+                <td>
+                    Commission per sale
+                </td>
+
+                <td>
+                    8–12%, depending on category
+                </td>
+
+            </tr>
+
+
+            <tr>
+
+                <td>
+                    Payout cycle
+                </td>
+
+                <td>
+                    Weekly, direct to bank account
+                </td>
+
+            </tr>
+
+
+            <tr>
+
+                <td>
+                    Payment processing
+                </td>
+
+                <td>
+                    Included in commission
+                </td>
+
+            </tr>
+
+
+            <tr>
+
+                <td>
+                    Returns handling
+                </td>
+
+                <td>
+                    Managed through your dashboard,
+                    no extra fee
+                </td>
+
+            </tr>
+
+        </table>
+
+    </section>
+
+
+
+    <!-- =================================================
+         FAQ
+    ================================================== -->
+
+    <section
+        id="faq"
+        class="block"
+    >
+
+        <span class="eyebrow">
+            QUESTIONS
+        </span>
+
+
+        <h2 class="block-title">
+            Frequently asked
+        </h2>
+
+
+        <div class="faq-item">
+
+            <h4>
+                How long does verification take?
+            </h4>
+
+            <p>
+                Most applications are reviewed within
+                2–3 business days. You'll get an email
+                once your account is approved.
+            </p>
+
+        </div>
+
+
+        <div class="faq-item">
+
+            <h4>
+                Can I sell in more than one category?
+            </h4>
+
+            <p>
+                Yes. Choose a primary category on your
+                application, then add additional categories
+                from your seller dashboard afterward.
+            </p>
+
+        </div>
+
+
+        <div class="faq-item">
+
+            <h4>
+                Who handles shipping?
+            </h4>
+
+            <p>
+                You pack and hand off orders to your
+                chosen courier partner; KHELZONE provides
+                pre-negotiated courier rates in the dashboard.
+            </p>
+
+        </div>
+
+
+        <div class="faq-item">
+
+            <h4>
+                What if a buyer requests a return?
+            </h4>
+
+            <p>
+                Returns are logged in your dashboard with
+                the reason and photos. Approved returns are
+                deducted from your next payout cycle.
+            </p>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         CTA
+    ================================================== -->
+
+    <section class="cta-band">
+
+        <h2>
+            Ready to get started?
+        </h2>
+
+        <p>
+            Applications typically take five minutes
+            to complete.
+        </p>
+
+        <a
+            href="sellerinfo.html"
+            class="cta-btn"
+        >
+            BECOME A SELLER →
+        </a>
+
+    </section>
+
+
 </main>
-<footer>© 2026 KHELZONE — PAKISTAN'S SPORTS MARKETPLACE</footer>
+
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer>
+
+    © 2026 KHELZONE — PAKISTAN'S SPORTS MARKETPLACE
+
+</footer>
+
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script>
+
+const menuButton =
+    document.getElementById("menuButton");
+
+const menuOverlay =
+    document.getElementById("menuOverlay");
+
+
+/* OPEN / CLOSE MENU */
+
+menuButton.addEventListener("click", function(){
+
+    const isOpen =
+        menuOverlay.classList.toggle("show");
+
+
+    menuButton.classList.toggle(
+        "open",
+        isOpen
+    );
+
+
+    menuButton.setAttribute(
+        "aria-expanded",
+        isOpen
+    );
+
+
+    document.body.classList.toggle(
+        "menu-open",
+        isOpen
+    );
+
+});
+
+
+/* CLOSE AFTER CLICKING A MENU LINK */
+
+document
+.querySelectorAll(".menu-item")
+.forEach(function(item){
+
+    item.addEventListener("click", function(){
+
+        menuOverlay.classList.remove("show");
+
+        menuButton.classList.remove("open");
+
+        menuButton.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+
+        document.body.classList.remove(
+            "menu-open"
+        );
+
+    });
+
+});
+
+
+/* ESC TO CLOSE */
+
+document.addEventListener(
+    "keydown",
+    function(event){
+
+        if(event.key === "Escape"){
+
+            menuOverlay.classList.remove("show");
+
+            menuButton.classList.remove("open");
+
+            menuButton.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+
+            document.body.classList.remove(
+                "menu-open"
+            );
+
+        }
+
+    }
+);
+
+
+/* CLICK OUTSIDE */
+
+menuOverlay.addEventListener(
+    "click",
+    function(event){
+
+        if(event.target === menuOverlay){
+
+            menuOverlay.classList.remove("show");
+
+            menuButton.classList.remove("open");
+
+            menuButton.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+
+            document.body.classList.remove(
+                "menu-open"
+            );
+
+        }
+
+    }
+);
+
+</script>
+
+
 </body>
 </html>

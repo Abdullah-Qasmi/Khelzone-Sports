@@ -4,58 +4,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>KHELZONE | Sell With Us</title>
 
     <!-- =====================================================
-         TAILWIND CONFIG
-         IMPORTANT: CONFIG COMES BEFORE TAILWIND CDN
+         TAILWIND CSS
     ====================================================== -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
     <script>
         tailwind.config = {
             darkMode: "class",
-
             theme: {
                 extend: {
-
                     colors: {
                         background: "#141313",
-
                         "surface-container-lowest": "#101010",
                         "surface-container-low": "#181818",
                         "surface-container": "#1d1d1d",
                         "surface-container-high": "#252525",
                         "surface-container-highest": "#303030",
-
                         "outline-variant": "#444748",
 
-                        "vibrant-orange": "#FF4D00",
-
-                        "secondary-fixed": "#2FF801",
-
+                        /* =========================
+                           REAL ORANGE THEME
+                        ========================== */
+                        "vibrant-orange": "#FF6B00",
+                        "secondary-fixed": "#FF6B00",
                         "on-surface": "#E5E2E1",
                         "on-surface-variant": "#BDB9B8",
-
-                        "on-secondary": "#061000",
-
+                        "on-secondary": "#141313",
                         "electric-blue": "#2196F3"
                     },
 
                     fontFamily: {
-                        body: [
-                            "Inter",
-                            "sans-serif"
-                        ],
-
-                        headline: [
-                            "Archivo Narrow",
-                            "sans-serif"
-                        ],
-
-                        mono: [
-                            "JetBrains Mono",
-                            "monospace"
-                        ]
+                        body: ["Inter", "sans-serif"],
+                        headline: ["Archivo Narrow", "sans-serif"],
+                        mono: ["JetBrains Mono", "monospace"]
                     },
 
                     spacing: {
@@ -71,13 +55,6 @@
         };
     </script>
 
-
-    <!-- =====================================================
-         TAILWIND CSS
-    ====================================================== -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-
-
     <!-- =====================================================
          MATERIAL SYMBOLS
     ====================================================== -->
@@ -85,7 +62,6 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700&display=swap"
         rel="stylesheet"
     >
-
 
     <!-- =====================================================
          GOOGLE FONTS
@@ -95,11 +71,14 @@
         rel="stylesheet"
     >
 
-
     <!-- =====================================================
-         EXTRA CSS
+         CUSTOM CSS
     ====================================================== -->
     <style>
+
+        /* =====================================================
+           RESET
+        ====================================================== */
 
         * {
             box-sizing: border-box;
@@ -115,21 +94,284 @@
             color: #e5e2e1;
             min-height: 100vh;
             font-family: "Inter", sans-serif;
+            overflow-x: hidden;
         }
 
+
         /* =====================================================
-           BUTTONS
+           ORANGE COLORS
+        ====================================================== */
+
+        :root {
+            --orange: #FF6B00;
+            --orange-light: #FF8A2B;
+            --orange-dark: #D94F00;
+            --orange-glow: rgba(255, 107, 0, 0.35);
+        }
+
+
+        /* =====================================================
+           NAVBAR
+        ====================================================== */
+
+        .kz-header {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 64px;
+            z-index: 99999;
+
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+
+            padding: 0 clamp(18px, 5vw, 60px);
+
+            background: rgba(20, 19, 19, 0.97);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+
+            border-bottom: 1px solid #303030;
+        }
+
+
+        /* =====================================================
+           MENU BUTTON
+        ====================================================== */
+
+        #menuButton {
+            grid-column: 1;
+            justify-self: start;
+
+            width: 42px;
+            height: 42px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: none !important;
+            outline: none !important;
+
+            background: transparent !important;
+
+            color: var(--orange) !important;
+
+            cursor: pointer;
+            z-index: 100002;
+        }
+
+        #menuButton:hover {
+            color: var(--orange-light) !important;
+        }
+
+        #menuIcon {
+            font-size: 30px;
+            color: var(--orange) !important;
+
+            transition:
+                transform 0.2s ease,
+                color 0.2s ease;
+        }
+
+
+        /* =====================================================
+           LOGO
+        ====================================================== */
+
+        .kz-logo {
+            grid-column: 2;
+            justify-self: center;
+
+            color: var(--orange) !important;
+
+            text-decoration: none;
+
+            font-size: 30px;
+            font-weight: 900;
+
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            line-height: 1;
+
+            z-index: 100001;
+        }
+
+        .kz-logo:hover {
+            color: var(--orange-light) !important;
+        }
+
+
+        /* =====================================================
+           DESKTOP NAV
+        ====================================================== */
+
+        .desktop-nav {
+            grid-column: 3;
+            justify-self: end;
+
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+
+            gap: 28px;
+            min-width: 0;
+        }
+
+        .desktop-nav a {
+            color: var(--orange) !important;
+
+            text-decoration: none;
+            white-space: nowrap;
+
+            transition:
+                color 0.2s ease,
+                background 0.2s ease,
+                border-color 0.2s ease;
+        }
+
+        .desktop-nav a:hover {
+            color: var(--orange-light) !important;
+        }
+
+
+        /* =====================================================
+           DESKTOP SELLER BUTTON
+        ====================================================== */
+
+        .desktop-seller-btn {
+            padding: 12px 20px;
+
+            border: 1px solid var(--orange);
+
+            border-radius: 8px;
+
+            color: var(--orange) !important;
+            background: transparent;
+
+            transition:
+                background 0.2s ease,
+                color 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .desktop-seller-btn:hover {
+            background: var(--orange) !important;
+            color: #141313 !important;
+            transform: translateY(-1px);
+        }
+
+
+        /* =====================================================
+           MOBILE MENU
+        ====================================================== */
+
+        .mobile-menu {
+            position: fixed !important;
+
+            top: 64px !important;
+            left: 0 !important;
+
+            width: 100% !important;
+
+            margin: 0 !important;
+            padding: 0 !important;
+
+            display: none !important;
+
+            background: rgba(20, 19, 19, 0.99);
+
+            border-top: 1px solid rgba(255, 107, 0, 0.25);
+            border-bottom: 1px solid var(--orange);
+
+            box-shadow:
+                0 15px 40px rgba(0, 0, 0, 0.75);
+
+            z-index: 99998 !important;
+
+            overflow: hidden;
+        }
+
+        .mobile-menu.show {
+            display: block !important;
+            animation: dropdownOpen 0.22s ease forwards;
+        }
+
+        @keyframes dropdownOpen {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+
+        /* =====================================================
+           MOBILE LINKS
+        ====================================================== */
+
+        .mobile-menu a {
+            display: block !important;
+
+            width: 100% !important;
+
+            padding: 18px 24px !important;
+            margin: 0 !important;
+
+            color: var(--orange) !important;
+
+            text-decoration: none !important;
+
+            font-family: "JetBrains Mono", monospace;
+            font-size: 13px;
+            font-weight: 700;
+
+            letter-spacing: 1.5px;
+
+            background: transparent !important;
+
+            border: none !important;
+            border-bottom: 1px solid rgba(255, 107, 0, 0.14) !important;
+
+            transition:
+                background 0.2s ease,
+                color 0.2s ease,
+                padding-left 0.2s ease;
+        }
+
+        .mobile-menu a:last-child {
+            border-bottom: none !important;
+        }
+
+        .mobile-menu a:hover {
+            background: rgba(255, 107, 0, 0.08) !important;
+            color: var(--orange-light) !important;
+            padding-left: 32px !important;
+        }
+
+
+        /* =====================================================
+           PRIMARY BUTTON
         ====================================================== */
 
         .btn-primary {
-            background: linear-gradient(
-                135deg,
-                #FF4D00 0%,
-                #cc3d00 100%
-            );
+            background:
+                linear-gradient(
+                    135deg,
+                    #FF6B00 0%,
+                    #D94F00 100%
+                ) !important;
+
+            color: #141313 !important;
 
             box-shadow:
-                0 4px 15px rgba(255, 77, 0, 0.35);
+                0 4px 15px rgba(255, 107, 0, 0.35);
 
             transition:
                 transform 0.25s ease,
@@ -140,13 +382,17 @@
             transform: translateY(-2px);
 
             box-shadow:
-                0 7px 22px rgba(255, 77, 0, 0.55);
+                0 7px 22px rgba(255, 107, 0, 0.55);
         }
 
 
+        /* =====================================================
+           SECONDARY BUTTON
+        ====================================================== */
+
         .btn-secondary {
-            border: 2px solid #2ff801;
-            color: #2ff801;
+            border: 2px solid #FF6B00 !important;
+            color: #FF6B00 !important;
 
             transition:
                 background 0.25s ease,
@@ -155,13 +401,48 @@
         }
 
         .btn-secondary:hover {
-            background: rgba(47, 248, 1, 0.10);
+            background: rgba(255, 107, 0, 0.10) !important;
+            color: var(--orange-light) !important;
+
             transform: translateY(-2px);
         }
 
 
         /* =====================================================
-           CARDS
+           ORANGE UTILITY COLORS
+        ====================================================== */
+
+        .text-vibrant-orange {
+            color: #FF6B00 !important;
+        }
+
+        .bg-vibrant-orange {
+            background-color: #FF6B00 !important;
+        }
+
+        .border-vibrant-orange {
+            border-color: #FF6B00 !important;
+        }
+
+        .text-secondary-fixed {
+            color: #FF6B00 !important;
+        }
+
+        .bg-secondary-fixed {
+            background-color: #FF6B00 !important;
+        }
+
+        .border-secondary-fixed {
+            border-color: #FF6B00 !important;
+        }
+
+        .hero-title {
+            color: #FF6B00 !important;
+        }
+
+
+        /* =====================================================
+           CARD HOVER
         ====================================================== */
 
         .card-hover {
@@ -184,10 +465,10 @@
         ====================================================== */
 
         .input-glow:focus {
-            border-bottom-color: #2ff801 !important;
+            border-bottom-color: #FF6B00 !important;
 
             box-shadow:
-                0 4px 15px rgba(47, 248, 1, 0.18);
+                0 4px 15px rgba(255, 107, 0, 0.18);
 
             outline: none;
         }
@@ -208,1987 +489,1184 @@
 
 
         /* =====================================================
-           HERO BACKGROUND
+           BACKGROUND IMAGES
         ====================================================== */
 
         .hero-bg {
-            background-image:
-                url("https://lh3.googleusercontent.com/aida-public/AB6AXuBRJx0KY5UR-HOc8TQGgRtpamRsmpgvBWPT3Np0ohqXRyFQO9gNztaHA6VUJW8PsamSRqVweRiHTGfYhf8BOPRAq_uwhGSGIlB1d1gIyY7dcMPNJOzmQxA2D8iaG9IPOjIImd_KkJFkuJXKtfev4GrxfXtKoAaQMQFovti7Nmb1BKBqVDsvJd7Smr4ujZyVUMW4I9pf3LoPrdbHnWkTeoSsaJ-syqive5L-NVYdy-mAzr-tS1QLsVPa_A");
+            background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBRJx0KY5UR-HOc8TQGgRtpamRsmpgvBWPT3Np0ohqXRyFQO9gNztaHA6VUJW8PsamSRqVweRiHTGfYhf8BOPRAq_uwhGSGIlB1d1gIyY7dcMPNJOzmQxA2D8iaG9IPOjIImd_KkJFkuJXKtfev4GrxfXtKoAaQMQFovti7Nmb1BKBqVDsvJd7Smr4ujZyVUMW4I9pf3LoPrdbHnWkTeoSsaJ-syqive5L-NVYdy-mAzr-tS1QLsVPa_A");
 
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
         }
-
-
-        /* =====================================================
-           SELLER BACKGROUNDS
-        ====================================================== */
 
         .seller1-bg {
-            background-image:
-                url("https://lh3.googleusercontent.com/aida-public/AB6AXuCPkdnwUmsSuAO7iGcGLIqysRim_MaN6NHkc1v0zc-Rjd-bAqmFiiqb4UOJSvvjlb2VrQFcg_wiIog4dboyn7ZPfsqrhzDq-V_sIuxSWjndGgC4PO2qXFHTJdaxiqC6SbuFuKHb717-z6fsc9vwh3XhBSyJL3UBsWbHZGbILVuwcurAiBw5cJBO0liMxPrUBQ1qTeLHmzrB07knzbAqq50nx19YeU86y6a7pg6eNntI5PYe8VNCkU5p-w");
+            background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCPkdnwUmsSuAO7iGcGLIqysRim_MaN6NHkc1v0zc-Rjd-bAqmFiiqb4UOJSvvjlb2VrQFcg_wiIog4dboyn7ZPfsqrhzDq-V_sIuxSWjndGgC4PO2qXFHTJdaxiqC6SbuFuKHb717-z6fsc9vwh3XhBSyJL3UBsWbHZGbILVuwcurAiBw5cJBO0liMxPrUBQ1qTeLHmzrB07knzbAqq50nx19YeU86y6a7pg6eNntI5PYe8VNCkU5p-w");
 
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
         }
-
 
         .seller2-bg {
-            background-image:
-                url("https://lh3.googleusercontent.com/aida-public/AB6AXuDzWdmLLzM7OddAjG3XGsxmmLm7K2jtqywQaV2sbzg5X4ts4D6GYA2hFxpQ48fMWm3zBFr3CVz1fpVjIO0-MmN0zAWVnbnMHQj6Kmmwp-iHQpIFqgyf_vS6EeAiIX1zdd2NTc1XIXs1Qjl250DOYgWFoafAwxBtNozow7qIHk7rRZuTt5jiKm0wmRbZyJdM4PhlUm7hmnvxEDuHMzLtVN8K4W3PdtSLwl9PYOtc9m2_VIPvw76H3wqLxg");
+            background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDzWdmLLzM7OddAjG3XGsxmmLm7K2jtqywQaV2sbzg5X4ts4D6GYA2hFxpQ48fMWm3zBFr3CVz1fpVjIO0-MmN0zAWVnbnMHQj6Kmmwp-iHQpIFqgyf_vS6EeAiIX1zdd2NTc1XIXs1Qjl250DOYgWFoafAwxBtNozow7qIHk7rRZuTt5jiKm0wmRbZyJdM4PhlUm7hmnvxEDuHMzLtVN8K4W3PdtSLwl9PYOtc9m2_VIPvw76H3wqLxg");
 
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
         }
 
 
         /* =====================================================
-           MOBILE MENU
-        ====================================================== */
-
-        .mobile-menu {
-            display: none;
-        }
-
-        .mobile-menu.show {
-            display: block;
-        }
-
-
-        /* =====================================================
-           NAVBAR MOBILE
+           MOBILE
         ====================================================== */
 
         @media (max-width: 768px) {
+
+            .kz-header {
+                grid-template-columns: 1fr auto 1fr;
+                padding: 0 18px;
+            }
+
+            .kz-logo {
+                font-size: 24px;
+                letter-spacing: 0.10em;
+            }
 
             .desktop-nav {
                 display: none !important;
             }
 
             .mobile-menu {
-                position: absolute;
-                top: 64px;
-                left: 0;
-                right: 0;
-
-                background: rgba(20, 19, 19, 0.98);
-
-                border-bottom:
-                    1px solid #303030;
-
-                padding: 20px;
-            }
-
-            .mobile-menu a {
-                display: block;
-
-                padding: 14px 10px;
-
-                color: #bdb9b8;
-
-                font-family:
-                    "JetBrains Mono",
-                    monospace;
-
-                font-size: 12px;
-
-                letter-spacing: 1px;
-
-                border-bottom:
-                    1px solid #303030;
-            }
-
-            .mobile-menu a:hover {
-                color: #FF4D00;
+                top: 64px !important;
             }
 
             .hero-title {
                 font-size: 48px !important;
-                line-height: 0.95;
+                line-height: 0.95 !important;
             }
-
         }
 
 
+        /* =====================================================
+           SMALL MOBILE
+        ====================================================== */
+
         @media (max-width: 500px) {
+
+            .kz-logo {
+                font-size: 21px;
+            }
 
             .hero-title {
                 font-size: 38px !important;
             }
 
+            .mobile-menu a {
+                padding: 18px 20px !important;
+            }
+        }
+
+
+        /* =====================================================
+           VERY SMALL SCREEN
+        ====================================================== */
+
+        @media (max-width: 360px) {
+
+            .kz-logo {
+                font-size: 18px;
+            }
+
+            #menuButton {
+                width: 38px;
+                height: 38px;
+            }
+
+            #menuIcon {
+                font-size: 27px;
+            }
         }
 
     </style>
-
 </head>
 
 
 <body class="overflow-x-hidden">
 
 
-<!-- =========================================================
-     NAVBAR
-========================================================= -->
-
-<header
-    class="
-        sticky
-        top-0
-        z-50
-        w-full
-        h-16
-        flex
-        items-center
-        justify-between
-        px-gutter
-        bg-background/95
-        backdrop-blur-md
-        border-b
-        border-surface-container-highest
-    "
->
-
-
-    <!-- LEFT: MENU -->
-
-    <button
-        id="menuButton"
-        type="button"
-        aria-label="Open menu"
-        aria-expanded="false"
-
-        class="
-            flex
-            items-center
-            justify-center
-            w-10
-            h-10
-            text-on-surface-variant
-            hover:text-vibrant-orange
-            transition-colors
-        "
-    >
-
-        <span
-            id="menuIcon"
-            class="material-symbols-outlined"
-        >
-            menu
-        </span>
-
-    </button>
-
-
-    <!-- CENTER: LOGO -->
-
-    <a
-        href="seller.html"
-
-        class="
-            absolute
-            left-1/2
-            -translate-x-1/2
-            font-black
-            text-2xl
-            md:text-3xl
-            tracking-widest
-            text-vibrant-orange
-            uppercase
-            whitespace-nowrap
-        "
-    >
-        KHELZONE
-    </a>
-
-
-    <!-- RIGHT DESKTOP NAV -->
-
-    <nav
-        class="
-            desktop-nav
-            ml-auto
-            flex
-            items-center
-            gap-8
-        "
-    >
-
-        <a
-            href="index.html"
-
-            class="
-                font-mono
-                text-xs
-                font-bold
-                tracking-widest
-                uppercase
-                text-on-surface-variant
-                hover:text-vibrant-orange
-                transition-colors
-            "
-        >
-            HOME
-        </a>
-
-
-        <a
-            href="seller-guide.html"
-
-            class="
-                font-mono
-                text-xs
-                font-bold
-                tracking-widest
-                uppercase
-                text-on-surface-variant
-                hover:text-vibrant-orange
-                transition-colors
-            "
-        >
-            SELLER GUIDE
-        </a>
-
-
-        <a
-            href="sellerinfo.html"
-
-            class="
-                font-mono
-                text-xs
-                font-bold
-                tracking-widest
-                uppercase
-                text-vibrant-orange
-                border
-                border-vibrant-orange
-                px-5
-                py-3
-                rounded-md
-                hover:bg-vibrant-orange
-                hover:text-black
-                transition-all
-            "
-        >
-            BECOME A SELLER
-        </a>
-
-    </nav>
-
-
-    <!-- MOBILE MENU -->
-
-    <div
-        id="mobileMenu"
-        class="mobile-menu"
-    >
-
-        <a href="index.html">
-            HOME
-        </a>
-
-        <a href="seller-guide.html">
-            SELLER GUIDE
-        </a>
-
-        <a
-            href="sellerinfo.html"
-            style="color:#FF4D00;"
-        >
-            BECOME A SELLER
-        </a>
-
-    </div>
-
-</header>
-
-
-
-<!-- =========================================================
-     MAIN
-========================================================= -->
-
-<main class="min-h-screen">
-
-
     <!-- =====================================================
-         HERO
+         NAVBAR
     ====================================================== -->
 
-    <section
-        class="
-            relative
-            w-full
-            min-h-[620px]
-            flex
-            items-center
-            justify-center
-            px-gutter
-            py-24
-            border-b
-            border-surface-container-highest
-            overflow-hidden
-        "
-    >
+    <header class="kz-header">
+
+        <!-- MENU BUTTON -->
+
+        <button
+            id="menuButton"
+            type="button"
+            aria-label="Open menu"
+            aria-expanded="false"
+        >
+            <span
+                id="menuIcon"
+                class="material-symbols-outlined"
+            >
+                menu
+            </span>
+        </button>
 
 
-        <!-- BACKGROUND -->
+        <!-- LOGO -->
 
-        <div class="absolute inset-0 z-0">
+        <a
+            href="seller.html"
+            class="kz-logo"
+        >
+            KHELZONE
+        </a>
 
-            <div
-                class="
-                    hero-bg
-                    w-full
-                    h-full
-                    opacity-30
-                "
-            ></div>
 
-            <div
-                class="
-                    absolute
-                    inset-0
-                    bg-gradient-to-t
-                    from-background
-                    via-background/80
-                    to-transparent
-                "
-            ></div>
+        <!-- DESKTOP NAV -->
+
+        <nav class="desktop-nav">
+
+            <a
+                href="index.html"
+                class="font-mono text-xs font-bold tracking-widest uppercase"
+            >
+                HOME
+            </a>
+
+            <a
+                href="seller-guide.html"
+                class="font-mono text-xs font-bold tracking-widest uppercase"
+            >
+                SELLER GUIDE
+            </a>
+
+            <a
+                href="sellerinfo.html"
+                class="desktop-seller-btn font-mono text-xs font-bold tracking-widest uppercase"
+            >
+                BECOME A SELLER
+            </a>
+
+        </nav>
+
+
+        <!-- =================================================
+             MOBILE DROPDOWN
+        ================================================== -->
+
+        <div
+            id="mobileMenu"
+            class="mobile-menu"
+        >
+
+            <a href="index.html">
+                HOME
+            </a>
+
+            <a href="seller-guide.html">
+                SELLER GUIDE
+            </a>
+
+            <a
+                href="sellerinfo.html"
+                style="color:#FF6B00 !important;"
+            >
+                BECOME A SELLER
+            </a>
 
         </div>
 
+    </header>
 
-        <!-- HERO CONTENT -->
 
-        <div
-            class="
-                relative
-                z-10
-                max-w-4xl
-                mx-auto
-                text-center
-                flex
-                flex-col
-                items-center
-                gap-8
-            "
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="min-h-screen">
+
+
+        <!-- =================================================
+             HERO
+        ================================================== -->
+
+        <section
+            class="relative w-full min-h-[620px] flex items-center justify-center px-gutter py-24 border-b border-surface-container-highest overflow-hidden"
         >
 
-            <!-- BADGE -->
+            <div class="absolute inset-0 z-0">
 
-            <span
-                class="
-                    font-mono
-                    text-xs
-                    text-secondary-fixed
-                    uppercase
-                    tracking-widest
-                    inline-block
-                    border
-                    border-secondary-fixed
-                    px-4
-                    py-2
-                    rounded-full
-                    bg-secondary-fixed/10
-                "
-            >
-                PARTNER WITH THE BEST
-            </span>
+                <div
+                    class="hero-bg w-full h-full opacity-30"
+                ></div>
+
+                <div
+                    class="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"
+                ></div>
+
+            </div>
 
 
-            <!-- HEADING -->
-
-            <h1
-                class="
-                    hero-title
-                    font-black
-                    text-6xl
-                    md:text-8xl
-                    leading-none
-                    tracking-tight
-                    uppercase
-                    text-on-surface
-                "
+            <div
+                class="relative z-10 max-w-4xl mx-auto text-center flex flex-col items-center gap-8"
             >
 
-                SELL WITH
-
-                <span class="text-vibrant-orange">
-                    KHELZONE
+                <span
+                    class="font-mono text-xs uppercase tracking-widest inline-block border px-4 py-2 rounded-full"
+                    style="
+                        color:#FF6B00;
+                        border-color:#FF6B00;
+                        background:rgba(255,107,0,0.10);
+                    "
+                >
+                    PARTNER WITH THE BEST
                 </span>
 
-            </h1>
 
-
-            <!-- DESCRIPTION -->
-
-            <p
-                class="
-                    max-w-3xl
-                    mx-auto
-                    text-base
-                    md:text-lg
-                    leading-8
-                    text-on-surface-variant
-                "
-            >
-                Connect your high-performance gear with athletes nationwide.
-                Join Pakistan's premier sports marketplace and scale your
-                business with engineered precision.
-            </p>
-
-
-            <!-- BUTTONS -->
-
-            <div
-                class="
-                    flex
-                    flex-col
-                    sm:flex-row
-                    gap-5
-                    mt-4
-                "
-            >
-
-                <a
-                    href="sellerinfo.html"
-
-                    class="
-                        btn-primary
-                        px-8
-                        py-4
-                        rounded-lg
-                        text-white
-                        font-mono
-                        text-xs
-                        font-bold
-                        tracking-widest
-                        uppercase
-                        text-center
-                    "
+                <h1
+                    class="hero-title font-black text-6xl md:text-8xl leading-none tracking-tight uppercase"
                 >
-                    BECOME A SELLER
-                </a>
+
+                    SELL WITH
+
+                    <span style="color:#FF6B00;">
+                        KHELZONE
+                    </span>
+
+                </h1>
 
 
-                <a
-                    href="seller-guide.html"
-
-                    class="
-                        btn-secondary
-                        px-8
-                        py-4
-                        rounded-lg
-                        font-mono
-                        text-xs
-                        font-bold
-                        tracking-widest
-                        uppercase
-                        text-center
-                    "
+                <p
+                    class="max-w-3xl mx-auto text-base md:text-lg leading-8 text-on-surface-variant"
                 >
-                    VIEW SELLER GUIDE
-                </a>
+                    Connect your high-performance gear with athletes nationwide.
+                    Join Pakistan's premier sports marketplace and scale your
+                    business with engineered precision.
+                </p>
+
+
+                <div
+                    class="flex flex-col sm:flex-row gap-5 mt-4"
+                >
+
+                    <a
+                        href="sellerinfo.html"
+                        class="btn-primary px-8 py-4 rounded-lg font-mono text-xs font-bold tracking-widest uppercase text-center"
+                    >
+                        BECOME A SELLER
+                    </a>
+
+                    <a
+                        href="seller-guide.html"
+                        class="btn-secondary px-8 py-4 rounded-lg font-mono text-xs font-bold tracking-widest uppercase text-center"
+                    >
+                        VIEW SELLER GUIDE
+                    </a>
+
+                </div>
 
             </div>
 
-        </div>
-
-    </section>
+        </section>
 
 
+        <!-- =================================================
+             WHY SELL WITH US
+        ================================================== -->
 
-    <!-- =====================================================
-         WHY SELL WITH US
-    ====================================================== -->
-
-    <section
-        class="
-            w-full
-            max-w-container-max
-            mx-auto
-            px-gutter
-            py-section-desktop
-        "
-    >
-
-        <div class="mb-12">
-
-            <h2
-                class="
-                    text-4xl
-                    md:text-5xl
-                    font-black
-                    uppercase
-                    text-on-surface
-                "
-            >
-                Why Sell With Us?
-            </h2>
-
-            <div
-                class="
-                    h-1
-                    w-24
-                    bg-vibrant-orange
-                    mt-5
-                "
-            ></div>
-
-        </div>
-
-
-        <div
-            class="
-                grid
-                grid-cols-1
-                md:grid-cols-3
-                gap-6
-            "
+        <section
+            class="w-full max-w-container-max mx-auto px-gutter py-section-desktop"
         >
 
-
-            <!-- CARD 1 -->
-
-            <div
-                class="
-                    card-hover
-                    bg-surface-container
-                    border
-                    border-outline-variant
-                    p-8
-                    rounded-xl
-                "
-            >
-
-                <div
-                    class="
-                        w-16
-                        h-16
-                        rounded-full
-                        bg-surface-container-lowest
-                        border
-                        border-outline-variant
-                        flex
-                        items-center
-                        justify-center
-                        mb-6
-                    "
-                >
-
-                    <span
-                        class="
-                            material-symbols-outlined
-                            text-3xl
-                            text-secondary-fixed
-                        "
-                    >
-                        verified
-                    </span>
-
-                </div>
-
-
-                <h3
-                    class="
-                        text-2xl
-                        font-bold
-                        text-on-surface
-                        mb-3
-                    "
-                >
-                    Verified Authority
-                </h3>
-
-
-                <p
-                    class="
-                        text-on-surface-variant
-                        leading-7
-                    "
-                >
-                    Earn the 'Verified Seller' badge, instilling immediate
-                    trust and highlighting your commitment to professional-grade quality.
-                </p>
-
-            </div>
-
-
-
-            <!-- CARD 2 -->
-
-            <div
-                class="
-                    card-hover
-                    bg-surface-container
-                    border
-                    border-outline-variant
-                    p-8
-                    rounded-xl
-                "
-            >
-
-                <div
-                    class="
-                        w-16
-                        h-16
-                        rounded-full
-                        bg-surface-container-lowest
-                        border
-                        border-outline-variant
-                        flex
-                        items-center
-                        justify-center
-                        mb-6
-                    "
-                >
-
-                    <span
-                        class="
-                            material-symbols-outlined
-                            text-3xl
-                            text-secondary-fixed
-                        "
-                    >
-                        public
-                    </span>
-
-                </div>
-
-
-                <h3
-                    class="
-                        text-2xl
-                        font-bold
-                        text-on-surface
-                        mb-3
-                    "
-                >
-                    Nationwide Reach
-                </h3>
-
-
-                <p
-                    class="
-                        text-on-surface-variant
-                        leading-7
-                    "
-                >
-                    Tap into a vast network of athletes, teams, and gear
-                    collectors across Pakistan, from Karachi to Sialkot.
-                </p>
-
-            </div>
-
-
-
-            <!-- CARD 3 -->
-
-            <div
-                class="
-                    card-hover
-                    bg-surface-container
-                    border
-                    border-outline-variant
-                    p-8
-                    rounded-xl
-                "
-            >
-
-                <div
-                    class="
-                        w-16
-                        h-16
-                        rounded-full
-                        bg-surface-container-lowest
-                        border
-                        border-outline-variant
-                        flex
-                        items-center
-                        justify-center
-                        mb-6
-                    "
-                >
-
-                    <span
-                        class="
-                            material-symbols-outlined
-                            text-3xl
-                            text-secondary-fixed
-                        "
-                    >
-                        lock
-                    </span>
-
-                </div>
-
-
-                <h3
-                    class="
-                        text-2xl
-                        font-bold
-                        text-on-surface
-                        mb-3
-                    "
-                >
-                    Secure Payments
-                </h3>
-
-
-                <p
-                    class="
-                        text-on-surface-variant
-                        leading-7
-                    "
-                >
-                    Experience frictionless, transparent financial
-                    transactions engineered for reliability and peace of mind.
-                </p>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-
-    <!-- =====================================================
-         APPLICATION
-    ====================================================== -->
-
-    <section
-        class="
-            w-full
-            bg-surface-container-low
-            py-section-desktop
-        "
-    >
-
-        <div
-            class="
-                max-w-container-max
-                mx-auto
-                px-gutter
-                grid
-                grid-cols-1
-                lg:grid-cols-2
-                gap-12
-                items-center
-            "
-        >
-
-
-            <!-- LEFT -->
-
-            <div>
+            <div class="mb-12">
 
                 <h2
-                    class="
-                        text-4xl
-                        md:text-5xl
-                        font-black
-                        uppercase
-                        text-on-surface
-                        mb-5
-                    "
+                    class="text-4xl md:text-5xl font-black uppercase text-on-surface"
                 >
-                    Start Your Application
+                    Why Sell With Us?
                 </h2>
 
+                <div
+                    class="h-1 w-24 mt-5"
+                    style="background:#FF6B00;"
+                ></div>
 
-                <p
-                    class="
-                        text-on-surface-variant
-                        text-lg
-                        leading-8
-                        max-w-xl
-                    "
-                >
-                    Begin the onboarding process. We meticulously vet our
-                    partners to maintain the Kinetic Premium standard.
-                </p>
+            </div>
 
 
-                <!-- PROGRESS -->
+            <div
+                class="grid grid-cols-1 md:grid-cols-3 gap-6"
+            >
+
+                <!-- CARD 1 -->
 
                 <div
-                    class="
-                        flex
-                        items-center
-                        gap-3
-                        mt-10
-                        max-w-lg
-                    "
+                    class="card-hover bg-surface-container border border-outline-variant p-8 rounded-xl"
                 >
 
                     <div
-                        class="
-                            w-9
-                            h-9
-                            rounded-full
-                            bg-vibrant-orange
-                            text-white
-                            flex
-                            items-center
-                            justify-center
-                            font-bold
-                        "
+                        class="w-16 h-16 rounded-full bg-surface-container-lowest border border-outline-variant flex items-center justify-center mb-6"
                     >
-                        1
+
+                        <span
+                            class="material-symbols-outlined text-3xl"
+                            style="color:#FF6B00;"
+                        >
+                            verified
+                        </span>
+
                     </div>
 
 
+                    <h3
+                        class="text-2xl font-bold text-on-surface mb-3"
+                    >
+                        Verified Authority
+                    </h3>
+
+
+                    <p
+                        class="text-on-surface-variant leading-7"
+                    >
+                        Earn the 'Verified Seller' badge, instilling immediate
+                        trust and highlighting your commitment to professional-grade quality.
+                    </p>
+
+                </div>
+
+
+                <!-- CARD 2 -->
+
+                <div
+                    class="card-hover bg-surface-container border border-outline-variant p-8 rounded-xl"
+                >
+
                     <div
-                        class="
-                            h-1
-                            flex-1
-                            bg-[#444748]
-                            rounded-full
-                            overflow-hidden
-                        "
+                        class="w-16 h-16 rounded-full bg-surface-container-lowest border border-outline-variant flex items-center justify-center mb-6"
+                    >
+
+                        <span
+                            class="material-symbols-outlined text-3xl"
+                            style="color:#FF6B00;"
+                        >
+                            public
+                        </span>
+
+                    </div>
+
+
+                    <h3
+                        class="text-2xl font-bold text-on-surface mb-3"
+                    >
+                        Nationwide Reach
+                    </h3>
+
+
+                    <p
+                        class="text-on-surface-variant leading-7"
+                    >
+                        Tap into a vast network of athletes, teams, and gear
+                        collectors across Pakistan, from Karachi to Sialkot.
+                    </p>
+
+                </div>
+
+
+                <!-- CARD 3 -->
+
+                <div
+                    class="card-hover bg-surface-container border border-outline-variant p-8 rounded-xl"
+                >
+
+                    <div
+                        class="w-16 h-16 rounded-full bg-surface-container-lowest border border-outline-variant flex items-center justify-center mb-6"
+                    >
+
+                        <span
+                            class="material-symbols-outlined text-3xl"
+                            style="color:#FF6B00;"
+                        >
+                            lock
+                        </span>
+
+                    </div>
+
+
+                    <h3
+                        class="text-2xl font-bold text-on-surface mb-3"
+                    >
+                        Secure Payments
+                    </h3>
+
+
+                    <p
+                        class="text-on-surface-variant leading-7"
+                    >
+                        Experience frictionless, transparent financial
+                        transactions engineered for reliability and peace of mind.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             APPLICATION
+        ================================================== -->
+
+        <section
+            class="w-full bg-surface-container-low py-section-desktop"
+        >
+
+            <div
+                class="max-w-container-max mx-auto px-gutter grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
+            >
+
+                <div>
+
+                    <h2
+                        class="text-4xl md:text-5xl font-black uppercase text-on-surface mb-5"
+                    >
+                        Start Your Application
+                    </h2>
+
+
+                    <p
+                        class="text-on-surface-variant text-lg leading-8 max-w-xl"
+                    >
+                        Begin the onboarding process. We meticulously vet our
+                        partners to maintain the Kinetic Premium standard.
+                    </p>
+
+
+                    <div
+                        class="flex items-center gap-3 mt-10 max-w-lg"
                     >
 
                         <div
-                            class="
-                                h-full
-                                w-1/3
-                                bg-vibrant-orange
-                            "
-                        ></div>
-
-                    </div>
+                            class="w-9 h-9 rounded-full text-black flex items-center justify-center font-bold"
+                            style="background:#FF6B00;"
+                        >
+                            1
+                        </div>
 
 
-                    <div
-                        class="
-                            w-9
-                            h-9
-                            rounded-full
-                            bg-surface-container
-                            text-on-surface-variant
-                            border
-                            border-outline-variant
-                            flex
-                            items-center
-                            justify-center
-                            font-bold
-                        "
-                    >
-                        2
-                    </div>
+                        <div
+                            class="h-1 flex-1 bg-[#444748] rounded-full overflow-hidden"
+                        >
+
+                            <div
+                                class="h-full w-1/3"
+                                style="background:#FF6B00;"
+                            ></div>
+
+                        </div>
 
 
-                    <div
-                        class="
-                            w-9
-                            h-9
-                            rounded-full
-                            bg-surface-container
-                            text-on-surface-variant
-                            border
-                            border-outline-variant
-                            flex
-                            items-center
-                            justify-center
-                            font-bold
-                        "
-                    >
-                        3
+                        <div
+                            class="w-9 h-9 rounded-full bg-surface-container text-on-surface-variant border border-outline-variant flex items-center justify-center font-bold"
+                        >
+                            2
+                        </div>
+
+
+                        <div
+                            class="w-9 h-9 rounded-full bg-surface-container text-on-surface-variant border border-outline-variant flex items-center justify-center font-bold"
+                        >
+                            3
+                        </div>
+
                     </div>
 
                 </div>
 
-            </div>
 
-
-
-            <!-- RIGHT FORM -->
-
-            <div
-                class="
-                    bg-surface-container
-                    border
-                    border-outline-variant
-                    p-8
-                    rounded-xl
-                    shadow-2xl
-                "
-            >
+                <!-- APPLICATION FORM -->
 
                 <div
-                    class="
-                        h-1
-                        w-full
-                        bg-gradient-to-r
-                        from-vibrant-orange
-                        to-secondary-fixed
-                        mb-8
-                        rounded-full
-                    "
-                ></div>
-
-
-                <h3
-                    class="
-                        text-2xl
-                        font-bold
-                        text-on-surface
-                        mb-8
-                    "
+                    class="bg-surface-container border border-outline-variant p-8 rounded-xl shadow-2xl"
                 >
-                    Business Information
-                </h3>
-
-
-                <form
-                    id="sellerForm"
-                    class="space-y-6"
-                >
-
-
-                    <!-- NAME + EMAIL -->
 
                     <div
-                        class="
-                            grid
-                            grid-cols-1
-                            md:grid-cols-2
-                            gap-6
-                        "
+                        class="h-1 w-full mb-8 rounded-full"
+                        style="background:linear-gradient(to right,#FF6B00,#D94F00);"
+                    ></div>
+
+
+                    <h3
+                        class="text-2xl font-bold text-on-surface mb-8"
                     >
+                        Business Information
+                    </h3>
+
+
+                    <form
+                        id="sellerForm"
+                        class="space-y-6"
+                    >
+
+                        <div
+                            class="grid grid-cols-1 md:grid-cols-2 gap-6"
+                        >
+
+                            <div>
+
+                                <label
+                                    class="block text-xs font-mono tracking-widest uppercase text-on-surface-variant mb-2"
+                                >
+                                    Full Name
+                                </label>
+
+
+                                <input
+                                    required
+                                    type="text"
+                                    name="fullName"
+                                    placeholder="Enter your name"
+                                    class="input-glow w-full bg-surface-container-high border-0 border-b-2 border-outline-variant text-on-surface px-4 py-3 rounded-t-md"
+                                >
+
+                            </div>
+
+
+                            <div>
+
+                                <label
+                                    class="block text-xs font-mono tracking-widest uppercase text-on-surface-variant mb-2"
+                                >
+                                    Email Address
+                                </label>
+
+
+                                <input
+                                    required
+                                    type="email"
+                                    name="email"
+                                    placeholder="athlete@example.com"
+                                    class="input-glow w-full bg-surface-container-high border-0 border-b-2 border-outline-variant text-on-surface px-4 py-3 rounded-t-md"
+                                >
+
+                            </div>
+
+                        </div>
+
 
                         <div>
 
                             <label
-                                class="
-                                    block
-                                    text-xs
-                                    font-mono
-                                    tracking-widest
-                                    uppercase
-                                    text-on-surface-variant
-                                    mb-2
-                                "
+                                class="block text-xs font-mono tracking-widest uppercase text-on-surface-variant mb-2"
                             >
-                                Full Name
+                                Phone Number
                             </label>
+
+
+                            <input
+                                required
+                                type="tel"
+                                name="phone"
+                                placeholder="+92 300 1234567"
+                                class="input-glow w-full bg-surface-container-high border-0 border-b-2 border-outline-variant text-on-surface px-4 py-3 rounded-t-md"
+                            >
+
+                        </div>
+
+
+                        <div>
+
+                            <label
+                                class="block text-xs font-mono tracking-widest uppercase text-on-surface-variant mb-2"
+                            >
+                                Business / Brand Name
+                            </label>
+
 
                             <input
                                 required
                                 type="text"
-                                placeholder="Enter your name"
-
-                                class="
-                                    input-glow
-                                    w-full
-                                    bg-surface-container-high
-                                    border-0
-                                    border-b-2
-                                    border-outline-variant
-                                    text-on-surface
-                                    px-4
-                                    py-3
-                                    rounded-t-md
-                                "
+                                name="business"
+                                placeholder="e.g. ABC Sports Sialkot"
+                                class="input-glow w-full bg-surface-container-high border-0 border-b-2 border-outline-variant text-on-surface px-4 py-3 rounded-t-md"
                             >
 
                         </div>
 
 
-                        <div>
+                        <div class="pt-4 flex justify-end">
 
-                            <label
-                                class="
-                                    block
-                                    text-xs
-                                    font-mono
-                                    tracking-widest
-                                    uppercase
-                                    text-on-surface-variant
-                                    mb-2
-                                "
+                            <button
+                                type="submit"
+                                class="btn-primary px-8 py-3 rounded-lg flex items-center gap-2 font-mono text-xs font-bold tracking-widest uppercase"
                             >
-                                Email Address
-                            </label>
 
-                            <input
-                                required
-                                type="email"
-                                placeholder="athlete@example.com"
+                                CONTINUE
 
-                                class="
-                                    input-glow
-                                    w-full
-                                    bg-surface-container-high
-                                    border-0
-                                    border-b-2
-                                    border-outline-variant
-                                    text-on-surface
-                                    px-4
-                                    py-3
-                                    rounded-t-md
-                                "
-                            >
+                                <span class="material-symbols-outlined text-lg">
+                                    arrow_forward
+                                </span>
+
+                            </button>
 
                         </div>
 
-                    </div>
+                    </form>
 
-
-
-                    <!-- PHONE -->
-
-                    <div>
-
-                        <label
-                            class="
-                                block
-                                text-xs
-                                font-mono
-                                tracking-widest
-                                uppercase
-                                text-on-surface-variant
-                                mb-2
-                            "
-                        >
-                            Phone Number
-                        </label>
-
-                        <input
-                            required
-                            type="tel"
-                            placeholder="+92 300 1234567"
-
-                            class="
-                                input-glow
-                                w-full
-                                bg-surface-container-high
-                                border-0
-                                border-b-2
-                                border-outline-variant
-                                text-on-surface
-                                px-4
-                                py-3
-                                rounded-t-md
-                            "
-                        >
-
-                    </div>
-
-
-
-                    <!-- BUSINESS -->
-
-                    <div>
-
-                        <label
-                            class="
-                                block
-                                text-xs
-                                font-mono
-                                tracking-widest
-                                uppercase
-                                text-on-surface-variant
-                                mb-2
-                            "
-                        >
-                            Business / Brand Name
-                        </label>
-
-                        <input
-                            required
-                            type="text"
-                            placeholder="e.g. ABC Sports Sialkot"
-
-                            class="
-                                input-glow
-                                w-full
-                                bg-surface-container-high
-                                border-0
-                                border-b-2
-                                border-outline-variant
-                                text-on-surface
-                                px-4
-                                py-3
-                                rounded-t-md
-                            "
-                        >
-
-                    </div>
-
-
-
-                    <!-- CONTINUE -->
-
-                    <div
-                        class="
-                            pt-4
-                            flex
-                            justify-end
-                        "
-                    >
-
-                        <a
-                            href="sellerinfo.html"
-
-                            class="
-                                btn-primary
-                                text-white
-                                px-8
-                                py-3
-                                rounded-lg
-                                flex
-                                items-center
-                                gap-2
-                                font-mono
-                                text-xs
-                                font-bold
-                                tracking-widest
-                                uppercase
-                            "
-                        >
-                            CONTINUE
-
-                            <span
-                                class="material-symbols-outlined text-lg"
-                            >
-                                arrow_forward
-                            </span>
-
-                        </a>
-
-                    </div>
-
-                </form>
+                </div>
 
             </div>
 
-        </div>
+        </section>
 
-    </section>
 
+        <!-- =================================================
+             ELITE PARTNERS
+        ================================================== -->
+
+        <section
+            class="w-full max-w-container-max mx-auto px-gutter py-section-desktop"
+        >
+
+            <div
+                class="flex flex-col md:flex-row justify-between md:items-end mb-12 pb-4 border-b border-surface-container-highest"
+            >
+
+                <div>
+
+                    <h2
+                        class="text-4xl md:text-5xl font-black uppercase text-on-surface"
+                    >
+                        Elite Partners
+                    </h2>
+
+                    <p
+                        class="text-on-surface-variant mt-3"
+                    >
+                        Join the ranks of top-performing sports manufacturers.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="mt-5 md:mt-0 font-mono text-xs font-bold tracking-widest uppercase flex items-center gap-2"
+                    style="color:#FF6B00;"
+                >
+
+                    VIEW ALL
+
+                    <span class="material-symbols-outlined text-base">
+                        chevron_right
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <div
+                class="flex overflow-x-auto gap-6 pb-6 snap-x snap-mandatory hide-scrollbar"
+            >
+
+                <!-- SELLER 1 -->
+
+                <div
+                    class="min-w-[300px] md:min-w-[350px] bg-surface-container-low border border-outline-variant rounded-xl overflow-hidden snap-center flex-shrink-0 card-hover"
+                >
+
+                    <div
+                        class="h-32 bg-surface-container-high relative"
+                    >
+
+                        <div
+                            class="seller1-bg w-full h-full opacity-60"
+                        ></div>
+
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-surface-container-low to-transparent"
+                        ></div>
+
+
+                        <div
+                            class="absolute top-3 right-3 text-black text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1"
+                            style="background:#FF6B00;"
+                        >
+
+                            <span class="material-symbols-outlined text-xs">
+                                verified
+                            </span>
+
+                            VERIFIED
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="p-6">
+
+                        <h4
+                            class="text-2xl font-bold text-on-surface mb-2"
+                        >
+                            ABC Sports
+                        </h4>
+
+
+                        <p
+                            class="text-on-surface-variant text-sm flex items-center gap-1 mb-5"
+                        >
+
+                            <span class="material-symbols-outlined text-base">
+                                location_on
+                            </span>
+
+                            Sialkot, PK
+
+                        </p>
+
+
+                        <div
+                            class="flex flex-wrap gap-2 mb-6"
+                        >
+
+                            <span
+                                class="px-3 py-1 border border-outline-variant rounded-full text-xs text-on-surface-variant"
+                            >
+                                Cricket
+                            </span>
+
+                            <span
+                                class="px-3 py-1 border border-outline-variant rounded-full text-xs text-on-surface-variant"
+                            >
+                                Accessories
+                            </span>
+
+                        </div>
+
+
+                        <div
+                            class="flex items-center justify-between border-t border-surface-container-high pt-4"
+                        >
+
+                            <div
+                                class="flex items-center gap-1"
+                                style="color:#FF6B00;"
+                            >
+
+                                <span class="material-symbols-outlined text-base">
+                                    star
+                                </span>
+
+                                <span class="font-bold">
+                                    4.9
+                                </span>
+
+                            </div>
+
+
+                            <span
+                                class="text-xs text-on-surface-variant"
+                            >
+                                1.2k Orders
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SELLER 2 -->
+
+                <div
+                    class="min-w-[300px] md:min-w-[350px] bg-surface-container-low border border-outline-variant rounded-xl overflow-hidden snap-center flex-shrink-0 card-hover"
+                >
+
+                    <div
+                        class="h-32 bg-surface-container-high relative"
+                    >
+
+                        <div
+                            class="seller2-bg w-full h-full opacity-60"
+                        ></div>
+
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-surface-container-low to-transparent"
+                        ></div>
+
+
+                        <div
+                            class="absolute top-3 right-3 text-black text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1"
+                            style="background:#FF6B00;"
+                        >
+
+                            <span class="material-symbols-outlined text-xs">
+                                verified
+                            </span>
+
+                            VERIFIED
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="p-6">
+
+                        <h4
+                            class="text-2xl font-bold text-on-surface mb-2"
+                        >
+                            Lahore Athletics
+                        </h4>
+
+
+                        <p
+                            class="text-on-surface-variant text-sm flex items-center gap-1 mb-5"
+                        >
+
+                            <span class="material-symbols-outlined text-base">
+                                location_on
+                            </span>
+
+                            Lahore, PK
+
+                        </p>
+
+
+                        <div
+                            class="flex flex-wrap gap-2 mb-6"
+                        >
+
+                            <span
+                                class="px-3 py-1 border border-outline-variant rounded-full text-xs text-on-surface-variant"
+                            >
+                                Apparel
+                            </span>
+
+                            <span
+                                class="px-3 py-1 border border-outline-variant rounded-full text-xs text-on-surface-variant"
+                            >
+                                Footwear
+                            </span>
+
+                        </div>
+
+
+                        <div
+                            class="flex items-center justify-between border-t border-surface-container-high pt-4"
+                        >
+
+                            <div
+                                class="flex items-center gap-1"
+                                style="color:#FF6B00;"
+                            >
+
+                                <span class="material-symbols-outlined text-base">
+                                    star
+                                </span>
+
+                                <span class="font-bold">
+                                    4.8
+                                </span>
+
+                            </div>
+
+
+                            <span
+                                class="text-xs text-on-surface-variant"
+                            >
+                                850 Orders
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- YOUR BRAND -->
+
+                <a
+                    href="sellerinfo.html"
+                    class="min-w-[300px] md:min-w-[350px] bg-surface-container-low border border-outline-variant rounded-xl snap-center flex-shrink-0 flex items-center justify-center card-hover opacity-80 hover:opacity-100"
+                >
+
+                    <div
+                        class="text-center p-8"
+                    >
+
+                        <div
+                            class="w-16 h-16 mx-auto rounded-full bg-surface-container-high border-2 border-dashed border-outline-variant flex items-center justify-center mb-6"
+                        >
+
+                            <span
+                                class="material-symbols-outlined text-3xl text-on-surface-variant"
+                            >
+                                add_business
+                            </span>
+
+                        </div>
+
+
+                        <h4
+                            class="text-2xl font-bold text-on-surface mb-2"
+                        >
+                            Your Brand Here
+                        </h4>
+
+
+                        <p
+                            class="text-on-surface-variant text-sm"
+                        >
+                            Join the elite network today.
+                        </p>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
 
 
     <!-- =====================================================
-         ELITE PARTNERS
+         FOOTER
     ====================================================== -->
 
-    <section
-        class="
-            w-full
-            max-w-container-max
-            mx-auto
-            px-gutter
-            py-section-desktop
-        "
+    <footer
+        class="border-t border-outline-variant bg-surface-container-lowest px-gutter py-16"
     >
 
         <div
-            class="
-                flex
-                flex-col
-                md:flex-row
-                justify-between
-                md:items-end
-                mb-12
-                pb-4
-                border-b
-                border-surface-container-highest
-            "
+            class="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-4 gap-12"
         >
 
             <div>
 
-                <h2
-                    class="
-                        text-4xl
-                        md:text-5xl
-                        font-black
-                        uppercase
-                        text-on-surface
-                    "
+                <a
+                    href="seller.html"
+                    class="text-3xl font-black tracking-widest"
+                    style="color:#FF6B00;"
                 >
-                    Elite Partners
-                </h2>
+                    KHELZONE
+                </a>
 
 
                 <p
-                    class="
-                        text-on-surface-variant
-                        mt-3
-                    "
+                    class="mt-5 text-on-surface-variant leading-7"
                 >
-                    Join the ranks of top-performing sports manufacturers.
+                    Engineered for Performance.
+                    The ultimate marketplace for elite sports gear.
                 </p>
 
             </div>
 
 
-            <button
-                type="button"
-                class="
-                    mt-5
-                    md:mt-0
-                    text-secondary-fixed
-                    font-mono
-                    text-xs
-                    font-bold
-                    tracking-widest
-                    uppercase
-                    flex
-                    items-center
-                    gap-2
-                "
-            >
+            <div>
 
-                VIEW ALL
-
-                <span class="material-symbols-outlined text-base">
-                    chevron_right
-                </span>
-
-            </button>
-
-        </div>
-
-
-
-        <!-- SELLER CARDS -->
-
-        <div
-            class="
-                flex
-                overflow-x-auto
-                gap-6
-                pb-6
-                snap-x
-                snap-mandatory
-                hide-scrollbar
-            "
-        >
-
-
-            <!-- SELLER 1 -->
-
-            <div
-                class="
-                    min-w-[300px]
-                    md:min-w-[350px]
-                    bg-surface-container-low
-                    border
-                    border-outline-variant
-                    rounded-xl
-                    overflow-hidden
-                    snap-center
-                    flex-shrink-0
-                    card-hover
-                "
-            >
-
-                <div
-                    class="
-                        h-32
-                        bg-surface-container-high
-                        relative
-                    "
+                <h4
+                    class="font-mono text-xs tracking-widest uppercase text-on-surface mb-5"
                 >
-
-                    <div
-                        class="
-                            seller1-bg
-                            w-full
-                            h-full
-                            opacity-60
-                        "
-                    ></div>
+                    Marketplace
+                </h4>
 
 
-                    <div
-                        class="
-                            absolute
-                            inset-0
-                            bg-gradient-to-t
-                            from-surface-container-low
-                            to-transparent
-                        "
-                    ></div>
+                <div class="flex flex-col gap-3">
 
-
-                    <div
-                        class="
-                            absolute
-                            top-3
-                            right-3
-                            bg-secondary-fixed
-                            text-black
-                            text-[10px]
-                            font-bold
-                            px-3
-                            py-1
-                            rounded-full
-                            flex
-                            items-center
-                            gap-1
-                        "
+                    <a
+                        href="index.html"
+                        class="text-on-surface-variant hover:text-secondary-fixed"
                     >
+                        Cricket Gear
+                    </a>
 
-                        <span class="material-symbols-outlined text-xs">
-                            verified
-                        </span>
-
-                        VERIFIED
-
-                    </div>
-
-                </div>
-
-
-                <div class="p-6">
-
-                    <h4
-                        class="
-                            text-2xl
-                            font-bold
-                            text-on-surface
-                            mb-2
-                        "
+                    <a
+                        href="index.html"
+                        class="text-on-surface-variant hover:text-secondary-fixed"
                     >
-                        ABC Sports
-                    </h4>
-
-
-                    <p
-                        class="
-                            text-on-surface-variant
-                            text-sm
-                            flex
-                            items-center
-                            gap-1
-                            mb-5
-                        "
-                    >
-
-                        <span class="material-symbols-outlined text-base">
-                            location_on
-                        </span>
-
-                        Sialkot, PK
-
-                    </p>
-
-
-                    <div class="flex flex-wrap gap-2 mb-6">
-
-                        <span
-                            class="
-                                px-3
-                                py-1
-                                border
-                                border-outline-variant
-                                rounded-full
-                                text-xs
-                                text-on-surface-variant
-                            "
-                        >
-                            Cricket
-                        </span>
-
-
-                        <span
-                            class="
-                                px-3
-                                py-1
-                                border
-                                border-outline-variant
-                                rounded-full
-                                text-xs
-                                text-on-surface-variant
-                            "
-                        >
-                            Accessories
-                        </span>
-
-                    </div>
-
-
-                    <div
-                        class="
-                            flex
-                            items-center
-                            justify-between
-                            border-t
-                            border-surface-container-high
-                            pt-4
-                        "
-                    >
-
-                        <div
-                            class="
-                                flex
-                                items-center
-                                gap-1
-                                text-secondary-fixed
-                            "
-                        >
-
-                            <span class="material-symbols-outlined text-base">
-                                star
-                            </span>
-
-                            <span class="font-bold">
-                                4.9
-                            </span>
-
-                        </div>
-
-
-                        <span
-                            class="
-                                text-xs
-                                text-on-surface-variant
-                            "
-                        >
-                            1.2k Orders
-                        </span>
-
-                    </div>
+                        Football Kits
+                    </a>
 
                 </div>
 
             </div>
 
 
+            <div>
 
-            <!-- SELLER 2 -->
-
-            <div
-                class="
-                    min-w-[300px]
-                    md:min-w-[350px]
-                    bg-surface-container-low
-                    border
-                    border-outline-variant
-                    rounded-xl
-                    overflow-hidden
-                    snap-center
-                    flex-shrink-0
-                    card-hover
-                "
-            >
-
-                <div
-                    class="
-                        h-32
-                        bg-surface-container-high
-                        relative
-                    "
+                <h4
+                    class="font-mono text-xs tracking-widest uppercase text-on-surface mb-5"
                 >
-
-                    <div
-                        class="
-                            seller2-bg
-                            w-full
-                            h-full
-                            opacity-60
-                        "
-                    ></div>
+                    For Sellers
+                </h4>
 
 
-                    <div
-                        class="
-                            absolute
-                            inset-0
-                            bg-gradient-to-t
-                            from-surface-container-low
-                            to-transparent
-                        "
-                    ></div>
+                <div class="flex flex-col gap-3">
 
-
-                    <div
-                        class="
-                            absolute
-                            top-3
-                            right-3
-                            bg-secondary-fixed
-                            text-black
-                            text-[10px]
-                            font-bold
-                            px-3
-                            py-1
-                            rounded-full
-                            flex
-                            items-center
-                            gap-1
-                        "
+                    <a
+                        href="seller-guide.html"
+                        class="text-on-surface-variant hover:text-secondary-fixed"
                     >
+                        Seller Guide
+                    </a>
 
-                        <span class="material-symbols-outlined text-xs">
-                            verified
-                        </span>
-
-                        VERIFIED
-
-                    </div>
-
-                </div>
-
-
-                <div class="p-6">
-
-                    <h4
-                        class="
-                            text-2xl
-                            font-bold
-                            text-on-surface
-                            mb-2
-                        "
+                    <a
+                        href="sellerinfo.html"
+                        class="text-on-surface-variant hover:text-secondary-fixed"
                     >
-                        Lahore Athletics
-                    </h4>
-
-
-                    <p
-                        class="
-                            text-on-surface-variant
-                            text-sm
-                            flex
-                            items-center
-                            gap-1
-                            mb-5
-                        "
-                    >
-
-                        <span class="material-symbols-outlined text-base">
-                            location_on
-                        </span>
-
-                        Lahore, PK
-
-                    </p>
-
-
-                    <div class="flex flex-wrap gap-2 mb-6">
-
-                        <span
-                            class="
-                                px-3
-                                py-1
-                                border
-                                border-outline-variant
-                                rounded-full
-                                text-xs
-                                text-on-surface-variant
-                            "
-                        >
-                            Apparel
-                        </span>
-
-
-                        <span
-                            class="
-                                px-3
-                                py-1
-                                border
-                                border-outline-variant
-                                rounded-full
-                                text-xs
-                                text-on-surface-variant
-                            "
-                        >
-                            Footwear
-                        </span>
-
-                    </div>
-
-
-                    <div
-                        class="
-                            flex
-                            items-center
-                            justify-between
-                            border-t
-                            border-surface-container-high
-                            pt-4
-                        "
-                    >
-
-                        <div
-                            class="
-                                flex
-                                items-center
-                                gap-1
-                                text-secondary-fixed
-                            "
-                        >
-
-                            <span class="material-symbols-outlined text-base">
-                                star
-                            </span>
-
-                            <span class="font-bold">
-                                4.8
-                            </span>
-
-                        </div>
-
-
-                        <span
-                            class="
-                                text-xs
-                                text-on-surface-variant
-                            "
-                        >
-                            850 Orders
-                        </span>
-
-                    </div>
+                        Become a Seller
+                    </a>
 
                 </div>
 
             </div>
 
 
+            <div>
 
-            <!-- YOUR BRAND -->
-
-            <a
-                href="sellerinfo.html"
-
-                class="
-                    min-w-[300px]
-                    md:min-w-[350px]
-                    bg-surface-container-low
-                    border
-                    border-outline-variant
-                    rounded-xl
-                    snap-center
-                    flex-shrink-0
-                    flex
-                    items-center
-                    justify-center
-                    card-hover
-                    opacity-80
-                    hover:opacity-100
-                "
-            >
-
-                <div class="text-center p-8">
-
-                    <div
-                        class="
-                            w-16
-                            h-16
-                            mx-auto
-                            rounded-full
-                            bg-surface-container-high
-                            border-2
-                            border-dashed
-                            border-outline-variant
-                            flex
-                            items-center
-                            justify-center
-                            mb-6
-                        "
-                    >
-
-                        <span
-                            class="
-                                material-symbols-outlined
-                                text-3xl
-                                text-on-surface-variant
-                            "
-                        >
-                            add_business
-                        </span>
-
-                    </div>
-
-
-                    <h4
-                        class="
-                            text-2xl
-                            font-bold
-                            text-on-surface
-                            mb-2
-                        "
-                    >
-                        Your Brand Here
-                    </h4>
-
-
-                    <p
-                        class="
-                            text-on-surface-variant
-                            text-sm
-                        "
-                    >
-                        Join the elite network today.
-                    </p>
-
-                </div>
-
-            </a>
-
-        </div>
-
-    </section>
-
-</main>
-
-
-
-<!-- =========================================================
-     FOOTER
-========================================================= -->
-
-<footer
-    class="
-        border-t
-        border-outline-variant
-        bg-surface-container-lowest
-        px-gutter
-        py-16
-    "
->
-
-    <div
-        class="
-            max-w-container-max
-            mx-auto
-            grid
-            grid-cols-1
-            md:grid-cols-4
-            gap-12
-        "
-    >
-
-
-        <!-- BRAND -->
-
-        <div>
-
-            <a
-                href="seller.html"
-                class="
-                    text-3xl
-                    font-black
-                    tracking-widest
-                    text-vibrant-orange
-                "
-            >
-                KHELZONE
-            </a>
-
-
-            <p
-                class="
-                    mt-5
-                    text-on-surface-variant
-                    leading-7
-                "
-            >
-                Engineered for Performance.
-                The ultimate marketplace for elite sports gear.
-            </p>
-
-        </div>
-
-
-
-        <!-- MARKETPLACE -->
-
-        <div>
-
-            <h4
-                class="
-                    font-mono
-                    text-xs
-                    tracking-widest
-                    uppercase
-                    text-on-surface
-                    mb-5
-                "
-            >
-                Marketplace
-            </h4>
-
-
-            <div class="flex flex-col gap-3">
-
-                <a
-                    href="index.html"
-                    class="
-                        text-on-surface-variant
-                        hover:text-secondary-fixed
-                    "
+                <h4
+                    class="font-mono text-xs tracking-widest uppercase text-on-surface mb-5"
                 >
-                    Cricket Gear
-                </a>
+                    Legal
+                </h4>
 
 
                 <a
-                    href="index.html"
-                    class="
-                        text-on-surface-variant
-                        hover:text-secondary-fixed
-                    "
+                    href="#"
+                    class="text-on-surface-variant hover:text-secondary-fixed"
                 >
-                    Football Kits
+                    Terms of Service
                 </a>
+
+
+                <p
+                    class="mt-8 text-xs text-on-surface-variant"
+                >
+                    © 2026 KHELZONE.<br>
+                    Engineered for Performance.
+                </p>
 
             </div>
 
         </div>
 
+    </footer>
 
 
-        <!-- SELLERS -->
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
 
-        <div>
+    <script>
 
-            <h4
-                class="
-                    font-mono
-                    text-xs
-                    tracking-widest
-                    uppercase
-                    text-on-surface
-                    mb-5
-                "
-            >
-                For Sellers
-            </h4>
+        /* =====================================================
+           MENU
+        ====================================================== */
 
+        const menuButton =
+            document.getElementById("menuButton");
 
-            <div class="flex flex-col gap-3">
+        const mobileMenu =
+            document.getElementById("mobileMenu");
 
-                <a
-                    href="seller-guide.html"
-                    class="
-                        text-on-surface-variant
-                        hover:text-secondary-fixed
-                    "
-                >
-                    Seller Guide
-                </a>
+        const menuIcon =
+            document.getElementById("menuIcon");
 
 
-                <a
-                    href="sellerinfo.html"
-                    class="
-                        text-on-surface-variant
-                        hover:text-secondary-fixed
-                    "
-                >
-                    Become a Seller
-                </a>
+        menuButton.addEventListener("click", function () {
 
-            </div>
-
-        </div>
+            const isOpen =
+                mobileMenu.classList.toggle("show");
 
 
-
-        <!-- LEGAL -->
-
-        <div>
-
-            <h4
-                class="
-                    font-mono
-                    text-xs
-                    tracking-widest
-                    uppercase
-                    text-on-surface
-                    mb-5
-                "
-            >
-                Legal
-            </h4>
+            menuButton.setAttribute(
+                "aria-expanded",
+                String(isOpen)
+            );
 
 
-            <a
-                href="#"
-                class="
-                    text-on-surface-variant
-                    hover:text-secondary-fixed
-                "
-            >
-                Terms of Service
-            </a>
+            menuButton.setAttribute(
+                "aria-label",
+                isOpen
+                    ? "Close menu"
+                    : "Open menu"
+            );
 
 
-            <p
-                class="
-                    mt-8
-                    text-xs
-                    text-on-surface-variant
-                "
-            >
-                © 2026 KHELZONE.
-                Engineered for Performance.
-            </p>
+            menuIcon.textContent =
+                isOpen
+                    ? "close"
+                    : "menu";
 
-        </div>
-
-    </div>
-
-</footer>
+        });
 
 
+        /* =====================================================
+           CLOSE MOBILE MENU
+        ====================================================== */
 
-<!-- =========================================================
-     NAVBAR JAVASCRIPT
-     NO seller.js REQUIRED
-========================================================= -->
+        document
+            .querySelectorAll("#mobileMenu a")
+            .forEach(function (link) {
 
-<script>
+                link.addEventListener("click", function () {
 
-    const menuButton =
-        document.getElementById("menuButton");
+                    mobileMenu.classList.remove("show");
 
-    const mobileMenu =
-        document.getElementById("mobileMenu");
+                    menuIcon.textContent = "menu";
 
-    const menuIcon =
-        document.getElementById("menuIcon");
+                    menuButton.setAttribute(
+                        "aria-expanded",
+                        "false"
+                    );
 
+                    menuButton.setAttribute(
+                        "aria-label",
+                        "Open menu"
+                    );
 
-    menuButton.addEventListener("click", function () {
+                });
 
-        const isOpen =
-            mobileMenu.classList.toggle("show");
-
-        menuButton.setAttribute(
-            "aria-expanded",
-            isOpen
-        );
-
-
-        if (isOpen) {
-
-            menuIcon.textContent = "close";
-
-        } else {
-
-            menuIcon.textContent = "menu";
-
-        }
-
-    });
+            });
 
 
-    /*
-       Close mobile menu when a link is clicked
-    */
+        /* =====================================================
+           SELLER FORM
+        ====================================================== */
 
-    document
-        .querySelectorAll("#mobileMenu a")
-        .forEach(function (link) {
+        document
+            .getElementById("sellerForm")
+            .addEventListener("submit", function (event) {
 
-            link.addEventListener("click", function () {
+                event.preventDefault();
+
+                window.location.href =
+                    "sellerinfo.html";
+
+            });
+
+
+        /* =====================================================
+           DESKTOP SCREEN
+           CLOSE MOBILE MENU
+        ====================================================== */
+
+        window.addEventListener("resize", function () {
+
+            if (window.innerWidth > 768) {
 
                 mobileMenu.classList.remove("show");
 
@@ -2199,29 +1677,16 @@
                     "false"
                 );
 
-            });
+                menuButton.setAttribute(
+                    "aria-label",
+                    "Open menu"
+                );
+
+            }
 
         });
 
-
-    /*
-       Simple form protection.
-       Actual application continues to sellerinfo.html
-    */
-
-    document
-        .getElementById("sellerForm")
-        .addEventListener("submit", function (event) {
-
-            event.preventDefault();
-
-            window.location.href =
-                "sellerinfo.html";
-
-        });
-
-</script>
-
+    </script>
 
 </body>
 </html>

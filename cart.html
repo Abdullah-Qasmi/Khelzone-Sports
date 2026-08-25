@@ -10,29 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <script src="cart.tailwind.config.js"></script>
   <link rel="stylesheet" href="cart.css"/>
-
-<style>
-.seller-nav-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 16px;
-  padding: 8px 16px;
-  border: 1px solid #444748;
-  border-radius: 999px;
-  color: #e5e2e1;
-  text-decoration: none;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  letter-spacing: .06em;
-  transition: .2s ease;
-}
-.seller-nav-btn:hover {
-  border-color: #FF6A00;
-  color: #FF6A00;
-}
-</style>
-
 </head>
 
 <body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased selection:bg-secondary-container selection:text-on-secondary-container">
@@ -50,12 +27,15 @@
       <a href="shop.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">SHOP</a>
       <a href="customize.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">CUSTOMIZE KIT</a>
       <a href="wishlist.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">WISHLIST</a>
-      <a href="seller.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">BECOME A SELLER</a>
-      
+      <a href="cart.html" class="font-label-caps text-label-caps text-secondary-container border-b-2 border-secondary-container pb-1 tracking-wider">CART</a>
     </nav>
   </div>
 
   <div class="flex items-center gap-lg">
+    <a href="seller.html" class="become-seller-link font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 hidden md:flex items-center gap-1 border border-outline-variant hover:border-secondary-container rounded-full px-sm py-1 tracking-wider">
+      <span class="material-symbols-outlined text-[16px]">storefront</span>
+      Become a Seller
+    </a>
   </div>
 </header>
 
@@ -64,8 +44,7 @@
   <a href="shop.html">SHOP</a>
   <a href="customize.html">CUSTOMIZE KIT</a>
   <a href="wishlist.html">WISHLIST</a>
-  <a href="seller.html">BECOME A SELLER</a>
-  
+  <a href="cart.html" class="active">CART</a>
 </div>
 
 <main class="flex-grow w-full max-w-container-max mx-auto px-gutter py-xl">

@@ -1,199 +1,208 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>KHELZONE - Cart</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script src="cart.tailwind.config.js"></script>
-<link rel="stylesheet" href="cart.css"/>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>KHELZONE - Cart</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="cart.tailwind.config.js"></script>
+  <link rel="stylesheet" href="cart.css"/>
+
+<style>
+.seller-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 16px;
+  padding: 8px 16px;
+  border: 1px solid #444748;
+  border-radius: 999px;
+  color: #e5e2e1;
+  text-decoration: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: .06em;
+  transition: .2s ease;
+}
+.seller-nav-btn:hover {
+  border-color: #FF6A00;
+  color: #FF6A00;
+}
+</style>
+
 </head>
+
 <body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased selection:bg-secondary-container selection:text-on-secondary-container">
-<!-- TopAppBar -->
-<header class="bg-background dark:bg-background border-b border-outline-variant dark:border-outline-variant docked full-width top-0 sticky flex justify-between items-center w-full px-gutter h-16 z-50 bg-background/95 backdrop-blur-md">
-<div class="flex items-center gap-lg">
-<button class="text-on-surface dark:text-on-surface hover:text-secondary-container transition-colors duration-200 lg:hidden">
-<span class="material-symbols-outlined font-headline-md text-headline-md">menu</span>
-</button>
-<h1 class="font-display-xl text-headline-md text-secondary-container tracking-tighter uppercase">KHELZONE</h1>
-<nav class="hidden lg:flex items-center gap-md ml-md">
-<a href="index.html" class="font-label-caps text-label-caps text-on-surface hover:text-secondary-container transition-colors duration-200 tracking-wider">HOME</a>
-<a href="shop.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">SHOP</a>
-<a href="sports.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">SPORTS</a>
-<a href="customize.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">CUSTOMIZE KIT</a>
-<a href="wishlist.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">WISHLIST</a>
-<a href="cart.html" class="font-label-caps text-label-caps text-secondary-container border-b-2 border-secondary-container pb-1 tracking-wider">CART</a>
-</nav>
-</div>
-<div class="flex items-center gap-lg">
-<a href="seller.html" class="become-seller-link font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 hidden md:flex items-center gap-1 border border-outline-variant hover:border-secondary-container rounded-full px-sm py-1 tracking-wider">
-<span class="material-symbols-outlined text-[16px]">storefront</span>
-Become a Seller
-</a>
-<a href="cart.html" class="cart-icon-link text-on-surface-variant hover:text-secondary-container transition-colors duration-200 relative flex items-center">
-<span class="material-symbols-outlined font-headline-md text-headline-md">shopping_cart</span>
-<span id="cart-header-count" class="absolute -top-2 -right-2 bg-secondary-container text-on-secondary-container text-[10px] font-bold font-label-caps rounded-full w-4 h-4 flex items-center justify-center">0</span>
-</a>
-</div>
+
+<header class="bg-background border-b border-outline-variant docked full-width top-0 sticky flex justify-between items-center w-full px-gutter h-16 z-50 bg-background/95 backdrop-blur-md">
+  <div class="flex items-center gap-lg">
+    <button id="mobile-menu-btn" class="text-on-surface hover:text-secondary-container transition-colors duration-200 lg:hidden" aria-label="Open menu">
+      <span class="material-symbols-outlined font-headline-md text-headline-md">menu</span>
+    </button>
+
+    <h1 class="font-display-xl text-headline-md text-secondary-container tracking-tighter uppercase">KHELZONE</h1>
+
+    <nav class="hidden lg:flex items-center gap-md ml-md">
+      <a href="index.html" class="font-label-caps text-label-caps text-on-surface hover:text-secondary-container transition-colors duration-200 tracking-wider">HOME</a>
+      <a href="shop.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">SHOP</a>
+      <a href="customize.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">CUSTOMIZE KIT</a>
+      <a href="wishlist.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">WISHLIST</a>
+      <a href="seller.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">BECOME A SELLER</a>
+      
+    </nav>
+  </div>
+
+  <div class="flex items-center gap-lg">
+  </div>
 </header>
+
+<div id="mobile-nav" class="mobile-nav hidden lg:hidden">
+  <a href="index.html">HOME</a>
+  <a href="shop.html">SHOP</a>
+  <a href="customize.html">CUSTOMIZE KIT</a>
+  <a href="wishlist.html">WISHLIST</a>
+  <a href="seller.html">BECOME A SELLER</a>
+  
+</div>
+
 <main class="flex-grow w-full max-w-container-max mx-auto px-gutter py-xl">
-<div class="flex flex-col md:flex-row gap-lg">
-<!-- Cart Items Section -->
-<section class="w-full md:w-2/3 flex flex-col gap-md">
-<div class="flex justify-between items-end border-b border-outline-variant pb-sm">
-<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background tracking-tight">YOUR CART</h2>
-<span id="item-count-label" class="font-label-caps text-label-caps text-on-surface-variant">0 ITEMS</span>
-</div>
+  <div class="flex flex-col md:flex-row gap-lg">
 
-<!-- Select All / Clear Cart -->
-<div class="flex items-center justify-between">
-<label class="flex items-center gap-sm cursor-pointer">
-<input type="checkbox" id="select-all-checkbox" class="khel-checkbox" />
-<span class="font-label-caps text-label-caps text-on-surface-variant">SELECT ALL</span>
-</label>
-<button id="clear-cart-btn" class="font-label-caps text-label-caps text-error hover:text-error-container flex items-center gap-1">
-<span class="material-symbols-outlined text-sm">delete_sweep</span>
-CLEAR CART
-</button>
-</div>
+    <section class="w-full md:w-2/3 flex flex-col gap-md">
+      <div class="flex justify-between items-end border-b border-outline-variant pb-sm">
+        <h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background tracking-tight">YOUR CART</h2>
+        <span id="item-count-label" class="font-label-caps text-label-caps text-on-surface-variant">0 ITEMS</span>
+      </div>
 
-<!-- Bulk Tracker -->
-<div id="bulk-tracker" class="bg-surface-charcoal rounded-xl p-md border border-secondary-container/50 flex flex-col gap-sm shadow-xl relative overflow-hidden">
-<div class="absolute top-0 right-0 w-32 h-32 bg-secondary-container/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
-<div class="flex justify-between items-center relative z-10">
-<div class="flex items-center gap-sm">
-<span class="material-symbols-outlined text-secondary-container" style="font-variation-settings: 'FILL' 1;">local_offer</span>
-<span class="font-headline-md text-headline-md text-on-background">BULK DISCOUNT TRACKER</span>
-</div>
-<span data-bulk-badge class="font-label-caps text-label-caps text-secondary-container border border-secondary-container px-sm py-xs rounded-full">0 / 10 ITEMS</span>
-</div>
-<div class="w-full bg-surface-container-highest h-3 rounded-full overflow-hidden mt-xs relative z-10">
-<div class="bg-secondary-container h-full rounded-full transition-all duration-500 progress-glow w-0"></div>
-</div>
-<p data-bulk-msg class="font-body-md text-body-md text-on-surface-variant mt-xs relative z-10">Add items for 20% OFF!</p>
-</div>
+      <div class="flex items-center justify-between">
+        <label class="flex items-center gap-sm cursor-pointer">
+          <input type="checkbox" id="select-all-checkbox" class="khel-checkbox"/>
+          <span class="font-label-caps text-label-caps text-on-surface-variant">SELECT ALL</span>
+        </label>
+        <button id="clear-cart-btn" class="font-label-caps text-label-caps text-error hover:text-error-container flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">delete_sweep</span>
+          CLEAR CART
+        </button>
+      </div>
 
-<!-- Free Shipping Progress -->
-<div id="free-ship-wrap" class="bg-surface-container-low border border-outline-variant/50 rounded-xl p-md flex flex-col gap-sm" style="display:none;">
-<div class="flex items-center gap-sm">
-<span class="material-symbols-outlined text-secondary-container text-sm">local_shipping</span>
-<p id="free-ship-msg" class="font-body-md text-body-md text-on-background"></p>
-</div>
-<div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
-<div id="free-ship-bar-fill" class="bg-secondary-container h-full rounded-full transition-all duration-500 progress-glow w-0"></div>
-</div>
-</div>
+      <div id="free-ship-wrap" class="bg-surface-container-low border border-outline-variant/50 rounded-xl p-md flex flex-col gap-sm" style="display:none;">
+        <div class="flex items-center gap-sm">
+          <span class="material-symbols-outlined text-secondary-container text-sm">local_shipping</span>
+          <p id="free-ship-msg" class="font-body-md text-body-md text-on-background"></p>
+        </div>
+        <div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
+          <div id="free-ship-bar-fill" class="bg-secondary-container h-full rounded-full transition-all duration-500 progress-glow w-0"></div>
+        </div>
+      </div>
 
-<!-- Item List -->
-<div id="cart-content-wrap">
-<div id="cart-items-container" class="flex flex-col gap-sm mt-sm"></div>
-</div>
+      <div id="cart-content-wrap">
+        <div id="cart-items-container" class="flex flex-col gap-sm mt-sm"></div>
+      </div>
 
-<!-- Empty Cart State -->
-<div id="empty-cart-state" class="flex-col items-center justify-center text-center gap-md py-xl bg-surface-container-low border border-surface-container-highest rounded-xl mt-sm">
-<span class="material-symbols-outlined text-on-surface-variant" style="font-size:64px;">shopping_cart_off</span>
-<h3 class="font-headline-md text-headline-md text-on-background">Your Cart is Empty</h3>
-<p class="font-body-md text-body-md text-on-surface-variant max-w-sm">Looks like you haven't added any sports gear yet.</p>
-<div class="flex flex-wrap justify-center gap-sm mt-sm">
-<button class="continue-shopping-btn btn-primary px-md py-sm rounded-lg font-label-caps text-label-caps text-surface-container-lowest font-bold" data-href="index.html">CONTINUE SHOPPING</button>
-<button class="continue-shopping-btn px-md py-sm rounded-lg font-label-caps text-label-caps border border-outline-variant text-on-surface-variant hover:text-on-background" data-href="shop.html">EXPLORE SPORTS</button>
-<button class="customize-kit-btn px-md py-sm rounded-lg font-label-caps text-label-caps border border-secondary-container text-secondary-container" data-href="customize.html">CUSTOMIZE YOUR KIT</button>
-</div>
-</div>
+      <div id="empty-cart-state" class="flex-col items-center justify-center text-center gap-md py-xl bg-surface-container-low border border-surface-container-highest rounded-xl mt-sm">
+        <span class="material-symbols-outlined text-on-surface-variant" style="font-size:64px;">shopping_cart_off</span>
+        <h3 class="font-headline-md text-headline-md text-on-background">Your Cart is Empty</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant max-w-sm">Looks like you haven't added any sports gear yet.</p>
+        <div class="flex flex-wrap justify-center gap-sm mt-sm">
+          <button class="continue-shopping-btn btn-primary px-md py-sm rounded-lg font-label-caps text-label-caps text-surface-container-lowest font-bold" data-href="index.html">CONTINUE SHOPPING</button>
+          <button class="customize-kit-btn px-md py-sm rounded-lg font-label-caps text-label-caps border border-secondary-container text-secondary-container" data-href="customize.html">CUSTOMIZE YOUR KIT</button>
+        </div>
+      </div>
 
-<!-- Saved for Later -->
-<section id="saved-for-later-section" class="flex-col gap-sm mt-lg" style="display:none;">
-<h3 class="font-headline-md text-headline-md text-on-background border-b border-outline-variant pb-sm">SAVED FOR LATER</h3>
-<div id="saved-items-container" class="flex flex-col gap-sm mt-sm"></div>
-</section>
+      <section id="saved-for-later-section" class="flex-col gap-sm mt-lg" style="display:none;">
+        <h3 class="font-headline-md text-headline-md text-on-background border-b border-outline-variant pb-sm">SAVED FOR LATER</h3>
+        <div id="saved-items-container" class="flex flex-col gap-sm mt-sm"></div>
+      </section>
 
-<!-- Recommendations -->
-<section class="flex flex-col gap-sm mt-lg">
-<h3 class="font-headline-md text-headline-md text-on-background border-b border-outline-variant pb-sm">YOU MAY ALSO LIKE</h3>
-<div id="recommendations-container" class="grid grid-cols-2 md:grid-cols-3 gap-sm mt-sm"></div>
-</section>
-</section>
+      <section class="flex flex-col gap-sm mt-lg">
+        <h3 class="font-headline-md text-headline-md text-on-background border-b border-outline-variant pb-sm">YOU MAY ALSO LIKE</h3>
+        <div id="recommendations-container" class="grid grid-cols-2 md:grid-cols-3 gap-sm mt-sm"></div>
+      </section>
+    </section>
 
-<!-- Order Summary Section -->
-<section class="w-full md:w-1/3">
-<div class="bg-surface-charcoal border border-outline-variant/50 rounded-xl p-md flex flex-col gap-md sticky top-24 shadow-2xl">
-<h3 class="font-headline-md text-headline-md text-on-background border-b border-outline-variant pb-sm">ORDER SUMMARY</h3>
+    <section class="w-full md:w-1/3">
+      <div class="bg-surface-charcoal border border-outline-variant/50 rounded-xl p-md flex flex-col gap-md sticky top-24 shadow-2xl">
+        <h3 class="font-headline-md text-headline-md text-on-background border-b border-outline-variant pb-sm">ORDER SUMMARY</h3>
 
-<!-- Coupon -->
-<div class="flex flex-col gap-xs">
-<div class="flex gap-sm">
-<input id="coupon-input" type="text" placeholder="Promo code (e.g. KHEL10)" class="form-input flex-grow" />
-<button id="coupon-apply-btn" class="font-label-caps text-label-caps px-sm py-1 rounded-lg border border-secondary-container text-secondary-container hover:bg-secondary-container/10">APPLY</button>
-</div>
-<p id="coupon-applied-note" class="font-label-caps text-label-caps text-secondary-container"></p>
-</div>
+        <div class="flex flex-col gap-xs">
+          <div class="flex gap-sm">
+            <input id="coupon-input" type="text" placeholder="Promo code (e.g. KHEL10)" autocomplete="off" class="form-input flex-grow"/>
+            <button id="coupon-apply-btn" class="font-label-caps text-label-caps px-sm py-1 rounded-lg border border-secondary-container text-secondary-container hover:bg-secondary-container/10">APPLY</button>
+          </div>
+          <p id="coupon-applied-note" class="font-label-caps text-label-caps text-secondary-container"></p>
+        </div>
 
-<div class="flex flex-col gap-sm">
-<div class="flex justify-between items-center text-on-surface-variant">
-<span class="font-body-md text-body-md">Subtotal</span>
-<span id="subtotal-value" class="font-price-display text-[18px]">PKR 0</span>
-</div>
-<div id="discount-row" class="flex justify-between items-center text-secondary-container" style="display:none;">
-<span class="font-body-md text-body-md flex items-center gap-xs">
-<span class="material-symbols-outlined text-sm">info</span>
-Discount
-</span>
-<span id="discount-value" class="font-price-display text-[18px]">- PKR 0</span>
-</div>
-<div class="flex justify-between items-center text-on-surface-variant border-b border-outline-variant pb-sm">
-<span class="font-body-md text-body-md">Shipping</span>
-<span id="shipping-value" class="font-price-display text-[18px]">PKR 0</span>
-</div>
-<div class="flex justify-between items-center pt-xs">
-<span class="font-headline-md text-headline-md text-on-background">TOTAL</span>
-<span id="total-value" class="font-price-display text-headline-md text-secondary-container font-bold tracking-tight">PKR 0</span>
-</div>
-</div>
-<button id="checkout-btn" class="btn-primary w-full py-sm rounded-lg font-label-caps text-label-caps text-surface-container-lowest font-bold hover:scale-[1.02] transition-transform duration-200 mt-sm flex justify-center items-center gap-sm shadow-[0_4px_14px_0_rgba(255,106,0,0.25)]">
-PROCEED TO CHECKOUT
-<span class="material-symbols-outlined">arrow_forward</span>
-</button>
-<!-- Support Banner -->
-<div class="mt-md bg-secondary-container/5 border border-secondary-container/20 rounded-lg p-sm flex items-start gap-sm">
-<span class="material-symbols-outlined text-secondary-container mt-xs" style="font-variation-settings: 'FILL' 1;">handshake</span>
-<div>
-<h4 class="font-label-caps text-label-caps text-secondary-container">COMMUNITY IMPACT</h4>
-<p class="font-body-md text-[14px] text-on-surface-variant mt-xs leading-tight">By completing this purchase, you are directly supporting local Sialkot manufacturers and artisans.</p>
-</div>
-</div>
-</div>
-</section>
-</div>
+        <div class="flex flex-col gap-sm">
+          <div class="flex justify-between items-center text-on-surface-variant">
+            <span class="font-body-md text-body-md">Subtotal</span>
+            <span id="subtotal-value" class="font-price-display text-[18px]">PKR 0</span>
+          </div>
+
+          <div id="discount-row" class="flex justify-between items-center text-secondary-container" style="display:none;">
+            <span class="font-body-md text-body-md flex items-center gap-xs">
+              <span class="material-symbols-outlined text-sm">info</span>
+              Discount
+            </span>
+            <span id="discount-value" class="font-price-display text-[18px]">- PKR 0</span>
+          </div>
+
+          <div class="flex justify-between items-center text-on-surface-variant border-b border-outline-variant pb-sm">
+            <span class="font-body-md text-body-md">Shipping</span>
+            <span id="shipping-value" class="font-price-display text-[18px]">PKR 0</span>
+          </div>
+
+          <div class="flex justify-between items-center pt-xs">
+            <span class="font-headline-md text-headline-md text-on-background">TOTAL</span>
+            <span id="total-value" class="font-price-display text-headline-md text-secondary-container font-bold tracking-tight">PKR 0</span>
+          </div>
+        </div>
+
+        <button id="checkout-btn" class="btn-primary w-full py-sm rounded-lg font-label-caps text-label-caps text-surface-container-lowest font-bold hover:scale-[1.02] transition-transform duration-200 mt-sm flex justify-center items-center gap-sm shadow-[0_4px_14px_0_rgba(255,106,0,0.25)]">
+          PROCEED TO CHECKOUT
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </button>
+
+        <div class="mt-md bg-secondary-container/5 border border-secondary-container/20 rounded-lg p-sm flex items-start gap-sm">
+          <span class="material-symbols-outlined text-secondary-container mt-xs" style="font-variation-settings: 'FILL' 1;">handshake</span>
+          <div>
+            <h4 class="font-label-caps text-label-caps text-secondary-container">COMMUNITY IMPACT</h4>
+            <p class="font-body-md text-[14px] text-on-surface-variant mt-xs leading-tight">By completing this purchase, you are directly supporting local Sialkot manufacturers and artisans.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
 </main>
-<!-- Footer -->
-<footer class="bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant full-width mt-auto">
-<div class="grid grid-cols-1 md:grid-cols-4 gap-lg px-gutter py-xl max-w-container-max mx-auto flat no shadows">
-<div class="flex flex-col gap-md">
-<span class="font-display-xl text-on-surface text-headline-md uppercase tracking-tighter">KHELZONE</span>
-<p class="font-body-md text-body-md text-on-surface-variant">© 2024 KHELZONE. Engineered for Performance.</p>
-</div>
-<div class="flex flex-col gap-sm">
-<h4 class="font-label-caps text-label-caps text-on-surface-variant mb-xs">SHOP</h4>
-<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="#">Cricket Gear</a>
-<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="#">Football Kits</a>
-</div>
-<div class="flex flex-col gap-sm">
-<h4 class="font-label-caps text-label-caps text-on-surface-variant mb-xs">B2B</h4>
-<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="#">Sialkot Manufacturers</a>
-<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="#">Bulk Inquiries</a>
-</div>
-<div class="flex flex-col gap-sm">
-<h4 class="font-label-caps text-label-caps text-on-surface-variant mb-xs">LEGAL</h4>
-<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="#">Terms of Service</a>
-</div>
-</div>
+
+<footer class="bg-surface-container-lowest border-t border-outline-variant full-width mt-auto">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-lg px-gutter py-xl max-w-container-max mx-auto flat no-shadows">
+    <div class="flex flex-col gap-md">
+      <span class="font-display-xl text-on-surface text-headline-md uppercase tracking-tighter">KHELZONE</span>
+      <p class="font-body-md text-body-md text-on-surface-variant">© 2024 KHELZONE. Engineered for Performance.</p>
+    </div>
+
+    <div class="flex flex-col gap-sm">
+      <h4 class="font-label-caps text-label-caps text-on-surface-variant mb-xs">SHOP</h4>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="shop.html">Cricket Gear</a>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="shop.html">Football Kits</a>
+    </div>
+
+    <div class="flex flex-col gap-sm">
+      <h4 class="font-label-caps text-label-caps text-on-surface-variant mb-xs">B2B</h4>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="#">Sialkot Manufacturers</a>
+    </div>
+
+    <div class="flex flex-col gap-sm">
+      <h4 class="font-label-caps text-label-caps text-on-surface-variant mb-xs">LEGAL</h4>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="#">Terms of Service</a>
+    </div>
+  </div>
 </footer>
 
-<!-- Toasts -->
 <div id="toast-container"></div>
-<!-- Modal root -->
 <div id="modal-root"></div>
 
 <script src="cart.js"></script>

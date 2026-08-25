@@ -1,11 +1,24 @@
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+:root{
+    --k-orange:#ff7a00;
+    --k-red:#d44000;
+    --k-dark:#080a0d;
+    --k-panel:#11151a;
+    --k-line:#252b33;
 }
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-body {
-  min-height: max(884px, 100dvh);
-}
+html{scroll-behavior:smooth}
+body{background:var(--k-dark);min-height:100vh}
+.no-scrollbar::-webkit-scrollbar{display:none}
+.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24}
+.hero-overlay{background:linear-gradient(90deg,rgba(0,0,0,.88) 0%,rgba(0,0,0,.58) 45%,rgba(0,0,0,.18) 100%),linear-gradient(0deg,rgba(0,0,0,.78),transparent 55%)}
+.glass{background:rgba(15,18,22,.78);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.card-hover{transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
+.card-hover:hover{transform:translateY(-5px);border-color:rgba(255,122,0,.55);box-shadow:0 18px 45px rgba(0,0,0,.28)}
+.orange-gradient{background:linear-gradient(135deg,#ff8a00,#d44000)}
+.text-gradient{background:linear-gradient(90deg,#ff9a2f,#ff5a00);-webkit-background-clip:text;background-clip:text;color:transparent}
+.drawer{transition:transform .3s ease}
+.modal{transition:opacity .2s ease,visibility .2s ease}
+.modal.hidden{opacity:0;visibility:hidden}
+#mobileMenu{transition:max-height .3s ease,opacity .3s ease}
+.badge-pulse{animation:pulseBadge 2s infinite}
+@keyframes pulseBadge{0%,100%{box-shadow:0 0 0 0 rgba(255,122,0,.35)}50%{box-shadow:0 0 0 7px rgba(255,122,0,0)}}

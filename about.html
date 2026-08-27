@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>About KHELZONE — Built For The Love Of Sport</title>
+<meta name="description" content="KHELZONE is a modern sports marketplace connecting athletes, teams and sellers with premium gear, custom kits and a real sports community." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+/* ==========================================================================
+   KHELZONE — About Page
+   Design tokens
+   ========================================================================== */
+:root {
+  --bg-primary: #050505;
+  --bg-secondary: #0B0B0B;
+  --card: #111111;
+  --card-2: #161616;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --orange: #FF6A00;
+  --orange-bright: #FF7A18;
+  --text: #FFFFFF;
+  --text-secondary: #A1A1AA;
+  --text-muted: #71717A;
+
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+
+  --max-w: 1280px;
+  --section-pad: clamp(4rem, 8vw, 7rem);
+}
+
+* { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-primary);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+img, svg { display: block; max-width: 100%; }
+
+a { color: inherit; text-decoration: none; }
+
+button { font-family: inherit; cursor: pointer; }
+
+.text-orange { color: var(--orange-bright); }
+
+.eyebrow {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--orange-bright);
+  margin-bottom: 0.9rem;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 4vw, 3.1rem);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  margin: 0 0 1.25rem;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--orange-bright);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   Reveal-on-scroll
+   ========================================================================== */
+.kz-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.kz-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .kz-reveal { opacity: 1; transform: none; transition: none; }
+  html { scroll-behavior: auto; }
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 1rem 1.75rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+  white-space: nowrap;
+}
+.btn:hover { transform: translateY(-2px); }
+
+.btn--primary {
+  background: var(--orange);
+  color: #0B0B0B;
+  border-color: var(--orange);
+}
+.btn--primary:hover {
+  background: var(--orange-bright);
+  border-color: var(--orange-bright);
+}
+
+.btn--secondary {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+.btn--secondary:hover {
+  border-color: var(--orange-bright);
+  color: var(--orange-bright);
+}
+
+.btn__arrow {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.25s ease;
+}
+.btn:hover .btn__arrow { transform: translateX(3px); }
+
+.badge {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--orange-bright);
+  border: 1px solid rgba(255, 106, 0, 0.35);
+  background: rgba(255, 106, 0, 0.08);
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ==========================================================================
+   Navbar
+   ========================================================================== */
+.kz-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(5, 5, 5, 0.82);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.kz-nav__inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.kz-nav__logo {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.4rem;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+.kz-nav__logo span { color: var(--orange-bright); }
+
+.kz-nav__links {
+  display: flex;
+  align-items: center;
+  gap: 2.2rem;
+}
+.kz-nav__links a {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  position: relative;
+  padding-bottom: 4px;
+  transition: color 0.2s ease;
+}
+.kz-nav__links a:hover { color: var(--text); }
+.kz-nav__links a.is-active {
+  color: var(--text);
+  font-weight: 600;
+}
+.kz-nav__links a.is-active::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -2px;
+  height: 2px;
+  background: var(--orange-bright);
+  border-radius: 2px;
+}
+
+.kz-nav__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.kz-nav__cart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  color: var(--text-secondary);
+  transition: color 0.2s ease, background 0.2s ease;
+}
+.kz-nav__cart svg { width: 20px; height: 20px; }
+.kz-nav__cart:hover {
+  color: var(--orange-bright);
+  background: rgba(255, 106, 0, 0.08);
+}
+
+.kz-nav__toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  padding: 8px;
+}
+.kz-nav__toggle span {
+  width: 22px;
+  height: 2px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.kz-nav__mobile {
+  display: none;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.5rem 1.5rem 1.25rem;
+  border-top: 1px solid var(--border);
+}
+.kz-nav__mobile a {
+  padding: 0.7rem 0;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+}
+.kz-nav__mobile a.is-active { color: var(--orange-bright); font-weight: 600; }
+.kz-nav__mobile.is-open { display: flex; }
+
+/* ==========================================================================
+   Hero
+   ========================================================================== */
+.hero {
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.hero__watermark {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(5rem, 16vw, 13rem);
+  letter-spacing: -0.03em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.045);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.hero__glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+}
+.hero__glow--1 {
+  width: 480px; height: 480px;
+  top: -160px; right: -120px;
+  background: rgba(255, 106, 0, 0.16);
+}
+.hero__glow--2 {
+  width: 380px; height: 380px;
+  bottom: -160px; left: -100px;
+  background: rgba(255, 122, 24, 0.08);
+}
+
+.hero__lines {
+  position: absolute;
+  top: 0; right: 0;
+  width: 55%;
+  height: 100%;
+  opacity: 0.7;
+}
+
+.hero__grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.hero__inner {
+  position: relative;
+  z-index: 1;
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: clamp(4rem, 9vw, 7rem) 1.5rem;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.hero__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.6rem, 6vw, 4.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  margin: 0 0 1.5rem;
+}
+
+.hero__lede {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  max-width: 46ch;
+  margin: 0 0 2.25rem;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.hero__visual {
+  display: flex;
+  justify-content: center;
+}
+.hero__visual-card {
+  position: relative;
+  width: min(100%, 380px);
+  aspect-ratio: 1;
+  border-radius: 24px;
+  background: linear-gradient(160deg, var(--card) 0%, #0A0A0A 100%);
+  border: 1px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), 0 0 60px rgba(255, 106, 0, 0.06);
+}
+.hero__visual-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 106, 0, 0.25);
+}
+.hero__visual-ring--1 { width: 68%; height: 68%; }
+.hero__visual-ring--2 { width: 88%; height: 88%; border-color: rgba(255, 106, 0, 0.12); }
+.hero__visual-kz {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(3.5rem, 8vw, 5rem);
+  color: var(--orange-bright);
+  letter-spacing: -0.02em;
+}
+.hero__visual-tag {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   Stats
+   ========================================================================== */
+.stats {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-secondary);
+}
+.stats__inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 2.75rem 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+}
+.stat {
+  border-left: 1px solid var(--border);
+  padding-left: 1.25rem;
+}
+.stat__num {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 2rem;
+  color: var(--orange-bright);
+  line-height: 1;
+  margin-bottom: 0.6rem;
+}
+.stat__label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   Story
+   ========================================================================== */
+.story {
+  position: relative;
+  padding: var(--section-pad) 1.5rem;
+  overflow: hidden;
+}
+.story__glow {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 400px;
+  background: radial-gradient(ellipse at center, rgba(255, 106, 0, 0.09), transparent 70%);
+  pointer-events: none;
+}
+.story__inner {
+  position: relative;
+  max-width: var(--max-w);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 3.5rem;
+  align-items: center;
+}
+.story__visual-card {
+  aspect-ratio: 4/5;
+  border-radius: 20px;
+  background: linear-gradient(150deg, var(--card) 0%, #0A0A0A 80%);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.story__visual-kz {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 4rem;
+  color: rgba(255, 106, 0, 0.35);
+}
+
+.glass-card {
+  background: rgba(17, 17, 17, 0.6);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 2rem;
+  backdrop-filter: blur(6px);
+}
+.glass-card p {
+  color: var(--text-secondary);
+  font-size: 0.98rem;
+  margin: 0 0 1.1rem;
+}
+.glass-card p:last-child { margin-bottom: 0; }
+
+/* ==========================================================================
+   Mission
+   ========================================================================== */
+.mission {
+  padding: var(--section-pad) 1.5rem;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.mission__inner {
+  max-width: 900px;
+  margin: 0 auto;
+  border-left: 3px solid var(--orange-bright);
+  padding-left: clamp(1.25rem, 4vw, 2.5rem);
+}
+.mission__statement {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.7rem, 4vw, 2.9rem);
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+  margin: 0 0 1.5rem;
+}
+.mission__support {
+  font-size: 1.02rem;
+  color: var(--text-secondary);
+  max-width: 60ch;
+  margin: 0;
+}
+
+/* ==========================================================================
+   Offers
+   ========================================================================== */
+.offers {
+  padding: var(--section-pad) 1.5rem;
+  max-width: var(--max-w);
+  margin: 0 auto;
+}
+.offers__head { margin-bottom: 2.75rem; max-width: 60ch; }
+
+.offers__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+.offer-card {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.75rem 1.5rem 2rem;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.offer-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255, 106, 0, 0.45);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45), 0 0 30px rgba(255, 106, 0, 0.08);
+}
+.offer-card__num {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+.offer-card__icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: rgba(255, 106, 0, 0.08);
+  border: 1px solid rgba(255, 106, 0, 0.2);
+  color: var(--orange-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+.offer-card__icon svg { width: 22px; height: 22px; }
+.offer-card:hover .offer-card__icon {
+  background: rgba(255, 106, 0, 0.18);
+  transform: scale(1.06);
+}
+.offer-card h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.02rem;
+  letter-spacing: 0.01em;
+  margin: 0 0 0.6rem;
+}
+.offer-card p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+.offer-card__arrow {
+  position: absolute;
+  top: 1.75rem;
+  right: 1.5rem;
+  width: 18px;
+  height: 18px;
+  color: var(--text-muted);
+  opacity: 0;
+  transform: translate(-4px, 4px);
+  transition: opacity 0.3s ease, transform 0.3s ease, color 0.3s ease;
+}
+.offer-card:hover .offer-card__arrow {
+  opacity: 1;
+  transform: translate(0, 0);
+  color: var(--orange-bright);
+}
+
+/* ==========================================================================
+   Team
+   ========================================================================== */
+.team {
+  padding: var(--section-pad) 1.5rem;
+  max-width: var(--max-w);
+  margin: 0 auto;
+}
+.team__head { text-align: center; margin-bottom: 3rem; }
+.team__head .section-title { }
+
+.team__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.75rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.team-card {
+  position: relative;
+  background: linear-gradient(165deg, var(--card) 0%, #0C0C0C 100%);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2.25rem;
+  overflow: hidden;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.team-card::before {
+  content: "";
+  position: absolute;
+  top: -40%;
+  right: -30%;
+  width: 260px;
+  height: 260px;
+  background: radial-gradient(circle, rgba(255, 106, 0, 0.14), transparent 70%);
+  pointer-events: none;
+}
+.team-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255, 106, 0, 0.4);
+  box-shadow: 0 25px 55px rgba(0, 0, 0, 0.5);
+}
+.team-card__top {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+.team-card__avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(150deg, var(--orange) 0%, #7A2D0F 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.team-card__avatar span {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #050505;
+}
+.team-card__badge {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--orange-bright);
+  border: 1px solid rgba(255, 106, 0, 0.3);
+  border-radius: 999px;
+  padding: 0.4rem 0.75rem;
+}
+.team-card__name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.35rem;
+  margin: 0 0 0.3rem;
+}
+.team-card__meta {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0 0 1.5rem;
+}
+.team-card__actions {
+  display: flex;
+  gap: 0.75rem;
+}
+.icon-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: border-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+.icon-btn svg { width: 17px; height: 17px; }
+.icon-btn:hover {
+  border-color: var(--orange-bright);
+  color: var(--orange-bright);
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   Contact
+   ========================================================================== */
+.contact {
+  padding: var(--section-pad) 1.5rem;
+  max-width: var(--max-w);
+  margin: 0 auto;
+}
+.contact__head { text-align: center; max-width: 60ch; margin: 0 auto 3rem; }
+.contact__sub {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+.contact__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+.contact-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.contact-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 106, 0, 0.4);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+}
+.contact-card__icon {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 1.1rem;
+  border-radius: 12px;
+  background: rgba(255, 106, 0, 0.08);
+  border: 1px solid rgba(255, 106, 0, 0.2);
+  color: var(--orange-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.contact-card__icon svg { width: 22px; height: 22px; }
+.contact-card h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  margin: 0 0 0.85rem;
+}
+.contact-card p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0.2rem 0;
+  word-break: break-word;
+}
+.contact-card:hover p { color: var(--text); }
+
+/* ==========================================================================
+   FAQ
+   ========================================================================== */
+.faq {
+  padding: var(--section-pad) 1.5rem;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.faq__head { text-align: center; margin-bottom: 2.5rem; }
+
+.faq__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+.faq-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: border-color 0.25s ease;
+}
+.faq-item.is-open { border-color: rgba(255, 106, 0, 0.4); }
+
+.faq-item__toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: none;
+  border: none;
+  color: var(--text);
+  text-align: left;
+  padding: 1.25rem 1.5rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.98rem;
+}
+.faq-item__icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  transition: transform 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+.faq-item.is-open .faq-item__icon {
+  transform: rotate(45deg);
+  color: var(--orange-bright);
+  border-color: var(--orange-bright);
+}
+
+.faq-item__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
+}
+.faq-item__panel > p {
+  overflow: hidden;
+  margin: 0;
+  padding: 0 1.5rem;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+.faq-item.is-open .faq-item__panel {
+  grid-template-rows: 1fr;
+}
+.faq-item.is-open .faq-item__panel > p {
+  padding: 0 1.5rem 1.35rem;
+}
+/* grid-template-rows transition needs the child wrapped for overflow to animate correctly */
+.faq-item__panel { display: grid; }
+.faq-item__panel > p { min-height: 0; }
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+.footer {
+  border-top: 1px solid var(--border);
+  background: var(--bg-secondary);
+}
+.footer__inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem 2.5rem;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 2.5rem;
+}
+.footer__logo {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: var(--text);
+}
+.footer__brand p {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  margin: 0.75rem 0 0;
+}
+.footer__col h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 1.1rem;
+}
+.footer__col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+.footer__col a {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+  word-break: break-word;
+}
+.footer__col a:hover { color: var(--orange-bright); }
+
+.footer__bottom {
+  border-top: 1px solid var(--border);
+  padding: 1.5rem;
+  text-align: center;
+}
+.footer__bottom p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .hero__inner { grid-template-columns: 1fr; text-align: left; }
+  .hero__visual { order: -1; max-width: 320px; margin: 0 auto 1rem; }
+  .story__inner { grid-template-columns: 1fr; }
+  .story__visual { max-width: 320px; margin: 0 auto; }
+  .offers__grid { grid-template-columns: repeat(2, 1fr); }
+  .footer__inner { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 768px) {
+  .kz-nav__links { display: none; }
+  .kz-nav__toggle { display: flex; }
+  .stats__inner { grid-template-columns: repeat(2, 1fr); }
+  .contact__grid { grid-template-columns: 1fr; }
+  .team__grid { grid-template-columns: 1fr; }
+  .footer__inner { grid-template-columns: 1fr; gap: 2rem; }
+}
+
+@media (max-width: 560px) {
+  .offers__grid { grid-template-columns: 1fr; }
+  .hero__actions { flex-direction: column; align-items: stretch; }
+  .hero__actions .btn { justify-content: center; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ============== NAVBAR ============== -->
+<header class="kz-nav">
+  <div class="kz-nav__inner">
+    <a href="index.html" class="kz-nav__logo">KHEL<span>ZONE</span></a>
+
+    <nav class="kz-nav__links" aria-label="Primary">
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="customization.html">Customize Your Kit</a>
+      <a href="about.html" class="is-active">About</a>
+    </nav>
+
+    <div class="kz-nav__actions">
+      <a href="cart.html" class="kz-nav__cart" aria-label="View cart">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 8H6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="20" r="1.4" fill="currentColor"/><circle cx="17" cy="20" r="1.4" fill="currentColor"/></svg>
+      </a>
+      <button class="kz-nav__toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <nav class="kz-nav__mobile" id="navMobile" aria-label="Mobile">
+    <a href="index.html">Home</a>
+    <a href="shop.html">Shop</a>
+    <a href="customization.html">Customize Your Kit</a>
+    <a href="cart.html">Cart</a>
+    <a href="about.html" class="is-active">About</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ============== HERO ============== -->
+  <section class="hero">
+    <div class="hero__bg" aria-hidden="true">
+      <span class="hero__watermark">KHELZONE</span>
+      <div class="hero__glow hero__glow--1"></div>
+      <div class="hero__glow hero__glow--2"></div>
+      <svg class="hero__lines" viewBox="0 0 600 800" aria-hidden="true">
+        <path d="M-50 650 C 150 550, 250 750, 650 500" stroke="url(#lineGrad)" stroke-width="1.5" fill="none" opacity="0.5"/>
+        <path d="M-50 500 C 150 420, 300 600, 650 350" stroke="url(#lineGrad)" stroke-width="1" fill="none" opacity="0.35"/>
+        <circle cx="480" cy="220" r="90" stroke="rgba(255,106,0,0.25)" stroke-width="1" fill="none"/>
+        <circle cx="480" cy="220" r="140" stroke="rgba(255,106,0,0.12)" stroke-width="1" fill="none"/>
+        <defs>
+          <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#FF6A00" stop-opacity="0"/>
+            <stop offset="50%" stop-color="#FF7A18" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#FF6A00" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="hero__grain"></div>
+    </div>
+
+    <div class="hero__inner">
+      <div class="hero__content kz-reveal">
+        <span class="badge">KHELZONE / ABOUT US</span>
+
+        <h1 class="hero__title">
+          BUILT FOR<br />
+          THE LOVE OF<br />
+          <span class="text-orange">SPORT.</span>
+        </h1>
+
+        <p class="hero__lede">
+          KHELZONE is a modern sports marketplace built to connect athletes, teams,
+          sports lovers and trusted sellers with the gear they need to perform.
+        </p>
+
+        <div class="hero__actions">
+          <a href="shop.html" class="btn btn--primary">
+            EXPLORE SHOP
+            <svg viewBox="0 0 20 20" fill="none" class="btn__arrow"><path d="M4 10h12M12 5l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="#team" class="btn btn--secondary">
+            MEET OUR TEAM
+          </a>
+        </div>
+      </div>
+
+      <div class="hero__visual kz-reveal" aria-hidden="true">
+        <div class="hero__visual-card">
+          <span class="hero__visual-kz">KZ</span>
+          <div class="hero__visual-ring hero__visual-ring--1"></div>
+          <div class="hero__visual-ring hero__visual-ring--2"></div>
+          <div class="hero__visual-tag">GEAR UP. PLAY HARD. WIN BIG.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== STATS ============== -->
+  <section class="stats">
+    <div class="stats__inner">
+      <div class="stat kz-reveal">
+        <span class="stat__num">01</span>
+        <span class="stat__label">Sports Marketplace</span>
+      </div>
+      <div class="stat kz-reveal">
+        <span class="stat__num">02</span>
+        <span class="stat__label">Custom Kit Experience</span>
+      </div>
+      <div class="stat kz-reveal">
+        <span class="stat__num">03</span>
+        <span class="stat__label">Customer &harr; Seller Communication</span>
+      </div>
+      <div class="stat kz-reveal">
+        <span class="stat__num">04</span>
+        <span class="stat__label">Built for Sports Lovers</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== OUR STORY ============== -->
+  <section class="story">
+    <div class="story__glow" aria-hidden="true"></div>
+    <div class="story__inner">
+      <div class="story__visual kz-reveal" aria-hidden="true">
+        <div class="story__visual-card">
+          <span class="story__visual-kz">KZ</span>
+        </div>
+      </div>
+
+      <div class="story__content kz-reveal">
+        <span class="eyebrow">Our Story</span>
+        <h2 class="section-title">
+          MORE THAN A STORE.<br />
+          IT'S A <span class="text-orange">SPORTS COMMUNITY.</span>
+        </h2>
+
+        <div class="glass-card">
+          <p>
+            KHELZONE started with a simple frustration: finding the right gear, the right kit
+            and the right seller shouldn't be complicated. Athletes and teams deserve a place
+            built specifically for them, not a generic marketplace that treats sport as an
+            afterthought.
+          </p>
+          <p>
+            So we built KHELZONE — a marketplace where equipment, team kits and full
+            customization live in one place, and where sellers and buyers can actually talk
+            to each other before a purchase is made.
+          </p>
+          <p>
+            Every feature exists to close the gap between wanting the right gear and actually
+            getting it, without the guesswork.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== MISSION ============== -->
+  <section class="mission">
+    <div class="mission__inner">
+      <span class="eyebrow">Our Mission</span>
+      <p class="mission__statement kz-reveal">
+        Make quality sports gear, customization and seller
+        connections accessible to <span class="text-orange">every athlete.</span>
+      </p>
+      <p class="mission__support kz-reveal">
+        Whether you're outfitting a full team, picking up equipment for weekend practice, or
+        building a custom kit from scratch — KHELZONE is designed to get you there faster,
+        with sellers you can actually reach.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============== OFFERS ============== -->
+  <section class="offers">
+    <div class="offers__head kz-reveal">
+      <span class="eyebrow">What KHELZONE Offers</span>
+      <h2 class="section-title">EVERYTHING YOU NEED TO <span class="text-orange">GEAR UP.</span></h2>
+    </div>
+
+    <div class="offers__grid">
+      <article class="offer-card kz-reveal">
+        <span class="offer-card__num">01</span>
+        <div class="offer-card__icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M6 8l3 3 5-5 4 4M6 16l3 3 5-5 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h3>SPORTS EQUIPMENT</h3>
+        <p>Cricket, football, basketball, tennis and more.</p>
+        <span class="offer-card__arrow" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M4 10h12M12 5l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </article>
+
+      <article class="offer-card kz-reveal">
+        <span class="offer-card__num">02</span>
+        <div class="offer-card__icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M8 4l4 3 4-3 3 4-2 2v9a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1v-9L5 8z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        </div>
+        <h3>TEAM KITS</h3>
+        <p>Professional kits for teams, clubs and athletes.</p>
+        <span class="offer-card__arrow" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M4 10h12M12 5l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </article>
+
+      <article class="offer-card kz-reveal">
+        <span class="offer-card__num">03</span>
+        <div class="offer-card__icon">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="1.2" opacity="0.6"/></svg>
+        </div>
+        <h3>CUSTOMIZATION</h3>
+        <p>Customize colors, names, numbers and kit designs.</p>
+        <span class="offer-card__arrow" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M4 10h12M12 5l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </article>
+
+      <article class="offer-card kz-reveal">
+        <span class="offer-card__num">04</span>
+        <div class="offer-card__icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M3 9l9-6 9 6-9 6-9-6z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M3 9v6l9 6 9-6V9" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        </div>
+        <h3>SELLER MARKETPLACE</h3>
+        <p>Connect customers directly with sports sellers.</p>
+        <span class="offer-card__arrow" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M4 10h12M12 5l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============== TEAM ============== -->
+  <section class="team" id="team">
+    <div class="team__head kz-reveal">
+      <span class="eyebrow">Meet The Team</span>
+      <h2 class="section-title">THE PEOPLE<br /><span class="text-orange">BEHIND KHELZONE.</span></h2>
+    </div>
+
+    <div class="team__grid">
+      <article class="team-card kz-reveal">
+        <div class="team-card__top">
+          <div class="team-card__avatar">
+            <span>AQ</span>
+          </div>
+          <span class="team-card__badge">CO-FOUNDER / DEVELOPER</span>
+        </div>
+        <h3 class="team-card__name">Abdullah Qasmi</h3>
+        <p class="team-card__meta">Karachi, Pakistan</p>
+
+        <div class="team-card__actions">
+          <a href="mailto:abdullahffgamer3710@gmail.com" class="icon-btn" aria-label="Email Abdullah Qasmi">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.6"/><path d="M4 7l8 6 8-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="tel:03492173648" class="icon-btn" aria-label="Call Abdullah Qasmi">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M6 3h3l2 5-2.5 1.5a12 12 0 0 0 5 5L15 12l5 2v3a2 2 0 0 1-2 2C10.5 19 5 13.5 5 6a2 2 0 0 1 1-3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="https://github.com/Abdullah-Qasmi" target="_blank" rel="noopener noreferrer" class="icon-btn" aria-label="Abdullah Qasmi's GitHub">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.1.39-1.99 1.03-2.69-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.03a9.4 9.4 0 0 1 5 0c1.91-1.3 2.75-1.03 2.75-1.03.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.69 0 3.85-2.34 4.7-4.57 4.94.36.31.68.92.68 1.86v2.75c0 .27.18.58.69.48A10 10 0 0 0 12 2z" fill="currentColor"/></svg>
+          </a>
+        </div>
+      </article>
+
+      <article class="team-card kz-reveal">
+        <div class="team-card__top">
+          <div class="team-card__avatar">
+            <span>AA</span>
+          </div>
+          <span class="team-card__badge">CO-FOUNDER / DEVELOPER</span>
+        </div>
+        <h3 class="team-card__name">Ayan Asfar</h3>
+        <p class="team-card__meta">Karachi, Pakistan</p>
+
+        <div class="team-card__actions">
+          <a href="mailto:ayanasfar12345@gmail.com" class="icon-btn" aria-label="Email Ayan Asfar">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.6"/><path d="M4 7l8 6 8-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="tel:03458089537" class="icon-btn" aria-label="Call Ayan Asfar">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M6 3h3l2 5-2.5 1.5a12 12 0 0 0 5 5L15 12l5 2v3a2 2 0 0 1-2 2C10.5 19 5 13.5 5 6a2 2 0 0 1 1-3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="https://github.com/ayanasfar12345-boop" target="_blank" rel="noopener noreferrer" class="icon-btn" aria-label="Ayan Asfar's GitHub">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.1.39-1.99 1.03-2.69-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.03a9.4 9.4 0 0 1 5 0c1.91-1.3 2.75-1.03 2.75-1.03.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.69 0 3.85-2.34 4.7-4.57 4.94.36.31.68.92.68 1.86v2.75c0 .27.18.58.69.48A10 10 0 0 0 12 2z" fill="currentColor"/></svg>
+          </a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============== CONTACT ============== -->
+  <section class="contact">
+    <div class="contact__head kz-reveal">
+      <span class="eyebrow">Get In Touch</span>
+      <h2 class="section-title">LET'S TALK <span class="text-orange">SPORT.</span></h2>
+      <p class="contact__sub">
+        Have a question, product idea, customization request or seller inquiry?
+        Get in touch with the KHELZONE team.
+      </p>
+    </div>
+
+    <div class="contact__grid">
+      <a href="mailto:abdullahffgamer3710@gmail.com" class="contact-card kz-reveal">
+        <div class="contact-card__icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.6"/><path d="M4 7l8 6 8-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h3>EMAIL</h3>
+        <p>abdullahffgamer3710@gmail.com</p>
+        <p>ayanasfar12345@gmail.com</p>
+      </a>
+
+      <a href="tel:03492173648" class="contact-card kz-reveal">
+        <div class="contact-card__icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M6 3h3l2 5-2.5 1.5a12 12 0 0 0 5 5L15 12l5 2v3a2 2 0 0 1-2 2C10.5 19 5 13.5 5 6a2 2 0 0 1 1-3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        </div>
+        <h3>PHONE</h3>
+        <p>03492173648</p>
+        <p>03458089537</p>
+      </a>
+
+      <a href="https://github.com/Abdullah-Qasmi" target="_blank" rel="noopener noreferrer" class="contact-card kz-reveal">
+        <div class="contact-card__icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.1.39-1.99 1.03-2.69-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.03a9.4 9.4 0 0 1 5 0c1.91-1.3 2.75-1.03 2.75-1.03.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.69 0 3.85-2.34 4.7-4.57 4.94.36.31.68.92.68 1.86v2.75c0 .27.18.58.69.48A10 10 0 0 0 12 2z" fill="currentColor"/></svg>
+        </div>
+        <h3>GITHUB</h3>
+        <p>Abdullah-Qasmi</p>
+        <p>ayanasfar12345-boop</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============== FAQ ============== -->
+  <section class="faq">
+    <div class="faq__head kz-reveal">
+      <span class="eyebrow">FAQ</span>
+      <h2 class="section-title">QUESTIONS, <span class="text-orange">ANSWERED.</span></h2>
+    </div>
+
+    <div class="faq__list" id="faqList">
+      <div class="faq-item kz-reveal">
+        <button class="faq-item__toggle" aria-expanded="false">
+          <span>What is KHELZONE?</span>
+          <span class="faq-item__icon">+</span>
+        </button>
+        <div class="faq-item__panel">
+          <p>KHELZONE is a modern sports marketplace that brings equipment, team kits,
+          customization and trusted sellers together in one place, built specifically for
+          athletes and sports lovers.</p>
+        </div>
+      </div>
+
+      <div class="faq-item kz-reveal">
+        <button class="faq-item__toggle" aria-expanded="false">
+          <span>What products can I find on KHELZONE?</span>
+          <span class="faq-item__icon">+</span>
+        </button>
+        <div class="faq-item__panel">
+          <p>You'll find equipment for cricket, football, basketball, tennis and more, along
+          with professional team kits and everyday sportswear from a range of sellers.</p>
+        </div>
+      </div>
+
+      <div class="faq-item kz-reveal">
+        <button class="faq-item__toggle" aria-expanded="false">
+          <span>Can I customize my sports kit?</span>
+          <span class="faq-item__icon">+</span>
+        </button>
+        <div class="faq-item__panel">
+          <p>Yes. KHELZONE lets you customize colors, names, numbers and full kit designs so
+          your team's gear looks exactly the way you want it to.</p>
+        </div>
+      </div>
+
+      <div class="faq-item kz-reveal">
+        <button class="faq-item__toggle" aria-expanded="false">
+          <span>Can sellers join KHELZONE?</span>
+          <span class="faq-item__icon">+</span>
+        </button>
+        <div class="faq-item__panel">
+          <p>Yes. The KHELZONE marketplace is built to connect sellers directly with customers,
+          making it easy to list products and reach athletes and teams looking for gear.</p>
+        </div>
+      </div>
+
+      <div class="faq-item kz-reveal">
+        <button class="faq-item__toggle" aria-expanded="false">
+          <span>How can I contact the KHELZONE team?</span>
+          <span class="faq-item__icon">+</span>
+        </button>
+        <div class="faq-item__panel">
+          <p>Reach the team directly using the email, phone or GitHub details in the
+          "Let's Talk Sport" section above.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============== FOOTER ============== -->
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__brand">
+      <span class="footer__logo">KHEL<span class="text-orange">ZONE</span></span>
+      <p>Gear Up. Play Hard. Win Big.</p>
+    </div>
+
+    <div class="footer__col">
+      <h4>Quick Links</h4>
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="customization.html">Customize Your Kit</a>
+      <a href="cart.html">Cart</a>
+      <a href="about.html">About</a>
+    </div>
+
+    <div class="footer__col">
+      <h4>Contact</h4>
+      <a href="mailto:abdullahffgamer3710@gmail.com">abdullahffgamer3710@gmail.com</a>
+      <a href="mailto:ayanasfar12345@gmail.com">ayanasfar12345@gmail.com</a>
+      <a href="tel:03492173648">03492173648</a>
+      <a href="tel:03458089537">03458089537</a>
+    </div>
+
+    <div class="footer__col">
+      <h4>GitHub</h4>
+      <a href="https://github.com/Abdullah-Qasmi" target="_blank" rel="noopener noreferrer">Abdullah-Qasmi</a>
+      <a href="https://github.com/ayanasfar12345-boop" target="_blank" rel="noopener noreferrer">ayanasfar12345-boop</a>
+    </div>
+  </div>
+
+  <div class="footer__bottom">
+    <p>&copy; 2026 KHELZONE. All Rights Reserved.</p>
+  </div>
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  /* ---- Mobile nav toggle ---- */
+  const navToggle = document.getElementById("navToggle");
+  const navMobile = document.getElementById("navMobile");
+
+  if (navToggle && navMobile) {
+    navToggle.addEventListener("click", () => {
+      const isOpen = navMobile.classList.toggle("is-open");
+      navToggle.setAttribute("aria-expanded", String(isOpen));
+      navToggle.classList.toggle("is-open", isOpen);
+    });
+
+    navMobile.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        navMobile.classList.remove("is-open");
+        navToggle.setAttribute("aria-expanded", "false");
+      });
+    });
+  }
+
+  /* ---- FAQ accordion ---- */
+  document.querySelectorAll(".faq-item").forEach((item) => {
+    const toggle = item.querySelector(".faq-item__toggle");
+    if (!toggle) return;
+
+    toggle.addEventListener("click", () => {
+      const isOpen = item.classList.contains("is-open");
+
+      // Close any other open item for a single-open accordion feel
+      document.querySelectorAll(".faq-item.is-open").forEach((openItem) => {
+        if (openItem !== item) {
+          openItem.classList.remove("is-open");
+          openItem.querySelector(".faq-item__toggle").setAttribute("aria-expanded", "false");
+        }
+      });
+
+      item.classList.toggle("is-open", !isOpen);
+      toggle.setAttribute("aria-expanded", String(!isOpen));
+    });
+  });
+
+  /* ---- Scroll-reveal ---- */
+  const revealEls = document.querySelectorAll(".kz-reveal");
+
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+    );
+
+    revealEls.forEach((el) => observer.observe(el));
+  } else {
+    revealEls.forEach((el) => el.classList.add("is-visible"));
+  }
+});
+
+</script>
+</body>
+</html>

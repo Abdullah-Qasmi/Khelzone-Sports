@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>KHELZONE | Admin Dashboard</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+        rel="stylesheet"
+    >
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Inter", sans-serif;
+            background: #08090b;
+            color: #fff;
+        }
+
+        .orange-gradient {
+            background: linear-gradient(
+                135deg,
+                #ff5a00 0%,
+                #d63f00 100%
+            );
+        }
+
+        .card {
+            background: #111318;
+            border: 1px solid rgba(255,255,255,.08);
+        }
+
+        .card:hover {
+            border-color: rgba(255,90,0,.35);
+        }
+
+        .sidebar {
+            background: #0d0f12;
+            border-right: 1px solid rgba(255,255,255,.08);
+        }
+
+        .nav-item {
+            transition: .2s ease;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255,90,0,.12);
+            color: #ff5a00;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 900;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- =========================================================
+     ADMIN CHECK SCREEN
+========================================================= -->
+
+<div
+    id="checkingScreen"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-[#08090b]"
+>
+    <div class="text-center">
+
+        <div
+            class="mx-auto mb-4 h-10 w-10 animate-spin rounded-full
+                   border-4 border-white/10 border-t-orange-500"
+        ></div>
+
+        <p class="text-sm text-gray-400">
+            Checking admin access...
+        </p>
+
+    </div>
+</div>
+
+
+<!-- =========================================================
+     MAIN DASHBOARD
+========================================================= -->
+
+<div id="dashboard" class="hidden min-h-screen">
+
+
+    <!-- MOBILE HEADER -->
+
+    <header
+        class="fixed left-0 right-0 top-0 z-40 flex h-16
+               items-center justify-between border-b
+               border-white/10 bg-[#0d0f12] px-4 lg:hidden"
+    >
+
+        <div class="text-2xl font-black text-orange-500">
+            KHELZONE
+        </div>
+
+        <button
+            id="mobileMenuBtn"
+            class="rounded-lg border border-orange-500/30
+                   bg-orange-500/10 p-2 text-orange-500"
+        >
+            <span class="material-symbols-outlined">
+                menu
+            </span>
+        </button>
+
+    </header>
+
+
+    <!-- SIDEBAR -->
+
+    <aside
+        id="sidebar"
+        class="sidebar fixed bottom-0 left-0 top-0 z-50
+               w-72 -translate-x-full transition-transform
+               duration-300 lg:translate-x-0"
+    >
+
+        <!-- LOGO -->
+
+        <div class="flex h-20 items-center px-7">
+
+            <div>
+
+                <div class="text-3xl font-black text-orange-500">
+                    KHELZONE
+                </div>
+
+                <div class="text-[9px] font-bold tracking-[.25em]
+                            text-gray-500">
+                    ADMIN PANEL
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- NAVIGATION -->
+
+        <nav class="space-y-2 px-4">
+
+            <button
+                class="nav-item active flex w-full items-center
+                       gap-3 rounded-xl px-4 py-3 text-left
+                       font-bold"
+            >
+
+                <span class="material-symbols-outlined">
+                    dashboard
+                </span>
+
+                Dashboard
+
+            </button>
+
+
+            <button
+                class="nav-item flex w-full items-center gap-3
+                       rounded-xl px-4 py-3 text-left
+                       font-bold text-gray-400"
+            >
+
+                <span class="material-symbols-outlined">
+                    inventory_2
+                </span>
+
+                Products
+
+            </button>
+
+
+            <button
+                class="nav-item flex w-full items-center gap-3
+                       rounded-xl px-4 py-3 text-left
+                       font-bold text-gray-400"
+            >
+
+                <span class="material-symbols-outlined">
+                    store
+                </span>
+
+                Sellers
+
+            </button>
+
+
+            <button
+                class="nav-item flex w-full items-center gap-3
+                       rounded-xl px-4 py-3 text-left
+                       font-bold text-gray-400"
+            >
+
+                <span class="material-symbols-outlined">
+                    group
+                </span>
+
+                Customers
+
+            </button>
+
+
+            <button
+                class="nav-item flex w-full items-center gap-3
+                       rounded-xl px-4 py-3 text-left
+                       font-bold text-gray-400"
+            >
+
+                <span class="material-symbols-outlined">
+                    shopping_bag
+                </span>
+
+                Orders
+
+            </button>
+
+        </nav>
+
+
+        <!-- BOTTOM -->
+
+        <div
+            class="absolute bottom-0 left-0 right-0
+                   border-t border-white/10 p-4"
+        >
+
+            <a
+                href="homepage.html"
+                class="mb-2 flex items-center gap-3 rounded-xl
+                       px-4 py-3 font-bold text-gray-400
+                       hover:bg-white/5 hover:text-white"
+            >
+
+                <span class="material-symbols-outlined">
+                    home
+                </span>
+
+                View Website
+
+            </a>
+
+
+            <button
+                id="logoutBtn"
+                class="flex w-full items-center gap-3
+                       rounded-xl px-4 py-3 font-bold
+                       text-red-400 hover:bg-red-500/10"
+            >
+
+                <span class="material-symbols-outlined">
+                    logout
+                </span>
+
+                Logout
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MOBILE OVERLAY -->
+
+    <div
+        id="mobileOverlay"
+        class="fixed inset-0 z-40 hidden bg-black/60 lg:hidden"
+    ></div>
+
+
+    <!-- CONTENT -->
+
+    <main class="min-h-screen lg:ml-72">
+
+        <!-- TOP BAR -->
+
+        <div
+            class="sticky top-0 z-30 hidden h-20
+                   items-center justify-between
+                   border-b border-white/10 bg-[#08090b]/90
+                   px-8 backdrop-blur lg:flex"
+        >
+
+            <div>
+
+                <h1 class="text-2xl font-black">
+                    Admin Dashboard
+                </h1>
+
+                <p class="text-sm text-gray-500">
+                    Manage your KHELZONE marketplace
+                </p>
+
+            </div>
+
+
+            <div class="flex items-center gap-3">
+
+                <div
+                    class="flex h-10 w-10 items-center justify-center
+                           rounded-full bg-orange-500/10
+                           text-orange-500"
+                >
+                    <span class="material-symbols-outlined">
+                        admin_panel_settings
+                    </span>
+                </div>
+
+                <div>
+
+                    <p
+                        id="adminName"
+                        class="text-sm font-bold"
+                    >
+                        Admin
+                    </p>
+
+                    <p
+                        id="adminEmail"
+                        class="text-xs text-gray-500"
+                    >
+                        —
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- MOBILE SPACING -->
+
+        <div class="h-16 lg:hidden"></div>
+
+
+        <!-- PAGE -->
+
+        <div class="p-5 sm:p-7 lg:p-8">
+
+            <!-- WELCOME -->
+
+            <div class="mb-8">
+
+                <p class="text-sm font-bold text-orange-500">
+                    ADMIN CONTROL CENTER
+                </p>
+
+                <h2 class="mt-1 text-3xl font-black">
+                    Welcome back 👋
+                </h2>
+
+                <p class="mt-2 text-gray-500">
+                    Here's what's happening in your marketplace.
+                </p>
+
+            </div>
+
+
+            <!-- STATS -->
+
+            <div
+                class="grid gap-4 sm:grid-cols-2
+                       xl:grid-cols-4"
+            >
+
+                <!-- PRODUCTS -->
+
+                <div class="card rounded-2xl p-5">
+
+                    <div
+                        class="mb-5 flex items-center
+                               justify-between"
+                    >
+
+                        <div
+                            class="flex h-11 w-11 items-center
+                                   justify-center rounded-xl
+                                   bg-orange-500/10
+                                   text-orange-500"
+                        >
+
+                            <span class="material-symbols-outlined">
+                                inventory_2
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <p class="text-sm text-gray-500">
+                        Total Products
+                    </p>
+
+                    <p
+                        id="productsCount"
+                        class="stat-number mt-1"
+                    >
+                        —
+                    </p>
+
+                </div>
+
+
+                <!-- SELLERS -->
+
+                <div class="card rounded-2xl p-5">
+
+                    <div
+                        class="mb-5 flex items-center
+                               justify-between"
+                    >
+
+                        <div
+                            class="flex h-11 w-11 items-center
+                                   justify-center rounded-xl
+                                   bg-blue-500/10 text-blue-400"
+                        >
+
+                            <span class="material-symbols-outlined">
+                                store
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <p class="text-sm text-gray-500">
+                        Sellers
+                    </p>
+
+                    <p
+                        id="sellersCount"
+                        class="stat-number mt-1"
+                    >
+                        —
+                    </p>
+
+                </div>
+
+
+                <!-- CUSTOMERS -->
+
+                <div class="card rounded-2xl p-5">
+
+                    <div
+                        class="mb-5 flex items-center
+                               justify-between"
+                    >
+
+                        <div
+                            class="flex h-11 w-11 items-center
+                                   justify-center rounded-xl
+                                   bg-green-500/10 text-green-400"
+                        >
+
+                            <span class="material-symbols-outlined">
+                                group
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <p class="text-sm text-gray-500">
+                        Customers
+                    </p>
+
+                    <p
+                        id="customersCount"
+                        class="stat-number mt-1"
+                    >
+                        —
+                    </p>
+
+                </div>
+
+
+                <!-- ACTIVE PRODUCTS -->
+
+                <div class="card rounded-2xl p-5">
+
+                    <div
+                        class="mb-5 flex items-center
+                               justify-between"
+                    >
+
+                        <div
+                            class="flex h-11 w-11 items-center
+                                   justify-center rounded-xl
+                                   bg-purple-500/10 text-purple-400"
+                        >
+
+                            <span class="material-symbols-outlined">
+                                check_circle
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <p class="text-sm text-gray-500">
+                        Active Products
+                    </p>
+
+                    <p
+                        id="activeProductsCount"
+                        class="stat-number mt-1"
+                    >
+                        —
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- QUICK ACTIONS -->
+
+            <div class="mt-8">
+
+                <h3 class="mb-4 text-xl font-black">
+                    Quick Actions
+                </h3>
+
+                <div
+                    class="grid gap-4
+                           sm:grid-cols-2
+                           xl:grid-cols-4"
+                >
+
+                    <button
+                        class="card rounded-2xl p-5 text-left
+                               transition hover:-translate-y-1"
+                    >
+
+                        <span
+                            class="material-symbols-outlined
+                                   text-orange-500 text-3xl"
+                        >
+                            add_box
+                        </span>
+
+                        <h4 class="mt-4 font-black">
+                            Add Product
+                        </h4>
+
+                        <p class="mt-1 text-sm text-gray-500">
+                            Create a new product.
+                        </p>
+
+                    </button>
+
+
+                    <button
+                        class="card rounded-2xl p-5 text-left
+                               transition hover:-translate-y-1"
+                    >
+
+                        <span
+                            class="material-symbols-outlined
+                                   text-blue-400 text-3xl"
+                        >
+                            manage_accounts
+                        </span>
+
+                        <h4 class="mt-4 font-black">
+                            Manage Sellers
+                        </h4>
+
+                        <p class="mt-1 text-sm text-gray-500">
+                            View and manage sellers.
+                        </p>
+
+                    </button>
+
+
+                    <button
+                        class="card rounded-2xl p-5 text-left
+                               transition hover:-translate-y-1"
+                    >
+
+                        <span
+                            class="material-symbols-outlined
+                                   text-green-400 text-3xl"
+                        >
+                            group
+                        </span>
+
+                        <h4 class="mt-4 font-black">
+                            Customers
+                        </h4>
+
+                        <p class="mt-1 text-sm text-gray-500">
+                            View registered customers.
+                        </p>
+
+                    </button>
+
+
+                    <button
+                        class="card rounded-2xl p-5 text-left
+                               transition hover:-translate-y-1"
+                    >
+
+                        <span
+                            class="material-symbols-outlined
+                                   text-purple-400 text-3xl"
+                        >
+                            shopping_bag
+                        </span>
+
+                        <h4 class="mt-4 font-black">
+                            Orders
+                        </h4>
+
+                        <p class="mt-1 text-sm text-gray-500">
+                            Manage marketplace orders.
+                        </p>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- RECENT PRODUCTS -->
+
+            <div class="mt-8">
+
+                <div class="mb-4 flex items-center justify-between">
+
+                    <h3 class="text-xl font-black">
+                        Recent Products
+                    </h3>
+
+                    <button
+                        id="refreshProducts"
+                        class="flex items-center gap-2
+                               rounded-lg border border-white/10
+                               px-3 py-2 text-xs font-bold
+                               text-gray-400 hover:text-white"
+                    >
+
+                        <span class="material-symbols-outlined text-base">
+                            refresh
+                        </span>
+
+                        Refresh
+
+                    </button>
+
+                </div>
+
+
+                <div class="card overflow-hidden rounded-2xl">
+
+                    <div class="overflow-x-auto">
+
+                        <table class="w-full text-left">
+
+                            <thead
+                                class="border-b border-white/10
+                                       bg-white/[.02]"
+                            >
+
+                                <tr>
+
+                                    <th class="px-5 py-4 text-xs
+                                               uppercase tracking-wider
+                                               text-gray-500">
+                                        Product
+                                    </th>
+
+                                    <th class="px-5 py-4 text-xs
+                                               uppercase tracking-wider
+                                               text-gray-500">
+                                        Sport
+                                    </th>
+
+                                    <th class="px-5 py-4 text-xs
+                                               uppercase tracking-wider
+                                               text-gray-500">
+                                        Price
+                                    </th>
+
+                                    <th class="px-5 py-4 text-xs
+                                               uppercase tracking-wider
+                                               text-gray-500">
+                                        Stock
+                                    </th>
+
+                                    <th class="px-5 py-4 text-xs
+                                               uppercase tracking-wider
+                                               text-gray-500">
+                                        Status
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody
+                                id="productsTable"
+                                class="divide-y divide-white/5"
+                            >
+
+                                <tr>
+
+                                    <td
+                                        colspan="5"
+                                        class="px-5 py-8 text-center
+                                               text-sm text-gray-500"
+                                    >
+                                        Loading products...
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+    /* =========================================================
+       SUPABASE
+    ========================================================= */
+
+    const SUPABASE_URL =
+        "https://antqexjhlsaynunlmzqa.supabase.co";
+
+    const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFudHFleGpobHNheW51bmxtenpxYSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzg3ODUxNjU2LCJleHAiOjIxMDM0Mjc2NTZ9.Z6ueEWgGJxg_Ag9GQextdiTTQq0R1AzNHEE7xm-20PU";
+
+    const supabaseClient =
+        window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_ANON_KEY
+        );
+
+
+    /* =========================================================
+       ELEMENTS
+    ========================================================= */
+
+    const checkingScreen =
+        document.getElementById("checkingScreen");
+
+    const dashboard =
+        document.getElementById("dashboard");
+
+    const adminName =
+        document.getElementById("adminName");
+
+    const adminEmail =
+        document.getElementById("adminEmail");
+
+
+    /* =========================================================
+       ADMIN AUTH CHECK
+    ========================================================= */
+
+    async function checkAdminAccess() {
+
+        try {
+
+            const {
+                data: {
+                    session
+                }
+            } =
+                await supabaseClient.auth.getSession();
+
+
+            /* NO LOGIN */
+
+            if (!session || !session.user) {
+
+                window.location.href =
+                    "login.html";
+
+                return;
+            }
+
+
+            /* GET PROFILE */
+
+            const {
+                data: profile,
+                error
+            } =
+                await supabaseClient
+                    .from("profiles")
+                    .select("full_name, email, role")
+                    .eq("id", session.user.id)
+                    .maybeSingle();
+
+
+            if (error) {
+
+                console.error(error);
+
+                throw new Error(
+                    "Could not verify profile."
+                );
+            }
+
+
+            /* PROFILE NOT FOUND */
+
+            if (!profile) {
+
+                await supabaseClient.auth.signOut();
+
+                window.location.href =
+                    "login.html";
+
+                return;
+            }
+
+
+            /* ROLE CHECK */
+
+            const role =
+                String(profile.role || "")
+                    .toLowerCase()
+                    .trim();
+
+
+            if (role !== "admin") {
+
+                alert(
+                    "Access denied. Admin account required."
+                );
+
+                window.location.href =
+                    "login.html";
+
+                return;
+            }
+
+
+            /* ADMIN INFORMATION */
+
+            adminName.textContent =
+                profile.full_name ||
+                "Admin";
+
+            adminEmail.textContent =
+                profile.email ||
+                session.user.email ||
+                "";
+
+
+            /* SHOW DASHBOARD */
+
+            checkingScreen.classList.add("hidden");
+
+            dashboard.classList.remove("hidden");
+
+
+            /* LOAD DATA */
+
+            await loadDashboardData();
+
+
+        } catch (error) {
+
+            console.error(
+                "Admin authentication error:",
+                error
+            );
+
+            window.location.href =
+                "login.html";
+        }
+    }
+
+
+    /* =========================================================
+       DASHBOARD DATA
+    ========================================================= */
+
+    async function loadDashboardData() {
+
+        await Promise.all([
+            loadProductStats(),
+            loadUserStats(),
+            loadRecentProducts()
+        ]);
+    }
+
+
+    /* =========================================================
+       PRODUCT STATS
+    ========================================================= */
+
+    async function loadProductStats() {
+
+        try {
+
+            const {
+                count: totalProducts
+            } =
+                await supabaseClient
+                    .from("products")
+                    .select("*", {
+                        count: "exact",
+                        head: true
+                    });
+
+
+            const {
+                count: activeProducts
+            } =
+                await supabaseClient
+                    .from("products")
+                    .select("*", {
+                        count: "exact",
+                        head: true
+                    })
+                    .eq("is_active", true);
+
+
+            document.getElementById(
+                "productsCount"
+            ).textContent =
+                totalProducts ?? 0;
+
+
+            document.getElementById(
+                "activeProductsCount"
+            ).textContent =
+                activeProducts ?? 0;
+
+
+        } catch (error) {
+
+            console.error(
+                "Product stats error:",
+                error
+            );
+
+            document.getElementById(
+                "productsCount"
+            ).textContent = "0";
+
+            document.getElementById(
+                "activeProductsCount"
+            ).textContent = "0";
+        }
+    }
+
+
+    /* =========================================================
+       USER STATS
+    ========================================================= */
+
+    async function loadUserStats() {
+
+        try {
+
+            const {
+                count: sellers
+            } =
+                await supabaseClient
+                    .from("profiles")
+                    .select("*", {
+                        count: "exact",
+                        head: true
+                    })
+                    .eq("role", "seller");
+
+
+            const {
+                count: customers
+            } =
+                await supabaseClient
+                    .from("profiles")
+                    .select("*", {
+                        count: "exact",
+                        head: true
+                    })
+                    .eq("role", "customer");
+
+
+            document.getElementById(
+                "sellersCount"
+            ).textContent =
+                sellers ?? 0;
+
+
+            document.getElementById(
+                "customersCount"
+            ).textContent =
+                customers ?? 0;
+
+
+        } catch (error) {
+
+            console.error(
+                "User stats error:",
+                error
+            );
+
+            document.getElementById(
+                "sellersCount"
+            ).textContent = "0";
+
+            document.getElementById(
+                "customersCount"
+            ).textContent = "0";
+        }
+    }
+
+
+    /* =========================================================
+       RECENT PRODUCTS
+    ========================================================= */
+
+    async function loadRecentProducts() {
+
+        const table =
+            document.getElementById(
+                "productsTable"
+            );
+
+        try {
+
+            const {
+                data,
+                error
+            } =
+                await supabaseClient
+                    .from("products")
+                    .select(
+                        "name, sport, price, stock, is_active"
+                    )
+                    .order(
+                        "created_at",
+                        {
+                            ascending: false
+                        }
+                    )
+                    .limit(8);
+
+
+            if (error) {
+                throw error;
+            }
+
+
+            if (!data || data.length === 0) {
+
+                table.innerHTML = `
+                    <tr>
+                        <td
+                            colspan="5"
+                            class="px-5 py-8 text-center
+                                   text-sm text-gray-500"
+                        >
+                            No products found.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+
+            table.innerHTML =
+                data.map(product => {
+
+                    const status =
+                        product.is_active
+                            ? `
+                                <span
+                                    class="rounded-full
+                                           bg-green-500/10
+                                           px-3 py-1 text-xs
+                                           font-bold text-green-400"
+                                >
+                                    Active
+                                </span>
+                              `
+                            : `
+                                <span
+                                    class="rounded-full
+                                           bg-gray-500/10
+                                           px-3 py-1 text-xs
+                                           font-bold text-gray-400"
+                                >
+                                    Inactive
+                                </span>
+                              `;
+
+
+                    return `
+                        <tr class="hover:bg-white/[.02]">
+
+                            <td class="px-5 py-4">
+                                <span class="font-bold">
+                                    ${escapeHtml(product.name || "Unnamed")}
+                                </span>
+                            </td>
+
+                            <td class="px-5 py-4 text-sm text-gray-400">
+                                ${escapeHtml(product.sport || "—")}
+                            </td>
+
+                            <td class="px-5 py-4 text-sm font-bold">
+                                Rs. ${Number(product.price || 0).toLocaleString()}
+                            </td>
+
+                            <td class="px-5 py-4 text-sm text-gray-400">
+                                ${product.stock ?? 0}
+                            </td>
+
+                            <td class="px-5 py-4">
+                                ${status}
+                            </td>
+
+                        </tr>
+                    `;
+
+                }).join("");
+
+
+        } catch (error) {
+
+            console.error(
+                "Products error:",
+                error
+            );
+
+            table.innerHTML = `
+                <tr>
+                    <td
+                        colspan="5"
+                        class="px-5 py-8 text-center
+                               text-sm text-red-400"
+                    >
+                        Could not load products.
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+
+    /* =========================================================
+       HTML ESCAPE
+    ========================================================= */
+
+    function escapeHtml(value) {
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+
+    /* =========================================================
+       LOGOUT
+    ========================================================= */
+
+    document
+        .getElementById("logoutBtn")
+        .addEventListener(
+            "click",
+            async () => {
+
+                await supabaseClient.auth.signOut();
+
+                localStorage.removeItem(
+                    "khelzone_role"
+                );
+
+                localStorage.removeItem(
+                    "khelzone_user_id"
+                );
+
+                window.location.href =
+                    "login.html";
+            }
+        );
+
+
+    /* =========================================================
+       REFRESH
+    ========================================================= */
+
+    document
+        .getElementById("refreshProducts")
+        .addEventListener(
+            "click",
+            async () => {
+
+                await loadDashboardData();
+
+            }
+        );
+
+
+    /* =========================================================
+       MOBILE MENU
+    ========================================================= */
+
+    const mobileMenuBtn =
+        document.getElementById(
+            "mobileMenuBtn"
+        );
+
+    const sidebar =
+        document.getElementById(
+            "sidebar"
+        );
+
+    const mobileOverlay =
+        document.getElementById(
+            "mobileOverlay"
+        );
+
+
+    function openMobileMenu() {
+
+        sidebar.classList.remove(
+            "-translate-x-full"
+        );
+
+        mobileOverlay.classList.remove(
+            "hidden"
+        );
+    }
+
+
+    function closeMobileMenu() {
+
+        sidebar.classList.add(
+            "-translate-x-full"
+        );
+
+        mobileOverlay.classList.add(
+            "hidden"
+        );
+    }
+
+
+    mobileMenuBtn.addEventListener(
+        "click",
+        openMobileMenu
+    );
+
+
+    mobileOverlay.addEventListener(
+        "click",
+        closeMobileMenu
+    );
+
+
+    /* =========================================================
+       START
+    ========================================================= */
+
+    checkAdminAccess();
+
+</script>
+
+</body>
+</html>

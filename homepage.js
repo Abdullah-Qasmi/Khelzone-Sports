@@ -78,71 +78,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* =========================================================
-       SEARCH OPEN
-    ========================================================== */
-
-    const searchBtn =
-        document.getElementById("searchBtn");
-
-    const searchPanel =
-        document.getElementById("searchPanel");
-
-    const closeSearch =
-        document.getElementById("closeSearch");
-
-    const searchInput =
-        document.getElementById("searchInput");
-
-
-    if (searchBtn && searchPanel) {
-
-        searchBtn.addEventListener("click", function () {
-
-            searchPanel.classList.toggle("hidden");
-
-            if (!searchPanel.classList.contains("hidden")) {
-
-                setTimeout(function () {
-
-                    if (searchInput) {
-                        searchInput.focus();
-                    }
-
-                }, 100);
-
-            }
-
-        });
-
-    }
-
-
-    /* =========================================================
-       CLOSE SEARCH
-    ========================================================== */
-
-    if (closeSearch && searchPanel) {
-
-        closeSearch.addEventListener("click", function () {
-
-            searchPanel.classList.add("hidden");
-
-        });
-
-    }
-
-
-    /* =========================================================
-       CLOSE SEARCH WITH ESCAPE KEY
+       NOTE: Navbar search (open/close + filtering) is handled
+       by the self-contained script in homepage.html, right
+       before this file is loaded. That keeps it independent
+       of this file's load order and avoids duplicate listeners.
     ========================================================== */
 
     document.addEventListener("keydown", function (event) {
 
         if (event.key === "Escape") {
-
-            if (searchPanel) {
-                searchPanel.classList.add("hidden");
-            }
 
             if (mobileMenu) {
 
@@ -224,14 +168,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* =========================================================
-       PRODUCT FILTER
+       PRODUCT FILTER (sport pills, if present)
     ========================================================== */
 
     const filterButtons =
         document.querySelectorAll(".filter-btn");
-
-    const productCards =
-        document.querySelectorAll(".product-card");
 
     const noProducts =
         document.getElementById("noProducts");
@@ -248,6 +189,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 button.getAttribute("data-filter");
 
             let visibleProducts = 0;
+
+            const productCards =
+                document.querySelectorAll(".product-card");
 
 
             /* REMOVE ACTIVE FROM ALL BUTTONS */
@@ -348,352 +292,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
             }
 
-        });
 
-    });
-
-
-    /* =========================================================
-       WISHLIST
-    ========================================================== */
-
-    const wishlistButtons =
-        document.querySelectorAll(".wishlist");
-
-    const wishlistBtn =
-        document.getElementById("wishlistBtn");
-
-    const wishlistModal =
-        document.getElementById("wishlistModal");
-
-    const wishlistList =
-        document.getElementById("wishlistList");
-
-    const wishCount =
-        document.getElementById("wishCount");
-
-
-    let wishlist = [];
-
-
-    /* LOAD WISHLIST FROM LOCAL STORAGE */
-
-    try {
-
-        const savedWishlist =
-            localStorage.getItem("khelzoneWishlist");
-
-        if (savedWishlist) {
-
-            wishlist =
-                JSON.parse(savedWishlist);
-
-        }
-
-    } catch (error) {
-
-        wishlist = [];
-
-    }
-
-
-    function saveWishlist() {
-
-        localStorage.setItem(
-            "khelzoneWishlist",
-            JSON.stringify(wishlist)
-        );
-
-    }
-
-
-    function updateWishlistCount() {
-
-        if (!wishCount) return;
-
-
-        if (wishlist.length > 0) {
-
-            wishCount.textContent =
-                wishlist.length;
-
-            wishCount.classList.remove("hidden");
-
-        } else {
-
-            wishCount.classList.add("hidden");
-
-        }
-
-    }
-
-
-    function updateWishlistButtons() {
-
-        wishlistButtons.forEach(function (button) {
-
-            const card =
-                button.closest(".product-card");
-
-            if (!card) return;
-
-
-            const name =
-                card.getAttribute("data-name");
-
-
-            const icon =
-                button.querySelector(
-                    ".material-symbols-outlined"
-                );
-
-
-            const exists =
-                wishlist.some(function (item) {
-
-                    return item.name === name;
-
-                });
-
-
-            if (exists) {
-
-                button.classList.add(
-                    "bg-red-500",
-                    "text-white"
-                );
-
-                if (icon) {
-                    icon.textContent = "favorite";
-                }
-
-            } else {
-
-                button.classList.remove(
-                    "bg-red-500",
-                    "text-white"
-                );
-
-                if (icon) {
-                    icon.textContent = "favorite";
-                }
-
-            }
-
-        });
-
-    }
-
-
-    function renderWishlist() {
-
-        if (!wishlistList) return;
-
-
-        wishlistList.innerHTML = "";
-
-
-        if (wishlist.length === 0) {
-
-            wishlistList.innerHTML = `
-                <div class="text-center py-10 text-gray-500">
-                    <span class="material-symbols-outlined text-5xl">
-                        favorite_border
-                    </span>
-
-                    <p class="mt-3">
-                        Your wishlist is empty.
-                    </p>
-                </div>
-            `;
-
-            return;
-
-        }
-
-
-        wishlist.forEach(function (item, index) {
-
-            const itemElement =
-                document.createElement("div");
-
-
-            itemElement.className =
-                "flex items-center justify-between gap-3 p-3 rounded-xl bg-white/5 border border-white/10";
-
-
-            itemElement.innerHTML = `
-                <div class="min-w-0">
-                    <p class="font-bold text-sm truncate">
-                        ${item.name}
-                    </p>
-
-                    <p class="text-xs text-orange-400 mt-1">
-                        ${item.price ? "Rs. " + Number(item.price).toLocaleString() : ""}
-                    </p>
-                </div>
-
-                <button
-                    class="remove-wishlist shrink-0 w-9 h-9 rounded-full hover:bg-red-500/20 text-red-400"
-                    data-index="${index}"
-                    aria-label="Remove from wishlist">
-
-                    <span class="material-symbols-outlined text-lg">
-                        delete
-                    </span>
-
-                </button>
-            `;
-
-
-            wishlistList.appendChild(itemElement);
-
-        });
-
-
-        const removeButtons =
-            wishlistList.querySelectorAll(
-                ".remove-wishlist"
+            /*
+             * Re-run the navbar search (defined in the
+             * self-contained script in homepage.html) on
+             * top of the new sport filter, if it's loaded.
+             */
+
+            document.dispatchEvent(
+                new CustomEvent("khelzoneProductsRendered")
             );
 
-
-        removeButtons.forEach(function (button) {
-
-            button.addEventListener("click", function () {
-
-                const index =
-                    Number(
-                        button.getAttribute("data-index")
-                    );
-
-
-                wishlist.splice(index, 1);
-
-                saveWishlist();
-
-                updateWishlistCount();
-
-                updateWishlistButtons();
-
-                renderWishlist();
-
-            });
-
-        });
-
-    }
-
-
-    wishlistButtons.forEach(function (button) {
-
-        button.addEventListener("click", function () {
-
-            const card =
-                button.closest(".product-card");
-
-            if (!card) return;
-
-
-            const name =
-                card.getAttribute("data-name");
-
-
-            const priceElement =
-                card.querySelector(".text-xl");
-
-
-            const price =
-                priceElement
-                    ? priceElement.textContent
-                        .replace("Rs.", "")
-                        .replace(/,/g, "")
-                        .trim()
-                    : "";
-
-
-            const existingIndex =
-                wishlist.findIndex(function (item) {
-
-                    return item.name === name;
-
-                });
-
-
-            if (existingIndex !== -1) {
-
-                wishlist.splice(existingIndex, 1);
-
-                showToast(
-                    "Removed from wishlist"
-                );
-
-            } else {
-
-                wishlist.push({
-                    name: name,
-                    price: price
-                });
-
-                showToast(
-                    "Added to wishlist"
-                );
-
-            }
-
-
-            saveWishlist();
-
-            updateWishlistCount();
-
-            updateWishlistButtons();
-
         });
 
     });
-
-
-    /* =========================================================
-       OPEN WISHLIST MODAL
-    ========================================================== */
-
-    if (wishlistBtn && wishlistModal) {
-
-        wishlistBtn.addEventListener("click", function () {
-
-            renderWishlist();
-
-            wishlistModal.classList.remove("hidden");
-
-        });
-
-    }
-
-
-    /* =========================================================
-       CLOSE WISHLIST BY CLICKING OUTSIDE
-    ========================================================== */
-
-    if (wishlistModal) {
-
-        wishlistModal.addEventListener("click", function (event) {
-
-            if (event.target === wishlistModal) {
-
-                wishlistModal.classList.add("hidden");
-
-            }
-
-        });
-
-    }
 
 
     /* =========================================================
        CART
     ========================================================== */
-
-    const cartButtons =
-        document.querySelectorAll(".add-cart");
 
     const cartCount =
         document.getElementById("cartCount");
@@ -1031,56 +648,59 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* =========================================================
-       ADD TO CART
+       ADD TO CART (event delegation so it works for
+       best-seller cards rendered/re-rendered after load)
     ========================================================== */
 
-    cartButtons.forEach(function (button) {
+    document.addEventListener("click", function (event) {
 
-        button.addEventListener("click", function () {
+        const button =
+            event.target.closest(".add-cart");
 
-            const name =
-                button.getAttribute("data-product");
-
-            const price =
-                Number(
-                    button.getAttribute("data-price")
-                );
+        if (!button) return;
 
 
-            const existing =
-                cart.find(function (item) {
+        const name =
+            button.getAttribute("data-product");
 
-                    return item.name === name;
-
-                });
-
-
-            if (existing) {
-
-                existing.quantity++;
-
-            } else {
-
-                cart.push({
-                    name: name,
-                    price: price,
-                    quantity: 1
-                });
-
-            }
-
-
-            saveCart();
-
-            updateCartCount();
-
-            renderCart();
-
-            showToast(
-                "Added to cart"
+        const price =
+            Number(
+                button.getAttribute("data-price")
             );
 
-        });
+
+        const existing =
+            cart.find(function (item) {
+
+                return item.name === name;
+
+            });
+
+
+        if (existing) {
+
+            existing.quantity++;
+
+        } else {
+
+            cart.push({
+                name: name,
+                price: price,
+                quantity: 1
+            });
+
+        }
+
+
+        saveCart();
+
+        updateCartCount();
+
+        renderCart();
+
+        showToast(
+            "Added to cart"
+        );
 
     });
 
@@ -1249,49 +869,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* =========================================================
-       NEWSLETTER
-    ========================================================== */
-
-    const newsletterForm =
-        document.getElementById(
-            "newsletterForm"
-        );
-
-
-    if (newsletterForm) {
-
-        newsletterForm.addEventListener(
-            "submit",
-            function (event) {
-
-                event.preventDefault();
-
-                const emailInput =
-                    newsletterForm.querySelector(
-                        'input[type="email"]'
-                    );
-
-
-                if (
-                    emailInput &&
-                    emailInput.value.trim() !== ""
-                ) {
-
-                    showToast(
-                        "Thanks for subscribing!"
-                    );
-
-                    newsletterForm.reset();
-
-                }
-
-            }
-        );
-
-    }
-
-
-    /* =========================================================
        TOAST
     ========================================================== */
 
@@ -1354,10 +931,6 @@ document.addEventListener("DOMContentLoaded", function () {
     /* =========================================================
        INITIALIZE
     ========================================================== */
-
-    updateWishlistCount();
-
-    updateWishlistButtons();
 
     updateCartCount();
 

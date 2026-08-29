@@ -80,7 +80,7 @@
             <a href="homepage.html" class="shrink-0">
 
                 <div class="font-display-xl text-2xl sm:text-3xl font-black tracking-tighter text-orange-500">
-                    KHELOZONE
+                    KHELZONE
                 </div>
 
                 <div class="hidden sm:block text-[9px] tracking-[.28em] text-gray-500 font-bold">
@@ -129,32 +129,15 @@
                 <!-- SEARCH -->
 
                 <button
-                    id="searchBtn"
+                    id="searchToggle"
+                    type="button"
                     aria-label="Search"
-                    class="p-2.5 rounded-full hover:bg-white/10 text-gray-300 hover:text-white transition">
+                    aria-expanded="false"
+                    aria-controls="searchContainer"
+                    class="relative z-10 p-2.5 rounded-full hover:bg-white/10 text-gray-300 hover:text-white transition pointer-events-auto">
 
-                    <span class="material-symbols-outlined">
+                    <span class="material-symbols-outlined pointer-events-none">
                         search
-                    </span>
-
-                </button>
-
-
-                <!-- WISHLIST -->
-
-                <button
-                    id="wishlistBtn"
-                    aria-label="Wishlist"
-                    class="p-2.5 rounded-full hover:bg-white/10 text-gray-300 hover:text-red-400 transition relative">
-
-                    <span class="material-symbols-outlined">
-                        favorite
-                    </span>
-
-                    <span
-                        id="wishCount"
-                        class="hidden absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 rounded-full bg-red-500 text-[9px] flex items-center justify-center">
-                        0
                     </span>
 
                 </button>
@@ -254,38 +237,72 @@
 
     <!-- =========================================================
          SEARCH PANEL
+         (self-contained: opened by #searchToggle, controlled
+         entirely by the inline script near the end of body)
     ========================================================== -->
 
     <div
-        id="searchPanel"
-        class="hidden sticky top-[72px] z-40 bg-[#101318] border-b border-white/10">
+        id="searchContainer"
+        class="sticky top-[72px] z-40 bg-[#101318] border-b border-white/10 overflow-hidden max-h-0 opacity-0 pointer-events-none transition-all duration-300 ease-in-out">
 
-        <div class="max-w-5xl mx-auto px-4 py-4 flex gap-3">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row gap-3">
 
             <div class="relative flex-1">
 
                 <span
-                    class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
+                    class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
                     search
                 </span>
 
                 <input
                     id="searchInput"
-                    type="search"
+                    type="text"
+                    inputmode="search"
                     placeholder="Search bats, footballs, jerseys, gloves..."
-                    class="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-gray-500 focus:border-orange-500 focus:ring-0">
+                    autocomplete="off"
+                    class="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-11 text-white placeholder:text-gray-500 focus:border-orange-500 focus:ring-0">
+
+                <button
+                    id="searchClearInput"
+                    type="button"
+                    aria-label="Clear search"
+                    class="hidden absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/10 text-gray-500 hover:text-white transition">
+
+                    <span class="material-symbols-outlined text-lg pointer-events-none">
+                        close
+                    </span>
+
+                </button>
 
             </div>
 
-            <button
-                id="closeSearch"
-                class="px-4 rounded-xl border border-white/10 hover:bg-white/10">
+            <div class="flex gap-2 shrink-0">
 
-                <span class="material-symbols-outlined">
-                    close
-                </span>
+                <button
+                    id="searchGo"
+                    type="button"
+                    aria-label="Run search"
+                    class="flex-1 sm:flex-none px-4 py-3 sm:py-0 rounded-xl orange-gradient font-black uppercase text-xs tracking-wide hover:scale-[1.02] transition">
 
-            </button>
+                    <span class="material-symbols-outlined align-middle pointer-events-none">
+                        search
+                    </span>
+
+                </button>
+
+                <button
+                    id="searchClose"
+                    type="button"
+                    aria-label="Close search"
+                    class="flex-1 sm:flex-none px-4 py-3 sm:py-0 rounded-xl border border-white/10 hover:bg-white/10">
+
+                    <span class="material-symbols-outlined pointer-events-none">
+                        close
+                    </span>
+
+                </button>
+
+            </div>
 
         </div>
 
@@ -629,7 +646,7 @@
                     class="sport-card relative h-44 sm:h-52 rounded-2xl overflow-hidden border border-white/10 group card-hover">
 
                     <img
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbwh7AlnRcJGP7Uyhuewddk8TjWrzO8sEFLsP4lBC9cs8ewEAQI8ZYJGk8Al8jjohhq4bFxHjmKyTUUaksXuv2j7leYU_saBjdr-JcJMQzkB1jU7YDK9iyIYCo4PBbfN_dakf_YuEOJ7pSI9qFwNkKMf3v2x7FeXUq4JA2AbXiNsQ5Pys5iS3rJsmdiQBp4wj5YaSI3oP_e_LB0a0sYxiutt17e7aOvHMyDt3CdCf6g_jkeJipJVQbKA"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbwh7AlnRcJGP7Uyhuewddk8TjWrzO8sEFLsP4lBC9cs8ewEAQI8ZYJGk8Al8jjohhq4bFxHjmKyTUUaksXuv2j7leYU_saBjdr-JcJMQzkB1jU7YDK9iyIYCo4PBbfN_dakf_YuEOJ7pSI9qFwPys5iS3rJsmdiQBp4wj5YaSI3oP_e_LB0a0sYxiutt17e7aOvHMyDt3CdCf6g_jkeJipJVQbKA"
                         class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500"
                         alt="Hockey">
 
@@ -883,12 +900,208 @@
 
 
         <!-- =====================================================
-             BEST SELLERS - DYNAMIC FROM ADMIN
+             BEST SELLERS - DYNAMIC FROM ADMIN + FEATURED SELLERS
         ====================================================== -->
 
         <section
             id="products"
             class="py-16 sm:py-20 px-5 sm:px-8 max-w-7xl mx-auto">
+
+            <!-- FEATURED SELLERS -->
+
+            <div class="mb-14">
+
+                <p
+                    class="text-orange-500 text-xs font-black uppercase tracking-[.2em] mb-2">
+                    Marketplace
+                </p>
+
+                <h2
+                    class="text-3xl sm:text-4xl font-black uppercase mb-8">
+                    Top Sellers on KHELZONE
+                </h2>
+
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+                    <!-- SELLER 1 -->
+                    <div class="p-6 rounded-2xl bg-[#11151a] border border-white/10 card-hover flex flex-col">
+
+                        <div class="flex items-center gap-4">
+
+                            <div class="w-14 h-14 rounded-full orange-gradient flex items-center justify-center text-base font-black uppercase shrink-0">
+                                PG
+                            </div>
+
+                            <div class="min-w-0">
+                                <h3 class="font-black uppercase text-sm truncate">
+                                    ProGear Sports Co.
+                                </h3>
+                                <span class="text-[10px] text-orange-400 font-bold uppercase tracking-wider">
+                                    Cricket Specialist
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <p class="text-xs text-gray-500 mt-4 leading-relaxed flex-1">
+                            Sialkot-based manufacturer supplying premium cricket bats, pads and
+                            protective gear to club and academy players nationwide.
+                        </p>
+
+                        <div class="flex items-center justify-between mt-5 pt-4 border-t border-white/10">
+                            <div class="flex items-center gap-1 text-amber-400 text-xs">
+                                ★★★★★ <span class="text-gray-500">(4.8)</span>
+                            </div>
+                            <span class="text-[10px] text-gray-500 font-bold uppercase">
+                                120+ Products
+                            </span>
+                        </div>
+
+                        <a
+                            href="shop.html?seller=progear-sports"
+                            class="mt-4 inline-flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl border border-white/15 hover:border-orange-500 hover:text-orange-400 text-xs font-black uppercase tracking-wide transition">
+                            Visit Store
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </a>
+
+                    </div>
+
+
+                    <!-- SELLER 2 -->
+                    <div class="p-6 rounded-2xl bg-[#11151a] border border-white/10 card-hover flex flex-col">
+
+                        <div class="flex items-center gap-4">
+
+                            <div class="w-14 h-14 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-base font-black uppercase shrink-0">
+                                FH
+                            </div>
+
+                            <div class="min-w-0">
+                                <h3 class="font-black uppercase text-sm truncate">
+                                    Falcon Football Hub
+                                </h3>
+                                <span class="text-[10px] text-orange-400 font-bold uppercase tracking-wider">
+                                    Football Specialist
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <p class="text-xs text-gray-500 mt-4 leading-relaxed flex-1">
+                            Match balls, boots and training gear curated for local leagues,
+                            school teams and weekend players across Pakistan.
+                        </p>
+
+                        <div class="flex items-center justify-between mt-5 pt-4 border-t border-white/10">
+                            <div class="flex items-center gap-1 text-amber-400 text-xs">
+                                ★★★★★ <span class="text-gray-500">(4.6)</span>
+                            </div>
+                            <span class="text-[10px] text-gray-500 font-bold uppercase">
+                                85+ Products
+                            </span>
+                        </div>
+
+                        <a
+                            href="shop.html?seller=falcon-football-hub"
+                            class="mt-4 inline-flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl border border-white/15 hover:border-orange-500 hover:text-orange-400 text-xs font-black uppercase tracking-wide transition">
+                            Visit Store
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </a>
+
+                    </div>
+
+
+                    <!-- SELLER 3 -->
+                    <div class="p-6 rounded-2xl bg-[#11151a] border border-white/10 card-hover flex flex-col">
+
+                        <div class="flex items-center gap-4">
+
+                            <div class="w-14 h-14 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-base font-black uppercase shrink-0">
+                                HN
+                            </div>
+
+                            <div class="min-w-0">
+                                <h3 class="font-black uppercase text-sm truncate">
+                                    Hockey Nation PK
+                                </h3>
+                                <span class="text-[10px] text-orange-400 font-bold uppercase tracking-wider">
+                                    Hockey Specialist
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <p class="text-xs text-gray-500 mt-4 leading-relaxed flex-1">
+                            Field hockey sticks, shin guards and turf shoes trusted by
+                            university and club-level squads.
+                        </p>
+
+                        <div class="flex items-center justify-between mt-5 pt-4 border-t border-white/10">
+                            <div class="flex items-center gap-1 text-amber-400 text-xs">
+                                ★★★★★ <span class="text-gray-500">(4.9)</span>
+                            </div>
+                            <span class="text-[10px] text-gray-500 font-bold uppercase">
+                                60+ Products
+                            </span>
+                        </div>
+
+                        <a
+                            href="shop.html?seller=hockey-nation-pk"
+                            class="mt-4 inline-flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl border border-white/15 hover:border-orange-500 hover:text-orange-400 text-xs font-black uppercase tracking-wide transition">
+                            Visit Store
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </a>
+
+                    </div>
+
+
+                    <!-- SELLER 4 -->
+                    <div class="p-6 rounded-2xl bg-[#11151a] border border-white/10 card-hover flex flex-col">
+
+                        <div class="flex items-center gap-4">
+
+                            <div class="w-14 h-14 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-base font-black uppercase shrink-0">
+                                ER
+                            </div>
+
+                            <div class="min-w-0">
+                                <h3 class="font-black uppercase text-sm truncate">
+                                    Elite Racquet House
+                                </h3>
+                                <span class="text-[10px] text-orange-400 font-bold uppercase tracking-wider">
+                                    Tennis &amp; Badminton
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <p class="text-xs text-gray-500 mt-4 leading-relaxed flex-1">
+                            Racquets, strings and grips for tennis and badminton players,
+                            from beginner sets to tournament-grade gear.
+                        </p>
+
+                        <div class="flex items-center justify-between mt-5 pt-4 border-t border-white/10">
+                            <div class="flex items-center gap-1 text-amber-400 text-xs">
+                                ★★★★☆ <span class="text-gray-500">(4.5)</span>
+                            </div>
+                            <span class="text-[10px] text-gray-500 font-bold uppercase">
+                                45+ Products
+                            </span>
+                        </div>
+
+                        <a
+                            href="shop.html?seller=elite-racquet-house"
+                            class="mt-4 inline-flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl border border-white/15 hover:border-orange-500 hover:text-orange-400 text-xs font-black uppercase tracking-wide transition">
+                            Visit Store
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
 
             <div
                 class="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-8">
@@ -940,6 +1153,27 @@
             <div
                 id="productGrid"
                 class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+            </div>
+
+
+            <!-- SEARCH: NO RESULTS -->
+
+            <div
+                id="searchNoResults"
+                class="hidden text-center py-16 text-gray-500">
+
+                <span class="material-symbols-outlined text-5xl">
+                    search_off
+                </span>
+
+                <p class="mt-3 font-bold text-white">
+                    No products found.
+                </p>
+
+                <p class="mt-1 text-sm">
+                    Try a different name, category or keyword.
+                </p>
 
             </div>
 
@@ -1316,64 +1550,6 @@
 
         </section>
 
-
-        <!-- =====================================================
-             NEWSLETTER
-        ====================================================== -->
-
-        <section class="px-5 sm:px-8 pb-16">
-
-            <div
-                class="max-w-7xl mx-auto rounded-3xl bg-white/[.04] border border-white/10 p-7 sm:p-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-
-
-                <div>
-
-                    <p
-                        class="text-orange-500 text-xs font-black uppercase tracking-[.2em]">
-                        Stay in the game
-                    </p>
-
-                    <h2
-                        class="mt-2 text-2xl sm:text-3xl font-black uppercase">
-
-                        Get new drops & exclusive deals.
-
-                    </h2>
-
-                    <p
-                        class="mt-2 text-gray-500 text-sm">
-
-                        No spam. Just sports gear, offers and KHELZONE updates.
-
-                    </p>
-
-                </div>
-
-
-                <form
-                    id="newsletterForm"
-                    class="flex flex-col sm:flex-row gap-2 w-full lg:max-w-xl">
-
-                    <input
-                        type="email"
-                        required
-                        placeholder="Enter your email address"
-                        class="flex-1 bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-orange-500 focus:ring-0">
-
-                    <button
-                        class="orange-gradient rounded-xl px-6 py-3 font-black uppercase text-sm">
-
-                        Subscribe
-
-                    </button>
-
-                </form>
-
-            </div>
-
-        </section>
-
     </main>
 
 
@@ -1384,7 +1560,7 @@
     <footer class="border-t border-white/10 bg-[#07090c]">
 
         <div
-            class="max-w-7xl mx-auto px-5 sm:px-8 py-14 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10">
+            class="max-w-7xl mx-auto px-5 sm:px-8 py-14 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-10">
 
 
             <!-- BRAND -->
@@ -1394,7 +1570,7 @@
                 <a href="homepage.html">
 
                     <div class="text-3xl font-black tracking-tighter text-orange-500">
-                        KHELOZONE
+                        KHELZONE
                     </div>
 
                 </a>
@@ -1406,46 +1582,6 @@
                     Premium sports equipment and custom team kits built for performance.
 
                 </p>
-
-
-                <div class="flex gap-2 mt-5">
-
-                    <a
-                        href="#"
-                        aria-label="Instagram"
-                        class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center hover:bg-orange-500 hover:text-black transition">
-
-                        <span class="material-symbols-outlined text-base">
-                            photo_camera
-                        </span>
-
-                    </a>
-
-
-                    <a
-                        href="#"
-                        aria-label="Facebook"
-                        class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center hover:bg-orange-500 hover:text-black transition">
-
-                        <span class="material-symbols-outlined text-base">
-                            thumb_up
-                        </span>
-
-                    </a>
-
-
-                    <a
-                        href="#"
-                        aria-label="Contact"
-                        class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center hover:bg-orange-500 hover:text-black transition">
-
-                        <span class="material-symbols-outlined text-base">
-                            chat
-                        </span>
-
-                    </a>
-
-                </div>
 
             </div>
 
@@ -1523,46 +1659,6 @@
                         class="block hover:text-orange-400"
                         href="customization.html">
                         Bulk Orders
-                    </a>
-
-                </div>
-
-            </div>
-
-
-            <!-- HELP -->
-
-            <div>
-
-                <h3
-                    class="text-xs font-black uppercase tracking-widest mb-4">
-                    Help
-                </h3>
-
-                <div class="space-y-3 text-sm text-gray-500">
-
-                    <a
-                        class="block hover:text-orange-400"
-                        href="#">
-                        Track Order
-                    </a>
-
-                    <a
-                        class="block hover:text-orange-400"
-                        href="#">
-                        Shipping Info
-                    </a>
-
-                    <a
-                        class="block hover:text-orange-400"
-                        href="#">
-                        Returns
-                    </a>
-
-                    <a
-                        class="block hover:text-orange-400"
-                        href="#">
-                        Contact Support
                     </a>
 
                 </div>
@@ -1737,52 +1833,6 @@
         </div>
 
     </aside>
-
-
-    <!-- =========================================================
-         WISHLIST MODAL
-    ========================================================== -->
-
-    <div
-        id="wishlistModal"
-        class="modal hidden fixed inset-0 z-[100] bg-black/75 flex items-center justify-center p-4">
-
-        <div
-            class="w-full max-w-md bg-[#11151a] border border-white/10 rounded-2xl p-6 relative">
-
-
-            <button
-                onclick="document.getElementById('wishlistModal').classList.add('hidden')"
-                class="absolute right-4 top-4 text-gray-500 hover:text-white">
-
-                <span class="material-symbols-outlined">
-                    close
-                </span>
-
-            </button>
-
-
-            <div class="flex items-center gap-3">
-
-                <span class="material-symbols-outlined text-red-500">
-                    favorite
-                </span>
-
-                <h2 class="text-2xl font-black uppercase">
-                    My Wishlist
-                </h2>
-
-            </div>
-
-
-            <div
-                id="wishlistList"
-                class="mt-5 space-y-2 max-h-80 overflow-y-auto">
-            </div>
-
-        </div>
-
-    </div>
 
 
     <!-- =========================================================
@@ -1971,6 +2021,11 @@
                     "★".repeat(rating) +
                     "☆".repeat(5 - rating);
 
+                const searchBlob =
+                    [name, sport, category, brand]
+                        .join(" ")
+                        .toLowerCase();
+
 
                 return `
 
@@ -1978,6 +2033,7 @@
                         class="product-card card-hover bg-[#11151a] border border-white/10 rounded-2xl overflow-hidden"
                         data-category="${escapeAttr(String(sport).toLowerCase())}"
                         data-name="${escapeAttr(name)}"
+                        data-search="${escapeAttr(searchBlob)}"
                         data-product-id="${escapeAttr(product.id)}">
 
 
@@ -2021,19 +2077,6 @@
                                 BEST SELLER
 
                             </span>
-
-
-                            <!-- WISHLIST -->
-
-                            <button
-                                class="wishlist absolute top-3 right-3 w-9 h-9 rounded-full bg-black/60 flex items-center justify-center hover:bg-red-500 transition"
-                                aria-label="Add to wishlist">
-
-                                <span class="material-symbols-outlined text-lg">
-                                    favorite
-                                </span>
-
-                            </button>
 
                         </div>
 
@@ -2178,6 +2221,12 @@
 
                     noProducts.classList.remove("hidden");
 
+                    document.dispatchEvent(
+                        new CustomEvent(
+                            "khelzoneProductsRendered"
+                        )
+                    );
+
                     return;
 
                 }
@@ -2265,6 +2314,209 @@
                 renderBestSellers;
 
         })();
+
+    </script>
+
+
+    <!-- =========================================================
+         NAVBAR SEARCH SYSTEM (self-contained, defensive)
+         Controls #searchToggle / #searchContainer / #searchInput /
+         #searchClose / #searchGo / #searchClearInput and filters
+         .product-card items inside #productGrid.
+    ========================================================== -->
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const toggleBtn = document.getElementById("searchToggle");
+            const container = document.getElementById("searchContainer");
+            const input = document.getElementById("searchInput");
+            const closeBtn = document.getElementById("searchClose");
+            const goBtn = document.getElementById("searchGo");
+            const clearBtn = document.getElementById("searchClearInput");
+            const emptyState = document.getElementById("searchNoResults");
+            const grid = document.getElementById("productGrid");
+            const bestSellersEmptyState = document.getElementById("noProducts");
+
+            if (!toggleBtn || !container || !input) {
+                console.warn("KHELZONE search: one or more required elements are missing from the page.");
+                return;
+            }
+
+
+            /* ============================================
+               OPEN / CLOSE
+            ============================================= */
+
+            function isOpen() {
+                return container.classList.contains("search-open");
+            }
+
+            function openSearch() {
+
+                container.classList.add("search-open");
+
+                container.classList.remove("max-h-0", "opacity-0", "pointer-events-none");
+                container.classList.add("max-h-[140px]", "opacity-100", "pointer-events-auto");
+
+                toggleBtn.setAttribute("aria-expanded", "true");
+
+                window.setTimeout(function () {
+                    input.focus();
+                }, 200);
+
+            }
+
+            function closeSearch() {
+
+                container.classList.remove("search-open");
+
+                container.classList.remove("max-h-[140px]", "opacity-100", "pointer-events-auto");
+                container.classList.add("max-h-0", "opacity-0", "pointer-events-none");
+
+                toggleBtn.setAttribute("aria-expanded", "false");
+
+            }
+
+            toggleBtn.addEventListener("click", function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                if (isOpen()) {
+                    closeSearch();
+                } else {
+                    openSearch();
+                }
+
+            });
+
+            if (closeBtn) {
+
+                closeBtn.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    closeSearch();
+                });
+
+            }
+
+            /* Clicking anywhere inside the search bar must never close it */
+
+            container.addEventListener("click", function (event) {
+                event.stopPropagation();
+            });
+
+            /* Clicking outside the open search bar closes it */
+
+            document.addEventListener("click", function (event) {
+
+                if (!isOpen()) return;
+
+                const clickedToggle = toggleBtn.contains(event.target);
+                const clickedInsideContainer = container.contains(event.target);
+
+                if (!clickedToggle && !clickedInsideContainer) {
+                    closeSearch();
+                }
+
+            });
+
+            /* Escape closes the search bar */
+
+            document.addEventListener("keydown", function (event) {
+
+                if (event.key === "Escape" && isOpen()) {
+                    closeSearch();
+                }
+
+            });
+
+
+            /* ============================================
+               FILTERING
+            ============================================= */
+
+            function runSearch() {
+
+                if (!grid) return;
+
+                const query = input.value.trim().toLowerCase();
+
+                if (clearBtn) {
+                    clearBtn.classList.toggle("hidden", query === "");
+                }
+
+                const cards = grid.querySelectorAll(".product-card");
+                let visibleCount = 0;
+
+                cards.forEach(function (card) {
+
+                    const haystack = (
+                        card.getAttribute("data-search") ||
+                        card.getAttribute("data-name") ||
+                        card.textContent ||
+                        ""
+                    ).toLowerCase();
+
+                    const matches = query === "" || haystack.indexOf(query) !== -1;
+
+                    card.classList.toggle("hidden", !matches);
+
+                    if (matches) visibleCount++;
+
+                });
+
+                if (emptyState) {
+                    emptyState.classList.toggle("hidden", !(query !== "" && visibleCount === 0));
+                }
+
+                /* Don't let the "no best sellers at all" state fight the search message */
+
+                if (bestSellersEmptyState && query !== "") {
+                    bestSellersEmptyState.classList.add("hidden");
+                }
+
+            }
+
+            input.addEventListener("input", runSearch);
+
+            input.addEventListener("keydown", function (event) {
+
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    runSearch();
+                }
+
+            });
+
+            if (goBtn) {
+
+                goBtn.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    runSearch();
+                });
+
+            }
+
+            if (clearBtn) {
+
+                clearBtn.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    input.value = "";
+                    runSearch();
+                    input.focus();
+                });
+
+            }
+
+            /* Re-run the active search whenever best-seller cards re-render */
+
+            document.addEventListener("khelzoneProductsRendered", runSearch);
+
+        });
 
     </script>
 

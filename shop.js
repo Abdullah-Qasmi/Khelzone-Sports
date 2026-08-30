@@ -1,23 +1,38 @@
 /* ==========================================================================
    KHELZONE — SHOP.JS
-   ADMIN → SHOP PRODUCT SYSTEM
+   COMPLETE SUPABASE PRODUCT + CART + WISHLIST SYSTEM
    ========================================================================== */
 
 "use strict";
 
 /* ==========================================================================
+   SUPABASE CONFIG
+   ========================================================================== */
+
+const SUPABASE_URL = "https://antqexjhlsaynunlmzqa.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
+
+/* ==========================================================================
    STORAGE KEYS
    ========================================================================== */
 
-const PRODUCTS_KEY = "khz_products_v1";
 const CART_KEY = "khz_cart";
 const WISHLIST_KEY = "khz_wishlist";
 
+
 /* ==========================================================================
-   GLOBAL PRODUCT ARRAY
+   GLOBAL PRODUCTS
    ========================================================================== */
 
 let PRODUCTS = [];
+
 
 /* ==========================================================================
    BASIC HELPERS
@@ -29,9 +44,11 @@ const $ = (selector, context = document) =>
 const $$ = (selector, context = document) =>
   [...context.querySelectorAll(selector)];
 
+
 function money(value) {
   return "Rs. " + (Number(value) || 0).toLocaleString("en-PK");
 }
+
 
 function escapeHTML(value) {
   return String(value ?? "")
@@ -42,234 +59,522 @@ function escapeHTML(value) {
     .replace(/'/g, "&#039;");
 }
 
+
+/* ==========================================================================
+   FALLBACK IMAGE
+   ========================================================================== */
+
 function fallbackImgFor(sport) {
-  const label = String(sport || "KHELZONE").toUpperCase();
+
+  const label = String(
+    sport || "KHELZONE"
+  ).toUpperCase();
 
   const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="500" height="500">
-      <rect width="500" height="500" fill="#141414"/>
-      <rect x="15" y="15" width="470" height="470"
-        fill="none" stroke="#FF6A00" stroke-width="3"/>
-      <text x="50%" y="47%" fill="#FF6A00"
-        font-family="Arial" font-weight="800" font-size="34"
-        text-anchor="middle">KHELZONE</text>
-      <text x="50%" y="56%" fill="#A6A6A6"
-        font-family="Arial" font-size="15"
-        text-anchor="middle">${escapeHTML(label)}</text>
+    <svg xmlns="http://www.w3.org/2000/svg"
+         width="500"
+         height="500">
+
+      <rect
+        width="500"
+        height="500"
+        fill="#141414"
+      />
+
+      <rect
+        x="15"
+        y="15"
+        width="470"
+        height="470"
+        fill="none"
+        stroke="#FF6A00"
+        stroke-width="3"
+      />
+
+      <text
+        x="50%"
+        y="47%"
+        fill="#FF6A00"
+        font-family="Arial"
+        font-weight="800"
+        font-size="34"
+        text-anchor="middle"
+      >
+        KHELZONE
+      </text>
+
+      <text
+        x="50%"
+        y="56%"
+        fill="#A6A6A6"
+        font-family="Arial"
+        font-size="15"
+        text-anchor="middle"
+      >
+        ${escapeHTML(label)}
+      </text>
+
     </svg>
   `;
 
-  return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+  return "data:image/svg+xml;charset=UTF-8," +
+    encodeURIComponent(svg);
 }
 
+
 function safeImage(product) {
-  if (product.image && String(product.image).trim()) {
+
+  if (
+    product.image &&
+    String(product.image).trim()
+  ) {
     return product.image;
   }
 
   return fallbackImgFor(product.sport);
 }
 
+
 /* ==========================================================================
-   LOAD ADMIN PRODUCTS
+   PRODUCT NORMALIZER
    ========================================================================== */
 
-function loadAdminProducts() {
+function normalizeProduct(product, index = 0) {
+
+  const price =
+    Number(product.price) || 0;
+
+  const oldPrice =
+    Number(
+      product.old_price ||
+      product.oldPrice
+    ) || price;
+
+  let discount =
+    Number(product.discount) || 0;
+
+  if (
+    !discount &&
+    oldPrice > price
+  ) {
+
+    discount = Math.round(
+      (
+        (oldPrice - price) /
+        oldPrice
+      ) * 100
+    );
+  }
+
+  let sizes = product.sizes;
+
+  if (typeof sizes === "string") {
+
+    try {
+      sizes = JSON.parse(sizes);
+    }
+
+    catch {
+      sizes = sizes
+        .split(",")
+        .map(size => size.trim())
+        .filter(Boolean);
+    }
+  }
+
+  if (!Array.isArray(sizes)) {
+    sizes = ["Standard"];
+  }
+
+  sizes = sizes
+    .map(size => String(size).trim())
+    .filter(Boolean);
+
+  if (!sizes.length) {
+    sizes = ["Standard"];
+  }
+
+  return {
+
+    id:
+      product.id ??
+      `product-${index}`,
+
+    name:
+      String(
+        product.name ||
+        "KHELZONE Product"
+      ),
+
+    category:
+      String(
+        product.category ||
+        "Accessories"
+      ),
+
+    sport:
+      String(
+        product.sport ||
+        product.category ||
+        "Sports"
+      ),
+
+    price,
+
+    oldPrice,
+
+    discount,
+
+    rating:
+      Number(product.rating) || 0,
+
+    reviews:
+      Number(product.reviews) || 0,
+
+    image:
+      product.image_url ||
+      product.image ||
+      "",
+
+    description:
+      String(
+        product.description ||
+        "Premium quality sports gear from KHELZONE."
+      ),
+
+    sizes,
+
+    stock:
+      Math.max(
+        0,
+        Number(product.stock) || 0
+      ),
+
+    badge:
+      String(
+        product.badge || ""
+      ),
+
+    brand:
+      String(
+        product.brand ||
+        "KHELZONE"
+      ),
+
+    created_at:
+      product.created_at ||
+      ""
+  };
+}
+
+
+/* ==========================================================================
+   LOAD PRODUCTS FROM SUPABASE
+   ========================================================================== */
+
+async function loadProductsFromSupabase() {
+
   try {
-    const saved = localStorage.getItem(PRODUCTS_KEY);
 
-    if (!saved) {
-      PRODUCTS = [];
-      return;
-    }
+    console.log(
+      "Loading KHELZONE products from Supabase..."
+    );
 
-    const parsed = JSON.parse(saved);
-
-    if (!Array.isArray(parsed)) {
-      PRODUCTS = [];
-      return;
-    }
-
-    PRODUCTS = parsed
-      .filter(product => product)
-      .map((product, index) => {
-        const price = Number(product.price) || 0;
-
-        const oldPrice =
-          Number(product.oldPrice) || price;
-
-        let discount =
-          Number(product.discount) || 0;
-
-        if (!discount && oldPrice > price) {
-          discount = Math.round(
-            ((oldPrice - price) / oldPrice) * 100
-          );
+    const {
+      data,
+      error
+    } = await supabaseClient
+      .from("products")
+      .select("*")
+      .eq("is_active", true)
+      .order(
+        "created_at",
+        {
+          ascending: false
         }
+      );
 
-        return {
-          id: product.id ?? `admin-${index}`,
+    if (error) {
+      throw error;
+    }
 
-          name: String(
-            product.name || "KHELZONE Product"
-          ),
+    PRODUCTS =
+      (data || [])
+        .map(
+          (product, index) =>
+            normalizeProduct(
+              product,
+              index
+            )
+        );
 
-          category: String(
-            product.category || "Accessories"
-          ),
+    console.log(
+      `${PRODUCTS.length} products loaded from Supabase`
+    );
 
-          sport: String(
-            product.sport ||
-            product.category ||
-            "Sports"
-          ),
-
-          price,
-
-          oldPrice,
-
-          discount,
-
-          rating:
-            Number(product.rating) || 0,
-
-          reviews:
-            Number(product.reviews) || 0,
-
-          image:
-            product.image || "",
-
-          description: String(
-            product.description ||
-            "Quality sports gear from KHELZONE."
-          ),
-
-          sizes:
-            Array.isArray(product.sizes)
-              ? product.sizes
-              : ["Standard"],
-
-          stock: Math.max(
-            0,
-            Number(product.stock) || 0
-          ),
-
-          badge: String(
-            product.badge || ""
-          ),
-
-          brand: String(
-            product.brand || "KHELZONE"
-          )
-        };
-      });
   }
 
   catch (error) {
+
     console.error(
-      "KHELZONE product loading error:",
+      "Supabase product loading error:",
       error
     );
 
     PRODUCTS = [];
+
+    showProductLoadingError();
   }
 }
 
+
 /* ==========================================================================
-   INITIAL PRODUCT LOAD
+   PRODUCT LOADING ERROR
    ========================================================================== */
 
-loadAdminProducts();
+function showProductLoadingError() {
+
+  const grid =
+    $("#productGrid") ||
+    $("#productsContainer");
+
+  if (!grid) {
+    return;
+  }
+
+  grid.innerHTML = `
+    <div class="col-span-full text-center py-20">
+
+      <h2 class="text-xl font-bold mb-2">
+        Unable to Load Products
+      </h2>
+
+      <p
+        class="text-sm"
+        style="color:var(--khz-gray)"
+      >
+        Please check your Supabase connection.
+      </p>
+
+    </div>
+  `;
+
+  const empty = $("#emptyState");
+
+  if (empty) {
+    empty.classList.add("hidden");
+  }
+
+  const loadMore = $("#loadMoreWrap");
+
+  if (loadMore) {
+    loadMore.classList.add("hidden");
+  }
+
+  const count = $("#toolbarCount");
+
+  if (count) {
+    count.textContent = "Showing 0 of 0 products";
+  }
+}
+
 
 /* ==========================================================================
    STATE
    ========================================================================== */
 
 const state = {
+
   search: "",
-  sports: new Set(),
-  types: new Set(),
-  priceMax: 20000,
-  priceBuckets: new Set(),
-  brands: new Set(),
-  sizes: new Set(),
-  minRating: 0,
-  sort: "featured",
-  view: "grid",
-  visibleCount: 12,
-  cart: [],
-  wishlist: []
+
+  sports:
+    new Set(),
+
+  types:
+    new Set(),
+
+  priceMax:
+    20000,
+
+  priceBuckets:
+    new Set(),
+
+  brands:
+    new Set(),
+
+  sizes:
+    new Set(),
+
+  minRating:
+    0,
+
+  sort:
+    "featured",
+
+  view:
+    "grid",
+
+  visibleCount:
+    12,
+
+  cart:
+    [],
+
+  wishlist:
+    []
 };
 
+
 /* ==========================================================================
-   CART / WISHLIST STORAGE
+   CART STORAGE
    ========================================================================== */
 
 function loadCart() {
+
   try {
-    const saved = JSON.parse(
-      localStorage.getItem(CART_KEY) || "[]"
-    );
+
+    const saved =
+      JSON.parse(
+        localStorage.getItem(
+          CART_KEY
+        ) || "[]"
+      );
 
     state.cart =
-      Array.isArray(saved) ? saved : [];
+      Array.isArray(saved)
+        ? saved
+        : [];
+
   }
 
   catch {
+
     state.cart = [];
+
   }
 }
+
 
 function saveCart() {
-  localStorage.setItem(
-    CART_KEY,
-    JSON.stringify(state.cart)
-  );
-}
 
-function loadWishlist() {
   try {
-    const saved = JSON.parse(
-      localStorage.getItem(WISHLIST_KEY) || "[]"
+
+    localStorage.setItem(
+      CART_KEY,
+      JSON.stringify(
+        state.cart
+      )
     );
 
+  }
+
+  catch (error) {
+
+    console.error(
+      "Could not save cart:",
+      error
+    );
+  }
+}
+
+
+/* ==========================================================================
+   WISHLIST STORAGE
+   ========================================================================== */
+
+function loadWishlist() {
+
+  try {
+
+    const saved =
+      JSON.parse(
+        localStorage.getItem(
+          WISHLIST_KEY
+        ) || "[]"
+      );
+
     state.wishlist =
-      Array.isArray(saved) ? saved : [];
+      Array.isArray(saved)
+        ? saved
+        : [];
+
   }
 
   catch {
+
     state.wishlist = [];
+
   }
 }
 
+
 function saveWishlist() {
-  localStorage.setItem(
-    WISHLIST_KEY,
-    JSON.stringify(state.wishlist)
-  );
+
+  try {
+
+    localStorage.setItem(
+      WISHLIST_KEY,
+      JSON.stringify(
+        state.wishlist
+      )
+    );
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Could not save wishlist:",
+      error
+    );
+  }
 }
 
-loadCart();
-loadWishlist();
 
 /* ==========================================================================
    STAR RATING
    ========================================================================== */
 
 function starString(rating) {
-  const value = Number(rating) || 0;
+
+  const value =
+    Number(rating) || 0;
+
   let output = "";
 
-  for (let i = 1; i <= 5; i++) {
+  for (
+    let i = 1;
+    i <= 5;
+    i++
+  ) {
+
     output += `
       <svg
-        class="rating-star ${i <= Math.round(value) ? "" : "empty"}"
+        class="
+          rating-star
+          ${
+            i <= Math.round(value)
+              ? ""
+              : "empty"
+          }
+        "
         width="13"
         height="13"
         viewBox="0 0 20 20"
         fill="currentColor"
       >
-        <path d="M10 15.27L16.18 19l-1.64-7.03L20 7.24l-7.19-.61L10 0 7.19 6.63 0 7.24l5.46 4.73L3.82 19z"/>
+        <path d="
+          M10 15.27
+          L16.18 19
+          l-1.64-7.03
+          L20 7.24
+          l-7.19-.61
+          L10 0
+          7.19 6.63
+          0 7.24
+          l5.46 4.73
+          L3.82 19z
+        "/>
       </svg>
     `;
   }
@@ -277,12 +582,19 @@ function starString(rating) {
   return output;
 }
 
+
 /* ==========================================================================
-   BADGES
+   BADGE CLASS
    ========================================================================== */
 
 function badgeClass(badge) {
-  switch (String(badge || "").toUpperCase()) {
+
+  switch (
+    String(
+      badge || ""
+    ).toUpperCase()
+  ) {
+
     case "NEW":
       return "badge-new";
 
@@ -306,181 +618,280 @@ function badgeClass(badge) {
   }
 }
 
+
 /* ==========================================================================
-   FILTERING
+   PRICE BUCKET FILTER
    ========================================================================== */
 
-function priceInBucket(price, bucket) {
-  if (bucket === "u2000") {
+function priceInBucket(
+  price,
+  bucket
+) {
+
+  if (
+    bucket === "u2000"
+  ) {
     return price < 2000;
   }
 
-  if (bucket === "2000-5000") {
-    return price >= 2000 && price <= 5000;
+  if (
+    bucket === "2000-5000"
+  ) {
+    return (
+      price >= 2000 &&
+      price <= 5000
+    );
   }
 
-  if (bucket === "5000-10000") {
-    return price > 5000 && price <= 10000;
+  if (
+    bucket === "5000-10000"
+  ) {
+    return (
+      price > 5000 &&
+      price <= 10000
+    );
   }
 
-  if (bucket === "a10000") {
+  if (
+    bucket === "a10000"
+  ) {
     return price > 10000;
   }
 
   return true;
 }
 
+
+/* ==========================================================================
+   GET FILTERED PRODUCTS
+   ========================================================================== */
+
 function getFilteredProducts() {
-  let list = PRODUCTS.filter(product => {
 
-    /* SEARCH */
+  let list =
+    PRODUCTS.filter(
+      product => {
 
-    if (state.search) {
-      const query =
-        state.search.toLowerCase();
+        /* SEARCH */
 
-      const text = `
-        ${product.name}
-        ${product.category}
-        ${product.sport}
-        ${product.description}
-        ${product.brand}
-      `.toLowerCase();
+        if (
+          state.search
+        ) {
 
-      if (!text.includes(query)) {
-        return false;
+          const query =
+            state.search.toLowerCase();
+
+          const text = `
+            ${product.name}
+            ${product.category}
+            ${product.sport}
+            ${product.description}
+            ${product.brand}
+          `.toLowerCase();
+
+          if (
+            !text.includes(
+              query
+            )
+          ) {
+            return false;
+          }
+        }
+
+
+        /* SPORT */
+
+        if (
+          state.sports.size &&
+          !state.sports.has(
+            product.sport
+          )
+        ) {
+          return false;
+        }
+
+
+        /* TYPE */
+
+        if (
+          state.types.size &&
+          !state.types.has(
+            product.category
+          )
+        ) {
+          return false;
+        }
+
+
+        /* PRICE MAX */
+
+        if (
+          product.price >
+          state.priceMax
+        ) {
+          return false;
+        }
+
+
+        /* PRICE BUCKET */
+
+        if (
+          state.priceBuckets.size
+        ) {
+
+          const valid =
+            [
+              ...state.priceBuckets
+            ].some(
+              bucket =>
+                priceInBucket(
+                  product.price,
+                  bucket
+                )
+            );
+
+          if (!valid) {
+            return false;
+          }
+        }
+
+
+        /* BRAND */
+
+        if (
+          state.brands.size &&
+          !state.brands.has(
+            product.brand
+          )
+        ) {
+          return false;
+        }
+
+
+        /* SIZE */
+
+        if (
+          state.sizes.size
+        ) {
+
+          const valid =
+            product.sizes.some(
+              size =>
+                state.sizes.has(
+                  size
+                )
+            );
+
+          if (!valid) {
+            return false;
+          }
+        }
+
+
+        /* RATING */
+
+        if (
+          state.minRating &&
+          product.rating <
+          state.minRating
+        ) {
+          return false;
+        }
+
+        return true;
       }
-    }
+    );
 
-    /* SPORT */
-
-    if (
-      state.sports.size &&
-      !state.sports.has(product.sport)
-    ) {
-      return false;
-    }
-
-    /* TYPE */
-
-    if (
-      state.types.size &&
-      !state.types.has(product.category)
-    ) {
-      return false;
-    }
-
-    /* PRICE */
-
-    if (product.price > state.priceMax) {
-      return false;
-    }
-
-    /* PRICE BUCKET */
-
-    if (state.priceBuckets.size) {
-      const valid = [...state.priceBuckets].some(
-        bucket =>
-          priceInBucket(product.price, bucket)
-      );
-
-      if (!valid) {
-        return false;
-      }
-    }
-
-    /* BRAND */
-
-    if (
-      state.brands.size &&
-      !state.brands.has(product.brand)
-    ) {
-      return false;
-    }
-
-    /* SIZE */
-
-    if (state.sizes.size) {
-      const sizes =
-        Array.isArray(product.sizes)
-          ? product.sizes
-          : [];
-
-      const valid = sizes.some(
-        size => state.sizes.has(size)
-      );
-
-      if (!valid) {
-        return false;
-      }
-    }
-
-    /* RATING */
-
-    if (
-      state.minRating &&
-      product.rating < state.minRating
-    ) {
-      return false;
-    }
-
-    return true;
-  });
 
   /* SORT */
 
-  switch (state.sort) {
+  switch (
+    state.sort
+  ) {
+
     case "popular":
+
       list.sort(
-        (a, b) => b.reviews - a.reviews
+        (a, b) =>
+          b.reviews -
+          a.reviews
       );
+
       break;
+
 
     case "newest":
+
       list.sort(
-        (a, b) => Number(b.id) - Number(a.id)
+        (a, b) =>
+          new Date(
+            b.created_at
+          ) -
+          new Date(
+            a.created_at
+          )
       );
+
       break;
+
 
     case "price-low":
+
       list.sort(
-        (a, b) => a.price - b.price
+        (a, b) =>
+          a.price -
+          b.price
       );
+
       break;
+
 
     case "price-high":
+
       list.sort(
-        (a, b) => b.price - a.price
+        (a, b) =>
+          b.price -
+          a.price
       );
+
       break;
+
 
     case "rating":
+
       list.sort(
-        (a, b) => b.rating - a.rating
+        (a, b) =>
+          b.rating -
+          a.rating
       );
+
       break;
 
-    default:
-      break;
+    /* "featured" — keep Supabase's newest-first order as-is */
   }
 
   return list;
 }
+
 
 /* ==========================================================================
    PRODUCT CARD
    ========================================================================== */
 
 function productCardHTML(product) {
-  const liked = state.wishlist.some(
-    id =>
-      String(id) === String(product.id)
-  );
+
+  const liked =
+    state.wishlist.some(
+      id =>
+        String(id) ===
+        String(product.id)
+    );
 
   const outOfStock =
     Number(product.stock) <= 0;
 
   return `
+
     <div
       class="product-card"
       data-id="${escapeHTML(product.id)}"
@@ -492,14 +903,21 @@ function productCardHTML(product) {
           product.badge
             ? `
               <span
-                class="badge ${badgeClass(product.badge)}
-                absolute top-3 left-3 z-10"
+                class="
+                  badge
+                  ${badgeClass(product.badge)}
+                  absolute
+                  top-3
+                  left-3
+                  z-10
+                "
               >
                 ${escapeHTML(product.badge)}
               </span>
             `
             : ""
         }
+
 
         <button
           class="
@@ -508,44 +926,36 @@ function productCardHTML(product) {
             top-3
             right-3
             z-10
-            ${liked ? "active" : ""}
+            ${
+              liked
+                ? "active"
+                : ""
+            }
           "
           data-action="wishlist"
           data-id="${escapeHTML(product.id)}"
           aria-label="Toggle wishlist"
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#fff"
-            stroke-width="2"
-          >
-            <path d="
-              M20.8 4.6
-              a5.5 5.5 0 00-7.8 0
-              L12 5.6
-              l-1-1
-              a5.5 5.5 0 10-7.8 7.8
-              l1 1
-              L12 21
-              l7.8-7.6
-              1-1
-              a5.5 5.5 0 000-7.8z
-            "/>
-          </svg>
+          ♥
         </button>
 
+
         <img
-          src="${escapeHTML(safeImage(product))}"
-          alt="${escapeHTML(product.name)}"
+          src="${escapeHTML(
+            safeImage(product)
+          )}"
+          alt="${escapeHTML(
+            product.name
+          )}"
           loading="lazy"
           onerror="
             this.onerror=null;
-            this.src='${fallbackImgFor(product.sport)}';
+            this.src='${fallbackImgFor(
+              product.sport
+            )}';
           "
         >
+
 
         <button
           class="
@@ -562,16 +972,31 @@ function productCardHTML(product) {
 
       </div>
 
-      <div class="p-4 flex flex-col flex-1">
+
+      <div
+        class="
+          p-4
+          flex
+          flex-col
+          flex-1
+        "
+      >
 
         <p
-          class="text-[11px] uppercase tracking-wide"
-          style="color:var(--khz-gray)"
+          class="
+            text-[11px]
+            uppercase
+            tracking-wide
+          "
+          style="
+            color:var(--khz-gray)
+          "
         >
           ${escapeHTML(product.sport)}
           ·
           ${escapeHTML(product.category)}
         </p>
+
 
         <h3
           class="
@@ -585,12 +1010,22 @@ function productCardHTML(product) {
           ${escapeHTML(product.name)}
         </h3>
 
+
         <p
-          class="text-xs line-clamp-2 mb-2"
-          style="color:var(--khz-gray)"
+          class="
+            text-xs
+            line-clamp-2
+            mb-2
+          "
+          style="
+            color:var(--khz-gray)
+          "
         >
-          ${escapeHTML(product.description)}
+          ${escapeHTML(
+            product.description
+          )}
         </p>
+
 
         <div
           class="
@@ -600,15 +1035,22 @@ function productCardHTML(product) {
             mb-2
           "
         >
+
           ${starString(product.rating)}
 
           <span
             class="text-xs ml-1"
-            style="color:var(--khz-gray)"
+            style="
+              color:var(--khz-gray)
+            "
           >
-            (${Number(product.reviews) || 0})
+            (${Number(
+              product.reviews
+            ) || 0})
           </span>
+
         </div>
+
 
         <div
           class="
@@ -618,36 +1060,62 @@ function productCardHTML(product) {
             mb-1
           "
         >
-          <span class="price-current text-lg">
+
+          <span
+            class="
+              price-current
+              text-lg
+            "
+          >
             ${money(product.price)}
           </span>
 
+
           ${
-            product.oldPrice > product.price
+            product.oldPrice >
+            product.price
               ? `
-                <span class="price-old text-xs">
-                  ${money(product.oldPrice)}
+                <span
+                  class="
+                    price-old
+                    text-xs
+                  "
+                >
+                  ${money(
+                    product.oldPrice
+                  )}
                 </span>
               `
               : ""
           }
 
+
           ${
             product.discount > 0
               ? `
                 <span
-                  class="text-xs font-bold"
-                  style="color:var(--khz-red)"
+                  class="
+                    text-xs
+                    font-bold
+                  "
+                  style="
+                    color:var(--khz-red)
+                  "
                 >
                   -${product.discount}%
                 </span>
               `
               : ""
           }
+
         </div>
 
+
         <p
-          class="text-xs mb-3"
+          class="
+            text-xs
+            mb-3
+          "
           style="
             color:
               ${
@@ -664,6 +1132,7 @@ function productCardHTML(product) {
           }
         </p>
 
+
         <button
           class="
             add-cart-btn
@@ -675,7 +1144,11 @@ function productCardHTML(product) {
           "
           data-action="addcart"
           data-id="${escapeHTML(product.id)}"
-          ${outOfStock ? "disabled" : ""}
+          ${
+            outOfStock
+              ? "disabled"
+              : ""
+          }
         >
           ${
             outOfStock
@@ -690,12 +1163,16 @@ function productCardHTML(product) {
   `;
 }
 
+
 /* ==========================================================================
    RENDER PRODUCTS
    ========================================================================== */
 
 function renderProducts() {
-  const grid = $("#productGrid");
+
+  const grid =
+    $("#productGrid") ||
+    $("#productsContainer");
 
   if (!grid) {
     return;
@@ -710,50 +1187,72 @@ function renderProducts() {
       state.visibleCount
     );
 
+
   const count =
     $("#toolbarCount");
 
   if (count) {
+
     count.textContent =
       `Showing ${visible.length} of ${filtered.length} products`;
   }
 
-  if (state.view === "compact") {
+
+  if (
+    state.view === "compact"
+  ) {
+
     grid.className =
       "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4";
   }
 
   else {
+
     grid.className =
       "grid grid-cols-2 lg:grid-cols-3 gap-5";
   }
 
+
   const empty =
     $("#emptyState");
 
-  if (filtered.length === 0) {
+
+  if (
+    filtered.length === 0
+  ) {
+
     grid.innerHTML = "";
 
     if (empty) {
-      empty.classList.remove("hidden");
+      empty.classList.remove(
+        "hidden"
+      );
     }
+
   }
 
   else {
+
     if (empty) {
-      empty.classList.add("hidden");
+      empty.classList.add(
+        "hidden"
+      );
     }
 
     grid.innerHTML =
       visible
-        .map(productCardHTML)
+        .map(
+          productCardHTML
+        )
         .join("");
   }
+
 
   const loadMore =
     $("#loadMoreWrap");
 
   if (loadMore) {
+
     loadMore.classList.toggle(
       "hidden",
       state.visibleCount >=
@@ -762,11 +1261,13 @@ function renderProducts() {
   }
 }
 
+
 /* ==========================================================================
-   TRENDING
+   TRENDING PRODUCTS
    ========================================================================== */
 
 function renderTrending() {
+
   const wrap =
     $("#trendingGrid");
 
@@ -775,155 +1276,154 @@ function renderTrending() {
   }
 
   const items =
-    PRODUCTS.slice(0, 6);
+    [...PRODUCTS]
+      .sort(
+        (a, b) =>
+          b.rating -
+          a.rating
+      )
+      .slice(0, 6);
+
 
   if (!items.length) {
+
     wrap.innerHTML = `
       <div
-        class="col-span-full text-center py-10"
+        class="
+          col-span-full
+          text-center
+          py-10
+        "
       >
+
         <p
           class="text-sm"
-          style="color:var(--khz-gray)"
+          style="
+            color:var(--khz-gray)
+          "
         >
-          Add products from the Admin Panel
-          to see them here.
+          No products available yet.
         </p>
+
       </div>
     `;
 
     return;
   }
 
+
   wrap.innerHTML =
     items
-      .map(product => `
-        <div
-          class="product-card"
-          data-id="${escapeHTML(product.id)}"
-        >
-
+      .map(
+        product => `
           <div
-            class="product-img-wrap"
-            style="height:210px"
+            class="product-card"
           >
 
-            ${
-              product.badge
-                ? `
-                  <span
-                    class="
-                      badge
-                      ${badgeClass(product.badge)}
-                      absolute
-                      top-3
-                      left-3
-                      z-10
-                    "
-                  >
-                    ${escapeHTML(product.badge)}
-                  </span>
-                `
-                : ""
-            }
-
-            <img
-              src="${escapeHTML(safeImage(product))}"
-              alt="${escapeHTML(product.name)}"
-              loading="lazy"
-              onerror="
-                this.onerror=null;
-                this.src='${fallbackImgFor(product.sport)}';
-              "
-            >
-
-            <button
-              class="
-                quick-view-btn
-                absolute
-                w-full
-                py-3
-              "
-              data-action="quickview"
-              data-id="${escapeHTML(product.id)}"
-            >
-              Quick View
-            </button>
-
-          </div>
-
-          <div class="p-4">
-
-            <h3
-              class="
-                font-bold
-                text-sm
-                mb-1
-              "
-            >
-              ${escapeHTML(product.name)}
-            </h3>
-
             <div
-              class="
-                flex
-                items-baseline
-                gap-2
+              class="product-img-wrap"
+              style="
+                height:210px
               "
             >
 
-              <span class="price-current">
-                ${money(product.price)}
-              </span>
+              <img
+                src="${escapeHTML(
+                  safeImage(product)
+                )}"
+                alt="${escapeHTML(
+                  product.name
+                )}"
+                loading="lazy"
+                onerror="
+                  this.onerror=null;
+                  this.src='${fallbackImgFor(
+                    product.sport
+                  )}';
+                "
+              >
 
-              ${
-                product.oldPrice > product.price
-                  ? `
-                    <span class="price-old text-xs">
-                      ${money(product.oldPrice)}
-                    </span>
-                  `
-                  : ""
-              }
+              <button
+                class="
+                  quick-view-btn
+                  absolute
+                  w-full
+                  py-3
+                "
+                data-action="quickview"
+                data-id="${escapeHTML(product.id)}"
+              >
+                Quick View
+              </button>
 
             </div>
 
-            <button
-              class="
-                add-cart-btn
-                mt-3
-                w-full
-                py-2
-                rounded-lg
-                text-xs
-              "
-              data-action="addcart"
-              data-id="${escapeHTML(product.id)}"
-              ${
-                Number(product.stock) <= 0
-                  ? "disabled"
-                  : ""
-              }
-            >
-              ${
-                Number(product.stock) <= 0
-                  ? "Unavailable"
-                  : "Add to Cart"
-              }
-            </button>
+
+            <div class="p-4">
+
+              <h3
+                class="
+                  font-bold
+                  text-sm
+                  mb-2
+                "
+              >
+                ${escapeHTML(
+                  product.name
+                )}
+              </h3>
+
+
+              <span
+                class="price-current"
+              >
+                ${money(product.price)}
+              </span>
+
+
+              <button
+                class="
+                  add-cart-btn
+                  mt-3
+                  w-full
+                  py-2
+                  rounded-lg
+                  text-xs
+                "
+                data-action="addcart"
+                data-id="${escapeHTML(product.id)}"
+                ${
+                  Number(product.stock) <= 0
+                    ? "disabled"
+                    : ""
+                }
+              >
+                ${
+                  Number(product.stock) <= 0
+                    ? "Unavailable"
+                    : "Add to Cart"
+                }
+              </button>
+
+            </div>
 
           </div>
-
-        </div>
-      `)
+        `
+      )
       .join("");
 }
 
+
 /* ==========================================================================
-   CART
+   ADD TO CART
    ========================================================================== */
 
-function addToCart(id, size, qty = 1) {
+function addToCart(
+  id,
+  size = null,
+  qty = 1
+) {
+
   const product =
     PRODUCTS.find(
       p =>
@@ -932,10 +1432,20 @@ function addToCart(id, size, qty = 1) {
     );
 
   if (!product) {
+
+    showToast(
+      "Product not found",
+      "cart"
+    );
+
     return;
   }
 
-  if (Number(product.stock) <= 0) {
+
+  if (
+    Number(product.stock) <= 0
+  ) {
+
     showToast(
       "Product is out of stock",
       "cart"
@@ -943,6 +1453,7 @@ function addToCart(id, size, qty = 1) {
 
     return;
   }
+
 
   const chosenSize =
     size ||
@@ -953,6 +1464,7 @@ function addToCart(id, size, qty = 1) {
         : "Standard"
     );
 
+
   const existing =
     state.cart.find(
       item =>
@@ -962,19 +1474,57 @@ function addToCart(id, size, qty = 1) {
           chosenSize
     );
 
+
   if (existing) {
+
+    if (
+      existing.qty + qty >
+      product.stock
+    ) {
+
+      showToast(
+        `Only ${product.stock} items available`,
+        "cart"
+      );
+
+      return;
+    }
+
     existing.qty += qty;
+
   }
 
   else {
+
+    if (qty > product.stock) {
+
+      showToast(
+        `Only ${product.stock} items available`,
+        "cart"
+      );
+
+      return;
+    }
+
     state.cart.push({
-      id: product.id,
-      size: chosenSize,
-      qty
+
+      id:
+        product.id,
+
+      size:
+        chosenSize,
+
+      qty:
+        Math.min(
+          qty,
+          product.stock
+        )
     });
   }
 
+
   saveCart();
+
   renderCart();
 
   showToast(
@@ -983,7 +1533,17 @@ function addToCart(id, size, qty = 1) {
   );
 }
 
-function updateCartQty(id, size, delta) {
+
+/* ==========================================================================
+   UPDATE CART QUANTITY
+   ========================================================================== */
+
+function updateCartQty(
+  id,
+  size,
+  delta
+) {
+
   const item =
     state.cart.find(
       cartItem =>
@@ -993,30 +1553,77 @@ function updateCartQty(id, size, delta) {
           size
     );
 
+
   if (!item) {
     return;
   }
 
+
+  const product =
+    PRODUCTS.find(
+      p =>
+        String(p.id) ===
+        String(id)
+    );
+
+
+  if (
+    delta > 0 &&
+    product &&
+    item.qty >= product.stock
+  ) {
+
+    showToast(
+      `Only ${product.stock} items available`,
+      "cart"
+    );
+
+    return;
+  }
+
+
   item.qty += delta;
 
-  if (item.qty <= 0) {
+
+  if (
+    item.qty <= 0
+  ) {
+
     state.cart =
       state.cart.filter(
         cartItem =>
           !(
-            String(cartItem.id) ===
+            String(
+              cartItem.id
+            ) ===
               String(id) &&
             cartItem.size ===
               size
           )
       );
+
+    showToast(
+      "Item removed from cart",
+      "cart"
+    );
   }
 
+
   saveCart();
+
   renderCart();
 }
 
-function removeFromCart(id, size) {
+
+/* ==========================================================================
+   REMOVE FROM CART
+   ========================================================================== */
+
+function removeFromCart(
+  id,
+  size
+) {
+
   state.cart =
     state.cart.filter(
       item =>
@@ -1028,7 +1635,9 @@ function removeFromCart(id, size) {
         )
     );
 
+
   saveCart();
+
   renderCart();
 
   showToast(
@@ -1037,27 +1646,37 @@ function removeFromCart(id, size) {
   );
 }
 
+
 /* ==========================================================================
    CART TOTALS
    ========================================================================== */
 
 function cartTotals() {
+
   let subtotal = 0;
 
-  state.cart.forEach(item => {
-    const product =
-      PRODUCTS.find(
-        p =>
-          String(p.id) ===
-          String(item.id)
-      );
 
-    if (product) {
-      subtotal +=
-        product.price *
-        Number(item.qty || 1);
+  state.cart.forEach(
+    item => {
+
+      const product =
+        PRODUCTS.find(
+          p =>
+            String(p.id) ===
+            String(item.id)
+        );
+
+      if (product) {
+
+        subtotal +=
+          product.price *
+          Number(
+            item.qty || 1
+          );
+      }
     }
-  });
+  );
+
 
   const shipping =
     subtotal === 0
@@ -1066,30 +1685,43 @@ function cartTotals() {
         ? 0
         : 250;
 
+
   return {
+
     subtotal,
+
     shipping,
-    total: subtotal + shipping
+
+    total:
+      subtotal +
+      shipping
   };
 }
+
 
 /* ==========================================================================
    RENDER CART
    ========================================================================== */
 
 function renderCart() {
+
   const count =
     state.cart.reduce(
       (sum, item) =>
         sum +
-        Number(item.qty || 0),
+        Number(
+          item.qty || 0
+        ),
       0
     );
+
 
   const countElement =
     $("#cartCount");
 
+
   if (countElement) {
+
     countElement.textContent =
       count;
 
@@ -1099,213 +1731,273 @@ function renderCart() {
     );
   }
 
+
   const body =
     $("#cartItems");
 
-  if (!body) {
-    return;
-  }
+  if (body) {
 
-  if (state.cart.length === 0) {
-    body.innerHTML = `
-      <p
-        class="
-          text-sm
-          text-center
-          py-16
-        "
-        style="color:var(--khz-gray)"
-      >
-        Your cart is empty.
-        <br>
-        Time to gear up!
-      </p>
-    `;
-  }
+    if (
+      state.cart.length === 0
+    ) {
 
-  else {
-    body.innerHTML =
-      state.cart
-        .map(item => {
-          const product =
-            PRODUCTS.find(
-              p =>
-                String(p.id) ===
-                String(item.id)
-            );
+      body.innerHTML = `
+        <p
+          class="
+            text-sm
+            text-center
+            py-16
+          "
+          style="
+            color:var(--khz-gray)
+          "
+        >
+          Your cart is empty.
+          <br>
+          Time to gear up!
+        </p>
+      `;
 
-          if (!product) {
-            return "";
-          }
+    }
 
-          return `
-            <div
-              class="
-                flex
-                gap-3
-                py-4
-                border-b
-              "
-              style="border-color:var(--khz-line)"
-            >
+    else {
 
-              <img
-                src="${escapeHTML(safeImage(product))}"
-                class="
-                  w-16
-                  h-16
-                  object-contain
-                  rounded-lg
-                "
-                style="background:#141414"
-                onerror="
-                  this.onerror=null;
-                  this.src='${fallbackImgFor(product.sport)}';
-                "
-              >
+      body.innerHTML =
+        state.cart
+          .map(
+            item => {
 
-              <div class="flex-1">
+              const product =
+                PRODUCTS.find(
+                  p =>
+                    String(p.id) ===
+                    String(item.id)
+                );
 
-                <p
-                  class="
-                    text-sm
-                    font-bold
-                    leading-snug
-                  "
-                >
-                  ${escapeHTML(product.name)}
-                </p>
+              if (!product) {
+                return "";
+              }
 
-                <p
-                  class="
-                    text-xs
-                    mb-1
-                  "
-                  style="color:var(--khz-gray)"
-                >
-                  Size:
-                  ${escapeHTML(item.size)}
-                </p>
-
-                <p
-                  class="
-                    price-current
-                    text-sm
-                  "
-                >
-                  ${money(product.price)}
-                </p>
+              return `
 
                 <div
                   class="
                     flex
-                    items-center
-                    gap-2
-                    mt-2
+                    gap-3
+                    py-4
+                    border-b
+                  "
+                  style="
+                    border-color:
+                    var(--khz-line)
                   "
                 >
 
-                  <button
+                  <img
+                    src="${escapeHTML(
+                      safeImage(product)
+                    )}"
                     class="
-                      w-6
-                      h-6
-                      rounded
-                      border
-                      text-xs
+                      w-16
+                      h-16
+                      object-contain
+                      rounded-lg
                     "
-                    style="border-color:var(--khz-line)"
-                    data-action="qtyminus"
-                    data-id="${escapeHTML(product.id)}"
-                    data-size="${escapeHTML(item.size)}"
+                    style="
+                      background:#141414
+                    "
+                    onerror="
+                      this.onerror=null;
+                      this.src='${fallbackImgFor(
+                        product.sport
+                      )}';
+                    "
                   >
-                    −
-                  </button>
 
-                  <span
-                    class="
-                      text-sm
-                      w-5
-                      text-center
-                    "
-                  >
-                    ${item.qty}
-                  </span>
 
-                  <button
-                    class="
-                      w-6
-                      h-6
-                      rounded
-                      border
-                      text-xs
-                    "
-                    style="border-color:var(--khz-line)"
-                    data-action="qtyplus"
-                    data-id="${escapeHTML(product.id)}"
-                    data-size="${escapeHTML(item.size)}"
-                  >
-                    +
-                  </button>
+                  <div class="flex-1">
 
-                  <button
-                    class="
-                      ml-auto
-                      text-xs
-                      underline
-                    "
-                    style="color:var(--khz-red)"
-                    data-action="removecart"
-                    data-id="${escapeHTML(product.id)}"
-                    data-size="${escapeHTML(item.size)}"
-                  >
-                    Remove
-                  </button>
+                    <p
+                      class="
+                        text-sm
+                        font-bold
+                      "
+                    >
+                      ${escapeHTML(
+                        product.name
+                      )}
+                    </p>
+
+
+                    <p
+                      class="
+                        text-xs
+                        mb-1
+                      "
+                      style="
+                        color:
+                        var(--khz-gray)
+                      "
+                    >
+                      Size:
+                      ${escapeHTML(
+                        item.size
+                      )}
+                    </p>
+
+
+                    <p
+                      class="
+                        price-current
+                        text-sm
+                      "
+                    >
+                      ${money(
+                        product.price
+                      )}
+                    </p>
+
+
+                    <div
+                      class="
+                        flex
+                        items-center
+                        gap-2
+                        mt-2
+                      "
+                    >
+
+                      <button
+                        class="
+                          w-6
+                          h-6
+                          rounded
+                          border
+                        "
+                        data-action="qtyminus"
+                        data-id="${escapeHTML(
+                          product.id
+                        )}"
+                        data-size="${escapeHTML(
+                          item.size
+                        )}"
+                      >
+                        −
+                      </button>
+
+
+                      <span
+                        class="
+                          text-sm
+                          w-5
+                          text-center
+                        "
+                      >
+                        ${item.qty}
+                      </span>
+
+
+                      <button
+                        class="
+                          w-6
+                          h-6
+                          rounded
+                          border
+                        "
+                        data-action="qtyplus"
+                        data-id="${escapeHTML(
+                          product.id
+                        )}"
+                        data-size="${escapeHTML(
+                          item.size
+                        )}"
+                      >
+                        +
+                      </button>
+
+
+                      <button
+                        class="
+                          ml-auto
+                          text-xs
+                          underline
+                        "
+                        style="
+                          color:
+                          var(--khz-red)
+                        "
+                        data-action="removecart"
+                        data-id="${escapeHTML(
+                          product.id
+                        )}"
+                        data-size="${escapeHTML(
+                          item.size
+                        )}"
+                      >
+                        Remove
+                      </button>
+
+                    </div>
+
+                  </div>
 
                 </div>
-
-              </div>
-
-            </div>
-          `;
-        })
-        .join("");
+              `;
+            }
+          )
+          .join("");
+    }
   }
+
 
   const totals =
     cartTotals();
+
 
   const subtotal =
     $("#cartSubtotal");
 
   if (subtotal) {
     subtotal.textContent =
-      money(totals.subtotal);
+      money(
+        totals.subtotal
+      );
   }
+
 
   const shipping =
     $("#cartShipping");
 
   if (shipping) {
+
     shipping.textContent =
       totals.shipping === 0
         ? "FREE"
-        : money(totals.shipping);
+        : money(
+            totals.shipping
+          );
   }
+
 
   const total =
     $("#cartTotal");
 
   if (total) {
+
     total.textContent =
-      money(totals.total);
+      money(
+        totals.total
+      );
   }
 }
+
 
 /* ==========================================================================
    WISHLIST
    ========================================================================== */
 
 function toggleWishlist(id) {
+
   const product =
     PRODUCTS.find(
       p =>
@@ -1314,8 +2006,15 @@ function toggleWishlist(id) {
     );
 
   if (!product) {
+
+    showToast(
+      "Product not found",
+      "wishlist"
+    );
+
     return;
   }
+
 
   const index =
     state.wishlist.findIndex(
@@ -1324,7 +2023,9 @@ function toggleWishlist(id) {
         String(id)
     );
 
+
   if (index >= 0) {
+
     state.wishlist.splice(
       index,
       1
@@ -1334,9 +2035,11 @@ function toggleWishlist(id) {
       `${product.name} removed from wishlist`,
       "wishlist"
     );
+
   }
 
   else {
+
     state.wishlist.push(
       product.id
     );
@@ -1347,20 +2050,32 @@ function toggleWishlist(id) {
     );
   }
 
+
   saveWishlist();
+
   renderWishlistUI();
+
   renderProducts();
+
   renderTrending();
 }
 
+
+/* ==========================================================================
+   WISHLIST UI
+   ========================================================================== */
+
 function renderWishlistUI() {
+
   const count =
     state.wishlist.length;
+
 
   const countElement =
     $("#wishlistCount");
 
   if (countElement) {
+
     countElement.textContent =
       count;
 
@@ -1370,6 +2085,7 @@ function renderWishlistUI() {
     );
   }
 
+
   const body =
     $("#wishlistItems");
 
@@ -1377,7 +2093,9 @@ function renderWishlistUI() {
     return;
   }
 
+
   if (count === 0) {
+
     body.innerHTML = `
       <p
         class="
@@ -1385,7 +2103,10 @@ function renderWishlistUI() {
           text-center
           py-16
         "
-        style="color:var(--khz-gray)"
+        style="
+          color:
+          var(--khz-gray)
+        "
       >
         No saved items yet.
         <br>
@@ -1396,105 +2117,145 @@ function renderWishlistUI() {
     return;
   }
 
+
   body.innerHTML =
     state.wishlist
-      .map(id => {
-        const product =
-          PRODUCTS.find(
-            p =>
-              String(p.id) ===
-              String(id)
-          );
+      .map(
+        id => {
 
-        if (!product) {
-          return "";
-        }
+          const product =
+            PRODUCTS.find(
+              p =>
+                String(p.id) ===
+                String(id)
+            );
 
-        return `
-          <div
-            class="
-              flex
-              gap-3
-              py-4
-              border-b
-            "
-            style="border-color:var(--khz-line)"
-          >
+          if (!product) {
+            return "";
+          }
 
-            <img
-              src="${escapeHTML(safeImage(product))}"
+          const outOfStock =
+            Number(product.stock) <= 0;
+
+          return `
+
+            <div
               class="
-                w-16
-                h-16
-                object-contain
-                rounded-lg
+                flex
+                gap-3
+                py-4
+                border-b
               "
-              style="background:#141414"
             >
 
-            <div class="flex-1">
-
-              <p
+              <img
+                src="${escapeHTML(
+                  safeImage(product)
+                )}"
                 class="
-                  text-sm
-                  font-bold
-                  leading-snug
+                  w-16
+                  h-16
+                  object-contain
+                  rounded-lg
                 "
-              >
-                ${escapeHTML(product.name)}
-              </p>
-
-              <p
-                class="
-                  price-current
-                  text-sm
-                "
-              >
-                ${money(product.price)}
-              </p>
-
-              <div
-                class="
-                  flex
-                  items-center
-                  gap-3
-                  mt-2
+                onerror="
+                  this.onerror=null;
+                  this.src='${fallbackImgFor(
+                    product.sport
+                  )}';
                 "
               >
 
-                <button
+
+              <div class="flex-1">
+
+                <p
                   class="
-                    text-xs
+                    text-sm
                     font-bold
-                    px-3
-                    py-1.5
-                    rounded
-                    add-cart-btn
                   "
-                  data-action="addcart"
-                  data-id="${escapeHTML(product.id)}"
                 >
-                  Add to Cart
-                </button>
+                  ${escapeHTML(
+                    product.name
+                  )}
+                </p>
 
-                <button
-                  class="text-xs underline"
-                  style="color:var(--khz-red)"
-                  data-action="wishlist"
-                  data-id="${escapeHTML(product.id)}"
+
+                <p
+                  class="
+                    price-current
+                    text-sm
+                  "
                 >
-                  Remove
-                </button>
+                  ${money(
+                    product.price
+                  )}
+                </p>
+
+
+                <div
+                  class="
+                    flex
+                    gap-3
+                    mt-2
+                  "
+                >
+
+                  <button
+                    class="
+                      text-xs
+                      font-bold
+                      px-3
+                      py-1.5
+                      rounded
+                      add-cart-btn
+                    "
+                    data-action="addcart"
+                    data-id="${escapeHTML(
+                      product.id
+                    )}"
+                    ${
+                      outOfStock
+                        ? "disabled"
+                        : ""
+                    }
+                  >
+                    ${
+                      outOfStock
+                        ? "Unavailable"
+                        : "Add to Cart"
+                    }
+                  </button>
+
+
+                  <button
+                    class="
+                      text-xs
+                      underline
+                    "
+                    style="
+                      color:
+                      var(--khz-red)
+                    "
+                    data-action="wishlist"
+                    data-id="${escapeHTML(
+                      product.id
+                    )}"
+                  >
+                    Remove
+                  </button>
+
+                </div>
 
               </div>
 
             </div>
-
-          </div>
-        `;
-      })
+          `;
+        }
+      )
       .join("");
 }
+
 
 /* ==========================================================================
    QUICK VIEW
@@ -1502,7 +2263,9 @@ function renderWishlistUI() {
 
 let quickViewSize = null;
 
+
 function openQuickView(id) {
+
   const product =
     PRODUCTS.find(
       p =>
@@ -1511,14 +2274,22 @@ function openQuickView(id) {
     );
 
   if (!product) {
+
+    showToast(
+      "Product not found",
+      "cart"
+    );
+
     return;
   }
+
 
   quickViewSize =
     product.sizes &&
     product.sizes.length
       ? product.sizes[0]
       : "Standard";
+
 
   const content =
     $("#qvContent");
@@ -1527,12 +2298,13 @@ function openQuickView(id) {
     return;
   }
 
+
   content.innerHTML = `
+
     <div
       class="
         grid
         md:grid-cols-2
-        gap-0
       "
     >
 
@@ -1543,21 +2315,36 @@ function openQuickView(id) {
           items-center
           justify-center
         "
-        style="background:#141414"
+        style="
+          background:#141414
+        "
       >
 
         <img
-          src="${escapeHTML(safeImage(product))}"
-          class="max-h-80 object-contain"
+          src="${escapeHTML(
+            safeImage(product)
+          )}"
+          class="
+            max-h-80
+            object-contain
+          "
           onerror="
             this.onerror=null;
-            this.src='${fallbackImgFor(product.sport)}';
+            this.src='${fallbackImgFor(
+              product.sport
+            )}';
           "
         >
 
       </div>
 
-      <div class="p-6 md:p-8">
+
+      <div
+        class="
+          p-6
+          md:p-8
+        "
+      >
 
         <p
           class="
@@ -1566,12 +2353,16 @@ function openQuickView(id) {
             tracking-wide
             mb-1
           "
-          style="color:var(--khz-orange)"
+          style="
+            color:
+            var(--khz-orange)
+          "
         >
           ${escapeHTML(product.sport)}
           ·
           ${escapeHTML(product.category)}
         </p>
+
 
         <h2
           class="
@@ -1583,6 +2374,7 @@ function openQuickView(id) {
           ${escapeHTML(product.name)}
         </h2>
 
+
         <div
           class="
             flex
@@ -1591,72 +2383,57 @@ function openQuickView(id) {
             mb-3
           "
         >
+
           ${starString(product.rating)}
 
           <span
             class="text-xs"
-            style="color:var(--khz-gray)"
           >
             ${product.rating || 0}
             (${product.reviews || 0} reviews)
           </span>
+
         </div>
 
-        <div
+
+        <span
           class="
-            flex
-            items-baseline
-            gap-3
-            mb-4
+            price-current
+            text-2xl
           "
         >
+          ${money(product.price)}
+        </span>
 
-          <span
-            class="
-              price-current
-              text-2xl
-            "
-          >
-            ${money(product.price)}
-          </span>
+        ${
+          product.oldPrice > product.price
+            ? `
+              <span
+                class="price-old text-sm ml-2"
+              >
+                ${money(product.oldPrice)}
+              </span>
+            `
+            : ""
+        }
 
-          ${
-            product.oldPrice >
-            product.price
-              ? `
-                <span class="price-old">
-                  ${money(product.oldPrice)}
-                </span>
-              `
-              : ""
-          }
-
-          ${
-            product.discount > 0
-              ? `
-                <span
-                  class="
-                    badge
-                    badge-sale
-                  "
-                >
-                  -${product.discount}%
-                </span>
-              `
-              : ""
-          }
-
-        </div>
 
         <p
           class="
             text-sm
+            mt-4
             mb-5
           "
-          style="color:var(--khz-gray)"
+          style="
+            color:
+            var(--khz-gray)
+          "
         >
-          ${escapeHTML(product.description)}
+          ${escapeHTML(
+            product.description
+          )}
         </p>
+
 
         <p
           class="
@@ -1665,10 +2442,10 @@ function openQuickView(id) {
             uppercase
             mb-2
           "
-          style="color:var(--khz-gray)"
         >
           Select Size
         </p>
+
 
         <div
           class="
@@ -1681,15 +2458,11 @@ function openQuickView(id) {
         >
 
           ${
-            (
-              product.sizes &&
-              product.sizes.length
-                ? product.sizes
-                : ["Standard"]
-            )
+            product.sizes
               .map(
                 size => `
                   <button
+                    type="button"
                     class="
                       size-pill
                       px-4
@@ -1714,111 +2487,68 @@ function openQuickView(id) {
 
         </div>
 
+
         <p
           class="
             text-xs
-            font-bold
-            uppercase
-            mb-2
+            mb-5
           "
-          style="color:var(--khz-gray)"
+          style="
+            color:
+              ${
+                product.stock <= 0
+                  ? "var(--khz-red)"
+                  : "#00C2A8"
+              }
+          "
         >
-          Quantity
+          ${
+            product.stock <= 0
+              ? "Out of Stock"
+              : `In Stock (${product.stock})`
+          }
         </p>
+
 
         <div
           class="
             flex
-            items-center
             gap-3
-            mb-6
           "
         >
 
           <button
-            id="qvQtyMinus"
-            class="
-              w-8
-              h-8
-              rounded
-              border
-            "
-            style="border-color:var(--khz-line)"
-          >
-            −
-          </button>
-
-          <span
-            id="qvQty"
-            class="w-6 text-center"
-          >
-            1
-          </span>
-
-          <button
-            id="qvQtyPlus"
-            class="
-              w-8
-              h-8
-              rounded
-              border
-            "
-            style="border-color:var(--khz-line)"
-          >
-            +
-          </button>
-
-          <span
-            class="
-              text-xs
-              ml-auto
-            "
-            style="
-              color:
-                ${
-                  Number(product.stock) > 0
-                    ? "#00C2A8"
-                    : "var(--khz-red)"
-                }
-            "
-          >
-            ${
-              Number(product.stock) > 0
-                ? `In Stock (${product.stock})`
-                : "Out of Stock"
-            }
-          </span>
-
-        </div>
-
-        <div class="flex gap-3">
-
-          <button
             id="qvAddCart"
+            type="button"
             class="
               add-cart-btn
               flex-1
               py-3
               rounded-lg
-              text-sm
             "
             ${
-              Number(product.stock) <= 0
+              product.stock <= 0
                 ? "disabled"
                 : ""
             }
           >
-            Add to Cart
+            ${
+              product.stock <= 0
+                ? "Unavailable"
+                : "Add to Cart"
+            }
           </button>
+
 
           <button
             id="qvWishlist"
+            type="button"
             class="
               wishlist-btn
               ${
                 state.wishlist.some(
-                  id =>
-                    String(id) ===
+                  item =>
+                    String(item) ===
                     String(product.id)
                 )
                   ? "active"
@@ -1841,70 +2571,76 @@ function openQuickView(id) {
     </div>
   `;
 
-  let quantity = 1;
-
-  $("#qvQtyPlus").onclick =
-    () => {
-      quantity++;
-
-      $("#qvQty").textContent =
-        quantity;
-    };
-
-  $("#qvQtyMinus").onclick =
-    () => {
-      if (quantity > 1) {
-        quantity--;
-
-        $("#qvQty").textContent =
-          quantity;
-      }
-    };
 
   $$("#qvSizes .size-pill")
-    .forEach(button => {
-      button.onclick = () => {
-        quickViewSize =
-          button.dataset.size;
+    .forEach(
+      button => {
 
-        $$("#qvSizes .size-pill")
-          .forEach(item =>
-            item.classList.remove(
+        button.onclick =
+          () => {
+
+            quickViewSize =
+              button.dataset.size;
+
+            $$("#qvSizes .size-pill")
+              .forEach(
+                item =>
+                  item.classList.remove(
+                    "selected"
+                  )
+              );
+
+            button.classList.add(
               "selected"
-            )
-          );
+            );
+          };
+      }
+    );
 
-        button.classList.add(
-          "selected"
+
+  const qvAddCart = $("#qvAddCart");
+
+  if (qvAddCart) {
+
+    qvAddCart.onclick =
+      () => {
+
+        addToCart(
+          product.id,
+          quickViewSize
         );
       };
-    });
+  }
 
-  $("#qvAddCart").onclick =
-    () => {
-      addToCart(
-        product.id,
-        quickViewSize,
-        quantity
-      );
-    };
 
-  $("#qvWishlist").onclick =
-    () => {
-      toggleWishlist(
-        product.id
-      );
+  const qvWishlist = $("#qvWishlist");
 
-      $("#qvWishlist")
-        .classList.toggle(
-          "active"
+  if (qvWishlist) {
+
+    qvWishlist.onclick =
+      () => {
+
+        toggleWishlist(
+          product.id
         );
-    };
+
+        qvWishlist.classList.toggle(
+          "active",
+          state.wishlist.some(
+            item =>
+              String(item) ===
+              String(product.id)
+          )
+        );
+      };
+  }
+
 
   const modal =
     $("#quickViewModal");
 
   if (modal) {
+
     modal.classList.remove(
       "hidden"
     );
@@ -1914,11 +2650,14 @@ function openQuickView(id) {
   }
 }
 
+
 function closeQuickView() {
+
   const modal =
     $("#quickViewModal");
 
   if (modal) {
+
     modal.classList.add(
       "hidden"
     );
@@ -1928,6 +2667,7 @@ function closeQuickView() {
     "";
 }
 
+
 /* ==========================================================================
    TOAST
    ========================================================================== */
@@ -1936,6 +2676,7 @@ function showToast(
   message,
   type = "cart"
 ) {
+
   const container =
     $("#toastContainer");
 
@@ -1943,263 +2684,292 @@ function showToast(
     return;
   }
 
+
   const el =
     document.createElement(
       "div"
     );
 
+
   el.className =
     "toast flex items-center gap-3 px-4 py-3 rounded-xl mb-2";
 
-  const icon =
-    type === "wishlist"
-      ? `
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="var(--khz-red)"
-        >
-          <path d="
-            M20.8 4.6
-            a5.5 5.5 0 00-7.8 0
-            L12 5.6
-            l-1-1
-            a5.5 5.5 0 10-7.8 7.8
-            l1 1
-            L12 21
-            l7.8-7.6
-            1-1
-            a5.5 5.5 0 000-7.8z
-          "/>
-        </svg>
-      `
-      : `
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="var(--khz-orange)"
-          stroke-width="2"
-        >
-          <path d="M20 6L9 17l-5-5"/>
-        </svg>
-      `;
 
   el.innerHTML = `
-    ${icon}
-    <span class="text-sm font-medium">
+    <span
+      style="
+        color:
+        ${
+          type === "wishlist"
+            ? "#ff4d6d"
+            : "#FF6A00"
+        }
+      "
+    >
+      ${type === "wishlist" ? "♥" : "✓"}
+    </span>
+
+    <span
+      class="
+        text-sm
+        font-medium
+      "
+    >
       ${escapeHTML(message)}
     </span>
   `;
 
-  container.appendChild(el);
 
-  setTimeout(() => {
-    el.classList.add("leaving");
+  container.appendChild(
+    el
+  );
 
-    setTimeout(
-      () => el.remove(),
-      260
-    );
-  }, 2400);
+
+  setTimeout(
+    () => {
+
+      el.classList.add(
+        "leaving"
+      );
+
+      setTimeout(
+        () => el.remove(),
+        260
+      );
+
+    },
+    2400
+  );
 }
 
+
 /* ==========================================================================
-   FILTER UI
+   FILTERS
    ========================================================================== */
 
 function wireFilters() {
 
+  /* SPORT CHECKBOXES */
+
   $$('[data-filter="sport"]')
-    .forEach(checkbox => {
+    .forEach(
+      checkbox => {
 
-      checkbox.addEventListener(
-        "change",
-        () => {
+        checkbox.addEventListener(
+          "change",
+          () => {
 
-          if (checkbox.checked) {
-            state.sports.add(
-              checkbox.value
-            );
+            if (
+              checkbox.checked
+            ) {
+
+              state.sports.add(
+                checkbox.value
+              );
+
+            }
+
+            else {
+
+              state.sports.delete(
+                checkbox.value
+              );
+            }
+
+
+            state.visibleCount = 12;
+
+            syncCategorySelection();
+
+            renderProducts();
           }
-
-          else {
-            state.sports.delete(
-              checkbox.value
-            );
-          }
-
-          state.visibleCount =
-            12;
-
-          syncCategorySelection();
-          renderProducts();
-        }
-      );
-    });
-
-  $$('[data-filter="type"]')
-    .forEach(checkbox => {
-
-      checkbox.addEventListener(
-        "change",
-        () => {
-
-          if (checkbox.checked) {
-            state.types.add(
-              checkbox.value
-            );
-          }
-
-          else {
-            state.types.delete(
-              checkbox.value
-            );
-          }
-
-          state.visibleCount =
-            12;
-
-          renderProducts();
-        }
-      );
-    });
-
-  $$('[data-filter="pricebucket"]')
-    .forEach(checkbox => {
-
-      checkbox.addEventListener(
-        "change",
-        () => {
-
-          if (checkbox.checked) {
-            state.priceBuckets.add(
-              checkbox.value
-            );
-          }
-
-          else {
-            state.priceBuckets.delete(
-              checkbox.value
-            );
-          }
-
-          state.visibleCount =
-            12;
-
-          renderProducts();
-        }
-      );
-    });
-
-  $$('[data-filter="brand"]')
-    .forEach(checkbox => {
-
-      checkbox.addEventListener(
-        "change",
-        () => {
-
-          if (checkbox.checked) {
-            state.brands.add(
-              checkbox.value
-            );
-          }
-
-          else {
-            state.brands.delete(
-              checkbox.value
-            );
-          }
-
-          state.visibleCount =
-            12;
-
-          renderProducts();
-        }
-      );
-    });
-
-  $$('[data-filter="size"]')
-    .forEach(checkbox => {
-
-      checkbox.addEventListener(
-        "change",
-        () => {
-
-          if (checkbox.checked) {
-            state.sizes.add(
-              checkbox.value
-            );
-          }
-
-          else {
-            state.sizes.delete(
-              checkbox.value
-            );
-          }
-
-          state.visibleCount =
-            12;
-
-          renderProducts();
-        }
-      );
-    });
-
-  $$('[data-filter="rating"]')
-    .forEach(radio => {
-
-      radio.addEventListener(
-        "change",
-        () => {
-
-          state.minRating =
-            parseFloat(
-              radio.value
-            ) || 0;
-
-          state.visibleCount =
-            12;
-
-          renderProducts();
-        }
-      );
-    });
-
-  const priceSlider =
-    $("#priceRange");
-
-  if (priceSlider) {
-
-    priceSlider.addEventListener(
-      "input",
-      () => {
-
-        state.priceMax =
-          parseInt(
-            priceSlider.value,
-            10
-          ) || 20000;
-
-        const label =
-          $("#priceRangeLabel");
-
-        if (label) {
-          label.textContent =
-            money(
-              state.priceMax
-            );
-        }
-
-        state.visibleCount =
-          12;
-
-        renderProducts();
+        );
       }
     );
-  }
+
+
+  /* TYPE / CATEGORY CHECKBOXES */
+
+  $$('[data-filter="type"]')
+    .forEach(
+      checkbox => {
+
+        checkbox.addEventListener(
+          "change",
+          () => {
+
+            if (checkbox.checked) {
+              state.types.add(
+                checkbox.value
+              );
+            }
+
+            else {
+              state.types.delete(
+                checkbox.value
+              );
+            }
+
+            state.visibleCount = 12;
+
+            renderProducts();
+          }
+        );
+      }
+    );
+
+
+  /* BRAND CHECKBOXES */
+
+  $$('[data-filter="brand"]')
+    .forEach(
+      checkbox => {
+
+        checkbox.addEventListener(
+          "change",
+          () => {
+
+            if (checkbox.checked) {
+              state.brands.add(
+                checkbox.value
+              );
+            }
+
+            else {
+              state.brands.delete(
+                checkbox.value
+              );
+            }
+
+            state.visibleCount = 12;
+
+            renderProducts();
+          }
+        );
+      }
+    );
+
+
+  /* SIZE CHECKBOXES */
+
+  $$('[data-filter="size"]')
+    .forEach(
+      checkbox => {
+
+        checkbox.addEventListener(
+          "change",
+          () => {
+
+            if (checkbox.checked) {
+              state.sizes.add(
+                checkbox.value
+              );
+            }
+
+            else {
+              state.sizes.delete(
+                checkbox.value
+              );
+            }
+
+            state.visibleCount = 12;
+
+            renderProducts();
+          }
+        );
+      }
+    );
+
+
+  /* PRICE BUCKET CHECKBOXES */
+
+  $$('[data-filter="pricebucket"]')
+    .forEach(
+      checkbox => {
+
+        checkbox.addEventListener(
+          "change",
+          () => {
+
+            if (checkbox.checked) {
+              state.priceBuckets.add(
+                checkbox.value
+              );
+            }
+
+            else {
+              state.priceBuckets.delete(
+                checkbox.value
+              );
+            }
+
+            state.visibleCount = 12;
+
+            renderProducts();
+          }
+        );
+      }
+    );
+
+
+  /* RATING FILTER (buttons — click again to unselect) */
+
+  $$('[data-filter="rating"]')
+    .forEach(
+      button => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            const value =
+              Number(
+                button.dataset.value
+              ) || 0;
+
+            if (
+              state.minRating === value
+            ) {
+
+              state.minRating = 0;
+
+              $$('[data-filter="rating"]')
+                .forEach(
+                  item =>
+                    item.classList.remove(
+                      "selected"
+                    )
+                );
+
+            }
+
+            else {
+
+              state.minRating = value;
+
+              $$('[data-filter="rating"]')
+                .forEach(
+                  item =>
+                    item.classList.remove(
+                      "selected"
+                    )
+                );
+
+              button.classList.add(
+                "selected"
+              );
+            }
+
+            state.visibleCount = 12;
+
+            renderProducts();
+          }
+        );
+      }
+    );
+
+
+  /* SORT */
 
   const sort =
     $("#sortSelect");
@@ -2218,49 +2988,58 @@ function wireFilters() {
     );
   }
 
-  const gridButton =
-    $("#viewGridBtn");
 
-  if (gridButton) {
+  /* PRICE SLIDER */
 
-    gridButton.addEventListener(
-      "click",
-      () =>
-        setView("grid")
+  const priceSlider =
+    $("#priceRange");
+
+  if (priceSlider) {
+
+    const initialMax =
+      Number(priceSlider.value) ||
+      Number(priceSlider.max) ||
+      20000;
+
+    state.priceMax = initialMax;
+
+    const label =
+      $("#priceRangeLabel");
+
+    if (label) {
+
+      label.textContent =
+        money(
+          state.priceMax
+        );
+    }
+
+    priceSlider.addEventListener(
+      "input",
+      () => {
+
+        state.priceMax =
+          Number(
+            priceSlider.value
+          );
+
+        if (label) {
+
+          label.textContent =
+            money(
+              state.priceMax
+            );
+        }
+
+        state.visibleCount = 12;
+
+        renderProducts();
+      }
     );
   }
 
-  const compactButton =
-    $("#viewCompactBtn");
 
-  if (compactButton) {
-
-    compactButton.addEventListener(
-      "click",
-      () =>
-        setView("compact")
-    );
-  }
-
-  const clearButton =
-    $("#clearFiltersBtn");
-
-  if (clearButton) {
-    clearButton.addEventListener(
-      "click",
-      clearAllFilters
-    );
-  }
-
-  const clearButton2 =
-    $("#clearFiltersBtn2");
-
-  if (clearButton2) {
-    clearButton2.addEventListener(
-      "click",
-      clearAllFilters
-    );
-  }
+  /* LOAD MORE */
 
   const loadMore =
     $("#loadMoreBtn");
@@ -2271,209 +3050,141 @@ function wireFilters() {
       "click",
       () => {
 
-        state.visibleCount +=
-          9;
+        state.visibleCount += 9;
 
         renderProducts();
       }
     );
   }
-}
 
-/* ==========================================================================
-   VIEW
-   ========================================================================== */
 
-function setView(view) {
-  state.view =
-    view;
+  /* CLEAR FILTERS */
 
-  const gridButton =
-    $("#viewGridBtn");
+  const clear =
+    $("#clearFiltersBtn");
 
-  const compactButton =
-    $("#viewCompactBtn");
+  if (clear) {
 
-  if (gridButton) {
-    gridButton.classList.toggle(
-      "bg-white/10",
-      view === "grid"
+    clear.addEventListener(
+      "click",
+      clearAllFilters
     );
   }
 
-  if (compactButton) {
-    compactButton.classList.toggle(
-      "bg-white/10",
-      view === "compact"
+
+  const emptyClear =
+    $("#emptyClearFiltersBtn");
+
+  if (emptyClear) {
+
+    emptyClear.addEventListener(
+      "click",
+      clearAllFilters
     );
   }
-
-  renderProducts();
 }
 
-/* ==========================================================================
-   CLEAR FILTERS
-   ========================================================================== */
-
-function clearAllFilters() {
-  state.search = "";
-
-  state.sports.clear();
-  state.types.clear();
-  state.brands.clear();
-  state.sizes.clear();
-  state.priceBuckets.clear();
-
-  state.priceMax =
-    20000;
-
-  state.minRating =
-    0;
-
-  state.visibleCount =
-    12;
-
-  $$(
-    'input[type="checkbox"]'
-  ).forEach(
-    checkbox =>
-      checkbox.checked =
-        false
-  );
-
-  $$(
-    'input[type="radio"][data-filter="rating"]'
-  ).forEach(
-    radio =>
-      radio.checked =
-        false
-  );
-
-  const priceRange =
-    $("#priceRange");
-
-  if (priceRange) {
-    priceRange.value =
-      20000;
-  }
-
-  const priceLabel =
-    $("#priceRangeLabel");
-
-  if (priceLabel) {
-    priceLabel.textContent =
-      money(20000);
-  }
-
-  const search =
-    $("#searchInput");
-
-  if (search) {
-    search.value =
-      "";
-  }
-
-  const mobileSearch =
-    $("#searchInputMobile");
-
-  if (mobileSearch) {
-    mobileSearch.value =
-      "";
-  }
-
-  syncCategorySelection();
-  renderProducts();
-}
 
 /* ==========================================================================
    CATEGORY CARDS
    ========================================================================== */
 
 function syncCategorySelection() {
-  $$(".cat-card")
-    .forEach(card => {
 
-      card.classList.toggle(
-        "selected",
-        state.sports.has(
-          card.dataset.sport
-        )
-      );
-    });
+  $$(".cat-card")
+    .forEach(
+      card => {
+
+        card.classList.toggle(
+          "selected",
+
+          state.sports.has(
+            card.dataset.sport
+          )
+        );
+      }
+    );
 }
+
 
 function wireCategoryCards() {
+
   $$(".cat-card")
-    .forEach(card => {
+    .forEach(
+      card => {
 
-      card.addEventListener(
-        "click",
-        () => {
+        card.addEventListener(
+          "click",
+          () => {
 
-          const sport =
-            card.dataset.sport;
+            const sport =
+              card.dataset.sport;
 
-          if (
-            state.sports.has(
-              sport
+            if (!sport) {
+              return;
+            }
+
+
+            if (
+              state.sports.has(
+                sport
+              )
+            ) {
+
+              state.sports.delete(
+                sport
+              );
+
+            }
+
+            else {
+
+              state.sports.add(
+                sport
+              );
+            }
+
+
+            syncCategorySelection();
+
+
+            $$(
+              `[data-filter="sport"][value="${sport}"]`
             )
-          ) {
-            state.sports.delete(
-              sport
-            );
+              .forEach(
+                checkbox => {
+
+                  checkbox.checked =
+                    state.sports.has(
+                      sport
+                    );
+                }
+              );
+
+
+            state.visibleCount = 12;
+
+            renderProducts();
           }
-
-          else {
-            state.sports.add(
-              sport
-            );
-          }
-
-          syncCategorySelection();
-
-          $$(
-            `[data-filter="sport"][value="${sport}"]`
-          ).forEach(
-            checkbox =>
-              checkbox.checked =
-                state.sports.has(
-                  sport
-                )
-          );
-
-          state.visibleCount =
-            12;
-
-          renderProducts();
-
-          const shopGrid =
-            $("#shopGrid");
-
-          if (shopGrid) {
-            shopGrid.scrollIntoView({
-              behavior: "smooth",
-              block: "start"
-            });
-          }
-        }
-      );
-    });
+        );
+      }
+    );
 }
+
 
 /* ==========================================================================
    SEARCH
    ========================================================================== */
 
 function wireSearch() {
+
   const input =
     $("#searchInput");
-
-  const clearButton =
-    $("#searchClearBtn");
 
   if (!input) {
     return;
   }
+
 
   input.addEventListener(
     "input",
@@ -2482,47 +3193,140 @@ function wireSearch() {
       state.search =
         input.value.trim();
 
-      state.visibleCount =
-        12;
-
-      if (clearButton) {
-        clearButton.classList.toggle(
-          "hidden",
-          state.search === ""
-        );
-      }
+      state.visibleCount = 12;
 
       renderProducts();
     }
   );
 
-  if (clearButton) {
 
-    clearButton.addEventListener(
-      "click",
-      () => {
+  /* Prevent an enclosing <form> from reloading the page on Enter */
 
-        input.value =
-          "";
+  input.addEventListener(
+    "keydown",
+    event => {
+
+      if (event.key === "Enter") {
+
+        event.preventDefault();
 
         state.search =
-          "";
+          input.value.trim();
 
-        clearButton.classList.add(
-          "hidden"
-        );
+        state.visibleCount = 12;
 
         renderProducts();
       }
-    );
-  }
+    }
+  );
 }
 
+
 /* ==========================================================================
-   PRODUCT ACTIONS
+   CLEAR FILTERS
+   ========================================================================== */
+
+function clearAllFilters() {
+
+  state.search = "";
+
+  state.sports.clear();
+
+  state.types.clear();
+
+  state.brands.clear();
+
+  state.sizes.clear();
+
+  state.priceBuckets.clear();
+
+  state.minRating = 0;
+
+  state.visibleCount = 12;
+
+
+  $$(
+    'input[type="checkbox"]'
+  )
+    .forEach(
+      checkbox =>
+        checkbox.checked =
+          false
+    );
+
+
+  $$('[data-filter="rating"]')
+    .forEach(
+      button =>
+        button.classList.remove(
+          "selected"
+        )
+    );
+
+
+  const search =
+    $("#searchInput");
+
+  if (search) {
+    search.value = "";
+  }
+
+
+  const priceRange =
+    $("#priceRange");
+
+  if (priceRange) {
+
+    const maxValue =
+      Number(priceRange.max) ||
+      20000;
+
+    priceRange.value =
+      maxValue;
+
+    state.priceMax =
+      maxValue;
+
+  }
+
+  else {
+
+    state.priceMax = 20000;
+  }
+
+
+  const label =
+    $("#priceRangeLabel");
+
+  if (label) {
+    label.textContent =
+      money(state.priceMax);
+  }
+
+
+  const sort =
+    $("#sortSelect");
+
+  if (sort) {
+
+    sort.value = "featured";
+
+    state.sort = "featured";
+  }
+
+
+  syncCategorySelection();
+
+  renderProducts();
+}
+
+
+/* ==========================================================================
+   DELEGATED ACTIONS
    ========================================================================== */
 
 function wireDelegatedActions() {
+
   document.addEventListener(
     "click",
     event => {
@@ -2536,16 +3340,25 @@ function wireDelegatedActions() {
         return;
       }
 
+
       const action =
         button.dataset.action;
 
       const id =
         button.dataset.id;
 
-      if (action === "addcart") {
+
+      if (
+        action === "addcart"
+      ) {
+
+        if (button.disabled) {
+          return;
+        }
 
         addToCart(id);
       }
+
 
       else if (
         action === "wishlist"
@@ -2554,12 +3367,14 @@ function wireDelegatedActions() {
         toggleWishlist(id);
       }
 
+
       else if (
         action === "quickview"
       ) {
 
         openQuickView(id);
       }
+
 
       else if (
         action === "qtyplus"
@@ -2572,6 +3387,7 @@ function wireDelegatedActions() {
         );
       }
 
+
       else if (
         action === "qtyminus"
       ) {
@@ -2582,6 +3398,7 @@ function wireDelegatedActions() {
           -1
         );
       }
+
 
       else if (
         action === "removecart"
@@ -2596,36 +3413,51 @@ function wireDelegatedActions() {
   );
 }
 
+
 /* ==========================================================================
    DRAWERS
    ========================================================================== */
 
 function wireDrawers() {
+
   const cartDrawer =
     $("#cartDrawer");
 
   const wishlistDrawer =
     $("#wishlistDrawer");
 
-  const mobileFilter =
-    $("#mobileFilterDrawer");
-
-  const mobileNav =
-    $("#mobileNav");
-
   const backdrop =
     $("#drawerBackdrop");
 
+
   function openDrawer(drawer) {
+
     if (!drawer) {
       return;
     }
+
+    [
+      cartDrawer,
+      wishlistDrawer
+    ]
+      .forEach(
+        item => {
+
+          if (item && item !== drawer) {
+
+            item.classList.add(
+              "closed"
+            );
+          }
+        }
+      );
 
     drawer.classList.remove(
       "closed"
     );
 
     if (backdrop) {
+
       backdrop.classList.remove(
         "hidden"
       );
@@ -2635,40 +3467,44 @@ function wireDrawers() {
       "hidden";
   }
 
+
   function closeAllDrawers() {
+
     [
       cartDrawer,
-      wishlistDrawer,
-      mobileFilter
-    ].forEach(drawer => {
+      wishlistDrawer
+    ]
+      .forEach(
+        drawer => {
 
-      if (drawer) {
-        drawer.classList.add(
-          "closed"
-        );
-      }
-    });
+          if (drawer) {
 
-    if (mobileNav) {
-      mobileNav.classList.add(
-        "hidden"
+            drawer.classList.add(
+              "closed"
+            );
+          }
+        }
       );
-    }
+
 
     if (backdrop) {
+
       backdrop.classList.add(
         "hidden"
       );
     }
 
+
     document.body.style.overflow =
       "";
   }
+
 
   const cartButton =
     $("#cartIconBtn");
 
   if (cartButton) {
+
     cartButton.addEventListener(
       "click",
       () =>
@@ -2678,33 +3514,24 @@ function wireDrawers() {
     );
   }
 
-  const cartMobile =
-    $("#cartIconBtnMobile");
-
-  if (cartMobile) {
-    cartMobile.addEventListener(
-      "click",
-      () =>
-        openDrawer(
-          cartDrawer
-        )
-    );
-  }
 
   const closeCart =
     $("#closeCartBtn");
 
   if (closeCart) {
+
     closeCart.addEventListener(
       "click",
       closeAllDrawers
     );
   }
 
+
   const wishlistButton =
     $("#wishlistIconBtn");
 
   if (wishlistButton) {
+
     wishlistButton.addEventListener(
       "click",
       () =>
@@ -2714,404 +3541,219 @@ function wireDrawers() {
     );
   }
 
+
   const closeWishlist =
     $("#closeWishlistBtn");
 
   if (closeWishlist) {
+
     closeWishlist.addEventListener(
       "click",
       closeAllDrawers
     );
   }
 
-  const filterButton =
-    $("#mobileFilterBtn");
-
-  if (filterButton) {
-    filterButton.addEventListener(
-      "click",
-      () =>
-        openDrawer(
-          mobileFilter
-        )
-    );
-  }
-
-  const closeFilter =
-    $("#closeMobileFilterBtn");
-
-  if (closeFilter) {
-    closeFilter.addEventListener(
-      "click",
-      closeAllDrawers
-    );
-  }
-
-  const applyFilter =
-    $("#applyMobileFilterBtn");
-
-  if (applyFilter) {
-    applyFilter.addEventListener(
-      "click",
-      closeAllDrawers
-    );
-  }
-
-  const menuButton =
-    $("#mobileMenuBtn");
-
-  if (menuButton) {
-    menuButton.addEventListener(
-      "click",
-      () => {
-
-        if (mobileNav) {
-          mobileNav.classList.remove(
-            "hidden"
-          );
-        }
-
-        if (backdrop) {
-          backdrop.classList.remove(
-            "hidden"
-          );
-        }
-
-        document.body.style.overflow =
-          "hidden";
-      }
-    );
-  }
-
-  const closeMenu =
-    $("#closeMobileNavBtn");
-
-  if (closeMenu) {
-    closeMenu.addEventListener(
-      "click",
-      closeAllDrawers
-    );
-  }
 
   if (backdrop) {
+
     backdrop.addEventListener(
       "click",
       closeAllDrawers
     );
   }
 
-  /* ================================================================
-     VIEW CART → cart.html
-     ================================================================ */
-
-  const viewCart =
-    $("#viewCartBtn");
-
-  if (viewCart) {
-    viewCart.addEventListener(
-      "click",
-      () => {
-        window.location.href =
-          "cart.html";
-      }
-    );
-  }
-
-  /* ================================================================
-     CHECKOUT
-     ================================================================ */
-
-  const checkout =
-    $("#checkoutBtn");
-
-  if (checkout) {
-    checkout.addEventListener(
-      "click",
-      () => {
-
-        if (
-          state.cart.length === 0
-        ) {
-          showToast(
-            "Your cart is empty",
-            "cart"
-          );
-
-          return;
-        }
-
-        showToast(
-          "Checkout is a demo — order not placed",
-          "cart"
-        );
-      }
-    );
-  }
 
   const closeQuick =
     $("#closeQuickViewBtn");
 
   if (closeQuick) {
+
     closeQuick.addEventListener(
       "click",
       closeQuickView
     );
   }
 
-  const modal =
+
+  const quickViewModal =
     $("#quickViewModal");
 
-  if (modal) {
-    modal.addEventListener(
+  if (quickViewModal) {
+
+    quickViewModal.addEventListener(
       "click",
       event => {
 
-        if (
-          event.target ===
-          modal
-        ) {
+        if (event.target === quickViewModal) {
+
           closeQuickView();
         }
       }
     );
   }
 
+
   document.addEventListener(
     "keydown",
     event => {
 
-      if (
-        event.key ===
-        "Escape"
-      ) {
+      if (event.key === "Escape") {
 
         closeQuickView();
+
         closeAllDrawers();
       }
     }
   );
 }
 
-/* ==========================================================================
-   NEWSLETTER
-   ========================================================================== */
-
-function wireNewsletter() {
-  const form =
-    $("#newsletterForm");
-
-  if (!form) {
-    return;
-  }
-
-  form.addEventListener(
-    "submit",
-    event => {
-
-      event.preventDefault();
-
-      const email =
-        $("#newsletterEmail");
-
-      if (
-        !email ||
-        !email.value.trim()
-      ) {
-        return;
-      }
-
-      form.classList.add(
-        "hidden"
-      );
-
-      const success =
-        $("#newsletterSuccess");
-
-      if (success) {
-        success.classList.remove(
-          "hidden"
-        );
-      }
-    }
-  );
-}
 
 /* ==========================================================================
-   URL SPORT FILTER
+   SUPABASE REALTIME
    ========================================================================== */
 
-function applyUrlSportFilter() {
-  const params =
-    new URLSearchParams(
-      window.location.search
-    );
+let realtimeChannel = null;
 
-  const sport =
-    params.get("sport");
 
-  if (!sport) {
-    return;
-  }
+function setupRealtimeProducts() {
 
-  const match =
-    [
-      "Football",
-      "Cricket",
-      "Tennis",
-      "Basketball",
-      "Volleyball",
-      "Badminton",
-      "Fitness",
-      "Running",
-      "Boxing",
-      "Hockey",
-      "Accessories"
-    ].find(
-      item =>
-        item.toLowerCase() ===
-        sport.toLowerCase()
-    );
-
-  if (!match) {
-    return;
-  }
-
-  state.sports.add(
-    match
-  );
-
-  $$(
-    `[data-filter="sport"][value="${match}"]`
-  ).forEach(
-    checkbox =>
-      checkbox.checked =
-        true
-  );
-
-  syncCategorySelection();
-}
-
-/* ==========================================================================
-   ADMIN → SHOP LIVE UPDATE
-   ========================================================================== */
-
-window.addEventListener(
-  "storage",
-  event => {
-
-    if (
-      event.key !==
-      PRODUCTS_KEY
-    ) {
-      return;
-    }
+  if (realtimeChannel) {
 
     console.log(
-      "KHELZONE: Admin catalog updated."
+      "Realtime already active — skipping duplicate subscription."
     );
 
-    loadAdminProducts();
-
-    renderProducts();
-    renderTrending();
-    renderCart();
-    renderWishlistUI();
+    return;
   }
-);
 
-/* ==========================================================================
-   WHEN SHOP TAB GETS FOCUS, RELOAD ADMIN PRODUCTS
-   ========================================================================== */
 
-window.addEventListener(
-  "focus",
-  () => {
+  try {
 
-    loadAdminProducts();
+    realtimeChannel =
+      supabaseClient
+        .channel(
+          "products-realtime"
+        )
+        .on(
 
-    renderProducts();
-    renderTrending();
-    renderCart();
-    renderWishlistUI();
+          "postgres_changes",
+
+          {
+            event: "*",
+            schema: "public",
+            table: "products"
+          },
+
+          async () => {
+
+            console.log(
+              "Products updated. Reloading..."
+            );
+
+            await loadProductsFromSupabase();
+
+            renderProducts();
+
+            renderTrending();
+
+            renderCart();
+
+            renderWishlistUI();
+          }
+
+        )
+        .subscribe();
+
   }
-);
+
+  catch (error) {
+
+    console.error(
+      "Could not start Supabase realtime:",
+      error
+    );
+  }
+}
+
 
 /* ==========================================================================
    INIT
    ========================================================================== */
 
-function init() {
-  loadAdminProducts();
+let khzInitialized = false;
+
+
+async function init() {
+
+  if (khzInitialized) {
+
+    console.log(
+      "KHELZONE Shop already initialized — skipping."
+    );
+
+    return;
+  }
+
+  khzInitialized = true;
+
+
+  console.log(
+    "KHELZONE Shop Initializing..."
+  );
+
+
   loadCart();
+
   loadWishlist();
 
-  wireFilters();
-  wireSearch();
-  wireCategoryCards();
-  wireDelegatedActions();
-  wireDrawers();
-  wireNewsletter();
 
-  applyUrlSportFilter();
+  wireFilters();
+
+  wireSearch();
+
+  wireCategoryCards();
+
+  wireDelegatedActions();
+
+  wireDrawers();
+
+
+  await loadProductsFromSupabase();
+
+
+  renderProducts();
 
   renderTrending();
-  renderProducts();
+
   renderCart();
+
   renderWishlistUI();
 
-  const priceLabel =
-    $("#priceRangeLabel");
 
-  if (priceLabel) {
-    priceLabel.textContent =
-      money(
-        state.priceMax
-      );
-  }
+  setupRealtimeProducts();
+
 
   const year =
     $("#yearNow");
 
   if (year) {
+
     year.textContent =
       new Date().getFullYear();
   }
 
+
   console.log(
-    `KHELZONE: ${PRODUCTS.length} admin products loaded.`
+    "KHELZONE loaded successfully"
   );
-
-  if (
-    new URLSearchParams(
-      window.location.search
-    ).get("sport")
-  ) {
-
-    requestAnimationFrame(
-      () => {
-
-        const shopGrid =
-          $("#shopGrid");
-
-        if (shopGrid) {
-          shopGrid.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-          });
-        }
-      }
-    );
-  }
 }
 
+
 /* ==========================================================================
-   START
+   BOOTSTRAP
    ========================================================================== */
 
-if (
-  document.readyState ===
-  "loading"
-) {
+if (document.readyState === "loading") {
 
   document.addEventListener(
     "DOMContentLoaded",
@@ -3121,5 +3763,6 @@ if (
 }
 
 else {
+
   init();
 }

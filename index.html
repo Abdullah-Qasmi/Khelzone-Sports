@@ -126,23 +126,6 @@
 
             <div class="ml-auto flex items-center gap-1 sm:gap-2">
 
-                <!-- SEARCH -->
-
-                <button
-                    id="searchToggle"
-                    type="button"
-                    aria-label="Search"
-                    aria-expanded="false"
-                    aria-controls="searchContainer"
-                    class="relative z-10 p-2.5 rounded-full hover:bg-white/10 text-gray-300 hover:text-white transition pointer-events-auto">
-
-                    <span class="material-symbols-outlined pointer-events-none">
-                        search
-                    </span>
-
-                </button>
-
-
                 <!-- CART -->
 
                 <a
@@ -233,80 +216,6 @@
         </div>
 
     </header>
-
-
-    <!-- =========================================================
-         SEARCH PANEL
-         (self-contained: opened by #searchToggle, controlled
-         entirely by the inline script near the end of body)
-    ========================================================== -->
-
-    <div
-        id="searchContainer"
-        class="sticky top-[72px] z-40 bg-[#101318] border-b border-white/10 overflow-hidden max-h-0 opacity-0 pointer-events-none transition-all duration-300 ease-in-out">
-
-        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row gap-3">
-
-            <div class="relative flex-1">
-
-                <span
-                    class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
-                    search
-                </span>
-
-                <input
-                    id="searchInput"
-                    type="text"
-                    inputmode="search"
-                    placeholder="Search bats, footballs, jerseys, gloves..."
-                    autocomplete="off"
-                    class="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-11 text-white placeholder:text-gray-500 focus:border-orange-500 focus:ring-0">
-
-                <button
-                    id="searchClearInput"
-                    type="button"
-                    aria-label="Clear search"
-                    class="hidden absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/10 text-gray-500 hover:text-white transition">
-
-                    <span class="material-symbols-outlined text-lg pointer-events-none">
-                        close
-                    </span>
-
-                </button>
-
-            </div>
-
-            <div class="flex gap-2 shrink-0">
-
-                <button
-                    id="searchGo"
-                    type="button"
-                    aria-label="Run search"
-                    class="flex-1 sm:flex-none px-4 py-3 sm:py-0 rounded-xl orange-gradient font-black uppercase text-xs tracking-wide hover:scale-[1.02] transition">
-
-                    <span class="material-symbols-outlined align-middle pointer-events-none">
-                        search
-                    </span>
-
-                </button>
-
-                <button
-                    id="searchClose"
-                    type="button"
-                    aria-label="Close search"
-                    class="flex-1 sm:flex-none px-4 py-3 sm:py-0 rounded-xl border border-white/10 hover:bg-white/10">
-
-                    <span class="material-symbols-outlined pointer-events-none">
-                        close
-                    </span>
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
 
 
     <!-- =========================================================
@@ -646,11 +555,11 @@
                     class="sport-card relative h-44 sm:h-52 rounded-2xl overflow-hidden border border-white/10 group card-hover">
 
                     <img
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbwh7AlnRcJGP7Uyhuewddk8TjWrzO8sEFLsP4lBC9cs8ewEAQI8ZYJGk8Al8jjohhq4bFxHjmKyTUUaksXuv2j7leYU_saBjdr-JcJMQzkB1jU7YDK9iyIYCo4PBbfN_dakf_YuEOJ7pSI9qFwPys5iS3rJsmdiQBp4wj5YaSI3oP_e_LB0a0sYxiutt17e7aOvHMyDt3CdCf6g_jkeJipJVQbKA"
+                        src="https://images.unsplash.com/photo-1537751181166-be1708a8ec4f?auto=format&fit=crop&w=1200&q=90"
                         class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500"
-                        alt="Hockey">
+                        alt="Field hockey player in action" onerror="this.onerror=null;this.src='https://images.squarespace-cdn.com/content/v1/5746af52b6aa605171e48142/f8df745a-c95c-4910-b2f0-e810c957f895/7.jpg';">
 
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
 
                     <span class="absolute bottom-4 left-4 font-black uppercase">
                         Hockey
@@ -1153,27 +1062,6 @@
             <div
                 id="productGrid"
                 class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-
-            </div>
-
-
-            <!-- SEARCH: NO RESULTS -->
-
-            <div
-                id="searchNoResults"
-                class="hidden text-center py-16 text-gray-500">
-
-                <span class="material-symbols-outlined text-5xl">
-                    search_off
-                </span>
-
-                <p class="mt-3 font-bold text-white">
-                    No products found.
-                </p>
-
-                <p class="mt-1 text-sm">
-                    Try a different name, category or keyword.
-                </p>
 
             </div>
 
@@ -1687,18 +1575,6 @@
                         class="block hover:text-orange-400"
                         href="seller.html">
                         Become a Seller
-                    </a>
-
-                    <a
-                        class="block hover:text-orange-400"
-                        href="#">
-                        Privacy Policy
-                    </a>
-
-                    <a
-                        class="block hover:text-orange-400"
-                        href="#">
-                        Terms
                     </a>
 
                 </div>
@@ -2314,209 +2190,6 @@
                 renderBestSellers;
 
         })();
-
-    </script>
-
-
-    <!-- =========================================================
-         NAVBAR SEARCH SYSTEM (self-contained, defensive)
-         Controls #searchToggle / #searchContainer / #searchInput /
-         #searchClose / #searchGo / #searchClearInput and filters
-         .product-card items inside #productGrid.
-    ========================================================== -->
-
-    <script>
-
-        document.addEventListener("DOMContentLoaded", function () {
-
-            const toggleBtn = document.getElementById("searchToggle");
-            const container = document.getElementById("searchContainer");
-            const input = document.getElementById("searchInput");
-            const closeBtn = document.getElementById("searchClose");
-            const goBtn = document.getElementById("searchGo");
-            const clearBtn = document.getElementById("searchClearInput");
-            const emptyState = document.getElementById("searchNoResults");
-            const grid = document.getElementById("productGrid");
-            const bestSellersEmptyState = document.getElementById("noProducts");
-
-            if (!toggleBtn || !container || !input) {
-                console.warn("KHELZONE search: one or more required elements are missing from the page.");
-                return;
-            }
-
-
-            /* ============================================
-               OPEN / CLOSE
-            ============================================= */
-
-            function isOpen() {
-                return container.classList.contains("search-open");
-            }
-
-            function openSearch() {
-
-                container.classList.add("search-open");
-
-                container.classList.remove("max-h-0", "opacity-0", "pointer-events-none");
-                container.classList.add("max-h-[140px]", "opacity-100", "pointer-events-auto");
-
-                toggleBtn.setAttribute("aria-expanded", "true");
-
-                window.setTimeout(function () {
-                    input.focus();
-                }, 200);
-
-            }
-
-            function closeSearch() {
-
-                container.classList.remove("search-open");
-
-                container.classList.remove("max-h-[140px]", "opacity-100", "pointer-events-auto");
-                container.classList.add("max-h-0", "opacity-0", "pointer-events-none");
-
-                toggleBtn.setAttribute("aria-expanded", "false");
-
-            }
-
-            toggleBtn.addEventListener("click", function (event) {
-
-                event.preventDefault();
-                event.stopPropagation();
-
-                if (isOpen()) {
-                    closeSearch();
-                } else {
-                    openSearch();
-                }
-
-            });
-
-            if (closeBtn) {
-
-                closeBtn.addEventListener("click", function (event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    closeSearch();
-                });
-
-            }
-
-            /* Clicking anywhere inside the search bar must never close it */
-
-            container.addEventListener("click", function (event) {
-                event.stopPropagation();
-            });
-
-            /* Clicking outside the open search bar closes it */
-
-            document.addEventListener("click", function (event) {
-
-                if (!isOpen()) return;
-
-                const clickedToggle = toggleBtn.contains(event.target);
-                const clickedInsideContainer = container.contains(event.target);
-
-                if (!clickedToggle && !clickedInsideContainer) {
-                    closeSearch();
-                }
-
-            });
-
-            /* Escape closes the search bar */
-
-            document.addEventListener("keydown", function (event) {
-
-                if (event.key === "Escape" && isOpen()) {
-                    closeSearch();
-                }
-
-            });
-
-
-            /* ============================================
-               FILTERING
-            ============================================= */
-
-            function runSearch() {
-
-                if (!grid) return;
-
-                const query = input.value.trim().toLowerCase();
-
-                if (clearBtn) {
-                    clearBtn.classList.toggle("hidden", query === "");
-                }
-
-                const cards = grid.querySelectorAll(".product-card");
-                let visibleCount = 0;
-
-                cards.forEach(function (card) {
-
-                    const haystack = (
-                        card.getAttribute("data-search") ||
-                        card.getAttribute("data-name") ||
-                        card.textContent ||
-                        ""
-                    ).toLowerCase();
-
-                    const matches = query === "" || haystack.indexOf(query) !== -1;
-
-                    card.classList.toggle("hidden", !matches);
-
-                    if (matches) visibleCount++;
-
-                });
-
-                if (emptyState) {
-                    emptyState.classList.toggle("hidden", !(query !== "" && visibleCount === 0));
-                }
-
-                /* Don't let the "no best sellers at all" state fight the search message */
-
-                if (bestSellersEmptyState && query !== "") {
-                    bestSellersEmptyState.classList.add("hidden");
-                }
-
-            }
-
-            input.addEventListener("input", runSearch);
-
-            input.addEventListener("keydown", function (event) {
-
-                if (event.key === "Enter") {
-                    event.preventDefault();
-                    runSearch();
-                }
-
-            });
-
-            if (goBtn) {
-
-                goBtn.addEventListener("click", function (event) {
-                    event.preventDefault();
-                    runSearch();
-                });
-
-            }
-
-            if (clearBtn) {
-
-                clearBtn.addEventListener("click", function (event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    input.value = "";
-                    runSearch();
-                    input.focus();
-                });
-
-            }
-
-            /* Re-run the active search whenever best-seller cards re-render */
-
-            document.addEventListener("khelzoneProductsRendered", runSearch);
-
-        });
 
     </script>
 

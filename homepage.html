@@ -54,6 +54,8 @@
 
     <!-- =========================================================
          HEADER / NAVBAR
+         (mobile hamburger removed per spec — desktop nav only,
+          nothing put in its place)
     ========================================================== -->
 
     <header class="sticky top-0 z-50 border-b border-white/10 bg-[#080a0d]/90 backdrop-blur-xl">
@@ -61,23 +63,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[72px] flex items-center gap-5">
 
 
-            <!-- MOBILE MENU -->
-
-            <button
-                id="menuBtn"
-                aria-label="Open menu"
-                class="lg:hidden p-2 text-gray-300 hover:text-orange-400">
-
-                <span class="material-symbols-outlined">
-                    menu
-                </span>
-
-            </button>
-
-
             <!-- LOGO -->
 
-            <a href="homepage.html" class="shrink-0">
+            <a href="index.html" class="shrink-0">
 
                 <div class="font-display-xl text-2xl sm:text-3xl font-black tracking-tighter text-orange-500">
                     KHELZONE
@@ -94,7 +82,7 @@
 
             <nav class="hidden lg:flex items-center gap-7 ml-8 text-sm font-semibold">
 
-                <a href="homepage.html"
+                <a href="index.html"
                     class="text-white hover:text-orange-400 transition">
                     Home
                 </a>
@@ -119,6 +107,11 @@
                     Our Story
                 </a>
 
+                <a href="about.html"
+                    class="text-gray-400 hover:text-white transition">
+                    About
+                </a>
+
             </nav>
 
 
@@ -141,6 +134,27 @@
                     </span>
 
                 </button>
+
+
+                <!-- WISHLIST -->
+
+                <a
+                    href="shop.html?openWishlist=1"
+                    id="wishlistLink"
+                    aria-label="Wishlist"
+                    class="p-2.5 rounded-full bg-white/5 hover:bg-white/10 text-white transition relative">
+
+                    <span class="material-symbols-outlined">
+                        favorite
+                    </span>
+
+                    <span
+                        id="wishlistCount"
+                        class="hidden absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-orange-500 text-[10px] font-bold flex items-center justify-center">
+                        0
+                    </span>
+
+                </a>
 
 
                 <!-- CART -->
@@ -177,68 +191,13 @@
 
         </div>
 
-
-        <!-- MOBILE MENU -->
-
-        <div
-            id="mobileMenu"
-            class="lg:hidden max-h-0 opacity-0 overflow-hidden border-t border-white/10">
-
-            <nav class="px-5 py-4 flex flex-col gap-1 text-sm font-semibold">
-
-                <a
-                    class="mobile-link py-3 border-b border-white/5"
-                    href="homepage.html">
-                    Home
-                </a>
-
-                <a
-                    class="mobile-link py-3 border-b border-white/5"
-                    href="shop.html">
-                    Shop
-                </a>
-
-                <a
-                    class="mobile-link py-3 border-b border-white/5"
-                    href="customization.html">
-                    Customize Your Kit
-                </a>
-
-                <a
-                    class="mobile-link py-3 border-b border-white/5"
-                    href="#deals">
-                    Deals
-                </a>
-
-                <a
-                    class="mobile-link py-3 border-b border-white/5"
-                    href="#story">
-                    Our Story
-                </a>
-
-                <a
-                    class="mobile-link py-3 border-b border-white/5"
-                    href="seller.html">
-                    Become a Seller
-                </a>
-
-                <a
-                    class="mobile-link py-3"
-                    href="cart.html">
-                    Shopping Cart
-                </a>
-
-            </nav>
-
-        </div>
-
     </header>
 
 
     <!-- =========================================================
          SEARCH PANEL
-         (self-contained: opened by #searchToggle, controlled
-         entirely by the inline script near the end of body)
+         Enter/Go now sends the user to shop.html?search=... —
+         it no longer filters the homepage in place.
     ========================================================== -->
 
     <div
@@ -606,7 +565,8 @@
                     <img
                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLnCkJl0Hw5LTWrCUGxTi18FgB3KfQ-XO0hcZmeSGAXpwDLJIyaqKnGIDTFDAafI_gv5hVCd2BrD6s1Jw98unBqeUOYIJIRoIvUo_V2CuiEjasQcfpAWav-Z-0-4TNYsd8uiargfUUNmjM1B3F91V5srySVs1Mu_fFYTpRIvrEqrT3mFxgsbjPgGzbJ-SE9Xg37iCD1sTj04Qd9bLapAvPC6LXhZYME_QZnks4RdcG-czygtuaOcPXfw"
                         class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500"
-                        alt="Cricket">
+                        alt="Cricket"
+                        onerror="this.src='https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&w=900&q=85';">
 
                     <div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent"></div>
 
@@ -627,7 +587,8 @@
                     <img
                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5p6XiUkGT0spHyJ9l_jOpd8ikuyF3L0gAV5it5qbNwCEAjVYVsIAgwKIWNeghvIVJWGVQdCpl1JUzkYyow6lmiQ4JqnFF3UJLjXoTDdxvQRBeHF4Bq4657ueEDgE0J9QLqsED9viSc7WzfWZu1wpB8gHVfYnd2Rsr1N5mXiy7FTFqvIK8OBsxOljDKxNDELKgqogw05-9cCVGC-AvlxvcARujMMZoEkp571WdozuGHwEhDh1TrOpzHg"
                         class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500"
-                        alt="Football">
+                        alt="Football"
+                        onerror="this.src='https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=900&q=85';">
 
                     <div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent"></div>
 
@@ -638,7 +599,7 @@
                 </a>
 
 
-                <!-- HOCKEY -->
+                <!-- HOCKEY (fixed: stable Unsplash source + onerror fallback) -->
 
                 <a
                     href="shop.html?sport=Hockey"
@@ -646,9 +607,10 @@
                     class="sport-card relative h-44 sm:h-52 rounded-2xl overflow-hidden border border-white/10 group card-hover">
 
                     <img
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbwh7AlnRcJGP7Uyhuewddk8TjWrzO8sEFLsP4lBC9cs8ewEAQI8ZYJGk8Al8jjohhq4bFxHjmKyTUUaksXuv2j7leYU_saBjdr-JcJMQzkB1jU7YDK9iyIYCo4PBbfN_dakf_YuEOJ7pSI9qFwPys5iS3rJsmdiQBp4wj5YaSI3oP_e_LB0a0sYxiutt17e7aOvHMyDt3CdCf6g_jkeJipJVQbKA"
+                        src="https://images.unsplash.com/photo-1580748141549-71748dbe0bdc?auto=format&fit=crop&w=900&q=85"
                         class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500"
-                        alt="Hockey">
+                        alt="Hockey"
+                        onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1518063319789-7217e6706b04?auto=format&fit=crop&w=900&q=85';">
 
                     <div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent"></div>
 
@@ -669,7 +631,8 @@
                     <img
                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7F589TrWkGsxA2p0Bf_ahcgvspAFqdxbHavKa1dEa5rcH64WkTb6jUkftymjvk8aj_9-GmAfF-0oZeZO549yAuZtwwMUjFnZXn5A-rkOAHoSxi8IIdZHevJRKxFYxzC_Wd3ItEoRCPsF2BubTVc0eCeO5u9-NoNoM0plmH-ioYbAIYIbMSG_V5IEPiK6ZLUPAv14s16Wm41wVrEgNZ-cUu-tA1hRzlq64nU6JXpULoc7TPeRmnLl0uQ"
                         class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500"
-                        alt="Badminton">
+                        alt="Badminton"
+                        onerror="this.src='https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=900&q=85';">
 
                     <div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent"></div>
 
@@ -900,7 +863,9 @@
 
 
         <!-- =====================================================
-             BEST SELLERS - DYNAMIC FROM ADMIN + FEATURED SELLERS
+             BEST SELLERS — now loaded from Supabase (same table
+             shop.js reads), instead of the old dead localStorage
+             key. Falls back to a friendly empty state on error.
         ====================================================== -->
 
         <section
@@ -1148,7 +1113,7 @@
             </div>
 
 
-            <!-- DYNAMIC PRODUCT GRID -->
+            <!-- DYNAMIC PRODUCT GRID (Supabase) -->
 
             <div
                 id="productGrid"
@@ -1157,28 +1122,7 @@
             </div>
 
 
-            <!-- SEARCH: NO RESULTS -->
-
-            <div
-                id="searchNoResults"
-                class="hidden text-center py-16 text-gray-500">
-
-                <span class="material-symbols-outlined text-5xl">
-                    search_off
-                </span>
-
-                <p class="mt-3 font-bold text-white">
-                    No products found.
-                </p>
-
-                <p class="mt-1 text-sm">
-                    Try a different name, category or keyword.
-                </p>
-
-            </div>
-
-
-            <!-- NO PRODUCTS -->
+            <!-- NO PRODUCTS / LOAD ERROR -->
 
             <div
                 id="noProducts"
@@ -1188,12 +1132,12 @@
                     inventory_2
                 </span>
 
-                <p class="mt-3 font-bold text-white">
+                <p id="noProductsTitle" class="mt-3 font-bold text-white">
                     No best sellers available.
                 </p>
 
-                <p class="mt-1 text-sm">
-                    Select "BEST SELLER" from the admin panel.
+                <p id="noProductsSub" class="mt-1 text-sm">
+                    Mark a product "BEST SELLER" from the seller/admin panel.
                 </p>
 
             </div>
@@ -1567,7 +1511,7 @@
 
             <div class="col-span-2 lg:col-span-1">
 
-                <a href="homepage.html">
+                <a href="index.html">
 
                     <div class="text-3xl font-black tracking-tighter text-orange-500">
                         KHELZONE
@@ -1691,6 +1635,12 @@
 
                     <a
                         class="block hover:text-orange-400"
+                        href="about.html">
+                        About
+                    </a>
+
+                    <a
+                        class="block hover:text-orange-400"
                         href="#">
                         Privacy Policy
                     </a>
@@ -1727,115 +1677,6 @@
 
 
     <!-- =========================================================
-         CART DRAWER
-    ========================================================== -->
-
-    <div
-        id="cartOverlay"
-        class="hidden fixed inset-0 bg-black/70 z-[80]">
-    </div>
-
-
-    <aside
-        id="cartDrawer"
-        class="drawer fixed right-0 top-0 bottom-0 z-[90] w-full max-w-md bg-[#101318] border-l border-white/10 translate-x-full flex flex-col">
-
-
-        <div
-            class="p-5 border-b border-white/10 flex items-center justify-between">
-
-            <div>
-
-                <h2 class="text-xl font-black uppercase">
-                    Your Cart
-                </h2>
-
-                <p
-                    id="cartSubtitle"
-                    class="text-xs text-gray-500 mt-1">
-                    0 items
-                </p>
-
-            </div>
-
-
-            <button
-                id="closeCart"
-                class="w-10 h-10 rounded-full hover:bg-white/10">
-
-                <span class="material-symbols-outlined">
-                    close
-                </span>
-
-            </button>
-
-        </div>
-
-
-        <div
-            id="cartItems"
-            class="flex-1 overflow-y-auto p-5 space-y-3">
-
-            <div
-                id="emptyCart"
-                class="h-full flex flex-col items-center justify-center text-center text-gray-500">
-
-                <span class="material-symbols-outlined text-6xl">
-                    shopping_cart
-                </span>
-
-                <h3 class="mt-4 text-white font-bold">
-                    Your cart is empty
-                </h3>
-
-                <p class="mt-1 text-sm">
-                    Add some gear and get game-ready.
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="p-5 border-t border-white/10">
-
-            <div class="flex justify-between text-sm text-gray-400">
-
-                <span>
-                    Subtotal
-                </span>
-
-                <strong
-                    id="cartTotal"
-                    class="text-white text-lg">
-                    Rs. 0
-                </strong>
-
-            </div>
-
-
-            <button
-                id="checkoutBtn"
-                class="mt-4 w-full orange-gradient py-4 rounded-xl font-black uppercase">
-
-                Proceed to Checkout
-
-            </button>
-
-
-            <p
-                class="text-center text-[10px] text-gray-600 mt-3">
-
-                Shipping and taxes calculated at checkout.
-
-            </p>
-
-        </div>
-
-    </aside>
-
-
-    <!-- =========================================================
          TOAST
     ========================================================== -->
 
@@ -1856,27 +1697,30 @@
 
 
     <!-- =========================================================
-         DYNAMIC BEST SELLER SYSTEM
+         SUPABASE-CONNECTED BEST SELLER SYSTEM
+         Reads from the SAME "products" table shop.js uses.
+         Uses the fetch() REST API directly (no extra SDK script
+         needed) so it stays a lightweight, additive change.
     ========================================================== -->
 
     <script>
 
         (() => {
 
-            const PRODUCT_KEY = "khz_products_v1";
+            /* Same project as shop.js — keep these two in sync
+               if you ever rotate the publishable key. */
+            const SUPABASE_URL = "https://antqexjhlsaynunlmzqa.supabase.co";
+            const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
 
             const grid = document.getElementById("productGrid");
             const noProducts = document.getElementById("noProducts");
+            const noProductsTitle = document.getElementById("noProductsTitle");
+            const noProductsSub = document.getElementById("noProductsSub");
 
             if (!grid) return;
 
 
-            /* ================================================
-               ESCAPE HTML
-            ================================================= */
-
             function escapeHtml(value) {
-
                 return String(value ?? "")
                     .replace(/[&<>"']/g, char => ({
                         "&": "&amp;",
@@ -1885,433 +1729,184 @@
                         '"': "&quot;",
                         "'": "&#039;"
                     }[char]));
-
             }
-
-
-            function escapeAttr(value) {
-                return escapeHtml(value);
-            }
-
-
-            /* ================================================
-               MONEY
-            ================================================= */
 
             function money(value) {
-
-                return "Rs. " +
-                    Number(value || 0).toLocaleString("en-PK");
-
+                return "Rs. " + Number(value || 0).toLocaleString("en-PK");
             }
 
-
-            /* ================================================
-               LOAD PRODUCTS FROM ADMIN
-            ================================================= */
-
-            function loadProducts() {
-
+            function getWishlist() {
                 try {
-
-                    const saved =
-                        localStorage.getItem(PRODUCT_KEY);
-
-                    if (!saved) {
-                        return [];
-                    }
-
-                    const data =
-                        JSON.parse(saved);
-
-                    return Array.isArray(data)
-                        ? data
-                        : [];
-
-                } catch (error) {
-
-                    console.error(
-                        "KHELZONE products loading error:",
-                        error
-                    );
-
+                    const saved = JSON.parse(localStorage.getItem("khz_wishlist") || "[]");
+                    return Array.isArray(saved) ? saved : [];
+                } catch {
                     return [];
-
                 }
-
             }
-
-
-            /* ================================================
-               BEST SELLERS
-            ================================================= */
-
-            function getBestSellers() {
-
-                return loadProducts()
-
-                    .filter(product => {
-
-                        return String(product.badge || "")
-                            .trim()
-                            .toUpperCase() === "BEST SELLER";
-
-                    })
-
-                    .filter(product => {
-
-                        return Number(product.stock ?? 0) > 0;
-
-                    })
-
-                    .slice(0, 8);
-
-            }
-
-
-            /* ================================================
-               CREATE CARD
-            ================================================= */
 
             function createCard(product) {
 
-                const name =
-                    product.name ||
-                    "KHELZONE Product";
-
-                const image =
-                    product.image || "";
-
-                const sport =
-                    product.sport ||
-                    "Sports";
-
-                const category =
-                    product.category ||
-                    "Sports Gear";
-
-                const brand =
-                    product.brand ||
-                    "KHELZONE";
-
-                const price =
-                    Number(product.price || 0);
-
-                const oldPrice =
-                    Number(product.oldPrice || 0);
-
-                const rating =
-                    Math.max(
-                        0,
-                        Math.min(
-                            5,
-                            Math.round(
-                                Number(product.rating ?? 5)
-                            )
-                        )
-                    );
-
-                const reviews =
-                    Number(product.reviews || 0);
-
-                const stock =
-                    Number(product.stock || 0);
-
-                const stars =
-                    "★".repeat(rating) +
-                    "☆".repeat(5 - rating);
-
-                const searchBlob =
-                    [name, sport, category, brand]
-                        .join(" ")
-                        .toLowerCase();
-
+                const id = product.id;
+                const name = product.name || "KHELZONE Product";
+                const image = product.image_url || product.image || "";
+                const sport = product.sport || product.category || "Sports";
+                const category = product.category || "Sports Gear";
+                const brand = product.brand || "KHELZONE";
+                const price = Number(product.price || 0);
+                const oldPrice = Number(product.old_price || product.oldPrice || 0);
+                const rating = Math.max(0, Math.min(5, Math.round(Number(product.rating ?? 0))));
+                const reviews = Number(product.reviews || 0);
+                const stock = Number(product.stock || 0);
+                const stars = "★".repeat(rating) + "☆".repeat(5 - rating);
+                const liked = getWishlist().some(w => String(w) === String(id));
 
                 return `
-
                     <article
-                        class="product-card card-hover bg-[#11151a] border border-white/10 rounded-2xl overflow-hidden"
-                        data-category="${escapeAttr(String(sport).toLowerCase())}"
-                        data-name="${escapeAttr(name)}"
-                        data-search="${escapeAttr(searchBlob)}"
-                        data-product-id="${escapeAttr(product.id)}">
+                        class="product-card card-hover bg-[#11151a] border border-white/10 rounded-2xl overflow-hidden relative"
+                        data-product-id="${escapeHtml(id)}">
 
+                        <div class="relative h-60 bg-[#181d23] flex items-center justify-center p-5">
 
-                        <!-- IMAGE -->
-
-                        <div
-                            class="relative h-60 bg-[#181d23] flex items-center justify-center p-5">
+                            <button
+                                type="button"
+                                class="khz-wishlist-btn absolute top-3 right-3 z-10 w-9 h-9 rounded-full flex items-center justify-center bg-black/50 hover:bg-black/70 transition ${liked ? "text-orange-500" : "text-white"}"
+                                data-id="${escapeHtml(id)}"
+                                aria-label="Toggle wishlist">
+                                <span class="material-symbols-outlined" style="font-variation-settings:'FILL' ${liked ? 1 : 0}">favorite</span>
+                            </button>
 
                             ${
                                 image
-                                    ?
-                                    `
-                                    <img
-                                        src="${escapeAttr(image)}"
-                                        alt="${escapeAttr(name)}"
-                                        class="w-full h-full object-contain"
-                                        onerror="this.style.opacity='0.25';">
-                                    `
-                                    :
-                                    `
-                                    <div class="flex flex-col items-center justify-center text-gray-600">
-
-                                        <span class="material-symbols-outlined text-6xl">
-                                            image
-                                        </span>
-
-                                        <span class="text-xs mt-2">
-                                            No Image
-                                        </span>
-
-                                    </div>
-                                    `
+                                    ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(name)}" class="w-full h-full object-contain" onerror="this.style.opacity='0.25';">`
+                                    : `<div class="flex flex-col items-center justify-center text-gray-600">
+                                         <span class="material-symbols-outlined text-6xl">image</span>
+                                         <span class="text-xs mt-2">No Image</span>
+                                       </div>`
                             }
 
-
-                            <!-- BADGE -->
-
-                            <span
-                                class="absolute top-3 left-3 bg-orange-500 text-black text-[10px] font-black px-2 py-1 rounded-full">
-
+                            <span class="absolute top-3 left-3 bg-orange-500 text-black text-[10px] font-black px-2 py-1 rounded-full">
                                 BEST SELLER
-
                             </span>
 
                         </div>
 
-
-                        <!-- INFO -->
-
                         <div class="p-5">
 
-                            <div
-                                class="text-[10px] text-orange-400 font-bold uppercase tracking-wider">
-
-                                ${escapeHtml(sport)}
-                                •
-                                ${escapeHtml(category)}
-
+                            <div class="text-[10px] text-orange-400 font-bold uppercase tracking-wider">
+                                ${escapeHtml(sport)} • ${escapeHtml(category)}
                             </div>
 
-
-                            <h3
-                                class="mt-2 font-bold leading-snug min-h-12">
-
+                            <h3 class="mt-2 font-bold leading-snug min-h-12">
                                 ${escapeHtml(name)}
-
                             </h3>
 
-
-                            <div
-                                class="text-[10px] text-gray-500 mt-1 uppercase tracking-wider">
-
+                            <div class="text-[10px] text-gray-500 mt-1 uppercase tracking-wider">
                                 ${escapeHtml(brand)}
-
                             </div>
 
-
-                            <!-- RATING -->
-
-                            <div
-                                class="flex items-center gap-1 mt-3 text-amber-400 text-sm">
-
-                                <span>
-                                    ${stars}
-                                </span>
-
-                                <span
-                                    class="text-gray-500 text-xs">
-
-                                    (${reviews})
-
-                                </span>
-
+                            <div class="flex items-center gap-1 mt-3 text-amber-400 text-sm">
+                                <span>${stars}</span>
+                                <span class="text-gray-500 text-xs">(${reviews})</span>
                             </div>
 
-
-                            <!-- PRICE -->
-
-                            <div
-                                class="flex items-center justify-between mt-4 gap-3">
+                            <div class="flex items-center justify-between mt-4 gap-3">
 
                                 <div>
-
-                                    <span
-                                        class="text-xl font-black">
-
-                                        ${money(price)}
-
-                                    </span>
-
+                                    <span class="text-xl font-black">${money(price)}</span>
                                     ${
                                         oldPrice > price
-                                            ?
-                                            `
-                                            <span
-                                                class="block text-xs text-gray-500 line-through">
-
-                                                ${money(oldPrice)}
-
-                                            </span>
-                                            `
-                                            :
-                                            ""
+                                            ? `<span class="block text-xs text-gray-500 line-through">${money(oldPrice)}</span>`
+                                            : ""
                                     }
-
                                 </div>
 
-
-                                <!-- CART -->
-
                                 <button
-                                    class="add-cart w-10 h-10 shrink-0 rounded-full bg-orange-500 text-black flex items-center justify-center hover:bg-orange-400 transition"
-                                    data-product="${escapeAttr(name)}"
-                                    data-price="${price}">
-
-                                    <span
-                                        class="material-symbols-outlined">
-
-                                        add_shopping_cart
-
-                                    </span>
-
+                                    class="khz-addcart-btn w-10 h-10 shrink-0 rounded-full bg-orange-500 text-black flex items-center justify-center hover:bg-orange-400 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                                    data-id="${escapeHtml(id)}"
+                                    ${stock <= 0 ? "disabled" : ""}>
+                                    <span class="material-symbols-outlined">add_shopping_cart</span>
                                 </button>
 
                             </div>
 
-
                             ${
                                 stock > 0 && stock <= 5
-                                    ?
-                                    `
-                                    <p
-                                        class="text-[10px] text-orange-400 mt-3 font-bold uppercase">
-
-                                        Only ${stock} left
-
-                                    </p>
-                                    `
-                                    :
-                                    ""
+                                    ? `<p class="text-[10px] text-orange-400 mt-3 font-bold uppercase">Only ${stock} left</p>`
+                                    : stock <= 0
+                                        ? `<p class="text-[10px] text-red-400 mt-3 font-bold uppercase">Out of stock</p>`
+                                        : ""
                             }
 
                         </div>
 
                     </article>
-
                 `;
-
             }
 
+            function showEmpty(title, sub) {
+                grid.innerHTML = "";
+                if (noProductsTitle) noProductsTitle.textContent = title;
+                if (noProductsSub) noProductsSub.textContent = sub;
+                noProducts.classList.remove("hidden");
+            }
 
-            /* ================================================
-               RENDER
-            ================================================= */
+            async function loadBestSellers() {
 
-            function renderBestSellers() {
+                try {
 
-                const bestSellers =
-                    getBestSellers();
+                    const url =
+                        `${SUPABASE_URL}/rest/v1/products` +
+                        `?select=*` +
+                        `&is_active=eq.true` +
+                        `&badge=eq.BEST%20SELLER` +
+                        `&order=created_at.desc` +
+                        `&limit=8`;
 
+                    const response = await fetch(url, {
+                        headers: {
+                            apikey: SUPABASE_PUBLISHABLE_KEY,
+                            Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`
+                        }
+                    });
 
-                if (!bestSellers.length) {
+                    if (!response.ok) {
+                        throw new Error(`Supabase responded ${response.status}`);
+                    }
 
-                    grid.innerHTML = "";
+                    const products = (await response.json()) || [];
 
-                    noProducts.classList.remove("hidden");
+                    const inStock = products.filter(p => Number(p.stock ?? 0) > 0);
 
-                    document.dispatchEvent(
-                        new CustomEvent(
-                            "khelzoneProductsRendered"
-                        )
+                    if (!inStock.length) {
+                        showEmpty(
+                            "No best sellers available.",
+                            "Mark a product \"BEST SELLER\" from the seller/admin panel."
+                        );
+                        return;
+                    }
+
+                    noProducts.classList.add("hidden");
+
+                    grid.innerHTML = inStock.map(createCard).join("");
+
+                } catch (error) {
+
+                    console.error("KHELZONE homepage best-sellers load error:", error);
+
+                    showEmpty(
+                        "Unable to load products.",
+                        "Please check your Supabase connection."
                     );
-
-                    return;
-
                 }
-
-
-                noProducts.classList.add("hidden");
-
-
-                grid.innerHTML =
-                    bestSellers
-                        .map(createCard)
-                        .join("");
-
-
-                /*
-                 * Tell home.js that new product cards
-                 * have been rendered.
-                 */
-
-                document.dispatchEvent(
-                    new CustomEvent(
-                        "khelzoneProductsRendered"
-                    )
-                );
-
             }
 
+            loadBestSellers();
 
-            /* ================================================
-               FIRST LOAD
-            ================================================= */
+            window.refreshKhelzoneBestSellers = loadBestSellers;
 
-            renderBestSellers();
-
-
-            /* ================================================
-               REFRESH WHEN RETURNING TO PAGE
-            ================================================= */
-
-            window.addEventListener(
-                "focus",
-                renderBestSellers
-            );
-
-
-            document.addEventListener(
-                "visibilitychange",
-                () => {
-
-                    if (!document.hidden) {
-
-                        renderBestSellers();
-
-                    }
-
-                }
-            );
-
-
-            /* ================================================
-               LOCALSTORAGE CHANGE
-            ================================================= */
-
-            window.addEventListener(
-                "storage",
-                event => {
-
-                    if (
-                        event.key === PRODUCT_KEY
-                    ) {
-
-                        renderBestSellers();
-
-                    }
-
-                }
-            );
-
-
-            /* ================================================
-               GLOBAL FUNCTION
-            ================================================= */
-
-            window.refreshKhelzoneBestSellers =
-                renderBestSellers;
+            /* Refresh when the tab regains focus, so changes made
+               elsewhere (admin panel, another tab) show up. */
+            window.addEventListener("focus", loadBestSellers);
 
         })();
 
@@ -2319,10 +1914,7 @@
 
 
     <!-- =========================================================
-         NAVBAR SEARCH SYSTEM (self-contained, defensive)
-         Controls #searchToggle / #searchContainer / #searchInput /
-         #searchClose / #searchGo / #searchClearInput and filters
-         .product-card items inside #productGrid.
+         NAVBAR SEARCH TOGGLE + REDIRECT-TO-SHOP SEARCH
     ========================================================== -->
 
     <script>
@@ -2335,186 +1927,98 @@
             const closeBtn = document.getElementById("searchClose");
             const goBtn = document.getElementById("searchGo");
             const clearBtn = document.getElementById("searchClearInput");
-            const emptyState = document.getElementById("searchNoResults");
-            const grid = document.getElementById("productGrid");
-            const bestSellersEmptyState = document.getElementById("noProducts");
 
             if (!toggleBtn || !container || !input) {
                 console.warn("KHELZONE search: one or more required elements are missing from the page.");
                 return;
             }
 
-
-            /* ============================================
-               OPEN / CLOSE
-            ============================================= */
-
             function isOpen() {
                 return container.classList.contains("search-open");
             }
 
             function openSearch() {
-
                 container.classList.add("search-open");
-
                 container.classList.remove("max-h-0", "opacity-0", "pointer-events-none");
                 container.classList.add("max-h-[140px]", "opacity-100", "pointer-events-auto");
-
                 toggleBtn.setAttribute("aria-expanded", "true");
-
-                window.setTimeout(function () {
-                    input.focus();
-                }, 200);
-
+                window.setTimeout(function () { input.focus(); }, 200);
             }
 
             function closeSearch() {
-
                 container.classList.remove("search-open");
-
                 container.classList.remove("max-h-[140px]", "opacity-100", "pointer-events-auto");
                 container.classList.add("max-h-0", "opacity-0", "pointer-events-none");
-
                 toggleBtn.setAttribute("aria-expanded", "false");
-
             }
 
             toggleBtn.addEventListener("click", function (event) {
-
                 event.preventDefault();
                 event.stopPropagation();
-
-                if (isOpen()) {
-                    closeSearch();
-                } else {
-                    openSearch();
-                }
-
+                if (isOpen()) closeSearch(); else openSearch();
             });
 
             if (closeBtn) {
-
                 closeBtn.addEventListener("click", function (event) {
                     event.preventDefault();
                     event.stopPropagation();
                     closeSearch();
                 });
-
             }
-
-            /* Clicking anywhere inside the search bar must never close it */
 
             container.addEventListener("click", function (event) {
                 event.stopPropagation();
             });
 
-            /* Clicking outside the open search bar closes it */
-
             document.addEventListener("click", function (event) {
-
                 if (!isOpen()) return;
-
                 const clickedToggle = toggleBtn.contains(event.target);
                 const clickedInsideContainer = container.contains(event.target);
-
-                if (!clickedToggle && !clickedInsideContainer) {
-                    closeSearch();
-                }
-
+                if (!clickedToggle && !clickedInsideContainer) closeSearch();
             });
-
-            /* Escape closes the search bar */
 
             document.addEventListener("keydown", function (event) {
-
-                if (event.key === "Escape" && isOpen()) {
-                    closeSearch();
-                }
-
+                if (event.key === "Escape" && isOpen()) closeSearch();
             });
 
-
-            /* ============================================
-               FILTERING
-            ============================================= */
+            /* Search now sends the user to shop.html?search=... */
 
             function runSearch() {
-
-                if (!grid) return;
-
-                const query = input.value.trim().toLowerCase();
-
-                if (clearBtn) {
-                    clearBtn.classList.toggle("hidden", query === "");
+                const query = input.value.trim();
+                if (!query) {
+                    input.focus();
+                    return;
                 }
-
-                const cards = grid.querySelectorAll(".product-card");
-                let visibleCount = 0;
-
-                cards.forEach(function (card) {
-
-                    const haystack = (
-                        card.getAttribute("data-search") ||
-                        card.getAttribute("data-name") ||
-                        card.textContent ||
-                        ""
-                    ).toLowerCase();
-
-                    const matches = query === "" || haystack.indexOf(query) !== -1;
-
-                    card.classList.toggle("hidden", !matches);
-
-                    if (matches) visibleCount++;
-
-                });
-
-                if (emptyState) {
-                    emptyState.classList.toggle("hidden", !(query !== "" && visibleCount === 0));
-                }
-
-                /* Don't let the "no best sellers at all" state fight the search message */
-
-                if (bestSellersEmptyState && query !== "") {
-                    bestSellersEmptyState.classList.add("hidden");
-                }
-
+                window.location.href = "shop.html?search=" + encodeURIComponent(query);
             }
 
-            input.addEventListener("input", runSearch);
+            input.addEventListener("input", function () {
+                if (clearBtn) clearBtn.classList.toggle("hidden", input.value.trim() === "");
+            });
 
             input.addEventListener("keydown", function (event) {
-
                 if (event.key === "Enter") {
                     event.preventDefault();
                     runSearch();
                 }
-
             });
 
             if (goBtn) {
-
                 goBtn.addEventListener("click", function (event) {
                     event.preventDefault();
                     runSearch();
                 });
-
             }
 
             if (clearBtn) {
-
                 clearBtn.addEventListener("click", function (event) {
                     event.preventDefault();
                     event.stopPropagation();
                     input.value = "";
-                    runSearch();
+                    clearBtn.classList.add("hidden");
                     input.focus();
                 });
-
             }
-
-            /* Re-run the active search whenever best-seller cards re-render */
-
-            document.addEventListener("khelzoneProductsRendered", runSearch);
 
         });
 
@@ -2522,7 +2026,8 @@
 
 
     <!-- =========================================================
-         ONLY JAVASCRIPT FILE
+         MAIN HOMEPAGE JS (cart count, wishlist count/toggle,
+         add-to-cart delegation, smooth scroll)
     ========================================================== -->
 
     <script src="home.js"></script>

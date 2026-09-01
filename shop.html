@@ -1,832 +1,818 @@
 <!DOCTYPE html>
-
-<html lang="en">
+<html lang="en" class="dark">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>KHELZONE — Shop | Gear Up. Play Hard.</title>
+    <title>KHELZONE — Shop | Gear Up. Play Hard.</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
-<link
-    href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="tailwind.config.js"></script>
 
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="tailwind.config.js"></script>
+    <link rel="stylesheet" href="shop.css">
 
-<link rel="stylesheet" href="shop.css">
+    <style>
+        :root {
+            --khz-orange: #ff5a00;
+            --khz-bg: #090a0c;
+            --khz-bg-alt: #101216;
+            --khz-line: rgba(255,255,255,.09);
+            --khz-gray: #8b9099;
+        }
 
+        body {
+            background: var(--khz-bg);
+            color: white;
+            font-family: Manrope, sans-serif;
+        }
 
+        .font-display {
+            font-family: Anton, sans-serif;
+        }
+
+        .khz-header {
+            background: rgba(9,10,12,.94);
+            backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--khz-line);
+        }
+
+        .logo-mark {
+            background: var(--khz-orange);
+            border-radius: 8px;
+        }
+
+        .nav-link {
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: rgba(255,255,255,.6);
+            transition: .2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: white;
+        }
+
+        .icon-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: .2s;
+        }
+
+        .icon-btn:hover {
+            color: var(--khz-orange);
+            transform: translateY(-1px);
+        }
+
+        .badge-count {
+            position: absolute;
+            top: -7px;
+            right: -9px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            background: var(--khz-orange);
+            color: white;
+            font-size: 9px;
+            font-weight: 900;
+        }
+
+        .stripe-divider {
+            height: 3px;
+            background: var(--khz-orange);
+        }
+
+        .speed-stripes {
+            background:
+                linear-gradient(135deg,
+                    rgba(255,90,0,.10) 0 2px,
+                    transparent 2px 18px),
+                var(--khz-bg);
+        }
+
+        .hero-headline {
+            font-size: clamp(52px, 8vw, 100px);
+            line-height: .9;
+        }
+
+        .hero-headline .accent {
+            color: var(--khz-orange);
+        }
+
+        .section-eyebrow {
+            color: var(--khz-orange);
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+        }
+
+        .cta-primary {
+            background: var(--khz-orange);
+            color: white;
+            border-radius: 10px;
+            font-weight: 900;
+            letter-spacing: .08em;
+            transition: .2s;
+        }
+
+        .cta-primary:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.08);
+        }
+
+        .cta-outline {
+            border: 1px solid rgba(255,255,255,.2);
+            border-radius: 10px;
+            font-weight: 900;
+            letter-spacing: .08em;
+            transition: .2s;
+        }
+
+        .cta-outline:hover {
+            border-color: var(--khz-orange);
+            color: var(--khz-orange);
+        }
+
+        .hero-visual-frame {
+            position: relative;
+            overflow: hidden;
+            border-radius: 24px;
+            border: 1px solid var(--khz-line);
+            background: #111;
+        }
+
+        .hero-visual-frame img {
+            filter: saturate(.9);
+        }
+
+        .hero-stat-chip {
+            background: rgba(0,0,0,.72);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,.12);
+        }
+
+        .cat-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 18px;
+            border: 1px solid var(--khz-line);
+            cursor: pointer;
+            transition: .3s;
+        }
+
+        .cat-card:hover,
+        .cat-card.active {
+            transform: translateY(-4px);
+            border-color: var(--khz-orange);
+        }
+
+        .cat-card img {
+            transition: .5s;
+        }
+
+        .cat-card:hover img {
+            transform: scale(1.08);
+        }
+
+        .cat-overlay {
+            background: linear-gradient(transparent 25%, rgba(0,0,0,.9));
+        }
+
+        .filter-chip {
+            background: rgba(255,255,255,.025);
+            border: 1px solid transparent;
+            transition: .2s;
+        }
+
+        .filter-chip:hover {
+            border-color: rgba(255,90,0,.5);
+        }
+
+        .filter-chip input {
+            accent-color: var(--khz-orange);
+            margin-right: 8px;
+        }
+
+        .khz-range {
+            accent-color: var(--khz-orange);
+        }
+
+        /* Product UI */
+
+        .product-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-radius: 18px;
+            background: #111318;
+            border: 1px solid rgba(255,255,255,.08);
+            transition: .3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255,90,0,.5);
+            box-shadow: 0 20px 45px rgba(0,0,0,.35);
+        }
+
+        .product-card__image-wrap {
+            position: relative;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            background: #080a0d;
+        }
+
+        .product-card__image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 18px;
+            transition: .5s;
+        }
+
+        .product-card:hover .product-card__image {
+            transform: scale(1.05);
+        }
+
+        .product-card__badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 3;
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: var(--khz-orange);
+            color: white;
+            font-size: 9px;
+            font-weight: 900;
+        }
+
+        .product-card__wishlist {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 5;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(0,0,0,.58);
+            border: 1px solid rgba(255,255,255,.12);
+            color: white;
+            font-size: 19px;
+            transition: .2s;
+        }
+
+        .product-card__wishlist:hover,
+        .product-card__wishlist.active {
+            color: var(--khz-orange);
+            transform: scale(1.08);
+        }
+
+        .product-card__quick-wrap {
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            transform: translateY(70px);
+            transition: .3s;
+        }
+
+        .product-card:hover .product-card__quick-wrap {
+            transform: translateY(0);
+        }
+
+        .product-card__quick {
+            width: 100%;
+            padding: 11px;
+            border-radius: 10px;
+            background: white;
+            color: black;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .08em;
+        }
+
+        .product-card__quick:hover {
+            background: var(--khz-orange);
+            color: white;
+        }
+
+        .product-card__content {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            padding: 15px;
+        }
+
+        .product-card__sport {
+            color: var(--khz-orange);
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: .15em;
+        }
+
+        .product-card__title {
+            min-height: 42px;
+            margin-top: 7px;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.35;
+        }
+
+        .product-card__description {
+            min-height: 35px;
+            margin-top: 7px;
+            color: #717680;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+        .product-card__rating {
+            margin-top: 10px;
+            font-size: 11px;
+            color: #ff9a55;
+        }
+
+        .product-card__price {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-top: 13px;
+        }
+
+        .product-card__price strong {
+            font-size: 16px;
+            font-weight: 900;
+        }
+
+        .product-card__price del {
+            color: #656871;
+            font-size: 10px;
+        }
+
+        .product-card__stock {
+            margin-top: 6px;
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .in-stock {
+            color: #22c55e;
+        }
+
+        .out-stock {
+            color: #ef4444;
+        }
+
+        .product-card__cart {
+            width: 100%;
+            margin-top: 12px;
+            padding: 11px;
+            border-radius: 10px;
+            background: var(--khz-orange);
+            color: white;
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            transition: .2s;
+        }
+
+        .product-card__cart:hover:not(:disabled) {
+            background: #ff6d20;
+        }
+
+        .product-card__cart:disabled {
+            background: rgba(255,255,255,.05);
+            color: #555;
+            cursor: not-allowed;
+        }
+
+        /* Wishlist drawer */
+
+        .wishlist-overlay,
+        .cart-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 80;
+            background: rgba(0,0,0,.65);
+            opacity: 0;
+            pointer-events: none;
+            transition: .3s;
+        }
+
+        .wishlist-overlay.open,
+        .cart-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .wishlist-drawer,
+        .cart-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            z-index: 90;
+            width: min(420px, 92vw);
+            height: 100vh;
+            background: #101216;
+            border-left: 1px solid var(--khz-line);
+            transform: translateX(100%);
+            transition: .3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .wishlist-drawer.open,
+        .cart-drawer.open {
+            transform: translateX(0);
+        }
+
+        .drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            border-bottom: 1px solid var(--khz-line);
+        }
+
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .drawer-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--khz-line);
+        }
+
+        .drawer-item img {
+            width: 78px;
+            height: 78px;
+            object-fit: contain;
+            border-radius: 12px;
+            background: #080a0d;
+        }
+
+        .drawer-item-info {
+            flex: 1;
+        }
+
+        .drawer-item-name {
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .drawer-item-price {
+            margin-top: 6px;
+            color: var(--khz-orange);
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .drawer-remove {
+            color: #777;
+            font-size: 20px;
+        }
+
+        .drawer-remove:hover {
+            color: #ef4444;
+        }
+
+        .drawer-footer {
+            padding: 18px;
+            border-top: 1px solid var(--khz-line);
+        }
+
+        .drawer-empty {
+            padding: 60px 20px;
+            text-align: center;
+            color: #777;
+        }
+
+        /* Mobile menu */
+
+        .mobile-menu {
+            display: none;
+            border-top: 1px solid var(--khz-line);
+            background: #0d0f12;
+        }
+
+        .mobile-menu.open {
+            display: block;
+        }
+
+        .mobile-menu a {
+            display: block;
+            padding: 13px 4px;
+            border-bottom: 1px solid rgba(255,255,255,.05);
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        /* Quick view */
+
+        .quick-view-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(0,0,0,.8);
+            backdrop-filter: blur(8px);
+        }
+
+        .quick-view-box {
+            position: relative;
+            width: min(900px, 100%);
+            max-height: 90vh;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: #111318;
+            border: 1px solid var(--khz-line);
+            border-radius: 22px;
+            overflow: hidden;
+        }
+
+        .quick-view-image {
+            min-height: 420px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #080a0d;
+        }
+
+        .quick-view-image img {
+            width: 100%;
+            height: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            padding: 30px;
+        }
+
+        .quick-view-content {
+            padding: 35px;
+        }
+
+        .quick-view-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 5;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(0,0,0,.7);
+            font-size: 22px;
+        }
+
+        .size-option {
+            padding: 9px 14px;
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 8px;
+            font-size: 11px;
+        }
+
+        .size-option.active,
+        .size-option:hover {
+            border-color: var(--khz-orange);
+            color: var(--khz-orange);
+        }
+
+        .shop-toast {
+            position: fixed;
+            left: 50%;
+            bottom: 25px;
+            z-index: 200;
+            transform: translate(-50%, 25px);
+            padding: 13px 20px;
+            border-radius: 999px;
+            background: #fff;
+            color: #111;
+            font-size: 12px;
+            font-weight: 800;
+            opacity: 0;
+            pointer-events: none;
+            transition: .3s;
+        }
+
+        .shop-toast.show {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        @media (max-width: 767px) {
+            .quick-view-box {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-view-image {
+                min-height: 280px;
+            }
+
+            .quick-view-content {
+                padding: 25px;
+            }
+
+            .product-card__quick-wrap {
+                display: none;
+            }
+        }
+    </style>
 </head>
 
 <body class="antialiased">
 
+    <!-- HEADER -->
+    <header class="khz-header sticky top-0 z-40">
 
-<!-- =========================================================
-     HEADER
-========================================================= -->
+        <div class="max-w-7xl mx-auto px-4 lg:px-6">
 
-<header class="khz-header sticky top-0 z-40">
+            <div class="flex items-center justify-between h-16 gap-4">
 
-    <div class="max-w-7xl mx-auto px-4 lg:px-6">
+                <div class="flex items-center gap-3">
 
-        <div class="flex items-center justify-between h-16 gap-4">
+                    <button id="mobileMenuBtn" class="lg:hidden icon-btn p-1" aria-label="Open menu"
+                        aria-expanded="false">
+                        ☰
+                    </button>
 
-            <!-- LOGO -->
-
-            <div class="flex items-center gap-3">
-
-                <button id="mobileMenuBtn" class="lg:hidden icon-btn p-1" aria-label="Open menu">
-
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M3 6h18M3 12h18M3 18h18" />
-                    </svg>
-
-                </button>
-
-                <a href="homepage.html" class="flex items-center gap-2">
-
-                    <span class="logo-mark w-8 h-8 flex items-center justify-center">
-
-                        <span class="font-display text-[#0A0A0A] text-lg leading-none pl-1">
-                            K
+                    <a href="homepage.html" class="flex items-center gap-2">
+                        <span class="logo-mark w-8 h-8 flex items-center justify-center">
+                            <span class="font-display text-[#0A0A0A] text-lg leading-none">K</span>
                         </span>
 
+                        <span class="font-display text-xl tracking-wide">
+                            KHELZONE
+                        </span>
+                    </a>
+
+                </div>
+
+                <nav class="hidden lg:flex items-center gap-8">
+
+                    <a href="#shopGrid" class="nav-link active">Shop</a>
+                    <a href="#categorySection" class="nav-link">Categories</a>
+                    <a href="#trendingSection" class="nav-link">Trending</a>
+                    <a href="#offerBanner" class="nav-link">Sale</a>
+                    <a href="about.html" class="nav-link">About</a>
+
+                </nav>
+
+                <div class="hidden md:flex flex-1 max-w-md relative">
+
+                    <input id="searchInput" type="text"
+                        placeholder="Search football, cricket, jerseys, shoes..."
+                        class="w-full bg-white/5 border border-white/10 rounded-full pl-11 pr-9 py-2.5 text-sm placeholder:text-white/35 focus:outline-none focus:border-orange-500 transition">
+
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 opacity-50">
+                        🔎
                     </span>
 
-                    <span class="font-display text-xl tracking-wide">
-                        KHELZONE
-                    </span>
-
-                </a>
-
-            </div>
-
-
-            <!-- NAVIGATION -->
-
-            <nav class="hidden lg:flex items-center gap-8">
-
-                <a href="#shopGrid" class="nav-link active">
-                    Shop
-                </a>
-
-                <a href="#categorySection" class="nav-link">
-                    Categories
-                </a>
-
-                <a href="#trendingSection" class="nav-link">
-                    Trending
-                </a>
-
-                <a href="#offerBanner" class="nav-link">
-                    Sale
-                </a>
-
-                <a href="#footer" class="nav-link">
-                    About
-                </a>
-
-            </nav>
-
-
-            <!-- SEARCH -->
-
-            <div class="hidden md:flex flex-1 max-w-md relative">
-
-                <input id="searchInput" type="text"
-                    placeholder="Search football, cricket, jerseys, shoes..."
-                    class="w-full bg-white/5 border border-white/10 rounded-full pl-11 pr-9 py-2.5 text-sm placeholder:text-white/35 focus:outline-none focus:border-[color:var(--khz-orange)] transition">
-
-                <svg class="absolute left-4 top-1/2 -translate-y-1/2 opacity-50" width="16" height="16"
-                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-
-                    <circle cx="11" cy="11" r="7" />
-                    <path d="M21 21l-4.3-4.3" />
-
-                </svg>
-
-                <button id="searchClearBtn"
-                    class="hidden absolute right-3 top-1/2 -translate-y-1/2 opacity-60 hover:opacity-100"
-                    aria-label="Clear search">
-
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2.5">
-
-                        <path d="M18 6L6 18M6 6l12 12" />
-
-                    </svg>
-
-                </button>
-
-            </div>
-
-
-            <!-- HEADER ICONS -->
-
-            <div class="flex items-center gap-4 lg:gap-5">
-
-                <!-- WISHLIST -->
-
-                <button id="wishlistIconBtn" class="icon-btn" aria-label="Wishlist">
-
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-
-                        <path
-                            d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 10-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z" />
-
-                    </svg>
-
-                    <span id="wishlistCount" class="badge-count hidden">
-                        0
-                    </span>
-
-                </button>
-
-
-                <!-- CART -->
-
-                <button id="cartIconBtn" class="icon-btn hidden sm:inline-flex" aria-label="Cart">
-
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-
-                        <circle cx="9" cy="21" r="1" />
-                        <circle cx="20" cy="21" r="1" />
-
-                        <path
-                            d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
-
-                    </svg>
-
-                    <span id="cartCount" class="badge-count hidden">
-                        0
-                    </span>
-
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <!-- MOBILE SEARCH -->
-
-        <div class="md:hidden pb-3 relative">
-
-            <input id="searchInputMobile" type="text" placeholder="Search KHELZONE..."
-                class="w-full bg-white/5 border border-white/10 rounded-full pl-11 pr-4 py-2.5 text-sm placeholder:text-white/35 focus:outline-none focus:border-[color:var(--khz-orange)]">
-
-            <svg class="absolute left-4 top-1/2 -translate-y-1/2 opacity-50" width="16" height="16"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-
-                <circle cx="11" cy="11" r="7" />
-                <path d="M21 21l-4.3-4.3" />
-
-            </svg>
-
-        </div>
-
-    </div>
-
-    <div class="stripe-divider"></div>
-
-</header>
-
-
-<!-- =========================================================
-     HERO SECTION
-========================================================= -->
-
-<section class="hero-section speed-stripes relative py-16 lg:py-24 px-4 lg:px-6">
-
-    <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center relative">
-
-        <div>
-
-            <p class="section-eyebrow mb-4">
-                KHELZONE Sports Marketplace
-            </p>
-
-            <h1 class="font-display hero-headline mb-6">
-
-                GEAR UP
-                <br>
-
-                FOR THE
-
-                <span class="accent">
-                    GAME
-                </span>
-
-            </h1>
-
-            <p class="text-white/60 text-base lg:text-lg max-w-md mb-8">
-
-                Premium sports equipment, apparel and accessories built for athletes who refuse to settle.
-
-            </p>
-
-
-            <div class="flex flex-wrap gap-4 mb-10">
-
-                <a href="#shopGrid" class="cta-primary px-8 py-4 inline-block text-sm">
-                    SHOP NOW
-                </a>
-
-                <a href="#categorySection" class="cta-outline px-8 py-4 inline-block text-sm">
-                    BROWSE CATEGORIES
-                </a>
-
-            </div>
-
-
-            <div class="flex gap-8">
-
-                <div>
-
-                    <p class="font-display text-2xl text-[color:var(--khz-orange)]">
-                        350+
-                    </p>
-
-                    <p class="text-xs text-white/50 uppercase tracking-wide">
-                        Premium Products
-                    </p>
-
-                </div>
-
-
-                <div>
-
-                    <p class="font-display text-2xl text-[color:var(--khz-orange)]">
-                        11
-                    </p>
-
-                    <p class="text-xs text-white/50 uppercase tracking-wide">
-                        Sports Covered
-                    </p>
-
-                </div>
-
-
-                <div>
-
-                    <p class="font-display text-2xl text-[color:var(--khz-orange)]">
-                        4.6★
-                    </p>
-
-                    <p class="text-xs text-white/50 uppercase tracking-wide">
-                        Avg. Rating
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- HERO IMAGE -->
-
-        <div class="hero-visual-frame">
-
-            <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1000&q=80"
-                alt="Sports equipment" class="w-full h-[320px] lg:h-[460px] object-cover">
-
-            <div class="hero-stat-chip absolute bottom-5 left-5 rounded-xl px-4 py-3">
-
-                <p class="text-xs text-white/50">
-                    Trending now
-                </p>
-
-                <p class="font-bold text-sm">
-                    Cricket & Football Gear
-                </p>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     CATEGORIES
-========================================================= -->
-
-<section id="categorySection" class="py-16 px-4 lg:px-6">
-
-    <div class="max-w-7xl mx-auto">
-
-        <div class="mb-8">
-
-            <p class="section-eyebrow mb-2">
-                Shop by Sport
-            </p>
-
-            <h2 class="font-display text-3xl lg:text-4xl">
-                FIND YOUR GAME
-            </h2>
-
-        </div>
-
-
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
-
-
-            <div class="cat-card h-56" data-sport="Football">
-
-                <img src="https://images.unsplash.com/photo-1614632537197-38a17061c2bd?w=400&q=80"
-                    class="absolute inset-0 w-full h-full object-cover" alt="Football">
-
-                <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-
-                    <h3 class="font-display text-lg">
-                        FOOTBALL
-                    </h3>
-
-                    <p class="text-xs text-white/60">
-                        Boots, jerseys & balls
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="cat-card h-56" data-sport="Cricket">
-
-                <img src="https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=400&q=80"
-                    class="absolute inset-0 w-full h-full object-cover" alt="Cricket">
-
-                <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-
-                    <h3 class="font-display text-lg">
-                        CRICKET
-                    </h3>
-
-                    <p class="text-xs text-white/60">
-                        Bats, pads & gloves
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="cat-card h-56" data-sport="Tennis">
-
-                <img src="https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=400&q=80"
-                    class="absolute inset-0 w-full h-full object-cover" alt="Tennis">
-
-                <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-
-                    <h3 class="font-display text-lg">
-                        TENNIS
-                    </h3>
-
-                    <p class="text-xs text-white/60">
-                        Rackets & apparel
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="cat-card h-56" data-sport="Basketball">
-
-                <img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400&q=80"
-                    class="absolute inset-0 w-full h-full object-cover" alt="Basketball">
-
-                <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-
-                    <h3 class="font-display text-lg">
-                        BASKETBALL
-                    </h3>
-
-                    <p class="text-xs text-white/60">
-                        Shoes & jerseys
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="cat-card h-56" data-sport="Volleyball">
-
-                <img src="https://images.unsplash.com/photo-1544717684-1243da23b6cd?w=400&q=80"
-                    class="absolute inset-0 w-full h-full object-cover" alt="Volleyball">
-
-                <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-
-                    <h3 class="font-display text-lg">
-                        VOLLEYBALL
-                    </h3>
-
-                    <p class="text-xs text-white/60">
-                        Nets, balls & gear
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="cat-card h-56" data-sport="Badminton">
-
-                <img src="https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=400&q=80"
-                    class="absolute inset-0 w-full h-full object-cover" alt="Badminton">
-
-                <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-
-                    <h3 class="font-display text-lg">
-                        BADMINTON
-                    </h3>
-
-                    <p class="text-xs text-white/60">
-                        Rackets & shuttles
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="cat-card h-56" data-sport="Fitness">
-
-                <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&q=80"
-                    class="absolute inset-0 w-full h-full object-cover" alt="Fitness">
-
-                <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-
-                    <h3 class="font-display text-lg">
-                        FITNESS
-                    </h3>
-
-                    <p class="text-xs text-white/60">
-                        Training equipment
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="cat-card h-56" data-sport="Running">
-
-                <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=400&q=80"
-                    class="absolute inset-0 w-full h-full object-cover" alt="Running">
-
-                <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-
-                    <h3 class="font-display text-lg">
-                        RUNNING
-                    </h3>
-
-                    <p class="text-xs text-white/60">
-                        Shoes & accessories
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     TRENDING PRODUCTS
-========================================================= -->
-
-<section id="trendingSection" class="py-16 px-4 lg:px-6" style="background:var(--khz-bg-alt)">
-
-    <div class="max-w-7xl mx-auto">
-
-        <p class="section-eyebrow mb-2">
-            Hand-picked
-        </p>
-
-        <h2 class="font-display text-3xl lg:text-4xl mb-8">
-            TRENDING GEAR
-        </h2>
-
-
-        <!-- PRODUCTS FROM SUPABASE -->
-
-        <div id="trendingGrid"
-            class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     SHOP PRODUCTS
-========================================================= -->
-
-<section id="shopGrid" class="py-16 px-4 lg:px-6">
-
-    <div class="max-w-7xl mx-auto">
-
-
-        <!-- TOOLBAR -->
-
-        <div
-            class="flex flex-wrap items-center justify-between gap-4 mb-8 pb-4 border-b"
-            style="border-color:var(--khz-line)">
-
-            <p id="toolbarCount" class="text-sm text-white/60">
-                Loading products...
-            </p>
-
-
-            <div class="flex items-center gap-3">
-
-                <select id="sortSelect"
-                    class="bg-white/5 border border-white/10 rounded-full px-4 py-2 text-xs focus:outline-none">
-
-                    <option value="featured">
-                        Sort: Featured
-                    </option>
-
-                    <option value="newest">
-                        Sort: Newest
-                    </option>
-
-                    <option value="price-low">
-                        Price: Low to High
-                    </option>
-
-                    <option value="price-high">
-                        Price: High to Low
-                    </option>
-
-                </select>
-
-            </div>
-
-        </div>
-
-
-        <div class="grid lg:grid-cols-[260px_1fr] gap-8">
-
-
-            <!-- FILTER SIDEBAR -->
-
-            <aside class="hidden lg:block space-y-6">
-
-                <div class="flex items-center justify-between">
-
-                    <h3 class="font-display text-lg">
-                        FILTERS
-                    </h3>
-
-                    <button id="clearFiltersBtn"
-                        class="text-xs underline"
-                        style="color:var(--khz-gray)">
-
-                        Clear All
-
+                    <button id="searchClearBtn"
+                        class="hidden absolute right-3 top-1/2 -translate-y-1/2 opacity-60 hover:opacity-100">
+                        ×
                     </button>
 
                 </div>
 
+                <div class="flex items-center gap-4">
 
-                <!-- SPORT FILTER -->
+                    <button id="wishlistIconBtn" class="icon-btn" aria-label="Wishlist">
+                        <span class="text-xl">♡</span>
+                        <span id="wishlistCount" class="badge-count hidden">0</span>
+                    </button>
 
-                <div class="filter-block">
-
-                    <h4 class="font-bold text-sm mb-3">
-                        Sport
-                    </h4>
-
-
-                    <div class="space-y-2">
-
-                        <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
-
-                            <input type="checkbox"
-                                data-filter="sport"
-                                value="Football">
-
-                            Football
-
-                        </label>
-
-
-                        <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
-
-                            <input type="checkbox"
-                                data-filter="sport"
-                                value="Cricket">
-
-                            Cricket
-
-                        </label>
-
-
-                        <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
-
-                            <input type="checkbox"
-                                data-filter="sport"
-                                value="Tennis">
-
-                            Tennis
-
-                        </label>
-
-
-                        <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
-
-                            <input type="checkbox"
-                                data-filter="sport"
-                                value="Basketball">
-
-                            Basketball
-
-                        </label>
-
-
-                        <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
-
-                            <input type="checkbox"
-                                data-filter="sport"
-                                value="Fitness">
-
-                            Fitness
-
-                        </label>
-
-                    </div>
+                    <button id="cartIconBtn" class="icon-btn" aria-label="Cart">
+                        🛒
+                        <span id="cartCount" class="badge-count hidden">0</span>
+                    </button>
 
                 </div>
 
+            </div>
 
-                <!-- PRODUCT TYPE -->
+            <!-- MOBILE MENU -->
+            <div id="mobileMenu" class="mobile-menu lg:hidden">
+                <a href="#shopGrid">Shop</a>
+                <a href="#categorySection">Categories</a>
+                <a href="#trendingSection">Trending</a>
+                <a href="#offerBanner">Sale</a>
+                <a href="about.html">About</a>
+            </div>
 
-                <div class="filter-block border-t pt-5"
-                    style="border-color:var(--khz-line)">
+            <!-- MOBILE SEARCH -->
+            <div class="md:hidden pb-3 relative">
 
-                    <h4 class="font-bold text-sm mb-3">
-                        Product Type
-                    </h4>
+                <input id="searchInputMobile" type="text"
+                    placeholder="Search KHELZONE..."
+                    class="w-full bg-white/5 border border-white/10 rounded-full pl-11 pr-4 py-2.5 text-sm placeholder:text-white/35 focus:outline-none focus:border-orange-500">
 
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 opacity-50">
+                    🔎
+                </span>
 
-                    <div class="space-y-2">
+            </div>
 
-                        <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+        </div>
 
-                            <input type="checkbox"
-                                data-filter="type"
-                                value="Shoes">
+        <div class="stripe-divider"></div>
 
-                            Shoes
-
-                        </label>
-
-
-                        <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
-
-                            <input type="checkbox"
-                                data-filter="type"
-                                value="Jerseys">
-
-                            Jerseys
-
-                        </label>
+    </header>
 
 
-                        <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+    <!-- HERO -->
+    <section class="hero-section speed-stripes relative py-16 lg:py-24 px-4 lg:px-6">
 
-                            <input type="checkbox"
-                                data-filter="type"
-                                value="Balls">
-
-                            Balls
-
-                        </label>
-
-
-                        <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
-
-                            <input type="checkbox"
-                                data-filter="type"
-                                value="Bats">
-
-                            Bats
-
-                        </label>
-
-
-                        <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
-
-                            <input type="checkbox"
-                                data-filter="type"
-                                value="Gloves">
-
-                            Gloves
-
-                        </label>
-
-                    </div>
-
-                </div>
-
-
-                <!-- PRICE -->
-
-                <div class="filter-block border-t pt-5"
-                    style="border-color:var(--khz-line)">
-
-                    <h4 class="font-bold text-sm mb-3">
-                        Price
-                    </h4>
-
-
-                    <input id="priceRange"
-                        type="range"
-                        min="500"
-                        max="100000"
-                        step="500"
-                        value="100000"
-                        class="khz-range w-full">
-
-
-                    <div class="flex justify-between text-xs mt-2"
-                        style="color:var(--khz-gray)">
-
-                        <span>
-                            Rs. 500
-                        </span>
-
-                        <span id="priceRangeLabel">
-                            Rs. 100,000
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </aside>
-
-
-            <!-- =====================================================
-                 DYNAMIC PRODUCT GRID
-
-                 DASHBOARD → SUPABASE → SHOP.JS → HERE
-            ====================================================== -->
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center relative">
 
             <div>
 
-                <div id="productGrid"
-                    class="grid grid-cols-2 lg:grid-cols-3 gap-5">
+                <p class="section-eyebrow mb-4">
+                    KHELZONE Sports Marketplace
+                </p>
 
-                    <!--
-                    Products automatically inserted by shop.js
-                    from Supabase database
-                    -->
+                <h1 class="font-display hero-headline mb-6">
+                    GEAR UP
+                    <br>
+                    FOR THE
+                    <span class="accent">GAME</span>
+                </h1>
+
+                <p class="text-white/60 text-base lg:text-lg max-w-md mb-8">
+                    Premium sports equipment, apparel and accessories built for athletes who refuse to settle.
+                </p>
+
+                <div class="flex flex-wrap gap-4 mb-10">
+
+                    <a href="#shopGrid" class="cta-primary px-8 py-4 inline-block text-sm">
+                        SHOP NOW
+                    </a>
+
+                    <a href="#categorySection" class="cta-outline px-8 py-4 inline-block text-sm">
+                        BROWSE CATEGORIES
+                    </a>
 
                 </div>
 
+                <div class="flex gap-8">
 
-                <!-- EMPTY STATE -->
+                    <div>
+                        <p class="font-display text-2xl text-orange-500">350+</p>
+                        <p class="text-xs text-white/50 uppercase">Premium Products</p>
+                    </div>
 
-                <div id="emptyState"
-                    class="hidden text-center py-20">
+                    <div>
+                        <p class="font-display text-2xl text-orange-500">11</p>
+                        <p class="text-xs text-white/50 uppercase">Sports Covered</p>
+                    </div>
 
-                    <p class="font-display text-2xl mb-2">
-                        NO PRODUCTS FOUND
+                    <div>
+                        <p class="font-display text-2xl text-orange-500">4.6★</p>
+                        <p class="text-xs text-white/50 uppercase">Avg. Rating</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="hero-visual-frame">
+
+                <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1000&q=80"
+                    alt="Sports equipment" class="w-full h-[320px] lg:h-[460px] object-cover">
+
+                <div class="hero-stat-chip absolute bottom-5 left-5 rounded-xl px-4 py-3">
+
+                    <p class="text-xs text-white/50">Trending now</p>
+
+                    <p class="font-bold text-sm">
+                        Cricket & Football Gear
                     </p>
-
-                    <p class="text-sm mb-6"
-                        style="color:var(--khz-gray)">
-
-                        No products available yet.
-
-                    </p>
-
-                    <button id="clearFiltersBtn2"
-                        class="cta-primary px-6 py-3 text-xs">
-
-                        CLEAR ALL FILTERS
-
-                    </button>
 
                 </div>
 
@@ -834,206 +820,525 @@
 
         </div>
 
-    </div>
-
-</section>
+    </section>
 
 
-<!-- =========================================================
-     OFFER
-========================================================= -->
+    <!-- CATEGORIES -->
+    <section id="categorySection" class="py-16 px-4 lg:px-6">
 
-<section id="offerBanner"
-    class="offer-banner speed-stripes relative py-16 px-4 lg:px-6 my-4">
+        <div class="max-w-7xl mx-auto">
 
-    <div
-        class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-8">
+            <div class="mb-8">
+                <p class="section-eyebrow mb-2">Shop by Sport</p>
+                <h2 class="font-display text-3xl lg:text-4xl">FIND YOUR GAME</h2>
+            </div>
 
-        <div>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
 
-            <p class="section-eyebrow mb-2">
-                Limited Time
-            </p>
+                <div class="cat-card h-56" data-sport="Football">
+                    <img src="https://images.unsplash.com/photo-1614632537197-38a17061c2bd?w=600&q=80"
+                        class="absolute inset-0 w-full h-full object-cover" alt="Football">
+                    <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
+                        <h3 class="font-display text-lg">FOOTBALL</h3>
+                        <p class="text-xs text-white/60">Boots, jerseys & balls</p>
+                    </div>
+                </div>
 
-            <h2 class="font-display text-3xl lg:text-5xl mb-2">
-                UP TO 40% OFF
+                <div class="cat-card h-56" data-sport="Cricket">
+                    <img src="https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=600&q=80"
+                        class="absolute inset-0 w-full h-full object-cover" alt="Cricket">
+                    <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
+                        <h3 class="font-display text-lg">CRICKET</h3>
+                        <p class="text-xs text-white/60">Bats, pads & gloves</p>
+                    </div>
+                </div>
+
+                <div class="cat-card h-56" data-sport="Tennis">
+                    <img src="https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=600&q=80"
+                        class="absolute inset-0 w-full h-full object-cover" alt="Tennis">
+                    <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
+                        <h3 class="font-display text-lg">TENNIS</h3>
+                        <p class="text-xs text-white/60">Rackets & apparel</p>
+                    </div>
+                </div>
+
+                <div class="cat-card h-56" data-sport="Basketball">
+                    <img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&q=80"
+                        class="absolute inset-0 w-full h-full object-cover" alt="Basketball">
+                    <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
+                        <h3 class="font-display text-lg">BASKETBALL</h3>
+                        <p class="text-xs text-white/60">Shoes & jerseys</p>
+                    </div>
+                </div>
+
+                <div class="cat-card h-56" data-sport="Volleyball">
+                    <img src="https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=900&q=85"
+                        class="absolute inset-0 w-full h-full object-cover" alt="Volleyball">
+                    <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
+                        <h3 class="font-display text-lg">VOLLEYBALL</h3>
+                        <p class="text-xs text-white/60">Balls, nets & gear</p>
+                    </div>
+                </div>
+
+                <div class="cat-card h-56" data-sport="Badminton">
+                    <img src="https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=600&q=80"
+                        class="absolute inset-0 w-full h-full object-cover" alt="Badminton">
+                    <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
+                        <h3 class="font-display text-lg">BADMINTON</h3>
+                        <p class="text-xs text-white/60">Rackets & shuttles</p>
+                    </div>
+                </div>
+
+                <div class="cat-card h-56" data-sport="Fitness">
+                    <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80"
+                        class="absolute inset-0 w-full h-full object-cover" alt="Fitness">
+                    <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
+                        <h3 class="font-display text-lg">FITNESS</h3>
+                        <p class="text-xs text-white/60">Training equipment</p>
+                    </div>
+                </div>
+
+                <div class="cat-card h-56" data-sport="Running">
+                    <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=600&q=80"
+                        class="absolute inset-0 w-full h-full object-cover" alt="Running">
+                    <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
+                        <h3 class="font-display text-lg">RUNNING</h3>
+                        <p class="text-xs text-white/60">Shoes & accessories</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- TRENDING -->
+    <section id="trendingSection" class="py-16 px-4 lg:px-6" style="background:var(--khz-bg-alt)">
+
+        <div class="max-w-7xl mx-auto">
+
+            <p class="section-eyebrow mb-2">Hand-picked</p>
+
+            <h2 class="font-display text-3xl lg:text-4xl mb-8">
+                TRENDING GEAR
             </h2>
 
-            <p class="text-lg lg:text-xl text-white/70">
-                LEVEL UP YOUR GAME
-            </p>
+            <div id="trendingGrid"
+                class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
+            </div>
 
         </div>
 
-
-        <a href="#shopGrid"
-            class="cta-primary px-10 py-4 inline-block text-sm">
-
-            SHOP SALE
-
-        </a>
-
-    </div>
-
-</section>
+    </section>
 
 
-<!-- =========================================================
-     FOOTER
-========================================================= -->
+    <!-- SHOP -->
+    <section id="shopGrid" class="py-16 px-4 lg:px-6">
 
-<footer id="footer"
-    class="pt-16 pb-8 px-4 lg:px-6 border-t"
-    style="border-color:var(--khz-line)">
+        <div class="max-w-7xl mx-auto">
 
-    <div class="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-8 pb-4 border-b"
+                style="border-color:var(--khz-line)">
 
+                <p id="toolbarCount" class="text-sm text-white/60">
+                    Loading products...
+                </p>
 
-        <div class="col-span-2 lg:col-span-1">
+                <div class="flex items-center gap-3">
 
-            <div class="flex items-center gap-2 mb-4">
+                    <button id="clearFiltersBtn"
+                        class="text-xs underline text-white/50 hover:text-orange-500">
+                        Clear All
+                    </button>
 
-                <span
-                    class="logo-mark w-7 h-7 flex items-center justify-center">
+                    <select id="sortSelect"
+                        class="bg-white/5 border border-white/10 rounded-full px-4 py-2 text-xs focus:outline-none">
 
-                    <span
-                        class="font-display text-[#0A0A0A] text-base leading-none pl-1">
+                        <option value="featured">Sort: Featured</option>
+                        <option value="newest">Sort: Newest</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="rating">Top Rated</option>
 
-                        K
+                    </select>
 
-                    </span>
-
-                </span>
-
-
-                <span class="font-display text-lg">
-                    KHELZONE
-                </span>
+                </div>
 
             </div>
 
 
-            <p class="text-xs"
-                style="color:var(--khz-gray)">
+            <div class="grid lg:grid-cols-[260px_1fr] gap-8">
 
-                Gear Up. Play Hard.
+                <!-- FILTERS -->
+                <aside class="hidden lg:block space-y-6">
 
+                    <div class="flex items-center justify-between">
+
+                        <h3 class="font-display text-lg">FILTERS</h3>
+
+                    </div>
+
+
+                    <div>
+
+                        <h4 class="font-bold text-sm mb-3">Sport</h4>
+
+                        <div class="space-y-2">
+
+                            <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+                                <input type="checkbox" data-filter="sport" value="Football">
+                                Football
+                            </label>
+
+                            <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+                                <input type="checkbox" data-filter="sport" value="Cricket">
+                                Cricket
+                            </label>
+
+                            <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+                                <input type="checkbox" data-filter="sport" value="Tennis">
+                                Tennis
+                            </label>
+
+                            <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+                                <input type="checkbox" data-filter="sport" value="Basketball">
+                                Basketball
+                            </label>
+
+                            <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+                                <input type="checkbox" data-filter="sport" value="Volleyball">
+                                Volleyball
+                            </label>
+
+                            <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+                                <input type="checkbox" data-filter="sport" value="Badminton">
+                                Badminton
+                            </label>
+
+                            <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+                                <input type="checkbox" data-filter="sport" value="Fitness">
+                                Fitness
+                            </label>
+
+                            <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+                                <input type="checkbox" data-filter="sport" value="Running">
+                                Running
+                            </label>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="border-t pt-5" style="border-color:var(--khz-line)">
+
+                        <h4 class="font-bold text-sm mb-3">Product Type</h4>
+
+                        <div class="space-y-2">
+
+                            <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+                                <input type="checkbox" data-filter="type" value="Shoes">
+                                Shoes
+                            </label>
+
+                            <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+                                <input type="checkbox" data-filter="type" value="Jerseys">
+                                Jerseys
+                            </label>
+
+                            <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+                                <input type="checkbox" data-filter="type" value="Balls">
+                                Balls
+                            </label>
+
+                            <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+                                <input type="checkbox" data-filter="type" value="Bats">
+                                Bats
+                            </label>
+
+                            <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+                                <input type="checkbox" data-filter="type" value="Gloves">
+                                Gloves
+                            </label>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="border-t pt-5" style="border-color:var(--khz-line)">
+
+                        <h4 class="font-bold text-sm mb-3">Price</h4>
+
+                        <input id="priceRange"
+                            type="range"
+                            min="500"
+                            max="100000"
+                            step="500"
+                            value="100000"
+                            class="khz-range w-full">
+
+                        <div class="flex justify-between text-xs mt-2 text-white/40">
+
+                            <span>Rs. 500</span>
+
+                            <span id="priceRangeLabel">
+                                Rs. 100,000
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </aside>
+
+
+                <!-- PRODUCTS -->
+                <div>
+
+                    <div id="productGrid"
+                        class="grid grid-cols-2 lg:grid-cols-3 gap-5">
+                    </div>
+
+                    <div id="emptyState" class="hidden text-center py-20">
+
+                        <p class="font-display text-2xl mb-2">
+                            NO PRODUCTS FOUND
+                        </p>
+
+                        <p class="text-sm mb-6 text-white/40">
+                            Try changing your search or filters.
+                        </p>
+
+                        <button id="clearFiltersBtn2"
+                            class="cta-primary px-6 py-3 text-xs">
+                            CLEAR ALL FILTERS
+                        </button>
+
+                    </div>
+
+                    <div class="text-center mt-8">
+
+                        <button id="loadMoreBtn"
+                            class="hidden cta-outline px-7 py-3 text-xs">
+                            LOAD MORE
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- OFFER -->
+    <section id="offerBanner"
+        class="offer-banner speed-stripes relative py-16 px-4 lg:px-6 my-4">
+
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-8">
+
+            <div>
+
+                <p class="section-eyebrow mb-2">Limited Time</p>
+
+                <h2 class="font-display text-3xl lg:text-5xl mb-2">
+                    UP TO 40% OFF
+                </h2>
+
+                <p class="text-lg lg:text-xl text-white/70">
+                    LEVEL UP YOUR GAME
+                </p>
+
+            </div>
+
+            <a href="#shopGrid" class="cta-primary px-10 py-4 inline-block text-sm">
+                SHOP SALE
+            </a>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer id="footer"
+        class="pt-16 pb-8 px-4 lg:px-6 border-t"
+        style="border-color:var(--khz-line)">
+
+        <div class="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+
+            <div class="col-span-2 lg:col-span-1">
+
+                <div class="flex items-center gap-2 mb-4">
+
+                    <span class="logo-mark w-7 h-7 flex items-center justify-center">
+                        <span class="font-display text-[#0A0A0A] text-base">K</span>
+                    </span>
+
+                    <span class="font-display text-lg">KHELZONE</span>
+
+                </div>
+
+                <p class="text-xs text-white/40">
+                    Gear Up. Play Hard.
+                </p>
+
+            </div>
+
+            <div>
+
+                <h4 class="font-bold text-sm mb-4">KHELZONE</h4>
+
+                <ul class="space-y-2 text-xs text-white/40">
+
+                    <li>
+                        <a href="about.html" class="hover:text-orange-500">
+                            About KHELZONE
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="hover:text-orange-500">
+                            Contact Us
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="seller.html" class="hover:text-orange-500">
+                            Become a Seller
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
+
+            <div>
+
+                <h4 class="font-bold text-sm mb-4">SHOP</h4>
+
+                <ul class="space-y-2 text-xs text-white/40">
+
+                    <li><button data-footer-category="Football">Football</button></li>
+                    <li><button data-footer-category="Cricket">Cricket</button></li>
+                    <li><button data-footer-category="Tennis">Tennis</button></li>
+                    <li><button data-footer-category="Basketball">Basketball</button></li>
+                    <li><button data-footer-category="Volleyball">Volleyball</button></li>
+
+                </ul>
+
+            </div>
+
+            <div>
+
+                <h4 class="font-bold text-sm mb-4">HELP</h4>
+
+                <ul class="space-y-2 text-xs text-white/40">
+
+                    <li>Shipping</li>
+                    <li>Returns</li>
+                    <li>FAQs</li>
+                    <li>Track Order</li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+        <div class="max-w-7xl mx-auto pt-6 border-t text-center"
+            style="border-color:var(--khz-line)">
+
+            <p class="text-xs text-white/40">
+                © <span id="yearNow"></span> KHELZONE. All Rights Reserved.
             </p>
 
         </div>
 
+    </footer>
 
-        <div>
 
-            <h4 class="font-bold text-sm mb-4">
-                KHELZONE
-            </h4>
+    <!-- WISHLIST OVERLAY -->
+    <div id="wishlistOverlay" class="wishlist-overlay"></div>
 
-            <ul class="space-y-2 text-xs"
-                style="color:var(--khz-gray)">
+    <!-- WISHLIST DRAWER -->
+    <aside id="wishlistDrawer" class="wishlist-drawer">
 
-                <li>
-                    <a href="#">
-                        About KHELZONE
-                    </a>
-                </li>
+        <div class="drawer-header">
 
-                <li>
-                    <a href="#">
-                        Contact Us
-                    </a>
-                </li>
+            <div>
+                <p class="section-eyebrow">Saved Items</p>
+                <h2 class="font-display text-2xl">WISHLIST</h2>
+            </div>
 
-                <li>
-                    <a href="#">
-                        Become a Seller
-                    </a>
-                </li>
-
-            </ul>
+            <button id="closeWishlistBtn" class="text-2xl text-white/60 hover:text-white">
+                ×
+            </button>
 
         </div>
 
+        <div id="wishlistItems" class="drawer-body"></div>
 
-        <div>
-
-            <h4 class="font-bold text-sm mb-4">
-                SHOP
-            </h4>
-
-            <ul class="space-y-2 text-xs"
-                style="color:var(--khz-gray)">
-
-                <li>Football</li>
-                <li>Cricket</li>
-                <li>Tennis</li>
-                <li>Basketball</li>
-
-            </ul>
-
-        </div>
+    </aside>
 
 
-        <div>
+    <!-- CART OVERLAY -->
+    <div id="cartOverlay" class="cart-overlay"></div>
 
-            <h4 class="font-bold text-sm mb-4">
-                HELP
-            </h4>
+    <!-- CART DRAWER -->
+    <aside id="cartDrawer" class="cart-drawer">
 
-            <ul class="space-y-2 text-xs"
-                style="color:var(--khz-gray)">
+        <div class="drawer-header">
 
-                <li>Shipping</li>
-                <li>Returns</li>
-                <li>FAQs</li>
-                <li>Track Order</li>
+            <div>
+                <p class="section-eyebrow">Your Gear</p>
+                <h2 class="font-display text-2xl">CART</h2>
+            </div>
 
-            </ul>
+            <button id="closeCartBtn" class="text-2xl text-white/60 hover:text-white">
+                ×
+            </button>
 
         </div>
 
-    </div>
+        <div id="cartDrawerItems" class="drawer-body"></div>
+
+        <div class="drawer-footer">
+
+            <div class="flex justify-between mb-4">
+
+                <span class="text-sm text-white/50">
+                    Total
+                </span>
+
+                <strong id="cartDrawerTotal" class="text-orange-500">
+                    Rs. 0
+                </strong>
+
+            </div>
+
+            <button id="goToCartBtn"
+                class="cta-primary w-full py-3 text-xs">
+                VIEW FULL CART
+            </button>
+
+        </div>
+
+    </aside>
 
 
-    <div class="max-w-7xl mx-auto pt-6 border-t text-center"
-        style="border-color:var(--khz-line)">
+    <!-- SUPABASE -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        <p class="text-xs"
-            style="color:var(--khz-gray)">
+    <!-- SHOP JS -->
+    <script src="shop.js"></script>
 
-            © <span id="yearNow"></span>
-            KHELZONE. All Rights Reserved.
-
-        </p>
-
-    </div>
-
-</footer>
-
-
-<!-- =========================================================
-     SUPABASE
-========================================================= -->
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-
-<!-- =========================================================
-     SHOP JAVASCRIPT
-
-     IMPORTANT:
-     shop.js will fetch products from Supabase.
-
-     Dashboard Product Add
-             ↓
-     Supabase Database
-             ↓
-     shop.js
-             ↓
-     productGrid
-========================================================= -->
-
-<script src="shop.js"></script>
 </body>
-
 </html>
+```

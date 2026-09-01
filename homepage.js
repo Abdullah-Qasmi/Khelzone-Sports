@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
     /* =========================================================
        ADD TO CART
        Used by the "Add to Cart" buttons rendered on Best Seller
-       cards in index.html (delegated, since the grid re-renders).
+       cards in homepage.html (delegated, since the grid re-renders).
     ========================================================== */
 
     function addToHomepageCart(id) {
@@ -77,7 +77,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const cart = loadCart();
 
         const existing = cart.find(
-            item => String(item.id) === String(id) && item.size === "Standard"
+            item =>
+                String(item.id) === String(id) &&
+                item.size === "Standard"
         );
 
         if (existing) {
@@ -86,7 +88,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         } else {
 
-            cart.push({ id: id, size: "Standard", qty: 1 });
+            cart.push({
+                id: id,
+                size: "Standard",
+                qty: 1
+            });
         }
 
         saveCart(cart);
@@ -107,7 +113,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         try {
 
-            const saved = JSON.parse(localStorage.getItem(WISHLIST_KEY) || "[]");
+            const saved = JSON.parse(
+                localStorage.getItem(WISHLIST_KEY) || "[]"
+            );
 
             return Array.isArray(saved) ? saved : [];
 
@@ -122,7 +130,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         try {
 
-            localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist));
+            localStorage.setItem(
+                WISHLIST_KEY,
+                JSON.stringify(wishlist)
+            );
 
         } catch (error) {
 
@@ -133,7 +144,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function updateWishlistCount() {
 
-        const wishlistCount = document.getElementById("wishlistCount");
+        const wishlistCount =
+            document.getElementById("wishlistCount");
 
         if (!wishlistCount) return;
 
@@ -141,7 +153,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         wishlistCount.textContent = count;
 
-        wishlistCount.classList.toggle("hidden", count === 0);
+        wishlistCount.classList.toggle(
+            "hidden",
+            count === 0
+        );
     }
 
 
@@ -151,7 +166,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const wishlist = loadWishlist();
 
-        const index = wishlist.findIndex(item => String(item) === String(id));
+        const index = wishlist.findIndex(
+            item => String(item) === String(id)
+        );
 
         let nowLiked;
 
@@ -174,22 +191,93 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (button) {
 
-            button.classList.toggle("text-orange-500", nowLiked);
-            button.classList.toggle("text-white", !nowLiked);
+            button.classList.toggle(
+                "text-orange-500",
+                nowLiked
+            );
 
-            const icon = button.querySelector(".material-symbols-outlined");
+            button.classList.toggle(
+                "text-white",
+                !nowLiked
+            );
+
+            const icon = button.querySelector(
+                ".material-symbols-outlined"
+            );
 
             if (icon) {
 
-                icon.style.fontVariationSettings = `'FILL' ${nowLiked ? 1 : 0}`;
+                icon.style.fontVariationSettings =
+                    `'FILL' ${nowLiked ? 1 : 0}`;
             }
         }
 
         showToast(
-            nowLiked ? "Added to wishlist" : "Removed from wishlist",
+            nowLiked
+                ? "Added to wishlist"
+                : "Removed from wishlist",
             "wishlist"
         );
     }
+
+
+    /* =========================================================
+       SPORT CATEGORY → SHOP FILTER
+       Click a sport category on homepage and open shop.html
+       with that category automatically selected.
+       
+       Example:
+       Cricket → shop.html?category=Cricket
+       Football → shop.html?category=Football
+    ========================================================== */
+
+    document
+        .querySelectorAll(".sport-card[data-sport]")
+        .forEach(function (card) {
+
+            // Show clickable cursor
+            card.style.cursor = "pointer";
+
+
+            // Make card keyboard accessible
+            if (!card.hasAttribute("tabindex")) {
+
+                card.setAttribute("tabindex", "0");
+            }
+
+            if (!card.hasAttribute("role")) {
+
+                card.setAttribute("role", "button");
+            }
+
+
+            // Click category
+            card.addEventListener("click", function () {
+
+                const sport = card.dataset.sport;
+
+                if (!sport) return;
+
+                window.location.href =
+                    "shop.html?category=" +
+                    encodeURIComponent(sport);
+            });
+
+
+            // Keyboard support
+            card.addEventListener("keydown", function (event) {
+
+                if (
+                    event.key === "Enter" ||
+                    event.key === " "
+                ) {
+
+                    event.preventDefault();
+
+                    card.click();
+                }
+            });
+        });
 
 
     /* =========================================================
@@ -201,20 +289,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.addEventListener("click", function (event) {
 
-        const addBtn = event.target.closest(".khz-addcart-btn");
+        const addBtn = event.target.closest(
+            ".khz-addcart-btn"
+        );
 
         if (addBtn && !addBtn.disabled) {
 
-            addToHomepageCart(addBtn.dataset.id);
+            addToHomepageCart(
+                addBtn.dataset.id
+            );
 
             return;
         }
 
-        const wishBtn = event.target.closest(".khz-wishlist-btn");
+
+        const wishBtn = event.target.closest(
+            ".khz-wishlist-btn"
+        );
 
         if (wishBtn) {
 
-            toggleHomepageWishlist(wishBtn.dataset.id, wishBtn);
+            toggleHomepageWishlist(
+                wishBtn.dataset.id,
+                wishBtn
+            );
 
             return;
         }
@@ -228,17 +326,21 @@ document.addEventListener("DOMContentLoaded", function () {
     window.addEventListener("storage", function (event) {
 
         if (event.key === CART_KEY) {
+
             updateCartCount();
         }
 
         if (event.key === WISHLIST_KEY) {
+
             updateWishlistCount();
         }
     });
 
+
     window.addEventListener("focus", function () {
 
         updateCartCount();
+
         updateWishlistCount();
     });
 
@@ -247,77 +349,126 @@ document.addEventListener("DOMContentLoaded", function () {
        DEALS SMOOTH SCROLL
     ========================================================== */
 
-    document.querySelectorAll('a[href="#deals"]').forEach(function (link) {
+    document
+        .querySelectorAll('a[href="#deals"]')
+        .forEach(function (link) {
 
-        link.addEventListener("click", function (event) {
+            link.addEventListener(
+                "click",
+                function (event) {
 
-            const deals = document.getElementById("deals");
+                    const deals =
+                        document.getElementById("deals");
 
-            if (deals) {
+                    if (deals) {
 
-                event.preventDefault();
+                        event.preventDefault();
 
-                deals.scrollIntoView({ behavior: "smooth", block: "start" });
-            }
+                        deals.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start"
+                        });
+                    }
+                }
+            );
         });
-    });
 
 
     /* =========================================================
        STORY SMOOTH SCROLL
     ========================================================== */
 
-    document.querySelectorAll('a[href="#story"]').forEach(function (link) {
+    document
+        .querySelectorAll('a[href="#story"]')
+        .forEach(function (link) {
 
-        link.addEventListener("click", function (event) {
+            link.addEventListener(
+                "click",
+                function (event) {
 
-            const story = document.getElementById("story");
+                    const story =
+                        document.getElementById("story");
 
-            if (story) {
+                    if (story) {
 
-                event.preventDefault();
+                        event.preventDefault();
 
-                story.scrollIntoView({ behavior: "smooth", block: "start" });
-            }
+                        story.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start"
+                        });
+                    }
+                }
+            );
         });
-    });
 
 
     /* =========================================================
        TOAST
     ========================================================== */
 
-    const toast = document.getElementById("toast");
-    const toastText = document.getElementById("toastText");
+    const toast =
+        document.getElementById("toast");
+
+    const toastText =
+        document.getElementById("toastText");
 
     let toastTimer;
+
 
     function showToast(message, type) {
 
         if (!toast) return;
 
         if (toastText) {
+
             toastText.textContent = message;
         }
 
-        const icon = toast.querySelector(".material-symbols-outlined");
+
+        const icon = toast.querySelector(
+            ".material-symbols-outlined"
+        );
 
         if (icon) {
 
-            icon.textContent = type === "wishlist" ? "favorite" : "check_circle";
+            icon.textContent =
+                type === "wishlist"
+                    ? "favorite"
+                    : "check_circle";
 
-            icon.style.color = type === "wishlist" ? "#ff4d6d" : "";
+            icon.style.color =
+                type === "wishlist"
+                    ? "#ff4d6d"
+                    : "";
         }
+
 
         clearTimeout(toastTimer);
 
-        toast.classList.remove("translate-y-20", "opacity-0");
-        toast.classList.add("translate-y-0", "opacity-100");
+
+        toast.classList.remove(
+            "translate-y-20",
+            "opacity-0"
+        );
+
+        toast.classList.add(
+            "translate-y-0",
+            "opacity-100"
+        );
+
 
         toastTimer = setTimeout(function () {
 
-            toast.classList.remove("translate-y-0", "opacity-100");
-            toast.classList.add("translate-y-20", "opacity-0");
+            toast.classList.remove(
+                "translate-y-0",
+                "opacity-100"
+            );
+
+            toast.classList.add(
+                "translate-y-20",
+                "opacity-0"
+            );
 
         }, 2500);
     }
@@ -328,6 +479,7 @@ document.addEventListener("DOMContentLoaded", function () {
     ========================================================== */
 
     updateCartCount();
+
     updateWishlistCount();
 
 });

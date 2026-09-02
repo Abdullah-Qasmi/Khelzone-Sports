@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>KHELZONE | Create Account</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Google Font -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Material Icons -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+        rel="stylesheet"
+    >
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            font-family: "Inter", sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(255, 90, 0, 0.18),
+                    transparent 35%
+                ),
+
+                radial-gradient(
+                    circle at bottom left,
+                    rgba(255, 90, 0, 0.08),
+                    transparent 30%
+                ),
+
+                #08090b;
+
+            color: white;
+        }
+
+
+        .signup-card {
+
+            background:
+                rgba(18, 20, 24, 0.94);
+
+            backdrop-filter: blur(18px);
+
+            -webkit-backdrop-filter: blur(18px);
+
+            border:
+                1px solid
+                rgba(255, 255, 255, 0.09);
+
+            box-shadow:
+                0 25px 70px
+                rgba(0, 0, 0, 0.55),
+
+                0 0 40px
+                rgba(255, 90, 0, 0.05);
+        }
+
+
+        .orange-gradient {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ff5a00 0%,
+                    #d63f00 100%
+                );
+        }
+
+
+        .orange-gradient:hover {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ff6818 0%,
+                    #d63f00 100%
+                );
+        }
+
+
+        .input-box {
+
+            background:
+                rgba(255, 255, 255, 0.04)
+                !important;
+
+            border:
+                1px solid
+                rgba(255, 255, 255, 0.10)
+                !important;
+
+            color:
+                white !important;
+        }
+
+
+        .input-box:focus {
+
+            border-color:
+                #ff5a00 !important;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(255, 90, 0, 0.12)
+                !important;
+        }
+
+
+        .input-box::placeholder {
+
+            color:
+                #6b7280;
+        }
+
+
+        .spinner {
+
+            width: 19px;
+            height: 19px;
+
+            border:
+                2px solid
+                rgba(255,255,255,0.35);
+
+            border-top-color:
+                white;
+
+            border-radius:
+                50%;
+
+            animation:
+                spin 0.7s linear infinite;
+        }
+
+
+        @keyframes spin {
+
+            to {
+                transform:
+                    rotate(360deg);
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body
+    class="
+        flex
+        items-center
+        justify-center
+        px-4
+        py-10
+    "
+>
+
+
+<main
+    class="
+        w-full
+        max-w-md
+    "
+>
+
+
+    <!-- LOGO -->
+
+    <a
+        href="homepage.html"
+        class="block text-center mb-8"
+    >
+
+        <div
+            class="
+                text-4xl
+                sm:text-5xl
+                font-black
+                tracking-tight
+                text-orange-500
+            "
+        >
+            KHELZONE
+        </div>
+
+
+        <div
+            class="
+                mt-2
+                text-[10px]
+                sm:text-xs
+                font-bold
+                tracking-[0.28em]
+                text-gray-500
+            "
+        >
+            ENGINEERED FOR PERFORMANCE
+        </div>
+
+    </a>
+
+
+
+    <!-- SIGNUP CARD -->
+
+    <section
+        class="
+            signup-card
+            rounded-3xl
+            p-6
+            sm:p-8
+        "
+    >
+
+
+        <!-- TITLE -->
+
+        <div
+            class="
+                text-center
+                mb-7
+            "
+        >
+
+            <div
+                class="
+                    mx-auto
+                    flex
+                    h-16
+                    w-16
+                    items-center
+                    justify-center
+                    rounded-2xl
+                    bg-orange-500/10
+                    border
+                    border-orange-500/20
+                "
+            >
+
+                <span
+                    class="
+                        material-symbols-outlined
+                        text-orange-500
+                        text-3xl
+                    "
+                >
+                    person_add
+                </span>
+
+            </div>
+
+
+            <h1
+                class="
+                    mt-5
+                    text-3xl
+                    font-black
+                    uppercase
+                "
+            >
+                Create Account
+            </h1>
+
+
+            <p
+                class="
+                    mt-2
+                    text-sm
+                    text-gray-500
+                "
+            >
+                Join KHELZONE today
+            </p>
+
+        </div>
+
+
+
+        <!-- FORM -->
+
+        <form
+            id="signupForm"
+            class="space-y-5"
+        >
+
+
+            <!-- NAME -->
+
+            <div>
+
+                <label
+                    for="fullName"
+                    class="
+                        mb-2
+                        block
+                        text-xs
+                        font-bold
+                        uppercase
+                        tracking-wider
+                        text-gray-400
+                    "
+                >
+                    Full Name
+                </label>
+
+
+                <input
+                    id="fullName"
+                    type="text"
+                    required
+                    autocomplete="name"
+                    placeholder="Enter your full name"
+                    class="
+                        input-box
+                        w-full
+                        rounded-xl
+                        px-4
+                        py-3.5
+                        outline-none
+                        transition
+                    "
+                >
+
+            </div>
+
+
+
+            <!-- EMAIL -->
+
+            <div>
+
+                <label
+                    for="email"
+                    class="
+                        mb-2
+                        block
+                        text-xs
+                        font-bold
+                        uppercase
+                        tracking-wider
+                        text-gray-400
+                    "
+                >
+                    Email
+                </label>
+
+
+                <input
+                    id="email"
+                    type="email"
+                    required
+                    autocomplete="email"
+                    placeholder="Enter your email"
+                    class="
+                        input-box
+                        w-full
+                        rounded-xl
+                        px-4
+                        py-3.5
+                        outline-none
+                        transition
+                    "
+                >
+
+            </div>
+
+
+
+            <!-- PASSWORD -->
+
+            <div>
+
+                <label
+                    for="password"
+                    class="
+                        mb-2
+                        block
+                        text-xs
+                        font-bold
+                        uppercase
+                        tracking-wider
+                        text-gray-400
+                    "
+                >
+                    Password
+                </label>
+
+
+                <div class="relative">
+
+                    <input
+                        id="password"
+                        type="password"
+                        required
+                        minlength="6"
+                        autocomplete="new-password"
+                        placeholder="Create a password"
+                        class="
+                            input-box
+                            w-full
+                            rounded-xl
+                            px-4
+                            py-3.5
+                            pr-12
+                            outline-none
+                            transition
+                        "
+                    >
+
+
+                    <button
+                        type="button"
+                        id="togglePassword"
+                        class="
+                            absolute
+                            right-3
+                            top-1/2
+                            -translate-y-1/2
+                            text-gray-500
+                            hover:text-white
+                        "
+                    >
+
+                        <span
+                            id="passwordIcon"
+                            class="
+                                material-symbols-outlined
+                            "
+                        >
+                            visibility
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- CONFIRM PASSWORD -->
+
+            <div>
+
+                <label
+                    for="confirmPassword"
+                    class="
+                        mb-2
+                        block
+                        text-xs
+                        font-bold
+                        uppercase
+                        tracking-wider
+                        text-gray-400
+                    "
+                >
+                    Confirm Password
+                </label>
+
+
+                <input
+                    id="confirmPassword"
+                    type="password"
+                    required
+                    minlength="6"
+                    autocomplete="new-password"
+                    placeholder="Confirm your password"
+                    class="
+                        input-box
+                        w-full
+                        rounded-xl
+                        px-4
+                        py-3.5
+                        outline-none
+                        transition
+                    "
+                >
+
+            </div>
+
+
+
+            <!-- MESSAGE -->
+
+            <div
+                id="message"
+                class="
+                    hidden
+                    rounded-xl
+                    border
+                    px-4
+                    py-3
+                    text-sm
+                    font-semibold
+                "
+            ></div>
+
+
+
+            <!-- BUTTON -->
+
+            <button
+                id="signupBtn"
+                type="submit"
+                class="
+                    orange-gradient
+                    w-full
+                    rounded-xl
+                    py-4
+                    font-black
+                    uppercase
+                    tracking-wide
+                    text-white
+                    flex
+                    items-center
+                    justify-center
+                    gap-2
+                    transition
+                    hover:scale-[1.01]
+                    active:scale-[0.99]
+                "
+            >
+
+                <span id="signupBtnText">
+                    Create Account
+                </span>
+
+
+                <span
+                    id="signupSpinner"
+                    class="spinner hidden"
+                ></span>
+
+
+                <span
+                    id="signupIcon"
+                    class="
+                        material-symbols-outlined
+                    "
+                >
+                    arrow_forward
+                </span>
+
+            </button>
+
+        </form>
+
+
+
+        <!-- LOGIN -->
+
+        <div
+            class="
+                mt-7
+                text-center
+            "
+        >
+
+            <p
+                class="
+                    text-sm
+                    text-gray-500
+                "
+            >
+
+                Already have an account?
+
+                <a
+                    href="login.html"
+                    class="
+                        font-bold
+                        text-orange-400
+                        hover:text-orange-300
+                    "
+                >
+                    Login
+                </a>
+
+            </p>
+
+        </div>
+
+
+
+        <!-- HOME -->
+
+        <div
+            class="
+                mt-7
+                border-t
+                border-white/10
+                pt-6
+            "
+        >
+
+            <a
+                href="homepage.html"
+                class="
+                    flex
+                    items-center
+                    justify-center
+                    gap-2
+                    text-sm
+                    text-gray-500
+                    hover:text-white
+                "
+            >
+
+                <span
+                    class="
+                        material-symbols-outlined
+                        text-base
+                    "
+                >
+                    arrow_back
+                </span>
+
+                Continue shopping
+
+            </a>
+
+        </div>
+
+    </section>
+
+
+
+    <p
+        class="
+            mt-6
+            text-center
+            text-[10px]
+            text-gray-600
+        "
+    >
+        © 2026 KHELZONE. Engineered for Performance.
+    </p>
+
+
+</main>
+
+
+
+<script>
+
+"use strict";
+
+
+/* =========================================================
+   SUPABASE
+========================================================= */
+
+const SUPABASE_URL =
+    "https://antqexjhlsaynunlmzqa.supabase.co";
+
+
+const SUPABASE_KEY =
+    "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
+
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const signupForm =
+    document.getElementById(
+        "signupForm"
+    );
+
+const fullNameInput =
+    document.getElementById(
+        "fullName"
+    );
+
+const emailInput =
+    document.getElementById(
+        "email"
+    );
+
+const passwordInput =
+    document.getElementById(
+        "password"
+    );
+
+const confirmPasswordInput =
+    document.getElementById(
+        "confirmPassword"
+    );
+
+const togglePassword =
+    document.getElementById(
+        "togglePassword"
+    );
+
+const passwordIcon =
+    document.getElementById(
+        "passwordIcon"
+    );
+
+const signupBtn =
+    document.getElementById(
+        "signupBtn"
+    );
+
+const signupBtnText =
+    document.getElementById(
+        "signupBtnText"
+    );
+
+const signupSpinner =
+    document.getElementById(
+        "signupSpinner"
+    );
+
+const signupIcon =
+    document.getElementById(
+        "signupIcon"
+    );
+
+const message =
+    document.getElementById(
+        "message"
+    );
+
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+function showMessage(
+    text,
+    type = "error"
+) {
+
+    message.textContent =
+        text;
+
+    message.className =
+        "rounded-xl border px-4 py-3 text-sm font-semibold";
+
+
+    if (type === "success") {
+
+        message.classList.add(
+            "bg-green-500/10",
+            "border-green-500/20",
+            "text-green-300"
+        );
+
+    } else {
+
+        message.classList.add(
+            "bg-red-500/10",
+            "border-red-500/20",
+            "text-red-300"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+function setLoading(
+    loading
+) {
+
+    signupBtn.disabled =
+        loading;
+
+
+    if (loading) {
+
+        signupBtnText.textContent =
+            "Creating...";
+
+        signupSpinner.classList.remove(
+            "hidden"
+        );
+
+        signupIcon.classList.add(
+            "hidden"
+        );
+
+        signupBtn.classList.add(
+            "opacity-70",
+            "cursor-not-allowed"
+        );
+
+    } else {
+
+        signupBtnText.textContent =
+            "Create Account";
+
+        signupSpinner.classList.add(
+            "hidden"
+        );
+
+        signupIcon.classList.remove(
+            "hidden"
+        );
+
+        signupBtn.classList.remove(
+            "opacity-70",
+            "cursor-not-allowed"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   PASSWORD SHOW / HIDE
+========================================================= */
+
+togglePassword.addEventListener(
+    "click",
+    function () {
+
+        if (
+            passwordInput.type ===
+            "password"
+        ) {
+
+            passwordInput.type =
+                "text";
+
+            passwordIcon.textContent =
+                "visibility_off";
+
+        } else {
+
+            passwordInput.type =
+                "password";
+
+            passwordIcon.textContent =
+                "visibility";
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   SIGNUP
+========================================================= */
+
+signupForm.addEventListener(
+    "submit",
+    async function (event) {
+
+        event.preventDefault();
+
+
+        message.classList.add(
+            "hidden"
+        );
+
+
+        const fullName =
+            fullNameInput.value.trim();
+
+
+        const email =
+            emailInput.value
+                .trim()
+                .toLowerCase();
+
+
+        const password =
+            passwordInput.value;
+
+
+        const confirmPassword =
+            confirmPasswordInput.value;
+
+
+        /* CHECK NAME */
+
+        if (!fullName) {
+
+            showMessage(
+                "Apna full name enter karo."
+            );
+
+            return;
+
+        }
+
+
+        /* CHECK PASSWORD */
+
+        if (
+            password.length < 6
+        ) {
+
+            showMessage(
+                "Password kam az kam 6 characters ka hona chahiye."
+            );
+
+            return;
+
+        }
+
+
+        /* CONFIRM PASSWORD */
+
+        if (
+            password !==
+            confirmPassword
+        ) {
+
+            showMessage(
+                "Passwords match nahi kar rahe."
+            );
+
+            return;
+
+        }
+
+
+        setLoading(true);
+
+
+        try {
+
+
+            /* =================================================
+               CREATE SUPABASE AUTH USER
+            ================================================= */
+
+            const {
+                data,
+                error
+            } =
+                await supabaseClient
+                    .auth
+                    .signUp({
+
+                        email:
+                            email,
+
+                        password:
+                            password,
+
+                        options: {
+
+                            data: {
+
+                                full_name:
+                                    fullName,
+
+                                role:
+                                    "customer"
+
+                            }
+
+                        }
+
+                    });
+
+
+            if (error) {
+
+                throw error;
+
+            }
+
+
+            if (!data?.user) {
+
+                throw new Error(
+                    "Account create nahi hua."
+                );
+
+            }
+
+
+            /* =================================================
+               SUCCESS
+            ================================================= */
+
+            showMessage(
+                "Account successfully create ho gaya! Login page open ho raha hai...",
+                "success"
+            );
+
+
+            setTimeout(
+                function () {
+
+                    window.location.replace(
+                        "login.html"
+                    );
+
+                },
+                1500
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "SIGNUP ERROR:",
+                error
+            );
+
+
+            let errorMessage =
+                error?.message ||
+                "Account create nahi ho saka.";
+
+
+            const lower =
+                errorMessage.toLowerCase();
+
+
+            if (
+                lower.includes(
+                    "user already registered"
+                )
+            ) {
+
+                errorMessage =
+                    "Is email se account already bana hua hai. Login karo.";
+
+            }
+
+
+            else if (
+                lower.includes(
+                    "password"
+                ) &&
+                lower.includes(
+                    "6"
+                )
+            ) {
+
+                errorMessage =
+                    "Password kam az kam 6 characters ka hona chahiye.";
+
+            }
+
+
+            else if (
+                lower.includes(
+                    "email"
+                ) &&
+                lower.includes(
+                    "invalid"
+                )
+            ) {
+
+                errorMessage =
+                    "Valid email address enter karo.";
+
+            }
+
+
+            showMessage(
+                errorMessage,
+                "error"
+            );
+
+
+            setLoading(false);
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+</html>

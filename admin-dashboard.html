@@ -1,1224 +1,632 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>KHELZONE | Admin Dashboard</title>
 
-    <!-- =====================================================
-         TAILWIND CSS
-    ====================================================== -->
-
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
         tailwind.config = {
             darkMode: "class",
-
             theme: {
                 extend: {
-
                     colors: {
-                        kzorange: "#ff5a00",
-                        kzorangeDark: "#d63f00",
-
-                        kzblack: "#090909",
-                        kzdark: "#111111",
-                        kzcard: "#181818",
-                        kzborder: "#2a2a2a"
-                    },
-
-                    boxShadow: {
-                        orange:
-                            "0 0 25px rgba(255,90,0,0.20)"
+                        kzOrange: "#ff5a00",
+                        kzOrangeDark: "#d63f00",
+                        kzBlack: "#090909",
+                        kzCard: "#151515",
+                        kzBorder: "#292929"
                     }
                 }
             }
         };
     </script>
 
-
-    <!-- =====================================================
-         SUPABASE
-    ====================================================== -->
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-
-    <!-- =====================================================
-         ICONS
-    ====================================================== -->
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-        rel="stylesheet"
-    >
-
-
-    <!-- =====================================================
-         CUSTOM CSS
-    ====================================================== -->
-
     <style>
-
         * {
             box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
         }
 
         body {
             margin: 0;
             background: #090909;
-            color: #f3f3f3;
-            font-family:
-                Inter,
-                ui-sans-serif,
-                system-ui,
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                sans-serif;
+            color: #f5f5f5;
+            font-family: Arial, Helvetica, sans-serif;
         }
 
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+        .hidden {
+            display: none !important;
         }
 
-        ::-webkit-scrollbar-track {
+        /* ================================
+           CHECKING SCREEN
+        ================================= */
+        #checkingScreen {
+            position: fixed;
+            inset: 0;
+            z-index: 999999;
             background: #090909;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 18px;
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: #333;
-            border-radius: 999px;
+        .checking-logo {
+            font-size: 34px;
+            font-weight: 900;
+            color: #ff5a00;
+            letter-spacing: 2px;
         }
 
-        ::-webkit-scrollbar-thumb:hover {
+        .loader {
+            width: 45px;
+            height: 45px;
+            border: 4px solid #292929;
+            border-top-color: #ff5a00;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ================================
+           ACCESS DENIED
+        ================================= */
+        #accessDenied {
+            position: fixed;
+            inset: 0;
+            z-index: 999998;
+            background: #090909;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .access-box {
+            width: 100%;
+            max-width: 500px;
+            background: #151515;
+            border: 1px solid #292929;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,.5);
+        }
+
+        .access-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: rgba(255,90,0,.1);
+            border: 2px solid #ff5a00;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+        }
+
+        .access-title {
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+
+        .access-text {
+            color: #a5a5a5;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .home-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            padding: 0 24px;
+            border-radius: 10px;
             background: #ff5a00;
+            color: white;
+            font-weight: 800;
+            text-decoration: none;
+            transition: .2s;
         }
 
-        .material-symbols-outlined {
-            font-size: 22px;
-            line-height: 1;
+        .home-btn:hover {
+            background: #d63f00;
+        }
+
+        /* ================================
+           SIDEBAR
+        ================================= */
+        .sidebar {
+            width: 260px;
+            min-height: 100vh;
+            background: #101010;
+            border-right: 1px solid #292929;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 100;
+        }
+
+        .sidebar-logo {
+            padding: 25px;
+            font-size: 27px;
+            font-weight: 900;
+            color: #ff5a00;
+            border-bottom: 1px solid #292929;
+        }
+
+        .sidebar-nav {
+            padding: 20px 12px;
         }
 
         .sidebar-link {
-            transition: 0.2s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 15px;
+            margin-bottom: 6px;
+            border-radius: 10px;
+            color: #aaa;
+            background: transparent;
+            border: 0;
+            cursor: pointer;
+            font-weight: 700;
+            text-align: left;
+            transition: .2s;
         }
 
         .sidebar-link:hover {
-            background: rgba(255, 90, 0, 0.10);
-            color: #ff5a00;
+            color: white;
+            background: #1c1c1c;
         }
 
         .sidebar-link.active {
+            color: white;
             background: #ff5a00;
-            color: #090909;
         }
 
-        .admin-card {
-            background: #181818;
-            border: 1px solid #2a2a2a;
-            border-radius: 16px;
+        .sidebar-bottom {
+            position: absolute;
+            bottom: 20px;
+            left: 12px;
+            right: 12px;
         }
 
-        .orange-btn {
+        .logout-btn {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #333;
+            border-radius: 10px;
+            background: #171717;
+            color: #ddd;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .logout-btn:hover {
             background: #ff5a00;
-            color: #090909;
+            color: white;
+            border-color: #ff5a00;
+        }
+
+        /* ================================
+           MAIN
+        ================================= */
+        .main {
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            min-height: 75px;
+            padding: 0 30px;
+            border-bottom: 1px solid #292929;
+            background: #0d0d0d;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .page-title {
+            font-size: 25px;
             font-weight: 900;
-            transition: 0.2s ease;
         }
 
-        .orange-btn:hover {
-            background: #d63f00;
-            transform: translateY(-1px);
+        .admin-info {
+            text-align: right;
         }
 
-        .danger-btn {
-            background: #dc2626;
-            color: white;
+        .admin-name {
             font-weight: 800;
         }
 
-        .success-btn {
-            background: #16a34a;
-            color: white;
-            font-weight: 800;
+        .admin-email {
+            color: #888;
+            font-size: 13px;
         }
 
-        .table-wrap {
+        .content {
+            padding: 30px;
+        }
+
+        /* ================================
+           MOBILE
+        ================================= */
+        .mobile-header {
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+
+            .sidebar {
+                transform: translateX(-100%);
+                transition: .25s;
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .mobile-header {
+                display: flex;
+                min-height: 65px;
+                padding: 0 18px;
+                align-items: center;
+                justify-content: space-between;
+                background: #101010;
+                border-bottom: 1px solid #292929;
+            }
+
+            .mobile-menu-btn {
+                width: 42px;
+                height: 42px;
+                border-radius: 9px;
+                border: 1px solid #ff5a00;
+                background: rgba(255,90,0,.08);
+                color: #ff5a00;
+                cursor: pointer;
+                font-size: 22px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .topbar {
+                display: none;
+            }
+        }
+
+        /* ================================
+           CARDS
+        ================================= */
+        .dashboard-card {
+            background: #151515;
+            border: 1px solid #292929;
+            border-radius: 15px;
+            padding: 22px;
+        }
+
+        .dashboard-card:hover {
+            border-color: #ff5a00;
+        }
+
+        .stat-value {
+            font-size: 30px;
+            font-weight: 900;
+            margin-top: 8px;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 14px;
+        }
+
+        /* ================================
+           TABLE
+        ================================= */
+        .table-wrapper {
             overflow-x: auto;
+            background: #151515;
+            border: 1px solid #292929;
+            border-radius: 15px;
         }
 
         table {
-            min-width: 750px;
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
         }
 
         th {
-            white-space: nowrap;
+            background: #1b1b1b;
+            color: #aaa;
+            text-align: left;
+            padding: 15px;
+            font-size: 13px;
+            text-transform: uppercase;
         }
 
         td {
-            vertical-align: middle;
+            padding: 15px;
+            border-top: 1px solid #292929;
+            color: #ddd;
         }
 
-        .modal {
-            backdrop-filter: blur(8px);
+        tr:hover td {
+            background: #191919;
         }
 
-        @media (max-width: 1023px) {
-
-            .desktop-sidebar {
-                display: none;
-            }
-
-            .mobile-sidebar {
-                display: block;
-            }
-
+        /* ================================
+           SECTION
+        ================================= */
+        .section {
+            display: none;
         }
 
-        @media (min-width: 1024px) {
-
-            .mobile-sidebar {
-                display: none;
-            }
-
+        .section.active {
+            display: block;
         }
 
+        .search-input {
+            width: 100%;
+            max-width: 400px;
+            background: #151515;
+            border: 1px solid #333;
+            color: white;
+            padding: 13px 15px;
+            border-radius: 10px;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #ff5a00;
+        }
     </style>
-
 </head>
-
 
 <body>
 
+<!-- =========================================================
+     SECURITY CHECKING SCREEN
+========================================================= -->
+<div id="checkingScreen">
+
+    <div class="checking-logo">
+        KHELZONE
+    </div>
+
+    <div class="loader"></div>
+
+    <div style="color:#888;">
+        Checking admin access...
+    </div>
+
+</div>
+
 
 <!-- =========================================================
-     CHECKING SCREEN
+     ACCESS DENIED
 ========================================================= -->
+<div id="accessDenied">
 
-<div
-    id="checkingScreen"
-    class="fixed inset-0 z-[9999] flex items-center justify-center bg-[#090909]"
->
+    <div class="access-box">
 
-    <div class="text-center">
+        <div class="access-icon">
+            🔒
+        </div>
 
-        <div
-            class="w-16 h-16 mx-auto mb-6 rounded-full border-4 border-orange-500/20 border-t-orange-500 animate-spin"
-        ></div>
+        <div class="access-title">
+            ACCESS DENIED
+        </div>
 
-        <h1 class="text-2xl font-black uppercase">
-            KHELZONE
-        </h1>
+        <div class="access-text">
+            You do not have permission to access
+            the KHELZONE Admin Dashboard.
+        </div>
 
-        <p class="mt-2 text-gray-400">
-            Checking admin access...
-        </p>
+        <a href="homepage.html" class="home-btn">
+            BACK TO HOMEPAGE
+        </a>
 
     </div>
 
 </div>
 
 
-
 <!-- =========================================================
      DASHBOARD
 ========================================================= -->
+<div id="dashboard" class="hidden">
 
-<div
-    id="dashboard"
-    class="hidden min-h-screen bg-[#090909]"
->
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="sidebar">
 
+        <div class="sidebar-logo">
+            KHELZONE
+        </div>
 
-    <!-- =====================================================
-         MOBILE TOP BAR
-    ====================================================== -->
-
-    <header
-        class="lg:hidden sticky top-0 z-50 h-16 bg-[#111111] border-b border-[#2a2a2a] flex items-center justify-between px-4"
-    >
-
-        <div class="flex items-center gap-3">
+        <nav class="sidebar-nav">
 
             <button
-                id="mobileMenuButton"
-                type="button"
-                class="w-10 h-10 rounded-lg bg-orange-500 text-black flex items-center justify-center"
-            >
-
-                <span class="material-symbols-outlined">
-                    menu
-                </span>
-
+                class="sidebar-link active"
+                data-section="dashboardSection">
+                📊 Dashboard
             </button>
 
+            <button
+                class="sidebar-link"
+                data-section="productsSection">
+                🛒 Products
+            </button>
 
-            <div>
+            <button
+                class="sidebar-link"
+                data-section="sellersSection">
+                🏪 Sellers
+            </button>
 
-                <div class="text-orange-500 font-black text-xl">
-                    KHELZONE
-                </div>
+            <button
+                class="sidebar-link"
+                data-section="customersSection">
+                👥 Customers
+            </button>
 
-                <div class="text-[10px] text-gray-400 uppercase tracking-widest">
-                    Admin Panel
-                </div>
+            <button
+                class="sidebar-link"
+                data-section="ordersSection">
+                📦 Orders
+            </button>
 
-            </div>
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <button id="logoutBtn" class="logout-btn">
+                Logout
+            </button>
 
         </div>
 
+    </aside>
+
+
+    <!-- MOBILE HEADER -->
+    <div class="mobile-header">
+
+        <div style="font-weight:900;color:#ff5a00;font-size:23px;">
+            KHELZONE
+        </div>
 
         <button
-            id="logoutBtn"
-            type="button"
-            class="w-10 h-10 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center"
-        >
-
-            <span class="material-symbols-outlined">
-                logout
-            </span>
-
+            id="mobileMenuBtn"
+            class="mobile-menu-btn">
+            ☰
         </button>
 
-    </header>
+    </div>
 
 
+    <!-- MAIN -->
+    <main class="main">
 
-    <!-- =====================================================
-         MOBILE SIDEBAR
-    ====================================================== -->
-
-    <aside
-        id="mobileMenu"
-        class="mobile-sidebar hidden lg:hidden fixed top-16 left-0 right-0 z-40 bg-[#111111] border-b border-[#2a2a2a] p-4"
-    >
-
-        <nav class="space-y-2">
-
-            <a
-                href="#"
-                data-section="dashboard"
-                class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded-xl font-bold"
-            >
-
-                <span class="material-symbols-outlined">
-                    dashboard
-                </span>
-
-                Dashboard
-
-            </a>
-
-
-            <a
-                href="#"
-                data-section="products"
-                class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-bold"
-            >
-
-                <span class="material-symbols-outlined">
-                    inventory_2
-                </span>
-
-                Products
-
-            </a>
-
-
-            <a
-                href="#"
-                data-section="sellers"
-                class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-bold"
-            >
-
-                <span class="material-symbols-outlined">
-                    storefront
-                </span>
-
-                Seller Applications
-
-            </a>
-
-
-            <a
-                href="#"
-                data-section="customers"
-                class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-bold"
-            >
-
-                <span class="material-symbols-outlined">
-                    groups
-                </span>
-
-                Customers
-
-            </a>
-
-
-            <a
-                href="#"
-                data-section="orders"
-                class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-bold"
-            >
-
-                <span class="material-symbols-outlined">
-                    shopping_bag
-                </span>
-
-                Orders
-
-            </a>
-
-        </nav>
-
-    </aside>
-
-
-
-    <!-- =====================================================
-         DESKTOP SIDEBAR
-    ====================================================== -->
-
-    <aside
-        class="desktop-sidebar fixed top-0 left-0 bottom-0 w-72 bg-[#111111] border-r border-[#2a2a2a] z-50"
-    >
-
-        <!-- Logo -->
-
-        <div class="h-20 px-6 flex items-center border-b border-[#2a2a2a]">
+        <!-- TOPBAR -->
+        <div class="topbar">
 
             <div>
-
-                <div class="text-3xl font-black tracking-tight text-orange-500">
-                    KHELZONE
-                </div>
-
-                <div class="text-[10px] uppercase tracking-[0.3em] text-gray-500">
-                    Admin Dashboard
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- Admin Info -->
-
-        <div class="p-5 border-b border-[#2a2a2a]">
-
-            <div class="flex items-center gap-3">
-
-                <div
-                    class="w-12 h-12 rounded-full bg-orange-500 text-black flex items-center justify-center font-black"
-                >
-
-                    <span class="material-symbols-outlined">
-                        admin_panel_settings
-                    </span>
-
-                </div>
-
-
-                <div class="min-w-0">
-
-                    <div
-                        id="adminName"
-                        class="font-black truncate"
-                    >
-                        Admin
-                    </div>
-
-                    <div
-                        id="adminEmail"
-                        class="text-xs text-gray-500 truncate"
-                    >
-                        -
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- Navigation -->
-
-        <nav class="p-4 space-y-2">
-
-            <a
-                href="#"
-                data-section="dashboard"
-                class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded-xl font-bold"
-            >
-
-                <span class="material-symbols-outlined">
-                    dashboard
-                </span>
-
-                Dashboard
-
-            </a>
-
-
-            <a
-                href="#"
-                data-section="products"
-                class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-bold"
-            >
-
-                <span class="material-symbols-outlined">
-                    inventory_2
-                </span>
-
-                Products
-
-            </a>
-
-
-            <a
-                href="#"
-                data-section="sellers"
-                class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-bold"
-            >
-
-                <span class="material-symbols-outlined">
-                    storefront
-                </span>
-
-                Seller Applications
-
-            </a>
-
-
-            <a
-                href="#"
-                data-section="customers"
-                class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-bold"
-            >
-
-                <span class="material-symbols-outlined">
-                    groups
-                </span>
-
-                Customers
-
-            </a>
-
-
-            <a
-                href="#"
-                data-section="orders"
-                class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-bold"
-            >
-
-                <span class="material-symbols-outlined">
-                    shopping_bag
-                </span>
-
-                Orders
-
-            </a>
-
-        </nav>
-
-
-        <!-- Bottom -->
-
-        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-[#2a2a2a]">
-
-            <button
-                id="logoutButton"
-                type="button"
-                class="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition font-bold"
-            >
-
-                <span class="material-symbols-outlined">
-                    logout
-                </span>
-
-                Logout
-
-            </button>
-
-        </div>
-
-    </aside>
-
-
-
-    <!-- =====================================================
-         MAIN CONTENT
-    ====================================================== -->
-
-    <main class="lg:ml-72 min-h-screen">
-
-
-        <!-- =================================================
-             DESKTOP HEADER
-        ================================================== -->
-
-        <header
-            class="hidden lg:flex sticky top-0 z-30 h-20 bg-[#090909]/95 backdrop-blur border-b border-[#2a2a2a] items-center justify-between px-8"
-        >
-
-            <div>
-
-                <div
-                    id="pageTitle"
-                    class="text-2xl font-black uppercase"
-                >
+                <div id="pageTitle" class="page-title">
                     Dashboard
                 </div>
+            </div>
 
-                <div class="text-xs text-gray-500 mt-1">
-                    Manage your KHELZONE marketplace
+            <div class="admin-info">
+
+                <div
+                    id="adminName"
+                    class="admin-name">
+                    Admin
+                </div>
+
+                <div
+                    id="adminEmail"
+                    class="admin-email">
+                    -
                 </div>
 
             </div>
 
-
-            <button
-                id="logoutBtnDesktop"
-                type="button"
-                data-logout
-                class="px-5 py-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition font-bold flex items-center gap-2"
-            >
-
-                <span class="material-symbols-outlined">
-                    logout
-                </span>
-
-                Logout
-
-            </button>
-
-        </header>
+        </div>
 
 
+        <div class="content">
 
-        <!-- =================================================
-             PAGE CONTENT
-        ================================================== -->
-
-        <div class="p-4 sm:p-6 lg:p-8">
-
-
-            <!-- =================================================
-                 DASHBOARD SECTION
-            ================================================== -->
-
+            <!-- ================= DASHBOARD ================= -->
             <section
-                data-dashboard-section="dashboard"
-            >
+                id="dashboardSection"
+                class="section active">
 
-                <div class="mb-8">
-
-                    <h2 class="text-3xl font-black uppercase">
+                <div class="mb-6">
+                    <h1 class="text-3xl font-black">
                         Dashboard
-                    </h2>
+                    </h1>
 
                     <p class="text-gray-500 mt-2">
-                        Welcome to KHELZONE Admin Panel.
+                        KHELZONE administration overview
                     </p>
-
                 </div>
 
 
-                <!-- Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
-
-
-                    <!-- Products -->
-
-                    <div class="admin-card p-6">
-
-                        <div class="flex items-center justify-between">
-
-                            <div>
-
-                                <p class="text-sm text-gray-500 uppercase font-bold">
-                                    Products
-                                </p>
-
-                                <p
-                                    id="totalProducts"
-                                    class="text-4xl font-black mt-2"
-                                >
-                                    0
-                                </p>
-
-                            </div>
-
-
-                            <div
-                                class="w-14 h-14 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center"
-                            >
-
-                                <span class="material-symbols-outlined text-3xl">
-                                    inventory_2
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- Sellers -->
-
-                    <div class="admin-card p-6">
-
-                        <div class="flex items-center justify-between">
-
-                            <div>
-
-                                <p class="text-sm text-gray-500 uppercase font-bold">
-                                    Sellers
-                                </p>
-
-                                <p
-                                    id="totalSellers"
-                                    class="text-4xl font-black mt-2"
-                                >
-                                    0
-                                </p>
-
-                            </div>
-
-
-                            <div
-                                class="w-14 h-14 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center"
-                            >
-
-                                <span class="material-symbols-outlined text-3xl">
-                                    storefront
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- Customers -->
-
-                    <div class="admin-card p-6">
-
-                        <div class="flex items-center justify-between">
-
-                            <div>
-
-                                <p class="text-sm text-gray-500 uppercase font-bold">
-                                    Customers
-                                </p>
-
-                                <p
-                                    id="totalCustomers"
-                                    class="text-4xl font-black mt-2"
-                                >
-                                    0
-                                </p>
-
-                            </div>
-
-
-                            <div
-                                class="w-14 h-14 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center"
-                            >
-
-                                <span class="material-symbols-outlined text-3xl">
-                                    groups
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- Orders -->
-
-                    <div class="admin-card p-6">
-
-                        <div class="flex items-center justify-between">
-
-                            <div>
-
-                                <p class="text-sm text-gray-500 uppercase font-bold">
-                                    Orders
-                                </p>
-
-                                <p
-                                    id="totalOrders"
-                                    class="text-4xl font-black mt-2"
-                                >
-                                    0
-                                </p>
-
-                            </div>
-
-
-                            <div
-                                class="w-14 h-14 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center"
-                            >
-
-                                <span class="material-symbols-outlined text-3xl">
-                                    shopping_bag
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-
-                <!-- Seller Status -->
-
-                <div class="admin-card p-6">
-
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-
-                        <div>
-
-                            <h3 class="text-xl font-black">
-                                Seller Applications
-                            </h3>
-
-                            <p class="text-gray-500 text-sm mt-1">
-                                Current seller application status.
-                            </p>
-
-                        </div>
-
-
-                        <button
-                            type="button"
-                            data-section="sellers"
-                            class="orange-btn px-5 py-3 rounded-xl"
-                            onclick="showSection('sellers')"
-                        >
-                            View Sellers
-                        </button>
-
-                    </div>
-
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-
-                        <div class="rounded-xl bg-yellow-500/10 p-5">
-
-                            <p class="text-yellow-400 text-sm font-bold uppercase">
-                                Pending
-                            </p>
-
-                            <p
-                                id="pendingSellers"
-                                class="text-3xl font-black mt-2"
-                            >
-                                0
-                            </p>
-
-                        </div>
-
-
-                        <div class="rounded-xl bg-green-500/10 p-5">
-
-                            <p class="text-green-400 text-sm font-bold uppercase">
-                                Approved
-                            </p>
-
-                            <p
-                                id="approvedSellers"
-                                class="text-3xl font-black mt-2"
-                            >
-                                0
-                            </p>
-
-                        </div>
-
-
-                        <div class="rounded-xl bg-red-500/10 p-5">
-
-                            <p class="text-red-400 text-sm font-bold uppercase">
-                                Rejected
-                            </p>
-
-                            <p
-                                id="rejectedSellers"
-                                class="text-3xl font-black mt-2"
-                            >
-                                0
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- =================================================
-                 PRODUCTS SECTION
-            ================================================== -->
-
-            <section
-                data-dashboard-section="products"
-                class="hidden"
-            >
-
-                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
-
-                    <div>
-
-                        <h2 class="text-3xl font-black uppercase">
+                    <div class="dashboard-card">
+                        <div class="stat-label">
                             Products
-                        </h2>
+                        </div>
 
-                        <p class="text-gray-500 mt-2">
-                            Manage marketplace products.
-                        </p>
-
+                        <div
+                            id="productCount"
+                            class="stat-value">
+                            0
+                        </div>
                     </div>
 
+                    <div class="dashboard-card">
+                        <div class="stat-label">
+                            Sellers
+                        </div>
 
-                    <div class="flex gap-3">
-
-                        <input
-                            id="productSearch"
-                            type="search"
-                            placeholder="Search products..."
-                            class="bg-[#181818] border border-[#2a2a2a] rounded-xl px-4 py-3 outline-none focus:border-orange-500 w-full sm:w-64"
-                        >
-
-
-                        <button
-                            id="refreshProducts"
-                            type="button"
-                            class="orange-btn px-4 py-3 rounded-xl flex items-center gap-2"
-                        >
-
-                            <span class="material-symbols-outlined">
-                                refresh
-                            </span>
-
-                            <span class="hidden sm:inline">
-                                Refresh
-                            </span>
-
-                        </button>
-
+                        <div
+                            id="sellerCount"
+                            class="stat-value">
+                            0
+                        </div>
                     </div>
 
-                </div>
-
-
-                <div class="admin-card overflow-hidden">
-
-                    <div class="table-wrap">
-
-                        <table class="w-full">
-
-                            <thead class="bg-[#111111]">
-
-                                <tr>
-
-                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
-                                        Image
-                                    </th>
-
-                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
-                                        Product
-                                    </th>
-
-                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
-                                        Category
-                                    </th>
-
-                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
-                                        Price
-                                    </th>
-
-                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
-                                        Stock
-                                    </th>
-
-                                </tr>
-
-                            </thead>
-
-
-                            <tbody
-                                id="productsTableBody"
-                                class="divide-y divide-[#2a2a2a]"
-                            >
-
-                                <tr>
-
-                                    <td
-                                        colspan="5"
-                                        class="text-center py-10 text-gray-500"
-                                    >
-                                        Loading products...
-                                    </td>
-
-                                </tr>
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- =================================================
-                 SELLERS SECTION
-            ================================================== -->
-
-            <section
-                data-dashboard-section="sellers"
-                class="hidden"
-            >
-
-                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
-
-                    <div>
-
-                        <h2 class="text-3xl font-black uppercase">
-                            Seller Applications
-                        </h2>
-
-                        <p class="text-gray-500 mt-2">
-                            Approve or reject seller applications.
-                        </p>
-
-                    </div>
-
-
-                    <div class="flex gap-3">
-
-                        <input
-                            id="sellerSearch"
-                            type="search"
-                            placeholder="Search sellers..."
-                            class="bg-[#181818] border border-[#2a2a2a] rounded-xl px-4 py-3 outline-none focus:border-orange-500 w-full sm:w-64"
-                        >
-
-
-                        <button
-                            id="refreshSellers"
-                            type="button"
-                            class="orange-btn px-4 py-3 rounded-xl flex items-center gap-2"
-                        >
-
-                            <span class="material-symbols-outlined">
-                                refresh
-                            </span>
-
-                            <span class="hidden sm:inline">
-                                Refresh
-                            </span>
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-
-                <div class="admin-card overflow-hidden">
-
-                    <div class="table-wrap">
-
-                        <table class="w-full">
-
-                            <thead class="bg-[#111111]">
-
-                                <tr>
-
-                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
-                                        Business / Owner
-                                    </th>
-
-                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
-                                        Email
-                                    </th>
-
-                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
-                                        Phone
-                                    </th>
-
-                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
-                                        City
-                                    </th>
-
-                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
-                                        Status
-                                    </th>
-
-                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
-                                        Actions
-                                    </th>
-
-                                </tr>
-
-                            </thead>
-
-
-                            <tbody
-                                id="sellersTableBody"
-                                class="divide-y divide-[#2a2a2a]"
-                            >
-
-                                <tr>
-
-                                    <td
-                                        colspan="6"
-                                        class="text-center py-10 text-gray-500"
-                                    >
-                                        Loading seller applications...
-                                    </td>
-
-                                </tr>
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- =================================================
-                 CUSTOMERS SECTION
-            ================================================== -->
-
-            <section
-                data-dashboard-section="customers"
-                class="hidden"
-            >
-
-                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
-
-                    <div>
-
-                        <h2 class="text-3xl font-black uppercase">
+                    <div class="dashboard-card">
+                        <div class="stat-label">
                             Customers
-                        </h2>
+                        </div>
 
-                        <p class="text-gray-500 mt-2">
-                            View registered customers.
-                        </p>
-
+                        <div
+                            id="customerCount"
+                            class="stat-value">
+                            0
+                        </div>
                     </div>
 
+                    <div class="dashboard-card">
+                        <div class="stat-label">
+                            Orders
+                        </div>
 
-                    <div class="flex gap-3">
-
-                        <input
-                            id="customerSearch"
-                            type="search"
-                            placeholder="Search customers..."
-                            class="bg-[#181818] border border-[#2a2a2a] rounded-xl px-4 py-3 outline-none focus:border-orange-500 w-full sm:w-64"
-                        >
-
-
-                        <button
-                            id="refreshCustomers"
-                            type="button"
-                            class="orange-btn px-4 py-3 rounded-xl"
-                        >
-
-                            <span class="material-symbols-outlined">
-                                refresh
-                            </span>
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-
-                <div class="admin-card overflow-hidden">
-
-                    <div class="table-wrap">
-
-                        <table class="w-full">
-
-                            <thead class="bg-[#111111]">
-
-                                <tr>
-
-                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
-                                        Name
-                                    </th>
-
-                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
-                                        Email
-                                    </th>
-
-                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
-                                        Phone
-                                    </th>
-
-                                </tr>
-
-                            </thead>
-
-
-                            <tbody
-                                id="customersTableBody"
-                                class="divide-y divide-[#2a2a2a]"
-                            >
-
-                                <tr>
-
-                                    <td
-                                        colspan="3"
-                                        class="text-center py-10 text-gray-500"
-                                    >
-                                        Loading customers...
-                                    </td>
-
-                                </tr>
-
-                            </tbody>
-
-                        </table>
-
+                        <div
+                            id="orderCount"
+                            class="stat-value">
+                            0
+                        </div>
                     </div>
 
                 </div>
@@ -1226,115 +634,230 @@
             </section>
 
 
-
-            <!-- =================================================
-                 ORDERS SECTION
-            ================================================== -->
-
+            <!-- ================= PRODUCTS ================= -->
             <section
-                data-dashboard-section="orders"
-                class="hidden"
-            >
+                id="productsSection"
+                class="section">
 
-                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
 
                     <div>
-
-                        <h2 class="text-3xl font-black uppercase">
-                            Orders
-                        </h2>
+                        <h1 class="text-3xl font-black">
+                            Products
+                        </h1>
 
                         <p class="text-gray-500 mt-2">
-                            View marketplace orders.
+                            Manage KHELZONE products
                         </p>
-
                     </div>
 
-
-                    <div class="flex gap-3">
-
-                        <input
-                            id="orderSearch"
-                            type="search"
-                            placeholder="Search orders..."
-                            class="bg-[#181818] border border-[#2a2a2a] rounded-xl px-4 py-3 outline-none focus:border-orange-500 w-full sm:w-64"
-                        >
-
-
-                        <button
-                            id="refreshOrders"
-                            type="button"
-                            class="orange-btn px-4 py-3 rounded-xl"
-                        >
-
-                            <span class="material-symbols-outlined">
-                                refresh
-                            </span>
-
-                        </button>
-
-                    </div>
+                    <input
+                        id="productSearch"
+                        class="search-input"
+                        type="text"
+                        placeholder="Search products...">
 
                 </div>
 
+                <div class="table-wrapper">
 
-                <div class="admin-card overflow-hidden">
+                    <table>
 
-                    <div class="table-wrap">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Category</th>
+                                <th>Seller</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
 
-                        <table class="w-full">
+                        <tbody id="productsTableBody">
 
-                            <thead class="bg-[#111111]">
+                            <tr>
+                                <td colspan="6">
+                                    Loading...
+                                </td>
+                            </tr>
 
-                                <tr>
+                        </tbody>
 
-                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
-                                        Order ID
-                                    </th>
-
-                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
-                                        Total
-                                    </th>
-
-                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
-                                        Status
-                                    </th>
-
-                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
-                                        Date
-                                    </th>
-
-                                </tr>
-
-                            </thead>
-
-
-                            <tbody
-                                id="ordersTableBody"
-                                class="divide-y divide-[#2a2a2a]"
-                            >
-
-                                <tr>
-
-                                    <td
-                                        colspan="4"
-                                        class="text-center py-10 text-gray-500"
-                                    >
-                                        Loading orders...
-                                    </td>
-
-                                </tr>
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
+                    </table>
 
                 </div>
 
             </section>
 
+
+            <!-- ================= SELLERS ================= -->
+            <section
+                id="sellersSection"
+                class="section">
+
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+
+                    <div>
+                        <h1 class="text-3xl font-black">
+                            Sellers
+                        </h1>
+
+                        <p class="text-gray-500 mt-2">
+                            Manage sellers
+                        </p>
+                    </div>
+
+                    <input
+                        id="sellerSearch"
+                        class="search-input"
+                        type="text"
+                        placeholder="Search sellers...">
+
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Business</th>
+                                <th>Owner</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="sellersTableBody">
+
+                            <tr>
+                                <td colspan="6">
+                                    Loading...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================= CUSTOMERS ================= -->
+            <section
+                id="customersSection"
+                class="section">
+
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+
+                    <div>
+                        <h1 class="text-3xl font-black">
+                            Customers
+                        </h1>
+
+                        <p class="text-gray-500 mt-2">
+                            Manage customers
+                        </p>
+                    </div>
+
+                    <input
+                        id="customerSearch"
+                        class="search-input"
+                        type="text"
+                        placeholder="Search customers...">
+
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="customersTableBody">
+
+                            <tr>
+                                <td colspan="4">
+                                    Loading...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================= ORDERS ================= -->
+            <section
+                id="ordersSection"
+                class="section">
+
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+
+                    <div>
+                        <h1 class="text-3xl font-black">
+                            Orders
+                        </h1>
+
+                        <p class="text-gray-500 mt-2">
+                            Manage customer orders
+                        </p>
+                    </div>
+
+                    <input
+                        id="orderSearch"
+                        class="search-input"
+                        type="text"
+                        placeholder="Search orders...">
+
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="ordersTableBody">
+
+                            <tr>
+                                <td colspan="6">
+                                    Loading...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
 
         </div>
 
@@ -1343,58 +866,30 @@
 </div>
 
 
-
 <!-- =========================================================
-     ADMIN DASHBOARD JS
-     
-     IMPORTANT:
-     File ka naam exactly:
-     admin-dashboard.js
+     SUPABASE + ADMIN SECURITY
 ========================================================= -->
-
-<script src="admin-dashboard.js"></script>
-
-
-<!-- =========================================================
-     DESKTOP LOGOUT FIX
-========================================================= -->
-
 <script>
 
-    document.addEventListener(
-        "DOMContentLoaded",
-        function () {
+    const SUPABASE_URL =
+        "https://antqexjhlsaynunlmzqa.supabase.co";
 
-            const desktopLogout =
-                document.getElementById(
-                    "logoutBtnDesktop"
-                );
+    const SUPABASE_KEY =
+        "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
 
-            if (desktopLogout) {
+    const supabaseClient =
+        window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
+        );
 
-                desktopLogout.addEventListener(
-                    "click",
-                    function () {
-
-                        const realLogout =
-                            document.querySelector(
-                                "#logoutButton"
-                            );
-
-                        if (realLogout) {
-                            realLogout.click();
-                        }
-
-                    }
-                );
-
-            }
-
-        }
-    );
+    window.supabaseClient = supabaseClient;
 
 </script>
 
+
+<!-- YOUR DASHBOARD JS -->
+<script src="admin-dashboard.js"></script>
 
 </body>
 </html>

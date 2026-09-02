@@ -1,7 +1,7 @@
 /* ============================================================
    KHELZONE ADMIN DASHBOARD
-   COMPLETE ADMIN-DASHBOARD.JS
-   ============================================================ */
+   ADMIN-ONLY ACCESS CONTROL
+============================================================ */
 
 "use strict";
 
@@ -10,152 +10,109 @@
    SUPABASE
 ============================================================ */
 
-const SUPABASE_URL =
-    "https://antqexjhlsaynunlmzqa.supabase.co";
-
-const SUPABASE_KEY =
-    "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
-
-
-if (!window.supabase) {
-
-    console.error(
-        "Supabase library is not loaded."
-    );
-
-} else {
-
-    window.supabaseClient =
-        window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_KEY
-        );
-
-}
-
-
-const supabaseClient =
-    window.supabaseClient;
+const supabaseClient = window.supabaseClient;
 
 
 /* ============================================================
-   GLOBAL STATE
-============================================================ */
-
-const state = {
-
-    user: null,
-
-    products: [],
-
-    sellers: [],
-
-    customers: [],
-
-    orders: [],
-
-    customerTable: null,
-
-    currentProduct: null,
-
-    currentSeller: null,
-
-    currentCustomer: null,
-
-    currentOrder: null
-
-};
-
-
-/* ============================================================
-   HELPER
+   HELPERS
 ============================================================ */
 
 function $(id) {
-
     return document.getElementById(id);
-
 }
 
 
 function escapeHTML(value) {
 
-    return String(value ?? "")
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    return String(value)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
-
 }
 
 
 function formatMoney(value) {
 
-    const number =
-        Number(value || 0);
+    const number = Number(value || 0);
 
-    return (
-        "Rs. " +
-        number.toLocaleString(
-            "en-PK",
-            {
-                maximumFractionDigits: 2
-            }
-        )
-    );
-
+    return "Rs. " + number.toLocaleString("en-PK");
 }
 
 
 function formatDate(value) {
 
     if (!value) {
-        return "—";
+        return "-";
     }
 
-    const date =
-        new Date(value);
+    try {
 
-    if (
-        Number.isNaN(
-            date.getTime()
-        )
-    ) {
-        return "—";
+        return new Date(value).toLocaleDateString(
+            "en-PK",
+            {
+                year: "numeric",
+                month: "short",
+                day: "numeric"
+            }
+        );
+
+    } catch {
+        return value;
     }
-
-    return date.toLocaleDateString(
-        "en-PK",
-        {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-        }
-    );
-
 }
 
 
 function initials(name) {
 
-    const text =
-        String(name || "User")
-            .trim();
-
-    if (!text) {
+    if (!name) {
         return "U";
     }
 
-    return text
-        .split(/\s+/)
+    return name
+        .split(" ")
+        .filter(Boolean)
         .slice(0, 2)
-        .map(word =>
-            word.charAt(0)
-        )
-        .join("")
-        .toUpperCase();
+        .map(x => x.charAt(0).toUpperCase())
+        .join("");
+}
 
+
+/* ============================================================
+   TABLE HELPER
+============================================================ */
+
+function showTableMessage(
+    tbodyId,
+    message,
+    colspan = 6
+) {
+
+    const tbody = $(tbodyId);
+
+    if (!tbody) {
+        return;
+    }
+
+    tbody.innerHTML = `
+        <tr>
+            <td
+                colspan="${colspan}"
+                style="
+                    text-align:center;
+                    padding:30px;
+                    color:#888;
+                "
+            >
+                ${escapeHTML(message)}
+            </td>
+        </tr>
+    `;
 }
 
 
@@ -163,404 +120,192 @@ function initials(name) {
    TOAST
 ============================================================ */
 
-function showToast(
-    message,
-    type = "success"
-) {
+function showToast(message) {
 
-    let toast =
-        $("toast");
+    let toast = $("kzToast");
 
     if (!toast) {
 
-        toast =
-            document.createElement(
-                "div"
-            );
+        toast = document.createElement("div");
 
-        toast.id =
-            "toast";
+        toast.id = "kzToast";
 
-        toast.className =
-            "fixed bottom-6 right-6 z-[99999] " +
-            "rounded-xl px-5 py-4 shadow-2xl " +
-            "font-bold text-sm";
+        toast.style.position = "fixed";
+        toast.style.right = "20px";
+        toast.style.bottom = "20px";
+        toast.style.zIndex = "999999";
+        toast.style.padding = "14px 20px";
+        toast.style.borderRadius = "10px";
+        toast.style.background = "#ff5a00";
+        toast.style.color = "#fff";
+        toast.style.fontWeight = "700";
+        toast.style.boxShadow =
+            "0 10px 30px rgba(0,0,0,.4)";
 
-        document.body.appendChild(
-            toast
-        );
-
+        document.body.appendChild(toast);
     }
 
+    toast.textContent = message;
 
-    toast.textContent =
-        message;
+    toast.style.display = "block";
 
+    clearTimeout(window.kzToastTimer);
 
-    toast.style.background =
-        type === "error"
-            ? "#7f1d1d"
-            : "#ff5a00";
+    window.kzToastTimer = setTimeout(() => {
 
+        toast.style.display = "none";
 
-    toast.style.color =
-        "#ffffff";
-
-
-    toast.style.display =
-        "block";
-
-
-    clearTimeout(
-        toast._timer
-    );
-
-
-    toast._timer =
-        setTimeout(
-            () => {
-
-                toast.style.display =
-                    "none";
-
-            },
-            3000
-        );
-
+    }, 3000);
 }
 
 
 /* ============================================================
-   STATUS BADGE
-============================================================ */
-
-function statusBadge(status) {
-
-    const value =
-        String(
-            status || "pending"
-        ).toLowerCase();
-
-
-    let cls =
-        "inline-flex items-center rounded-full " +
-        "px-3 py-1 text-xs font-black " +
-        "bg-yellow-500/10 text-yellow-400";
-
-
-    if (
-        value === "approved" ||
-        value === "active" ||
-        value === "delivered"
-    ) {
-
-        cls =
-            "inline-flex items-center rounded-full " +
-            "px-3 py-1 text-xs font-black " +
-            "bg-green-500/10 text-green-400";
-
-    }
-
-
-    if (
-        value === "rejected" ||
-        value === "inactive" ||
-        value === "cancelled"
-    ) {
-
-        cls =
-            "inline-flex items-center rounded-full " +
-            "px-3 py-1 text-xs font-black " +
-            "bg-red-500/10 text-red-400";
-
-    }
-
-
-    return `
-        <span class="${cls}">
-            ${escapeHTML(status || "pending")}
-        </span>
-    `;
-
-}
-
-
-/* ============================================================
-   LOADING HELPERS
-============================================================ */
-
-function tableLoading(
-    id,
-    colspan
-) {
-
-    const table =
-        $(id);
-
-    if (!table) {
-        return;
-    }
-
-
-    table.innerHTML = `
-
-        <tr>
-
-            <td
-                colspan="${colspan}"
-                class="py-10 text-center text-gray-500">
-
-                Loading...
-
-            </td>
-
-        </tr>
-
-    `;
-
-}
-
-
-function tableEmpty(
-    id,
-    colspan,
-    message = "No records found."
-) {
-
-    const table =
-        $(id);
-
-    if (!table) {
-        return;
-    }
-
-
-    table.innerHTML = `
-
-        <tr>
-
-            <td
-                colspan="${colspan}"
-                class="py-10 text-center text-gray-500">
-
-                ${escapeHTML(message)}
-
-            </td>
-
-        </tr>
-
-    `;
-
-}
-
-
-/* ============================================================
-   MODALS
-============================================================ */
-
-function openModal(id) {
-
-    const modal =
-        $(id);
-
-    if (!modal) {
-        return;
-    }
-
-    modal.classList.remove(
-        "hidden"
-    );
-
-}
-
-
-function closeModal(id) {
-
-    const modal =
-        $(id);
-
-    if (!modal) {
-        return;
-    }
-
-    modal.classList.add(
-        "hidden"
-    );
-
-}
-
-
-/* ============================================================
-   ADMIN ACCESS
-   IMPORTANT:
-   ADMIN CHECK = public.admins
+   🔐 ADMIN ACCESS CHECK
 ============================================================ */
 
 async function checkAdminAccess() {
 
-    const checkingScreen =
-        $("checkingScreen");
+    const checkingScreen = $("checkingScreen");
+    const dashboard = $("dashboard");
+    const accessDenied = $("accessDenied");
 
-    const dashboard =
-        $("dashboard");
+    /*
+        SECURITY FIRST:
+        Dashboard remains hidden until admin is verified.
+    */
+
+    if (dashboard) {
+        dashboard.classList.add("hidden");
+    }
+
+    if (accessDenied) {
+        accessDenied.style.display = "none";
+    }
+
+    if (checkingScreen) {
+        checkingScreen.style.display = "flex";
+    }
 
 
     try {
 
-        if (!supabaseClient) {
-
-            throw new Error(
-                "Supabase client could not start."
-            );
-
-        }
-
-
-        /* Get logged-in user */
+        /* -----------------------------------------
+           1. CHECK LOGIN
+        ----------------------------------------- */
 
         const {
-            data,
-            error
-        } =
-            await supabaseClient
-                .auth
-                .getUser();
+            data: {
+                user
+            },
+            error: userError
+        } = await supabaseClient.auth.getUser();
 
 
-        if (error) {
-            throw error;
+        if (userError) {
+
+            console.error(
+                "Supabase user error:",
+                userError
+            );
+
+            throw userError;
         }
 
 
-        const user =
-            data?.user;
+        /*
+            No logged-in user.
 
-
-        /* No login */
+            Send to admin login page.
+        */
 
         if (!user) {
 
-            window.location.href =
-                "admin.html";
+            window.location.replace("admin.html");
 
             return false;
-
         }
 
 
-        /* Check admins table */
+        /* -----------------------------------------
+           2. CHECK ADMIN TABLE
+        ----------------------------------------- */
 
         const {
             data: admin,
             error: adminError
-        } =
-            await supabaseClient
-                .from("admins")
-                .select("id")
-                .eq(
-                    "id",
-                    user.id
-                )
-                .maybeSingle();
+        } = await supabaseClient
+            .from("admins")
+            .select("id")
+            .eq("id", user.id)
+            .maybeSingle();
 
 
         if (adminError) {
 
             console.error(
-                "Admin check error:",
+                "Admin table error:",
                 adminError
             );
 
-            throw new Error(
-                "Admin table error: " +
-                adminError.message
-            );
-
+            throw adminError;
         }
 
 
-        /* Not admin */
+        /*
+            IMPORTANT:
+
+            User is NOT in admins table.
+
+            Do NOT logout the customer/seller.
+            Just deny dashboard access.
+        */
 
         if (!admin) {
 
-            await supabaseClient
-                .auth
-                .signOut();
-
+            console.warn(
+                "ACCESS DENIED:",
+                user.id
+            );
 
             if (checkingScreen) {
-
-                checkingScreen.innerHTML = `
-
-                    <div
-                        class="px-6 text-center max-w-md">
-
-                        <div
-                            class="mx-auto mb-5 flex h-16 w-16
-                            items-center justify-center
-                            rounded-full bg-red-500/10
-                            text-red-400">
-
-                            <span
-                                class="material-symbols-outlined text-3xl">
-
-                                block
-
-                            </span>
-
-                        </div>
-
-
-                        <h2
-                            class="text-2xl font-black text-white">
-
-                            ACCESS DENIED
-
-                        </h2>
-
-
-                        <p
-                            class="mt-3 text-sm text-gray-400">
-
-                            This account is not registered
-                            as a KHELZONE admin.
-
-                        </p>
-
-
-                        <a
-                            href="admin.html"
-                            class="mt-6 inline-flex rounded-xl
-                            bg-orange-500 px-6 py-3
-                            font-black text-black">
-
-                            Back to Login
-
-                        </a>
-
-                    </div>
-
-                `;
-
+                checkingScreen.style.display = "none";
             }
 
+            if (dashboard) {
+                dashboard.classList.add("hidden");
+            }
+
+            if (accessDenied) {
+
+                accessDenied.style.display = "flex";
+
+            } else {
+
+                window.location.replace("homepage.html");
+            }
 
             return false;
-
         }
 
 
-        /* Admin verified */
+        /* -----------------------------------------
+           3. ADMIN VERIFIED
+        ----------------------------------------- */
 
-        state.user =
-            user;
+        console.log(
+            "KHELZONE ADMIN VERIFIED:",
+            user.id
+        );
 
+
+        /*
+            Store only non-sensitive UI info.
+        */
 
         localStorage.setItem(
             "khelzone_role",
             "admin"
         );
-
 
         localStorage.setItem(
             "khelzone_user_id",
@@ -568,46 +313,55 @@ async function checkAdminAccess() {
         );
 
 
+        /* -----------------------------------------
+           4. ADMIN NAME / EMAIL
+        ----------------------------------------- */
+
         const adminName =
             user.user_metadata?.full_name ||
             user.user_metadata?.name ||
             user.email?.split("@")[0] ||
             "Admin";
 
+        const adminEmail =
+            user.email || "-";
+
 
         if ($("adminName")) {
 
             $("adminName").textContent =
                 adminName;
-
         }
 
 
         if ($("adminEmail")) {
 
             $("adminEmail").textContent =
-                user.email || "";
-
+                adminEmail;
         }
 
 
-        /* Show dashboard */
+        /* -----------------------------------------
+           5. SHOW DASHBOARD
+        ----------------------------------------- */
 
         if (checkingScreen) {
 
-            checkingScreen.classList.add(
-                "hidden"
-            );
+            checkingScreen.style.display =
+                "none";
+        }
 
+
+        if (accessDenied) {
+
+            accessDenied.style.display =
+                "none";
         }
 
 
         if (dashboard) {
 
-            dashboard.classList.remove(
-                "hidden"
-            );
-
+            dashboard.classList.remove("hidden");
         }
 
 
@@ -617,363 +371,158 @@ async function checkAdminAccess() {
     } catch (error) {
 
         console.error(
-            "ADMIN ACCESS ERROR:",
+            "KHELZONE Admin Access Error:",
             error
         );
 
 
         if (checkingScreen) {
 
-            checkingScreen.innerHTML = `
-
-                <div
-                    class="px-6 text-center max-w-lg">
-
-                    <span
-                        class="material-symbols-outlined
-                        text-5xl text-red-400">
-
-                        error
-
-                    </span>
+            checkingScreen.style.display =
+                "none";
+        }
 
 
-                    <h2
-                        class="mt-4 text-2xl
-                        font-black text-white">
+        if (dashboard) {
 
-                        ADMIN CHECK FAILED
-
-                    </h2>
+            dashboard.classList.add("hidden");
+        }
 
 
-                    <p
-                        class="mt-3 text-sm
-                        leading-6 text-gray-400">
+        if (accessDenied) {
 
-                        ${escapeHTML(
-                            error.message
-                        )}
+            accessDenied.innerHTML = `
 
-                    </p>
+                <div class="access-box">
 
+                    <div class="access-icon">
+                        ⚠️
+                    </div>
+
+                    <div class="access-title">
+                        ACCESS ERROR
+                    </div>
+
+                    <div class="access-text">
+                        We could not verify your admin
+                        permissions. Please try again.
+                    </div>
 
                     <button
-                        id="retryAdminButton"
-                        class="mt-6 rounded-xl
-                        bg-orange-500 px-6 py-3
-                        font-black text-black">
-
+                        onclick="location.reload()"
+                        class="home-btn"
+                        style="border:0;cursor:pointer;"
+                    >
                         TRY AGAIN
-
                     </button>
 
                 </div>
 
             `;
 
-
-            $("retryAdminButton")
-                ?.addEventListener(
-                    "click",
-                    () => location.reload()
-                );
+            accessDenied.style.display =
+                "flex";
 
         }
 
-
         return false;
-
     }
-
 }
 
 
 /* ============================================================
-   SIDEBAR NAVIGATION
-   YOUR HTML USES data-section
+   NAVIGATION
 ============================================================ */
 
-function showSection(
-    sectionName
-) {
+function showSection(sectionId) {
 
-    console.log(
-        "Opening section:",
-        sectionName
-    );
+    const sections =
+        document.querySelectorAll(".section");
 
+    sections.forEach(section => {
 
-    /* Hide every section */
+        section.classList.remove("active");
 
-    document
-        .querySelectorAll(
-            "[data-dashboard-section]"
-        )
-        .forEach(section => {
-
-            section.classList.add(
-                "hidden"
-            );
-
-        });
+    });
 
 
-    /* Find selected section */
+    const target =
+        $(sectionId);
 
-    const section =
-        document.querySelector(
-            `[data-dashboard-section="${sectionName}"]`
-        );
+    if (target) {
 
-
-    if (section) {
-
-        section.classList.remove(
-            "hidden"
-        );
-
-    } else {
-
-        console.warn(
-            "Dashboard section not found:",
-            sectionName
-        );
-
+        target.classList.add("active");
     }
 
 
-    /* Titles */
+    const links =
+        document.querySelectorAll(".sidebar-link");
+
+    links.forEach(link => {
+
+        link.classList.remove("active");
+
+    });
+
+
+    const activeLink =
+        document.querySelector(
+            `[data-section="${sectionId}"]`
+        );
+
+    if (activeLink) {
+
+        activeLink.classList.add("active");
+    }
+
 
     const titles = {
 
-        dashboard: [
-            "DASHBOARD",
-            "Manage your KHELZONE marketplace"
-        ],
+        dashboardSection: "Dashboard",
 
-        products: [
-            "PRODUCTS",
-            "Manage your marketplace products"
-        ],
+        productsSection: "Products",
 
-        sellers: [
-            "SELLER APPLICATIONS",
-            "Manage seller applications"
-        ],
+        sellersSection: "Sellers",
 
-        customers: [
-            "CUSTOMERS",
-            "Manage registered customers"
-        ],
+        customersSection: "Customers",
 
-        orders: [
-            "ORDERS",
-            "Manage marketplace orders"
-        ]
+        ordersSection: "Orders"
 
     };
 
 
-    if (titles[sectionName]) {
+    if ($("pageTitle")) {
 
-        if ($("pageTitle")) {
-
-            $("pageTitle").textContent =
-                titles[sectionName][0];
-
-        }
-
-
-        if ($("pageSubtitle")) {
-
-            $("pageSubtitle").textContent =
-                titles[sectionName][1];
-
-        }
-
+        $("pageTitle").textContent =
+            titles[sectionId] || "Dashboard";
     }
-
-
-    /* Active sidebar */
-
-    document
-        .querySelectorAll(
-            "[data-section]"
-        )
-        .forEach(link => {
-
-            const current =
-                link.getAttribute(
-                    "data-section"
-                );
-
-
-            if (
-                current ===
-                sectionName
-            ) {
-
-                link.classList.add(
-                    "bg-orange-500",
-                    "text-black"
-                );
-
-                link.classList.remove(
-                    "text-white",
-                    "text-gray-400"
-                );
-
-            } else {
-
-                link.classList.remove(
-                    "bg-orange-500",
-                    "text-black"
-                );
-
-                link.classList.add(
-                    "text-white"
-                );
-
-            }
-
-        });
 
 
     closeMobileMenu();
-
-
-    /* Load required data */
-
-    if (
-        sectionName ===
-        "products"
-    ) {
-
-        loadProducts();
-
-    }
-
-
-    if (
-        sectionName ===
-        "sellers"
-    ) {
-
-        loadSellers();
-
-    }
-
-
-    if (
-        sectionName ===
-        "customers"
-    ) {
-
-        loadCustomers();
-
-    }
-
-
-    if (
-        sectionName ===
-        "orders"
-    ) {
-
-        loadOrders();
-
-    }
-
 }
 
 
-/* Make function available to inline onclick */
-window.showSection =
-    showSection;
-
-
-/* ============================================================
-   NAVIGATION INIT
-============================================================ */
-
 function initNavigation() {
 
-    console.log(
-        "Initializing navigation..."
-    );
-
-
     document
-        .querySelectorAll(
-            "[data-section]"
-        )
+        .querySelectorAll(".sidebar-link")
         .forEach(link => {
 
             link.addEventListener(
                 "click",
-                function(event) {
-
-                    event.preventDefault();
-
+                () => {
 
                     const section =
-                        this.getAttribute(
-                            "data-section"
-                        );
+                        link.dataset.section;
 
+                    if (section) {
 
-                    if (!section) {
-                        return;
+                        showSection(section);
                     }
-
-
-                    showSection(
-                        section
-                    );
-
                 }
             );
 
         });
-
-
-    /*
-       Existing dashboard HTML has
-       View Sellers button using:
-       onclick="showSection('sellers')"
-    */
-
-    document
-        .querySelectorAll(
-            '[onclick*="showSection"]'
-        )
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                function() {
-
-                    const match =
-                        this.getAttribute(
-                            "onclick"
-                        )?.match(
-                            /showSection\(['"]([^'"]+)['"]/
-                        );
-
-
-                    if (match) {
-
-                        showSection(
-                            match[1]
-                        );
-
-                    }
-
-                }
-            );
-
-        });
-
 }
 
 
@@ -983,401 +532,141 @@ function initNavigation() {
 
 function openMobileMenu() {
 
-    const menu =
-        $("mobileMenu");
+    const sidebar = $("sidebar");
 
+    if (sidebar) {
 
-    if (!menu) {
-        return;
+        sidebar.classList.add(
+            "mobile-open"
+        );
     }
-
-
-    menu.classList.remove(
-        "hidden"
-    );
-
-
-    menu.classList.remove(
-        "max-h-0"
-    );
-
-
-    menu.classList.add(
-        "max-h-[600px]"
-    );
-
-
-    menu.classList.add(
-        "opacity-100"
-    );
-
 }
 
 
 function closeMobileMenu() {
 
-    const menu =
-        $("mobileMenu");
+    const sidebar = $("sidebar");
 
+    if (sidebar) {
 
-    if (!menu) {
-        return;
+        sidebar.classList.remove(
+            "mobile-open"
+        );
     }
-
-
-    menu.classList.add(
-        "hidden"
-    );
-
-
-    menu.classList.remove(
-        "max-h-[600px]"
-    );
-
-
-    menu.classList.add(
-        "max-h-0"
-    );
-
-
-    menu.classList.remove(
-        "opacity-100"
-    );
-
 }
 
 
 function initMobileMenu() {
 
-    const button =
-        $("mobileMenuButton");
+    const btn = $("mobileMenuBtn");
 
+    if (btn) {
 
-    if (button) {
-
-        button.addEventListener(
+        btn.addEventListener(
             "click",
-            function(event) {
-
-                event.preventDefault();
-
-
-                const menu =
-                    $("mobileMenu");
-
-
-                if (
-                    menu &&
-                    !menu.classList.contains(
-                        "hidden"
-                    )
-                ) {
-
-                    closeMobileMenu();
-
-                } else {
-
-                    openMobileMenu();
-
-                }
-
-            }
+            openMobileMenu
         );
-
     }
 
 
-    $("mobileMenuOverlay")
-        ?.addEventListener(
-            "click",
-            closeMobileMenu
-        );
+    document
+        .querySelectorAll(".sidebar-link")
+        .forEach(link => {
 
+            link.addEventListener(
+                "click",
+                closeMobileMenu
+            );
 
-    $("mobileMenuClose")
-        ?.addEventListener(
-            "click",
-            closeMobileMenu
-        );
-
+        });
 }
 
 
 /* ============================================================
-   DASHBOARD COUNTS
+   COUNT HELPER
 ============================================================ */
 
-async function countRows(
-    table,
-    filterColumn = null,
-    filterValue = null
-) {
-
-    let query =
-        supabaseClient
-            .from(table)
-            .select(
-                "*",
-                {
-                    count: "exact",
-                    head: true
-                }
-            );
-
-
-    if (
-        filterColumn &&
-        filterValue !== null
-    ) {
-
-        query =
-            query.eq(
-                filterColumn,
-                filterValue
-            );
-
-    }
-
-
-    const {
-        count,
-        error
-    } =
-        await query;
-
-
-    if (error) {
-        throw error;
-    }
-
-
-    return count || 0;
-
-}
-
-
-/* ============================================================
-   LOAD DASHBOARD
-============================================================ */
-
-async function loadDashboardData() {
+async function safeCount(tableName) {
 
     try {
 
-        let products =
-            0;
-
-        let sellers =
-            0;
-
-        let customers =
-            0;
-
-        let orders =
-            0;
-
-
-        /* Products */
-
-        try {
-
-            products =
-                await countRows(
-                    "products"
-                );
-
-        } catch (error) {
-
-            console.warn(
-                "Products count:",
-                error.message
-            );
-
-        }
-
-
-        /* Sellers */
-
-        try {
-
-            sellers =
-                await countRows(
-                    "sellers"
-                );
-
-        } catch (error) {
-
-            console.warn(
-                "Sellers count:",
-                error.message
-            );
-
-        }
-
-
-        /* Customers */
-
-        try {
-
-            customers =
-                await countRows(
-                    "customers"
-                );
-
-        } catch {
-
-            try {
-
-                customers =
-                    await countRows(
-                        "profiles"
-                    );
-
-            } catch {
-
-                customers =
-                    0;
-
-            }
-
-        }
-
-
-        /* Orders */
-
-        try {
-
-            orders =
-                await countRows(
-                    "orders"
-                );
-
-        } catch {
-
-            orders =
-                0;
-
-        }
-
-
-        setCount(
-            "totalProducts",
-            products
-        );
-
-
-        setCount(
-            "totalSellers",
-            sellers
-        );
-
-
-        setCount(
-            "totalCustomers",
-            customers
-        );
-
-
-        setCount(
-            "totalOrders",
-            orders
-        );
-
-
-        /* Seller statuses */
-
-        const pending =
-            await safeCount(
-                "sellers",
-                "status",
-                "pending"
-            );
-
-
-        const approved =
-            await safeCount(
-                "sellers",
-                "status",
-                "approved"
-            );
-
-
-        const rejected =
-            await safeCount(
-                "sellers",
-                "status",
-                "rejected"
-            );
-
-
-        setCount(
-            "pendingSellers",
-            pending
-        );
-
-
-        setCount(
-            "approvedSellers",
-            approved
-        );
-
-
-        setCount(
-            "rejectedSellers",
-            rejected
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Dashboard loading error:",
+        const {
+            count,
             error
-        );
+        } = await supabaseClient
+            .from(tableName)
+            .select("*", {
+                count: "exact",
+                head: true
+            });
 
-    }
 
-}
+        if (error) {
+
+            console.warn(
+                `Count error for ${tableName}:`,
+                error
+            );
+
+            return 0;
+        }
 
 
-async function safeCount(
-    table,
-    column,
-    value
-) {
-
-    try {
-
-        return await countRows(
-            table,
-            column,
-            value
-        );
+        return count || 0;
 
     } catch {
 
         return 0;
-
     }
-
 }
 
 
-function setCount(
-    id,
-    value
-) {
+async function loadDashboardData() {
 
-    const element =
-        $(id);
+    const [
+        products,
+        sellers,
+        customers,
+        orders
+    ] = await Promise.all([
 
-    if (element) {
+        safeCount("products"),
 
-        element.textContent =
-            String(value ?? 0);
+        safeCount("sellers"),
 
+        safeCount("customers"),
+
+        safeCount("orders")
+
+    ]);
+
+
+    if ($("productCount")) {
+
+        $("productCount").textContent =
+            products;
     }
 
+
+    if ($("sellerCount")) {
+
+        $("sellerCount").textContent =
+            sellers;
+    }
+
+
+    if ($("customerCount")) {
+
+        $("customerCount").textContent =
+            customers;
+    }
+
+
+    if ($("orderCount")) {
+
+        $("orderCount").textContent =
+            orders;
+    }
 }
 
 
@@ -1385,34 +674,32 @@ function setCount(
    PRODUCTS
 ============================================================ */
 
+let allProducts = [];
+
+
 async function loadProducts() {
 
-    const table =
+    const tbody =
         $("productsTableBody");
 
-
-    if (!table) {
-
-        console.warn(
-            "productsTableBody not found."
-        );
-
+    if (!tbody) {
         return;
-
     }
 
 
-    tableLoading(
+    showTableMessage(
         "productsTableBody",
-        7
+        "Loading products...",
+        6
     );
 
 
-    const {
-        data,
-        error
-    } =
-        await supabaseClient
+    try {
+
+        const {
+            data,
+            error
+        } = await supabaseClient
             .from("products")
             .select("*")
             .order(
@@ -1423,697 +710,253 @@ async function loadProducts() {
             );
 
 
-    if (error) {
+        if (error) {
+            throw error;
+        }
+
+
+        allProducts =
+            data || [];
+
+
+        renderProducts(
+            allProducts
+        );
+
+
+    } catch (error) {
 
         console.error(
             "Products error:",
             error
         );
 
-
-        tableEmpty(
+        showTableMessage(
             "productsTableBody",
-            7,
-            error.message
+            "Unable to load products.",
+            6
         );
-
-
-        return;
-
     }
-
-
-    state.products =
-        data || [];
-
-
-    renderProducts();
-
 }
 
 
-/* ============================================================
-   RENDER PRODUCTS
-============================================================ */
+function renderProducts(products) {
 
-function renderProducts() {
-
-    const table =
+    const tbody =
         $("productsTableBody");
 
-
-    if (!table) {
+    if (!tbody) {
         return;
     }
 
 
-    const search =
-        (
-            $("productSearch")
-                ?.value ||
-            ""
-        )
-        .trim()
-        .toLowerCase();
+    if (!products.length) {
 
-
-    const filtered =
-        state.products.filter(
-            product => {
-
-                const text = [
-
-                    product.name,
-
-                    product.sport,
-
-                    product.category,
-
-                    product.brand,
-
-                    product.description
-
-                ]
-                    .join(" ")
-                    .toLowerCase();
-
-
-                return (
-                    !search ||
-                    text.includes(search)
-                );
-
-            }
-        );
-
-
-    if (!filtered.length) {
-
-        tableEmpty(
+        showTableMessage(
             "productsTableBody",
-            7,
-            "No products found."
+            "No products found.",
+            6
         );
 
-
         return;
-
     }
 
 
-    table.innerHTML =
-        filtered
-            .map(
-                product => `
+    tbody.innerHTML =
+        products.map(product => {
 
-                <tr
-                    class="border-b border-white/5">
+            const name =
+                product.name ||
+                product.title ||
+                "Unnamed Product";
 
-                    <td class="py-4 pr-4">
+            const price =
+                product.price || 0;
 
-                        <div
-                            class="flex items-center gap-3">
+            const category =
+                product.category ||
+                "-";
 
-                            ${
-                                product.image_url
-                                    ? `
-                                        <img
-                                            src="${escapeHTML(
-                                                product.image_url
-                                            )}"
-                                            class="h-12 w-12
-                                            rounded-lg
-                                            object-cover"
-                                            alt="${escapeHTML(
-                                                product.name
-                                            )}">
-                                      `
-                                    : `
-                                        <div
-                                            class="flex h-12 w-12
-                                            items-center
-                                            justify-center
-                                            rounded-lg
-                                            bg-white/5">
+            const seller =
+                product.seller_name ||
+                product.seller_email ||
+                product.seller_id ||
+                "-";
 
-                                            <span
-                                                class="material-symbols-outlined
-                                                text-gray-500">
-
-                                                image
-
-                                            </span>
-
-                                        </div>
-                                      `
-                            }
+            const active =
+                product.is_active !== false;
 
 
-                            <div>
+            return `
 
-                                <p
-                                    class="font-black text-white">
+                <tr>
 
-                                    ${escapeHTML(
-                                        product.name ||
-                                        "Unnamed"
-                                    )}
-
-                                </p>
-
-
-                                <p
-                                    class="text-xs
-                                    text-gray-500">
-
-                                    ${escapeHTML(
-                                        product.brand ||
-                                        ""
-                                    )}
-
-                                </p>
-
-                            </div>
-
-                        </div>
-
+                    <td>
+                        <strong>
+                            ${escapeHTML(name)}
+                        </strong>
                     </td>
 
-
-                    <td
-                        class="py-4 pr-4 text-gray-400">
-
-                        ${escapeHTML(
-                            product.sport ||
-                            "—"
-                        )}
-
+                    <td>
+                        ${formatMoney(price)}
                     </td>
 
-
-                    <td
-                        class="py-4 pr-4 text-gray-400">
-
-                        ${escapeHTML(
-                            product.category ||
-                            "—"
-                        )}
-
+                    <td>
+                        ${escapeHTML(category)}
                     </td>
 
-
-                    <td
-                        class="py-4 pr-4 font-black">
-
-                        ${formatMoney(
-                            product.price
-                        )}
-
+                    <td>
+                        ${escapeHTML(seller)}
                     </td>
 
-
-                    <td
-                        class="py-4 pr-4">
-
-                        ${escapeHTML(
-                            product.stock ??
-                            0
-                        )}
-
+                    <td>
+                        <span
+                            style="
+                                color:${active
+                                    ? "#42d392"
+                                    : "#ff5a00"};
+                                font-weight:800;
+                            "
+                        >
+                            ${active
+                                ? "Active"
+                                : "Inactive"}
+                        </span>
                     </td>
 
+                    <td>
 
-                    <td class="py-4">
-
-                        ${statusBadge(
-                            product.is_active === false
-                                ? "inactive"
-                                : "active"
-                        )}
-
-                    </td>
-
-
-                    <td
-                        class="py-4 text-right">
-
-                        <div
-                            class="flex justify-end
-                            gap-2">
-
-                            <button
-                                type="button"
-                                data-product-edit="${escapeHTML(
-                                    product.id
-                                )}"
-                                class="rounded-lg
-                                border border-white/10
-                                p-2 text-gray-300
-                                hover:text-orange-400">
-
-                                <span
-                                    class="material-symbols-outlined
-                                    text-base">
-
-                                    edit
-
-                                </span>
-
-                            </button>
-
-
-                            <button
-                                type="button"
-                                data-product-toggle="${escapeHTML(
-                                    product.id
-                                )}"
-                                class="rounded-lg
-                                border border-white/10
-                                p-2 text-yellow-400">
-
-                                <span
-                                    class="material-symbols-outlined
-                                    text-base">
-
-                                    ${
-                                        product.is_active === false
-                                            ? "visibility"
-                                            : "visibility_off"
-                                    }
-
-                                </span>
-
-                            </button>
-
-
-                            <button
-                                type="button"
-                                data-product-delete="${escapeHTML(
-                                    product.id
-                                )}"
-                                class="rounded-lg
-                                border border-red-500/20
-                                p-2 text-red-400">
-
-                                <span
-                                    class="material-symbols-outlined
-                                    text-base">
-
-                                    delete
-
-                                </span>
-
-                            </button>
-
-                        </div>
+                        <button
+                            onclick="toggleProduct('${product.id}', ${active})"
+                            style="
+                                padding:8px 12px;
+                                border-radius:7px;
+                                border:1px solid #333;
+                                background:#191919;
+                                color:white;
+                                cursor:pointer;
+                            "
+                        >
+                            ${active
+                                ? "Disable"
+                                : "Enable"}
+                        </button>
 
                     </td>
 
                 </tr>
 
-            `
-            )
-            .join("");
+            `;
 
-
-    /* Edit */
-
-    table
-        .querySelectorAll(
-            "[data-product-edit]"
-        )
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    const product =
-                        state.products.find(
-                            item =>
-                                String(item.id) ===
-                                String(
-                                    button.dataset.productEdit
-                                )
-                        );
-
-
-                    if (product) {
-
-                        editProduct(
-                            product
-                        );
-
-                    }
-
-                }
-            );
-
-        });
-
-
-    /* Toggle */
-
-    table
-        .querySelectorAll(
-            "[data-product-toggle]"
-        )
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    const product =
-                        state.products.find(
-                            item =>
-                                String(item.id) ===
-                                String(
-                                    button.dataset.productToggle
-                                )
-                        );
-
-
-                    if (product) {
-
-                        toggleProduct(
-                            product
-                        );
-
-                    }
-
-                }
-            );
-
-        });
-
-
-    /* Delete */
-
-    table
-        .querySelectorAll(
-            "[data-product-delete]"
-        )
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    const product =
-                        state.products.find(
-                            item =>
-                                String(item.id) ===
-                                String(
-                                    button.dataset.productDelete
-                                )
-                        );
-
-
-                    if (product) {
-
-                        deleteProduct(
-                            product
-                        );
-
-                    }
-
-                }
-            );
-
-        });
-
+        }).join("");
 }
 
-
-/* ============================================================
-   PRODUCT SEARCH
-============================================================ */
 
 function initProductSearch() {
 
-    $("productSearch")
-        ?.addEventListener(
-            "input",
-            renderProducts
-        );
+    const input =
+        $("productSearch");
+
+    if (!input) {
+        return;
+    }
 
 
-    $("refreshProducts")
-        ?.addEventListener(
-            "click",
-            loadProducts
-        );
+    input.addEventListener(
+        "input",
+        () => {
 
+            const query =
+                input.value
+                    .trim()
+                    .toLowerCase();
+
+
+            if (!query) {
+
+                renderProducts(
+                    allProducts
+                );
+
+                return;
+            }
+
+
+            const filtered =
+                allProducts.filter(
+                    product => {
+
+                        return [
+
+                            product.name,
+
+                            product.title,
+
+                            product.category,
+
+                            product.seller_name,
+
+                            product.seller_email
+
+                        ]
+                            .filter(Boolean)
+                            .some(value =>
+                                String(value)
+                                    .toLowerCase()
+                                    .includes(query)
+                            );
+                    }
+                );
+
+
+            renderProducts(
+                filtered
+            );
+        }
+    );
 }
 
-
-/* ============================================================
-   EDIT PRODUCT
-============================================================ */
-
-function editProduct(
-    product
-) {
-
-    state.currentProduct =
-        product;
-
-
-    /*
-       If your HTML has a product modal,
-       these fields will automatically be filled.
-    */
-
-    if ($("editProductId")) {
-
-        $("editProductId").value =
-            product.id || "";
-
-    }
-
-
-    if ($("editProductName")) {
-
-        $("editProductName").value =
-            product.name || "";
-
-    }
-
-
-    if ($("editProductPrice")) {
-
-        $("editProductPrice").value =
-            product.price ?? "";
-
-    }
-
-
-    if ($("editProductStock")) {
-
-        $("editProductStock").value =
-            product.stock ?? "";
-
-    }
-
-
-    if ($("editProductCategory")) {
-
-        $("editProductCategory").value =
-            product.category || "";
-
-    }
-
-
-    if ($("editProductSport")) {
-
-        $("editProductSport").value =
-            product.sport || "";
-
-    }
-
-
-    if ($("editProductImage")) {
-
-        $("editProductImage").value =
-            product.image_url || "";
-
-    }
-
-
-    if ($("editProductActive")) {
-
-        $("editProductActive").checked =
-            product.is_active !== false;
-
-    }
-
-
-    /* Open whichever modal exists */
-
-    if ($("editProductModal")) {
-
-        openModal(
-            "editProductModal"
-        );
-
-    } else if ($("productModal")) {
-
-        openModal(
-            "productModal"
-        );
-
-    } else {
-
-        /*
-           No modal in HTML.
-           Show product information instead.
-        */
-
-        alert(
-            "Product selected:\n\n" +
-            "Name: " +
-            (product.name || "—") +
-            "\nPrice: " +
-            formatMoney(product.price) +
-            "\nStock: " +
-            (product.stock ?? 0)
-        );
-
-    }
-
-}
-
-
-/* ============================================================
-   TOGGLE PRODUCT
-============================================================ */
 
 async function toggleProduct(
-    product
+    productId,
+    currentStatus
 ) {
 
-    const next =
-        product.is_active === false;
+    try {
 
-
-    const confirmed =
-        confirm(
-            next
-                ? `Activate "${product.name}"?`
-                : `Deactivate "${product.name}"?`
-        );
-
-
-    if (!confirmed) {
-        return;
-    }
-
-
-    const {
-        error
-    } =
-        await supabaseClient
+        const {
+            error
+        } = await supabaseClient
             .from("products")
             .update({
-                is_active: next
+                is_active: !currentStatus
             })
-            .eq(
-                "id",
-                product.id
-            );
+            .eq("id", productId);
 
 
-    if (error) {
-
-        console.error(
-            error
-        );
+        if (error) {
+            throw error;
+        }
 
 
         showToast(
-            error.message,
-            "error"
+            "Product status updated."
         );
 
 
-        return;
+        await loadProducts();
 
+        await loadDashboardData();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Could not update product."
+        );
     }
-
-
-    showToast(
-        next
-            ? "Product activated."
-            : "Product deactivated."
-    );
-
-
-    await loadProducts();
-
-    await loadDashboardData();
-
-}
-
-
-/* ============================================================
-   DELETE PRODUCT
-============================================================ */
-
-async function deleteProduct(
-    product
-) {
-
-    const confirmed =
-        confirm(
-            `Delete "${product.name}" permanently?`
-        );
-
-
-    if (!confirmed) {
-        return;
-    }
-
-
-    const {
-        error
-    } =
-        await supabaseClient
-            .from("products")
-            .delete()
-            .eq(
-                "id",
-                product.id
-            );
-
-
-    if (error) {
-
-        console.error(
-            error
-        );
-
-
-        showToast(
-            error.message,
-            "error"
-        );
-
-
-        return;
-
-    }
-
-
-    showToast(
-        "Product deleted successfully."
-    );
-
-
-    await loadProducts();
-
-    await loadDashboardData();
-
 }
 
 
@@ -2121,34 +964,32 @@ async function deleteProduct(
    SELLERS
 ============================================================ */
 
+let allSellers = [];
+
+
 async function loadSellers() {
 
-    const table =
+    const tbody =
         $("sellersTableBody");
 
-
-    if (!table) {
-
-        console.warn(
-            "sellersTableBody not found."
-        );
-
+    if (!tbody) {
         return;
-
     }
 
 
-    tableLoading(
+    showTableMessage(
         "sellersTableBody",
+        "Loading sellers...",
         6
     );
 
 
-    const {
-        data,
-        error
-    } =
-        await supabaseClient
+    try {
+
+        const {
+            data,
+            error
+        } = await supabaseClient
             .from("sellers")
             .select("*")
             .order(
@@ -2159,766 +1000,284 @@ async function loadSellers() {
             );
 
 
-    if (error) {
+        if (error) {
+            throw error;
+        }
+
+
+        allSellers =
+            data || [];
+
+
+        renderSellers(
+            allSellers
+        );
+
+
+    } catch (error) {
 
         console.error(
             "Sellers error:",
             error
         );
 
-
-        tableEmpty(
+        showTableMessage(
             "sellersTableBody",
-            6,
-            error.message
+            "Unable to load sellers.",
+            6
         );
-
-
-        return;
-
     }
-
-
-    state.sellers =
-        data || [];
-
-
-    renderSellers();
-
 }
 
 
-/* ============================================================
-   RENDER SELLERS
-============================================================ */
+function renderSellers(sellers) {
 
-function renderSellers() {
-
-    const table =
+    const tbody =
         $("sellersTableBody");
 
-
-    if (!table) {
+    if (!tbody) {
         return;
     }
 
 
-    const search =
-        (
-            $("sellerSearch")
-                ?.value ||
-            ""
-        )
-        .trim()
-        .toLowerCase();
+    if (!sellers.length) {
 
-
-    const filtered =
-        state.sellers.filter(
-            seller => {
-
-                const text = [
-
-                    seller.business_name,
-
-                    seller.owner_name,
-
-                    seller.email,
-
-                    seller.phone,
-
-                    seller.city,
-
-                    seller.category,
-
-                    seller.status
-
-                ]
-                    .join(" ")
-                    .toLowerCase();
-
-
-                return (
-                    !search ||
-                    text.includes(search)
-                );
-
-            }
-        );
-
-
-    if (!filtered.length) {
-
-        tableEmpty(
+        showTableMessage(
             "sellersTableBody",
-            6,
-            "No seller applications found."
+            "No sellers found.",
+            6
         );
 
-
         return;
-
     }
 
 
-    table.innerHTML =
-        filtered
-            .map(
-                seller => `
+    tbody.innerHTML =
+        sellers.map(seller => {
 
-                <tr
-                    class="border-b border-white/5">
+            const business =
+                seller.business_name ||
+                seller.shop_name ||
+                seller.store_name ||
+                "-";
 
-                    <td class="py-4 pr-4">
+            const owner =
+                seller.owner_name ||
+                seller.name ||
+                "-";
 
-                        <div
-                            class="flex items-center gap-3">
+            const email =
+                seller.email ||
+                "-";
 
-                            <div
-                                class="flex h-10 w-10
-                                shrink-0 items-center
-                                justify-center
-                                rounded-full
-                                bg-orange-500/10
-                                text-orange-400
-                                font-black">
+            const phone =
+                seller.phone ||
+                seller.phone_number ||
+                "-";
 
-                                ${escapeHTML(
-                                    initials(
-                                        seller.owner_name
-                                    )
-                                )}
-
-                            </div>
+            const status =
+                seller.status ||
+                "pending";
 
 
-                            <div>
+            return `
 
-                                <p
-                                    class="font-black">
+                <tr>
 
-                                    ${escapeHTML(
-                                        seller.owner_name ||
-                                        "—"
-                                    )}
-
-                                </p>
-
-
-                                <p
-                                    class="text-xs
-                                    text-gray-500">
-
-                                    ${escapeHTML(
-                                        seller.city ||
-                                        ""
-                                    )}
-
-                                </p>
-
-                            </div>
-
-                        </div>
-
+                    <td>
+                        ${escapeHTML(business)}
                     </td>
 
-
-                    <td
-                        class="py-4 pr-4 font-bold">
-
-                        ${escapeHTML(
-                            seller.business_name ||
-                            "—"
-                        )}
-
+                    <td>
+                        ${escapeHTML(owner)}
                     </td>
 
-
-                    <td
-                        class="py-4 pr-4
-                        text-gray-400">
-
-                        ${escapeHTML(
-                            seller.email ||
-                            "—"
-                        )}
-
+                    <td>
+                        ${escapeHTML(email)}
                     </td>
 
-
-                    <td
-                        class="py-4 pr-4
-                        text-gray-400">
-
-                        ${escapeHTML(
-                            seller.phone ||
-                            "—"
-                        )}
-
+                    <td>
+                        ${escapeHTML(phone)}
                     </td>
 
-
-                    <td class="py-4">
-
-                        ${statusBadge(
-                            seller.status ||
-                            "pending"
-                        )}
-
+                    <td>
+                        ${escapeHTML(status)}
                     </td>
 
+                    <td>
 
-                    <td
-                        class="py-4 text-right">
-
-                        <div
-                            class="flex justify-end
-                            gap-2">
-
-                            <button
-                                type="button"
-                                data-seller-view="${escapeHTML(
-                                    seller.id
-                                )}"
-                                class="rounded-lg
-                                border border-white/10
-                                p-2
-                                text-gray-300
-                                hover:text-orange-400">
-
-                                <span
-                                    class="material-symbols-outlined">
-
-                                    visibility
-
-                                </span>
-
-                            </button>
-
-
-                            ${
-                                seller.status !==
-                                "approved"
-                                    ? `
-                                        <button
-                                            type="button"
-                                            data-seller-approve="${escapeHTML(
-                                                seller.id
-                                            )}"
-                                            class="rounded-lg
-                                            border
-                                            border-green-500/20
-                                            p-2
-                                            text-green-400">
-
-                                            <span
-                                                class="material-symbols-outlined">
-
-                                                check
-
-                                            </span>
-
-                                        </button>
-                                      `
-                                    : ""
-                            }
-
-
-                            ${
-                                seller.status !==
-                                "rejected"
-                                    ? `
-                                        <button
-                                            type="button"
-                                            data-seller-reject="${escapeHTML(
-                                                seller.id
-                                            )}"
-                                            class="rounded-lg
-                                            border
-                                            border-red-500/20
-                                            p-2
-                                            text-red-400">
-
-                                            <span
-                                                class="material-symbols-outlined">
-
-                                                close
-
-                                            </span>
-
-                                        </button>
-                                      `
-                                    : ""
-                            }
-
-                        </div>
+                        <button
+                            onclick="viewSeller('${seller.id}')"
+                            style="
+                                padding:8px 12px;
+                                border-radius:7px;
+                                border:1px solid #333;
+                                background:#191919;
+                                color:white;
+                                cursor:pointer;
+                            "
+                        >
+                            View
+                        </button>
 
                     </td>
 
                 </tr>
 
-            `
-            )
-            .join("");
+            `;
 
-
-    /* View */
-
-    table
-        .querySelectorAll(
-            "[data-seller-view]"
-        )
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    const seller =
-                        state.sellers.find(
-                            item =>
-                                String(item.id) ===
-                                String(
-                                    button.dataset.sellerView
-                                )
-                        );
-
-
-                    if (seller) {
-
-                        viewSeller(
-                            seller
-                        );
-
-                    }
-
-                }
-            );
-
-        });
-
-
-    /* Approve */
-
-    table
-        .querySelectorAll(
-            "[data-seller-approve]"
-        )
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    updateSellerStatus(
-                        button.dataset.sellerApprove,
-                        "approved"
-                    );
-
-                }
-            );
-
-        });
-
-
-    /* Reject */
-
-    table
-        .querySelectorAll(
-            "[data-seller-reject]"
-        )
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    updateSellerStatus(
-                        button.dataset.sellerReject,
-                        "rejected"
-                    );
-
-                }
-            );
-
-        });
-
+        }).join("");
 }
 
-
-/* ============================================================
-   VIEW SELLER
-============================================================ */
-
-function viewSeller(
-    seller
-) {
-
-    state.currentSeller =
-        seller;
-
-
-    const body =
-        $("sellerModalBody");
-
-
-    if (!body) {
-
-        alert(
-            "SELLER DETAILS\n\n" +
-
-            "Business: " +
-            (seller.business_name || "—") +
-
-            "\nOwner: " +
-            (seller.owner_name || "—") +
-
-            "\nEmail: " +
-            (seller.email || "—") +
-
-            "\nPhone: " +
-            (seller.phone || "—") +
-
-            "\nCity: " +
-            (seller.city || "—") +
-
-            "\nCategory: " +
-            (seller.category || "—") +
-
-            "\nStatus: " +
-            (seller.status || "pending")
-        );
-
-
-        return;
-
-    }
-
-
-    body.innerHTML = `
-
-        <div
-            class="space-y-5">
-
-            <div>
-
-                <p
-                    class="text-xs text-gray-500">
-
-                    BUSINESS
-
-                </p>
-
-                <p
-                    class="mt-1 text-lg
-                    font-black">
-
-                    ${escapeHTML(
-                        seller.business_name ||
-                        "—"
-                    )}
-
-                </p>
-
-            </div>
-
-
-            <div
-                class="grid grid-cols-1
-                gap-4 sm:grid-cols-2">
-
-                <div>
-
-                    <p
-                        class="text-xs text-gray-500">
-
-                        Owner
-
-                    </p>
-
-                    <p
-                        class="font-bold">
-
-                        ${escapeHTML(
-                            seller.owner_name ||
-                            "—"
-                        )}
-
-                    </p>
-
-                </div>
-
-
-                <div>
-
-                    <p
-                        class="text-xs text-gray-500">
-
-                        Email
-
-                    </p>
-
-                    <p
-                        class="font-bold break-all">
-
-                        ${escapeHTML(
-                            seller.email ||
-                            "—"
-                        )}
-
-                    </p>
-
-                </div>
-
-
-                <div>
-
-                    <p
-                        class="text-xs text-gray-500">
-
-                        Phone
-
-                    </p>
-
-                    <p
-                        class="font-bold">
-
-                        ${escapeHTML(
-                            seller.phone ||
-                            "—"
-                        )}
-
-                    </p>
-
-                </div>
-
-
-                <div>
-
-                    <p
-                        class="text-xs text-gray-500">
-
-                        City
-
-                    </p>
-
-                    <p
-                        class="font-bold">
-
-                        ${escapeHTML(
-                            seller.city ||
-                            "—"
-                        )}
-
-                    </p>
-
-                </div>
-
-
-                <div>
-
-                    <p
-                        class="text-xs text-gray-500">
-
-                        Category
-
-                    </p>
-
-                    <p
-                        class="font-bold">
-
-                        ${escapeHTML(
-                            seller.category ||
-                            "—"
-                        )}
-
-                    </p>
-
-                </div>
-
-
-                <div>
-
-                    <p
-                        class="text-xs text-gray-500">
-
-                        Status
-
-                    </p>
-
-                    <div
-                        class="mt-1">
-
-                        ${statusBadge(
-                            seller.status
-                        )}
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div>
-
-                <p
-                    class="text-xs text-gray-500">
-
-                    Monthly Volume
-
-                </p>
-
-                <p
-                    class="font-bold">
-
-                    ${escapeHTML(
-                        seller.monthly_volume ||
-                        "—"
-                    )}
-
-                </p>
-
-            </div>
-
-
-            <div>
-
-                <p
-                    class="text-xs text-gray-500">
-
-                    APPLICATION MESSAGE
-
-                </p>
-
-                <p
-                    class="mt-2
-                    whitespace-pre-wrap
-                    text-sm
-                    leading-6
-                    text-gray-300">
-
-                    ${escapeHTML(
-                        seller.message ||
-                        "No message."
-                    )}
-
-                </p>
-
-            </div>
-
-        </div>
-
-    `;
-
-
-    openModal(
-        "sellerModal"
-    );
-
-}
-
-
-/* ============================================================
-   UPDATE SELLER STATUS
-============================================================ */
-
-async function updateSellerStatus(
-    sellerId,
-    newStatus
-) {
-
-    const action =
-        newStatus ===
-        "approved"
-            ? "approve"
-            : "reject";
-
-
-    if (
-        !confirm(
-            `Are you sure you want to ${action} this seller?`
-        )
-    ) {
-
-        return;
-
-    }
-
-
-    const {
-        error
-    } =
-        await supabaseClient
-            .from("sellers")
-            .update({
-
-                status:
-                    newStatus,
-
-                updated_at:
-                    new Date().toISOString()
-
-            })
-            .eq(
-                "id",
-                sellerId
-            );
-
-
-    if (error) {
-
-        console.error(
-            "Seller status error:",
-            error
-        );
-
-
-        showToast(
-            error.message,
-            "error"
-        );
-
-
-        return;
-
-    }
-
-
-    showToast(
-        newStatus ===
-            "approved"
-            ? "Seller approved successfully."
-            : "Seller rejected."
-    );
-
-
-    await loadSellers();
-
-    await loadDashboardData();
-
-}
-
-
-/* ============================================================
-   SELLER SEARCH
-============================================================ */
 
 function initSellerSearch() {
 
-    $("sellerSearch")
-        ?.addEventListener(
-            "input",
-            renderSellers
+    const input =
+        $("sellerSearch");
+
+    if (!input) {
+        return;
+    }
+
+
+    input.addEventListener(
+        "input",
+        () => {
+
+            const query =
+                input.value
+                    .trim()
+                    .toLowerCase();
+
+
+            if (!query) {
+
+                renderSellers(
+                    allSellers
+                );
+
+                return;
+            }
+
+
+            const filtered =
+                allSellers.filter(
+                    seller => {
+
+                        return [
+
+                            seller.business_name,
+
+                            seller.shop_name,
+
+                            seller.owner_name,
+
+                            seller.name,
+
+                            seller.email,
+
+                            seller.phone
+
+                        ]
+                            .filter(Boolean)
+                            .some(value =>
+                                String(value)
+                                    .toLowerCase()
+                                    .includes(query)
+                            );
+                    }
+                );
+
+
+            renderSellers(
+                filtered
+            );
+        }
+    );
+}
+
+
+function viewSeller(id) {
+
+    const seller =
+        allSellers.find(
+            item =>
+                String(item.id) ===
+                String(id)
         );
 
 
-    $("refreshSellers")
-        ?.addEventListener(
-            "click",
-            loadSellers
+    if (!seller) {
+        return;
+    }
+
+
+    alert(
+        "Seller\n\n" +
+        "Business: " +
+        (
+            seller.business_name ||
+            seller.shop_name ||
+            "-"
+        ) +
+        "\nOwner: " +
+        (
+            seller.owner_name ||
+            seller.name ||
+            "-"
+        ) +
+        "\nEmail: " +
+        (
+            seller.email ||
+            "-"
+        ) +
+        "\nPhone: " +
+        (
+            seller.phone ||
+            "-"
+        )
+    );
+}
+
+
+async function updateSellerStatus(
+    id,
+    status
+) {
+
+    try {
+
+        const {
+            error
+        } = await supabaseClient
+            .from("sellers")
+            .update({
+                status: status
+            })
+            .eq("id", id);
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        showToast(
+            "Seller status updated."
         );
 
+
+        await loadSellers();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Could not update seller."
+        );
+    }
 }
 
 
@@ -2926,100 +1285,33 @@ function initSellerSearch() {
    CUSTOMERS
 ============================================================ */
 
-async function findCustomerTable() {
-
-    const tables = [
-        "customers",
-        "profiles"
-    ];
-
-
-    for (
-        const table of tables
-    ) {
-
-        try {
-
-            const {
-                error
-            } =
-                await supabaseClient
-                    .from(table)
-                    .select("*")
-                    .limit(1);
-
-
-            if (!error) {
-
-                return table;
-
-            }
-
-        } catch {
-
-            // Continue
-
-        }
-
-    }
-
-
-    return null;
-
-}
+let allCustomers = [];
 
 
 async function loadCustomers() {
 
-    const table =
+    const tbody =
         $("customersTableBody");
 
-
-    if (!table) {
-
-        console.warn(
-            "customersTableBody not found."
-        );
-
+    if (!tbody) {
         return;
-
     }
 
 
-    tableLoading(
+    showTableMessage(
         "customersTableBody",
-        6
+        "Loading customers...",
+        4
     );
 
 
-    const customerTable =
-        await findCustomerTable();
+    try {
 
-
-    if (!customerTable) {
-
-        tableEmpty(
-            "customersTableBody",
-            6,
-            "Customers table not available."
-        );
-
-
-        return;
-
-    }
-
-
-    state.customerTable =
-        customerTable;
-
-
-    const {
-        data,
-        error
-    } =
-        await supabaseClient
-            .from(customerTable)
+        const {
+            data,
+            error
+        } = await supabaseClient
+            .from("customers")
             .select("*")
             .order(
                 "created_at",
@@ -3029,500 +1321,222 @@ async function loadCustomers() {
             );
 
 
-    if (error) {
+        if (error) {
+            throw error;
+        }
+
+
+        allCustomers =
+            data || [];
+
+
+        renderCustomers(
+            allCustomers
+        );
+
+
+    } catch (error) {
 
         console.error(
             "Customers error:",
             error
         );
 
-
-        tableEmpty(
+        showTableMessage(
             "customersTableBody",
-            6,
-            error.message
+            "Unable to load customers.",
+            4
         );
-
-
-        return;
-
     }
-
-
-    state.customers =
-        data || [];
-
-
-    renderCustomers();
-
 }
 
 
-function customerName(
-    customer
-) {
+function customerName(customer) {
 
     return (
-        customer.full_name ||
         customer.name ||
-        customer.display_name ||
+        customer.full_name ||
         customer.username ||
-        customer.email?.split("@")[0] ||
         "Customer"
     );
-
 }
 
 
-function customerPhone(
-    customer
-) {
+function customerPhone(customer) {
 
     return (
         customer.phone ||
         customer.phone_number ||
-        "—"
+        "-"
     );
-
 }
 
 
-function renderCustomers() {
+function renderCustomers(customers) {
 
-    const table =
+    const tbody =
         $("customersTableBody");
 
-
-    if (!table) {
+    if (!tbody) {
         return;
     }
 
 
-    const search =
-        (
-            $("customerSearch")
-                ?.value ||
-            ""
-        )
-        .trim()
-        .toLowerCase();
+    if (!customers.length) {
 
-
-    const filtered =
-        state.customers.filter(
-            customer => {
-
-                const text = [
-
-                    customerName(
-                        customer
-                    ),
-
-                    customer.email,
-
-                    customerPhone(
-                        customer
-                    ),
-
-                    customer.city
-
-                ]
-                    .join(" ")
-                    .toLowerCase();
-
-
-                return (
-                    !search ||
-                    text.includes(search)
-                );
-
-            }
-        );
-
-
-    if (!filtered.length) {
-
-        tableEmpty(
+        showTableMessage(
             "customersTableBody",
-            6,
-            "No customers found."
+            "No customers found.",
+            4
         );
 
-
         return;
-
     }
 
 
-    table.innerHTML =
-        filtered
-            .map(
-                customer => `
+    tbody.innerHTML =
+        customers.map(customer => {
 
-                <tr
-                    class="border-b border-white/5">
+            return `
 
-                    <td class="py-4 pr-4">
+                <tr>
 
-                        <div
-                            class="flex items-center gap-3">
-
-                            <div
-                                class="flex h-10 w-10
-                                items-center
-                                justify-center
-                                rounded-full
-                                bg-orange-500/10
-                                text-orange-400
-                                font-black">
-
-                                ${escapeHTML(
-                                    initials(
-                                        customerName(
-                                            customer
-                                        )
-                                    )
-                                )}
-
-                            </div>
-
-
-                            <div>
-
-                                <p
-                                    class="font-black">
-
-                                    ${escapeHTML(
-                                        customerName(
-                                            customer
-                                        )
-                                    )}
-
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    </td>
-
-
-                    <td
-                        class="py-4 pr-4
-                        text-gray-400">
-
+                    <td>
                         ${escapeHTML(
-                            customer.email ||
-                            "—"
+                            customerName(customer)
                         )}
-
                     </td>
 
-
-                    <td
-                        class="py-4 pr-4
-                        text-gray-400">
-
+                    <td>
                         ${escapeHTML(
-                            customerPhone(
-                                customer
-                            )
+                            customer.email || "-"
                         )}
-
                     </td>
 
-
-                    <td
-                        class="py-4 pr-4
-                        text-gray-400">
-
+                    <td>
                         ${escapeHTML(
-                            customer.city ||
-                            "—"
+                            customerPhone(customer)
                         )}
-
                     </td>
 
-
-                    <td class="py-4">
-
-                        ${statusBadge(
-                            customer.is_active === false
-                                ? "inactive"
-                                : "active"
-                        )}
-
-                    </td>
-
-
-                    <td
-                        class="py-4 text-right">
+                    <td>
 
                         <button
-                            type="button"
-                            data-customer-view="${escapeHTML(
-                                customer.id
-                            )}"
-                            class="rounded-lg
-                            border border-white/10
-                            p-2 text-gray-300
-                            hover:text-orange-400">
-
-                            <span
-                                class="material-symbols-outlined">
-
-                                visibility
-
-                            </span>
-
+                            onclick="viewCustomer('${customer.id}')"
+                            style="
+                                padding:8px 12px;
+                                border-radius:7px;
+                                border:1px solid #333;
+                                background:#191919;
+                                color:white;
+                                cursor:pointer;
+                            "
+                        >
+                            View
                         </button>
 
                     </td>
 
                 </tr>
 
-            `
-            )
-            .join("");
+            `;
 
-
-    table
-        .querySelectorAll(
-            "[data-customer-view]"
-        )
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    const customer =
-                        state.customers.find(
-                            item =>
-                                String(item.id) ===
-                                String(
-                                    button.dataset.customerView
-                                )
-                        );
-
-
-                    if (customer) {
-
-                        viewCustomer(
-                            customer
-                        );
-
-                    }
-
-                }
-            );
-
-        });
-
+        }).join("");
 }
 
 
-/* ============================================================
-   VIEW CUSTOMER
-============================================================ */
+function viewCustomer(id) {
 
-function viewCustomer(
-    customer
-) {
-
-    state.currentCustomer =
-        customer;
-
-
-    const body =
-        $("customerModalBody");
-
-
-    if (!body) {
-
-        alert(
-            "CUSTOMER DETAILS\n\n" +
-
-            "Name: " +
-            customerName(customer) +
-
-            "\nEmail: " +
-            (customer.email || "—") +
-
-            "\nPhone: " +
-            customerPhone(customer) +
-
-            "\nCity: " +
-            (customer.city || "—")
+    const customer =
+        allCustomers.find(
+            item =>
+                String(item.id) ===
+                String(id)
         );
 
 
+    if (!customer) {
         return;
-
     }
 
 
-    body.innerHTML = `
-
-        <div class="space-y-5">
-
-            <div>
-
-                <p
-                    class="text-xs text-gray-500">
-
-                    CUSTOMER
-
-                </p>
-
-
-                <p
-                    class="mt-1 text-xl
-                    font-black">
-
-                    ${escapeHTML(
-                        customerName(
-                            customer
-                        )
-                    )}
-
-                </p>
-
-            </div>
-
-
-            <div
-                class="grid grid-cols-1
-                gap-4 sm:grid-cols-2">
-
-                <div>
-
-                    <p
-                        class="text-xs
-                        text-gray-500">
-
-                        Email
-
-                    </p>
-
-
-                    <p
-                        class="font-bold break-all">
-
-                        ${escapeHTML(
-                            customer.email ||
-                            "—"
-                        )}
-
-                    </p>
-
-                </div>
-
-
-                <div>
-
-                    <p
-                        class="text-xs
-                        text-gray-500">
-
-                        Phone
-
-                    </p>
-
-
-                    <p
-                        class="font-bold">
-
-                        ${escapeHTML(
-                            customerPhone(
-                                customer
-                            )
-                        )}
-
-                    </p>
-
-                </div>
-
-
-                <div>
-
-                    <p
-                        class="text-xs
-                        text-gray-500">
-
-                        City
-
-                    </p>
-
-
-                    <p
-                        class="font-bold">
-
-                        ${escapeHTML(
-                            customer.city ||
-                            "—"
-                        )}
-
-                    </p>
-
-                </div>
-
-
-                <div>
-
-                    <p
-                        class="text-xs
-                        text-gray-500">
-
-                        Joined
-
-                    </p>
-
-
-                    <p
-                        class="font-bold">
-
-                        ${formatDate(
-                            customer.created_at
-                        )}
-
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    `;
-
-
-    openModal(
-        "customerModal"
+    alert(
+        "Customer\n\n" +
+        "Name: " +
+        customerName(customer) +
+        "\nEmail: " +
+        (
+            customer.email ||
+            "-"
+        ) +
+        "\nPhone: " +
+        customerPhone(customer)
     );
-
 }
 
 
-/* ============================================================
-   CUSTOMER INIT
-============================================================ */
-
 function initCustomerSearch() {
 
-    $("customerSearch")
-        ?.addEventListener(
-            "input",
-            renderCustomers
-        );
+    const input =
+        $("customerSearch");
+
+    if (!input) {
+        return;
+    }
 
 
-    $("refreshCustomers")
-        ?.addEventListener(
-            "click",
-            loadCustomers
-        );
+    input.addEventListener(
+        "input",
+        () => {
 
+            const query =
+                input.value
+                    .trim()
+                    .toLowerCase();
+
+
+            if (!query) {
+
+                renderCustomers(
+                    allCustomers
+                );
+
+                return;
+            }
+
+
+            const filtered =
+                allCustomers.filter(
+                    customer => {
+
+                        return [
+
+                            customer.name,
+
+                            customer.full_name,
+
+                            customer.username,
+
+                            customer.email,
+
+                            customer.phone
+
+                        ]
+                            .filter(Boolean)
+                            .some(value =>
+                                String(value)
+                                    .toLowerCase()
+                                    .includes(query)
+                            );
+                    }
+                );
+
+
+            renderCustomers(
+                filtered
+            );
+        }
+    );
 }
 
 
@@ -3530,34 +1544,32 @@ function initCustomerSearch() {
    ORDERS
 ============================================================ */
 
+let allOrders = [];
+
+
 async function loadOrders() {
 
-    const table =
+    const tbody =
         $("ordersTableBody");
 
-
-    if (!table) {
-
-        console.warn(
-            "ordersTableBody not found."
-        );
-
+    if (!tbody) {
         return;
-
     }
 
 
-    tableLoading(
+    showTableMessage(
         "ordersTableBody",
+        "Loading orders...",
         6
     );
 
 
-    const {
-        data,
-        error
-    } =
-        await supabaseClient
+    try {
+
+        const {
+            data,
+            error
+        } = await supabaseClient
             .from("orders")
             .select("*")
             .order(
@@ -3568,489 +1580,254 @@ async function loadOrders() {
             );
 
 
-    if (error) {
+        if (error) {
+            throw error;
+        }
 
-        console.warn(
-            "Orders:",
-            error.message
+
+        allOrders =
+            data || [];
+
+
+        renderOrders(
+            allOrders
         );
 
 
-        state.orders =
-            [];
+    } catch (error) {
 
+        console.error(
+            "Orders error:",
+            error
+        );
 
-        tableEmpty(
+        showTableMessage(
             "ordersTableBody",
-            6,
-            "Orders table could not be loaded."
+            "Unable to load orders.",
+            6
         );
-
-
-        return;
-
     }
-
-
-    state.orders =
-        data || [];
-
-
-    renderOrders();
-
 }
 
 
-function orderNumber(
-    order
-) {
+function orderNumber(order) {
 
     return (
         order.order_number ||
-        order.order_no ||
         order.order_id ||
         order.id ||
-        "—"
+        "-"
     );
-
 }
 
 
-function orderCustomer(
-    order
-) {
+function orderCustomer(order) {
 
     return (
         order.customer_name ||
         order.customer_email ||
-        order.email ||
         order.user_email ||
-        order.customer_id ||
-        "Customer"
+        "-"
     );
-
 }
 
 
-function orderTotal(
-    order
-) {
+function orderTotal(order) {
 
     return (
-        order.total ??
-        order.total_amount ??
-        order.grand_total ??
-        order.amount ??
+        order.total ||
+        order.total_amount ||
+        order.amount ||
         0
     );
-
 }
 
 
-function renderOrders() {
+function renderOrders(orders) {
 
-    const table =
+    const tbody =
         $("ordersTableBody");
 
-
-    if (!table) {
+    if (!tbody) {
         return;
     }
 
 
-    const search =
-        (
-            $("orderSearch")
-                ?.value ||
-            ""
-        )
-        .trim()
-        .toLowerCase();
+    if (!orders.length) {
 
-
-    const filtered =
-        state.orders.filter(
-            order => {
-
-                const text = [
-
-                    orderNumber(
-                        order
-                    ),
-
-                    orderCustomer(
-                        order
-                    ),
-
-                    order.status
-
-                ]
-                    .join(" ")
-                    .toLowerCase();
-
-
-                return (
-                    !search ||
-                    text.includes(search)
-                );
-
-            }
-        );
-
-
-    if (!filtered.length) {
-
-        tableEmpty(
+        showTableMessage(
             "ordersTableBody",
-            6,
-            "No orders found."
+            "No orders found.",
+            6
         );
 
-
         return;
-
     }
 
 
-    table.innerHTML =
-        filtered
-            .map(
-                order => `
+    tbody.innerHTML =
+        orders.map(order => {
 
-                <tr
-                    class="border-b border-white/5">
+            return `
 
-                    <td
-                        class="py-4 pr-4
-                        font-black">
+                <tr>
 
+                    <td>
                         ${escapeHTML(
-                            orderNumber(
-                                order
-                            )
+                            orderNumber(order)
                         )}
-
                     </td>
 
-
-                    <td
-                        class="py-4 pr-4
-                        text-gray-400">
-
+                    <td>
                         ${escapeHTML(
-                            orderCustomer(
-                                order
-                            )
+                            orderCustomer(order)
                         )}
-
                     </td>
 
-
-                    <td
-                        class="py-4 pr-4
-                        font-black">
-
+                    <td>
                         ${formatMoney(
-                            orderTotal(
-                                order
-                            )
+                            orderTotal(order)
                         )}
-
                     </td>
 
-
-                    <td class="py-4">
-
-                        ${statusBadge(
-                            order.status ||
-                            "pending"
+                    <td>
+                        ${escapeHTML(
+                            order.status || "-"
                         )}
-
                     </td>
 
-
-                    <td
-                        class="py-4 pr-4
-                        text-gray-400">
-
+                    <td>
                         ${formatDate(
                             order.created_at
                         )}
-
                     </td>
 
-
-                    <td
-                        class="py-4 text-right">
+                    <td>
 
                         <button
-                            type="button"
-                            data-order-view="${escapeHTML(
-                                order.id
-                            )}"
-                            class="rounded-lg
-                            border border-white/10
-                            p-2 text-gray-300
-                            hover:text-orange-400">
-
-                            <span
-                                class="material-symbols-outlined">
-
-                                visibility
-
-                            </span>
-
+                            onclick="viewOrder('${order.id}')"
+                            style="
+                                padding:8px 12px;
+                                border-radius:7px;
+                                border:1px solid #333;
+                                background:#191919;
+                                color:white;
+                                cursor:pointer;
+                            "
+                        >
+                            View
                         </button>
 
                     </td>
 
                 </tr>
 
-            `
-            )
-            .join("");
+            `;
 
-
-    table
-        .querySelectorAll(
-            "[data-order-view]"
-        )
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    const order =
-                        state.orders.find(
-                            item =>
-                                String(item.id) ===
-                                String(
-                                    button.dataset.orderView
-                                )
-                        );
-
-
-                    if (order) {
-
-                        viewOrder(
-                            order
-                        );
-
-                    }
-
-                }
-            );
-
-        });
-
+        }).join("");
 }
 
 
-/* ============================================================
-   VIEW ORDER
-============================================================ */
+function viewOrder(id) {
 
-function viewOrder(
-    order
-) {
-
-    state.currentOrder =
-        order;
-
-
-    const body =
-        $("orderModalBody");
-
-
-    if (!body) {
-
-        alert(
-            "ORDER DETAILS\n\n" +
-
-            "Order: " +
-            orderNumber(order) +
-
-            "\nCustomer: " +
-            orderCustomer(order) +
-
-            "\nTotal: " +
-            formatMoney(
-                orderTotal(order)
-            ) +
-
-            "\nStatus: " +
-            (order.status || "pending")
+    const order =
+        allOrders.find(
+            item =>
+                String(item.id) ===
+                String(id)
         );
 
 
+    if (!order) {
         return;
-
     }
 
 
-    body.innerHTML = `
-
-        <div class="space-y-5">
-
-            <div>
-
-                <p
-                    class="text-xs text-gray-500">
-
-                    ORDER NUMBER
-
-                </p>
-
-
-                <p
-                    class="mt-1 text-xl
-                    font-black">
-
-                    ${escapeHTML(
-                        orderNumber(
-                            order
-                        )
-                    )}
-
-                </p>
-
-            </div>
-
-
-            <div
-                class="grid grid-cols-1
-                gap-4 sm:grid-cols-2">
-
-                <div>
-
-                    <p
-                        class="text-xs
-                        text-gray-500">
-
-                        Customer
-
-                    </p>
-
-
-                    <p
-                        class="font-bold">
-
-                        ${escapeHTML(
-                            orderCustomer(
-                                order
-                            )
-                        )}
-
-                    </p>
-
-                </div>
-
-
-                <div>
-
-                    <p
-                        class="text-xs
-                        text-gray-500">
-
-                        Total
-
-                    </p>
-
-
-                    <p
-                        class="font-black
-                        text-orange-400">
-
-                        ${formatMoney(
-                            orderTotal(
-                                order
-                            )
-                        )}
-
-                    </p>
-
-                </div>
-
-
-                <div>
-
-                    <p
-                        class="text-xs
-                        text-gray-500">
-
-                        Status
-
-                    </p>
-
-
-                    <div class="mt-1">
-
-                        ${statusBadge(
-                            order.status ||
-                            "pending"
-                        )}
-
-                    </div>
-
-                </div>
-
-
-                <div>
-
-                    <p
-                        class="text-xs
-                        text-gray-500">
-
-                        Date
-
-                    </p>
-
-
-                    <p
-                        class="font-bold">
-
-                        ${formatDate(
-                            order.created_at
-                        )}
-
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    `;
-
-
-    openModal(
-        "orderModal"
+    alert(
+        "Order\n\n" +
+        "Order ID: " +
+        orderNumber(order) +
+        "\nCustomer: " +
+        orderCustomer(order) +
+        "\nTotal: " +
+        formatMoney(
+            orderTotal(order)
+        ) +
+        "\nStatus: " +
+        (
+            order.status ||
+            "-"
+        ) +
+        "\nDate: " +
+        formatDate(
+            order.created_at
+        )
     );
-
 }
 
 
-/* ============================================================
-   ORDER SEARCH
-============================================================ */
-
 function initOrderSearch() {
 
-    $("orderSearch")
-        ?.addEventListener(
-            "input",
-            renderOrders
-        );
+    const input =
+        $("orderSearch");
+
+    if (!input) {
+        return;
+    }
 
 
-    $("refreshOrders")
-        ?.addEventListener(
-            "click",
-            loadOrders
-        );
+    input.addEventListener(
+        "input",
+        () => {
 
+            const query =
+                input.value
+                    .trim()
+                    .toLowerCase();
+
+
+            if (!query) {
+
+                renderOrders(
+                    allOrders
+                );
+
+                return;
+            }
+
+
+            const filtered =
+                allOrders.filter(
+                    order => {
+
+                        return [
+
+                            order.order_number,
+
+                            order.order_id,
+
+                            order.customer_name,
+
+                            order.customer_email,
+
+                            order.status
+
+                        ]
+                            .filter(Boolean)
+                            .some(value =>
+                                String(value)
+                                    .toLowerCase()
+                                    .includes(query)
+                            );
+                    }
+                );
+
+
+            renderOrders(
+                filtered
+            );
+        }
+    );
 }
 
 
@@ -4062,12 +1839,18 @@ async function logoutAdmin() {
 
     try {
 
+        localStorage.removeItem(
+            "khelzone_role"
+        );
+
+        localStorage.removeItem(
+            "khelzone_user_id"
+        );
+
+
         const {
             error
-        } =
-            await supabaseClient
-                .auth
-                .signOut();
+        } = await supabaseClient.auth.signOut();
 
 
         if (error) {
@@ -4076,227 +1859,99 @@ async function logoutAdmin() {
                 "Logout error:",
                 error
             );
-
         }
+
+
+        window.location.replace(
+            "homepage.html"
+        );
+
 
     } catch (error) {
 
-        console.error(
-            error
+        console.error(error);
+
+        window.location.replace(
+            "homepage.html"
         );
-
     }
-
-
-    localStorage.removeItem(
-        "khelzone_role"
-    );
-
-
-    localStorage.removeItem(
-        "khelzone_user_id"
-    );
-
-
-    window.location.href =
-        "admin.html";
-
 }
 
 
 function initLogout() {
 
-    [
-        "logoutBtn",
-        "logoutButton",
-        "logoutBtnDesktop"
-    ]
-        .forEach(id => {
+    const logoutBtn =
+        $("logoutBtn");
 
-            $(id)?.addEventListener(
-                "click",
-                function(event) {
+    if (!logoutBtn) {
+        return;
+    }
 
-                    event.preventDefault();
 
-                    logoutAdmin();
-
-                }
-            );
-
-        });
-
+    logoutBtn.addEventListener(
+        "click",
+        logoutAdmin
+    );
 }
 
 
 /* ============================================================
-   MODAL CLOSE
-============================================================ */
-
-function initModalClose() {
-
-    document
-        .querySelectorAll(
-            "[data-close-modal]"
-        )
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                function() {
-
-                    closeModal(
-                        this.dataset.closeModal
-                    );
-
-                }
-            );
-
-        });
-
-
-    document
-        .querySelectorAll(
-            ".modal-overlay"
-        )
-        .forEach(modal => {
-
-            modal.addEventListener(
-                "click",
-                function(event) {
-
-                    if (
-                        event.target ===
-                        modal
-                    ) {
-
-                        modal.classList.add(
-                            "hidden"
-                        );
-
-                    }
-
-                }
-            );
-
-        });
-
-}
-
-
-/* ============================================================
-   KEYBOARD ESC
+   ESC KEY
 ============================================================ */
 
 function initKeyboard() {
 
     document.addEventListener(
         "keydown",
-        function(event) {
+        event => {
 
-            if (
-                event.key ===
-                "Escape"
-            ) {
-
-                document
-                    .querySelectorAll(
-                        ".modal-overlay"
-                    )
-                    .forEach(modal => {
-
-                        modal.classList.add(
-                            "hidden"
-                        );
-
-                    });
-
+            if (event.key === "Escape") {
 
                 closeMobileMenu();
-
             }
-
         }
     );
-
 }
 
 
 /* ============================================================
-   INITIALIZE EVERYTHING
+   INITIALIZE DASHBOARD
 ============================================================ */
 
 async function initAdminDashboard() {
 
-    console.log(
-        "================================"
-    );
+    /*
+        IMPORTANT:
 
-    console.log(
-        "KHELZONE ADMIN DASHBOARD"
-    );
+        NOTHING ELSE RUNS BEFORE
+        ADMIN ACCESS IS VERIFIED.
+    */
 
-    console.log(
-        "Starting..."
-    );
-
-    console.log(
-        "================================"
-    );
-
-
-    /* First check admin */
-
-    const allowed =
+    const isAdmin =
         await checkAdminAccess();
 
 
-    if (!allowed) {
+    if (!isAdmin) {
 
-        console.warn(
-            "Admin access denied."
+        console.log(
+            "Dashboard initialization stopped."
         );
 
         return;
-
     }
 
 
-    console.log(
-        "Admin verified:"
-    );
-
-    console.log(
-        state.user.email
-    );
-
-
-    /* Navigation */
+    /* -----------------------------------------
+       ADMIN VERIFIED
+    ----------------------------------------- */
 
     initNavigation();
 
-
-    /* Mobile menu */
-
     initMobileMenu();
-
-
-    /* Logout */
 
     initLogout();
 
-
-    /* Modals */
-
-    initModalClose();
-
-
-    /* Keyboard */
-
     initKeyboard();
-
-
-    /* Searches */
 
     initProductSearch();
 
@@ -4307,32 +1962,33 @@ async function initAdminDashboard() {
     initOrderSearch();
 
 
-    /* Dashboard */
+    await Promise.all([
 
-    await loadDashboardData();
+        loadDashboardData(),
 
+        loadProducts(),
 
-    /* Open Dashboard */
+        loadSellers(),
 
-    showSection(
-        "dashboard"
-    );
+        loadCustomers(),
+
+        loadOrders()
+
+    ]);
 
 
     console.log(
-        "KHELZONE Admin Dashboard READY."
+        "KHELZONE Admin Dashboard initialized."
     );
-
 }
 
 
 /* ============================================================
-   DOM READY
+   START
 ============================================================ */
 
 if (
-    document.readyState ===
-    "loading"
+    document.readyState === "loading"
 ) {
 
     document.addEventListener(
@@ -4343,5 +1999,4 @@ if (
 } else {
 
     initAdminDashboard();
-
 }

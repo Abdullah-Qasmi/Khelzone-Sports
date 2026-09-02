@@ -1,7 +1,28 @@
 /* ==========================================================================
    KHELZONE CART — JAVASCRIPT
-   Compatible with shop.js
-   Storage Key: khz_cart
+   ==========================================================================
+   Compatible with:
+   - shop.js
+   - shop.html
+   - cart.html
+
+   Storage Key:
+   khz_cart
+
+   Features:
+   - Shop → Cart
+   - Quantity + / -
+   - Remove item
+   - Clear cart
+   - Item count
+   - Subtotal
+   - Shipping
+   - Free shipping above Rs. 10,000
+   - Grand total
+   - Coupon support
+   - Checkout
+   - Empty cart state
+   - Cross-tab cart updates
    ========================================================================== */
 
 "use strict";
@@ -23,15 +44,11 @@ const $ = (selector, context = document) =>
 
 
 const $$ = (selector, context = document) =>
-    Array.from(
-        context.querySelectorAll(selector)
-    );
+    Array.from(context.querySelectorAll(selector));
 
 
 function money(value) {
-
     return `Rs. ${Number(value || 0).toLocaleString("en-PK")}`;
-
 }
 
 
@@ -55,6 +72,15 @@ let cart = [];
 
 
 /* ==========================================================================
+   COUPON STATE
+   ========================================================================== */
+
+let appliedCoupon = null;
+
+let discountAmount = 0;
+
+
+/* ==========================================================================
    LOAD CART
    ========================================================================== */
 
@@ -68,14 +94,26 @@ function loadCart() {
             );
 
 
-        cart = saved
-            ? JSON.parse(saved)
-            : [];
+        if (!saved) {
+
+            cart = [];
+
+            return;
+
+        }
 
 
-        if (
-            !Array.isArray(cart)
-        ) {
+        const parsed =
+            JSON.parse(saved);
+
+
+        if (Array.isArray(parsed)) {
+
+            cart = parsed;
+
+        }
+
+        else {
 
             cart = [];
 
@@ -86,7 +124,7 @@ function loadCart() {
     catch (error) {
 
         console.error(
-            "Error loading cart:",
+            "KHELZONE: Error loading cart:",
             error
         );
 
@@ -115,7 +153,7 @@ function saveCart() {
     catch (error) {
 
         console.error(
-            "Error saving cart:",
+            "KHELZONE: Error saving cart:",
             error
         );
 
@@ -125,22 +163,123 @@ function saveCart() {
 
 
 /* ==========================================================================
-   GET CART TOTAL QUANTITY
+   NORMALIZE CART ITEM
+   ========================================================================== */
+
+function normalizeCartItem(item) {
+
+    if (!item || typeof item !== "object") {
+
+        return null;
+
+    }
+
+
+    const quantity =
+        Number(
+            item.qty ??
+            item.quantity ??
+            1
+        );
+
+
+    const price =
+        Number(
+            item.price ?? 0
+        );
+
+
+    return {
+
+        id:
+            item.id ??
+            item.productId ??
+            "",
+
+        productId:
+            item.productId ??
+            item.id ??
+            "",
+
+        name:
+            item.name ||
+            item.title ||
+            "KHELZONE Product",
+
+        category:
+            item.category ||
+            item.sport ||
+            "",
+
+        price:
+            Number.isFinite(price)
+                ? price
+                : 0,
+
+        image:
+            item.image ||
+            item.image_url ||
+            item.thumbnail ||
+            "",
+
+        size:
+            item.size ||
+            "Standard",
+
+        qty:
+            Number.isFinite(quantity) &&
+            quantity > 0
+                ? quantity
+                : 1
+
+    };
+
+}
+
+
+/* ==========================================================================
+   CLEAN CART
+   ========================================================================== */
+
+function normalizeCart() {
+
+    cart = cart
+        .map(normalizeCartItem)
+        .filter(
+            item =>
+                item &&
+                item.id !== ""
+        );
+
+}
+
+
+/* ==========================================================================
+   GET CART ITEM COUNT
    ========================================================================== */
 
 function getCartItemCount() {
 
     return cart.reduce(
 
-        (total, item) =>
+        (total, item) => {
 
-            total +
+            const quantity =
+                Number(
+                    item.qty ??
+                    item.quantity ??
+                    1
+                );
 
-            Number(
-                item.qty ||
-                item.quantity ||
-                1
-            ),
+
+            return total +
+                (
+                    Number.isFinite(quantity)
+                        ? quantity
+                        : 1
+                );
+
+        },
 
         0
 
@@ -167,14 +306,21 @@ function getSubtotal() {
 
             const quantity =
                 Number(
-                    item.qty ||
-                    item.quantity ||
+                    item.qty ??
+                    item.quantity ??
                     1
                 );
 
 
             return total +
-                (price * quantity);
+                (
+                    price *
+                    (
+                        Number.isFinite(quantity)
+                            ? quantity
+                            : 1
+                    )
+                );
 
         },
 
@@ -191,9 +337,7 @@ function getSubtotal() {
 
 function getShipping(subtotal) {
 
-    if (
-        subtotal <= 0
-    ) {
+    if (subtotal <= 0) {
 
         return 0;
 
@@ -202,9 +346,7 @@ function getShipping(subtotal) {
 
     /* Free delivery above Rs. 10,000 */
 
-    if (
-        subtotal >= 10000
-    ) {
+    if (subtotal >= 10000) {
 
         return 0;
 
@@ -212,6 +354,54 @@ function getShipping(subtotal) {
 
 
     return 250;
+
+}
+
+
+/* ==========================================================================
+   GET DISCOUNT
+   ========================================================================== */
+
+function getDiscount(subtotal) {
+
+    if (
+        !appliedCoupon ||
+        subtotal <= 0
+    ) {
+
+        return 0;
+
+    }
+
+
+    if (
+        appliedCoupon.type === "percentage"
+    ) {
+
+        return Math.round(
+            subtotal *
+            (
+                appliedCoupon.value /
+                100
+            )
+        );
+
+    }
+
+
+    if (
+        appliedCoupon.type === "fixed"
+    ) {
+
+        return Math.min(
+            appliedCoupon.value,
+            subtotal
+        );
+
+    }
+
+
+    return 0;
 
 }
 
@@ -232,19 +422,30 @@ function getGrandTotal() {
         );
 
 
-    return subtotal +
-        shipping;
+    const discount =
+        getDiscount(
+            subtotal
+        );
+
+
+    return Math.max(
+        0,
+        subtotal +
+        shipping -
+        discount
+    );
 
 }
 
 
 /* ==========================================================================
-   GET PRODUCT IMAGE
+   GET ITEM IMAGE
    ========================================================================== */
 
 function getItemImage(item) {
 
     if (
+        item &&
         item.image
     ) {
 
@@ -271,7 +472,10 @@ function findCartItem(
 
         item =>
 
-            String(item.id) ===
+            String(
+                item.id ??
+                item.productId
+            ) ===
             String(productId)
 
             &&
@@ -292,7 +496,7 @@ function findCartItem(
 
 
 /* ==========================================================================
-   UPDATE CART QUANTITY
+   UPDATE QUANTITY
    ========================================================================== */
 
 function updateQuantity(
@@ -308,9 +512,7 @@ function updateQuantity(
         );
 
 
-    if (
-        !item
-    ) {
+    if (!item) {
 
         return;
 
@@ -319,8 +521,8 @@ function updateQuantity(
 
     const currentQuantity =
         Number(
-            item.qty ||
-            item.quantity ||
+            item.qty ??
+            item.quantity ??
             1
         );
 
@@ -348,6 +550,70 @@ function updateQuantity(
         newQuantity;
 
 
+    /* Remove old quantity property if it exists */
+
+    delete item.quantity;
+
+
+    saveCart();
+
+    renderCart();
+
+}
+
+
+/* ==========================================================================
+   SET QUANTITY
+   ========================================================================== */
+
+function setQuantity(
+    productId,
+    size,
+    quantity
+) {
+
+    const item =
+        findCartItem(
+            productId,
+            size
+        );
+
+
+    if (!item) {
+
+        return;
+
+    }
+
+
+    const newQuantity =
+        Number(quantity);
+
+
+    if (
+        !Number.isFinite(newQuantity) ||
+        newQuantity <= 0
+    ) {
+
+        removeItem(
+            productId,
+            size
+        );
+
+        return;
+
+    }
+
+
+    item.qty =
+        Math.floor(
+            newQuantity
+        );
+
+
+    delete item.quantity;
+
+
     saveCart();
 
     renderCart();
@@ -364,14 +630,20 @@ function removeItem(
     size = "Standard"
 ) {
 
+    const oldLength =
+        cart.length;
+
+
     cart =
         cart.filter(
 
             item =>
 
                 !(
-
-                    String(item.id) ===
+                    String(
+                        item.id ??
+                        item.productId
+                    ) ===
                     String(productId)
 
                     &&
@@ -385,10 +657,19 @@ function removeItem(
                         size ||
                         "Standard"
                     )
-
                 )
 
         );
+
+
+    if (
+        cart.length ===
+        oldLength
+    ) {
+
+        return;
+
+    }
 
 
     saveCart();
@@ -406,14 +687,30 @@ function removeItem(
    CLEAR ENTIRE CART
    ========================================================================== */
 
-function clearCart() {
+function clearCart(
+    showMessage = false
+) {
 
     cart = [];
+
+
+    appliedCoupon = null;
+
+    discountAmount = 0;
 
 
     saveCart();
 
     renderCart();
+
+
+    if (showMessage) {
+
+        showToast(
+            "Cart cleared successfully"
+        );
+
+    }
 
 }
 
@@ -426,8 +723,8 @@ function cartItemHTML(item) {
 
     const quantity =
         Number(
-            item.qty ||
-            item.quantity ||
+            item.qty ??
+            item.quantity ??
             1
         );
 
@@ -439,21 +736,31 @@ function cartItemHTML(item) {
 
 
     const total =
-        price * quantity;
+        price *
+        quantity;
 
 
     const image =
-        getItemImage(
-            item
-        );
+        getItemImage(item);
+
+
+    const productId =
+        item.id ??
+        item.productId ??
+        "";
+
+
+    const size =
+        item.size ||
+        "Standard";
 
 
     return `
 
-        <div
+        <article
             class="cart-item"
-            data-product-id="${escapeHTML(item.id)}"
-            data-size="${escapeHTML(item.size || "Standard")}"
+            data-product-id="${escapeHTML(productId)}"
+            data-size="${escapeHTML(size)}"
         >
 
             <div class="cart-item__image">
@@ -461,7 +768,7 @@ function cartItemHTML(item) {
                 <img
                     src="${escapeHTML(image)}"
                     alt="${escapeHTML(item.name)}"
-
+                    loading="lazy"
                     onerror="
                         this.onerror=null;
                         this.src='https://placehold.co/300x300/111111/ffffff?text=KHELZONE';
@@ -496,13 +803,9 @@ function cartItemHTML(item) {
                 <p class="cart-item__size">
 
                     Size:
+
                     <strong>
-
-                        ${escapeHTML(
-                            item.size ||
-                            "Standard"
-                        )}
-
+                        ${escapeHTML(size)}
                     </strong>
 
                 </p>
@@ -510,9 +813,7 @@ function cartItemHTML(item) {
 
                 <div class="cart-item__price">
 
-                    ${money(
-                        price
-                    )}
+                    ${money(price)}
 
                 </div>
 
@@ -523,15 +824,10 @@ function cartItemHTML(item) {
 
                 <button
                     type="button"
-
                     class="quantity-btn"
-
                     data-cart-action="decrease"
-
-                    data-id="${escapeHTML(item.id)}"
-
-                    data-size="${escapeHTML(item.size || "Standard")}"
-
+                    data-id="${escapeHTML(productId)}"
+                    data-size="${escapeHTML(size)}"
                     aria-label="Decrease quantity"
                 >
 
@@ -549,15 +845,10 @@ function cartItemHTML(item) {
 
                 <button
                     type="button"
-
                     class="quantity-btn"
-
                     data-cart-action="increase"
-
-                    data-id="${escapeHTML(item.id)}"
-
-                    data-size="${escapeHTML(item.size || "Standard")}"
-
+                    data-id="${escapeHTML(productId)}"
+                    data-size="${escapeHTML(size)}"
                     aria-label="Increase quantity"
                 >
 
@@ -570,24 +861,17 @@ function cartItemHTML(item) {
 
             <div class="cart-item__total">
 
-                ${money(
-                    total
-                )}
+                ${money(total)}
 
             </div>
 
 
             <button
                 type="button"
-
                 class="cart-item__remove"
-
                 data-cart-action="remove"
-
-                data-id="${escapeHTML(item.id)}"
-
-                data-size="${escapeHTML(item.size || "Standard")}"
-
+                data-id="${escapeHTML(productId)}"
+                data-size="${escapeHTML(size)}"
                 aria-label="Remove item"
             >
 
@@ -595,7 +879,7 @@ function cartItemHTML(item) {
 
             </button>
 
-        </div>
+        </article>
 
     `;
 
@@ -651,26 +935,45 @@ function emptyCartHTML() {
 
 
 /* ==========================================================================
+   GET CART ITEMS CONTAINER
+   ========================================================================== */
+
+function getCartItemsContainer() {
+
+    /*
+       Supports all possible IDs used by the
+       current KHELZONE cart page.
+    */
+
+    return (
+
+        $("#cart-items-container") ||
+
+        $("#cartItemsContainer") ||
+
+        $("#cartItems") ||
+
+        $(".cart-items")
+
+    );
+
+}
+
+
+/* ==========================================================================
    RENDER CART ITEMS
    ========================================================================== */
 
 function renderCartItems() {
 
     const container =
-
-        $("#cartItems") ||
-
-        $("#cartItemsContainer") ||
-
-        $(".cart-items");
+        getCartItemsContainer();
 
 
-    if (
-        !container
-    ) {
+    if (!container) {
 
         console.warn(
-            "Cart items container not found."
+            "KHELZONE: Cart items container not found."
         );
 
         return;
@@ -678,9 +981,7 @@ function renderCartItems() {
     }
 
 
-    if (
-        !cart.length
-    ) {
+    if (!cart.length) {
 
         container.innerHTML =
             emptyCartHTML();
@@ -692,131 +993,46 @@ function renderCartItems() {
 
     container.innerHTML =
         cart
-            .map(
-                cartItemHTML
-            )
+            .map(cartItemHTML)
             .join("");
 
 }
 
 
 /* ==========================================================================
-   UPDATE CART SUMMARY
+   UPDATE ITEM COUNT LABEL
    ========================================================================== */
 
-function updateCartSummary() {
-
-    const subtotal =
-        getSubtotal();
-
-
-    const shipping =
-        getShipping(
-            subtotal
-        );
-
-
-    const total =
-        getGrandTotal();
-
+function updateItemCountLabel() {
 
     const itemCount =
         getCartItemCount();
 
 
-    /* Subtotal */
-
-    $$(
-        "#cartSubtotal, [data-cart-subtotal]"
-    )
-
-        .forEach(
-            element => {
-
-                element.textContent =
-                    money(
-                        subtotal
-                    );
-
-            }
-        );
+    const labels = $$(
+        "#item-count-label"
+    );
 
 
-    /* Shipping */
+    labels.forEach(
+        element => {
 
-    $$(
-        "#cartShipping, [data-cart-shipping]"
-    )
+            element.textContent =
+                `${itemCount} ${
+                    itemCount === 1
+                        ? "ITEM"
+                        : "ITEMS"
+                }`;
 
-        .forEach(
-            element => {
-
-                element.textContent =
-
-                    shipping === 0
-
-                        ? "FREE"
-
-                        : money(
-                            shipping
-                        );
-
-            }
-        );
+        }
+    );
 
 
-    /* Grand Total */
-
-    $$(
-        "#cartTotal, #cartGrandTotal, [data-cart-total]"
-    )
-
-        .forEach(
-            element => {
-
-                element.textContent =
-                    money(
-                        total
-                    );
-
-            }
-        );
-
-
-    /* Cart Count */
-
-    $$(
-        "#cartBadge, #cartCount, [data-cart-count]"
-    )
-
-        .forEach(
-            element => {
-
-                element.textContent =
-                    itemCount;
-
-
-                if (
-                    element.hasAttribute(
-                        "hidden"
-                    )
-                ) {
-
-                    element.hidden =
-                        itemCount === 0;
-
-                }
-
-            }
-        );
-
-
-    /* Item count text */
+    /* Support older cart IDs */
 
     $$(
         "#cartItemCount, [data-cart-item-count]"
     )
-
         .forEach(
             element => {
 
@@ -834,15 +1050,317 @@ function updateCartSummary() {
 
 
 /* ==========================================================================
+   UPDATE CART BADGE
+   ========================================================================== */
+
+function updateCartBadge() {
+
+    const itemCount =
+        getCartItemCount();
+
+
+    $$(
+        "#cartCount, #cartBadge, [data-cart-count]"
+    )
+        .forEach(
+            element => {
+
+                element.textContent =
+                    itemCount;
+
+
+                element.classList.toggle(
+                    "hidden",
+                    itemCount === 0
+                );
+
+            }
+        );
+
+}
+
+
+/* ==========================================================================
+   UPDATE SUBTOTAL
+   ========================================================================== */
+
+function updateSubtotal() {
+
+    const subtotal =
+        getSubtotal();
+
+
+    $$(
+        "#subtotal-value"
+    )
+        .forEach(
+            element => {
+
+                element.textContent =
+                    money(subtotal);
+
+            }
+        );
+
+
+    /* Support alternative IDs */
+
+    $$(
+        "#cartSubtotal, [data-cart-subtotal]"
+    )
+        .forEach(
+            element => {
+
+                element.textContent =
+                    money(subtotal);
+
+            }
+        );
+
+}
+
+
+/* ==========================================================================
+   UPDATE SHIPPING
+   ========================================================================== */
+
+function updateShipping() {
+
+    const subtotal =
+        getSubtotal();
+
+
+    const shipping =
+        getShipping(
+            subtotal
+        );
+
+
+    $$(
+        "#shipping-value"
+    )
+        .forEach(
+            element => {
+
+                element.textContent =
+                    shipping === 0
+                        ? "FREE"
+                        : money(shipping);
+
+            }
+        );
+
+
+    /* Alternative IDs */
+
+    $$(
+        "#cartShipping, [data-cart-shipping]"
+    )
+        .forEach(
+            element => {
+
+                element.textContent =
+                    shipping === 0
+                        ? "FREE"
+                        : money(shipping);
+
+            }
+        );
+
+}
+
+
+/* ==========================================================================
+   UPDATE DISCOUNT
+   ========================================================================== */
+
+function updateDiscount() {
+
+    const subtotal =
+        getSubtotal();
+
+
+    const discount =
+        getDiscount(
+            subtotal
+        );
+
+
+    const discountRow =
+        $("#discount-row");
+
+
+    const discountValue =
+        $("#discount-value");
+
+
+    if (discountRow) {
+
+        discountRow.style.display =
+            discount > 0
+                ? ""
+                : "none";
+
+    }
+
+
+    if (discountValue) {
+
+        discountValue.textContent =
+            `- ${money(discount)}`;
+
+    }
+
+
+    discountAmount =
+        discount;
+
+}
+
+
+/* ==========================================================================
+   UPDATE GRAND TOTAL
+   ========================================================================== */
+
+function updateGrandTotal() {
+
+    const total =
+        getGrandTotal();
+
+
+    $$(
+        "#total-value"
+    )
+        .forEach(
+            element => {
+
+                element.textContent =
+                    money(total);
+
+            }
+        );
+
+
+    /* Alternative IDs */
+
+    $$(
+        "#cartTotal, #cartGrandTotal, [data-cart-total]"
+    )
+        .forEach(
+            element => {
+
+                element.textContent =
+                    money(total);
+
+            }
+        );
+
+}
+
+
+/* ==========================================================================
+   FREE SHIPPING MESSAGE
+   ========================================================================== */
+
+function updateFreeShipping() {
+
+    const wrap =
+        $("#free-ship-wrap");
+
+
+    const message =
+        $("#free-ship-msg");
+
+
+    const bar =
+        $("#free-ship-bar-fill");
+
+
+    if (!wrap) {
+
+        return;
+
+    }
+
+
+    const subtotal =
+        getSubtotal();
+
+
+    if (subtotal <= 0) {
+
+        wrap.style.display =
+            "none";
+
+        return;
+
+    }
+
+
+    wrap.style.display =
+        "";
+
+
+    const threshold =
+        10000;
+
+
+    const remaining =
+        Math.max(
+            0,
+            threshold -
+            subtotal
+        );
+
+
+    if (message) {
+
+        if (remaining > 0) {
+
+            message.textContent =
+                `Add ${money(remaining)} more for FREE delivery`;
+
+        }
+
+        else {
+
+            message.textContent =
+                "🎉 You unlocked FREE delivery!";
+
+        }
+
+    }
+
+
+    if (bar) {
+
+        const percentage =
+            Math.min(
+                100,
+                (
+                    subtotal /
+                    threshold
+                ) * 100
+            );
+
+
+        bar.style.width =
+            `${percentage}%`;
+
+    }
+
+}
+
+
+/* ==========================================================================
    UPDATE CHECKOUT BUTTON
    ========================================================================== */
 
 function updateCheckoutButton() {
 
     const buttons =
-
         $$(
-            "#checkoutBtn, [data-checkout]"
+            "#checkout-btn, #checkoutBtn, [data-checkout]"
         );
 
 
@@ -862,8 +1380,102 @@ function updateCheckoutButton() {
                 empty
             );
 
+
+            button.setAttribute(
+                "aria-disabled",
+                empty
+                    ? "true"
+                    : "false"
+            );
+
         }
     );
+
+}
+
+
+/* ==========================================================================
+   UPDATE EMPTY STATE
+   ========================================================================== */
+
+function updateEmptyState() {
+
+    const emptyState =
+        $("#empty-cart-state");
+
+
+    if (!emptyState) {
+
+        return;
+
+    }
+
+
+    emptyState.style.display =
+        cart.length === 0
+            ? ""
+            : "none";
+
+}
+
+
+/* ==========================================================================
+   UPDATE SAVED FOR LATER
+   ========================================================================== */
+
+function updateSavedForLater() {
+
+    const section =
+        $("#saved-for-later-section");
+
+
+    if (!section) {
+
+        return;
+
+    }
+
+
+    /*
+       No saved-for-later products are currently
+       stored by shop.js, so keep this section
+       hidden until that feature is implemented.
+    */
+
+    section.style.display =
+        "none";
+
+}
+
+
+/* ==========================================================================
+   UPDATE COUPON NOTE
+   ========================================================================== */
+
+function updateCouponNote() {
+
+    const note =
+        $("#coupon-applied-note");
+
+
+    if (!note) {
+
+        return;
+
+    }
+
+
+    if (!appliedCoupon) {
+
+        note.textContent = "";
+
+        return;
+
+    }
+
+
+    note.textContent =
+        `${appliedCoupon.code} applied`;
 
 }
 
@@ -874,11 +1486,31 @@ function updateCheckoutButton() {
 
 function renderCart() {
 
+    normalizeCart();
+
     renderCartItems();
 
-    updateCartSummary();
+    updateItemCountLabel();
+
+    updateCartBadge();
+
+    updateSubtotal();
+
+    updateShipping();
+
+    updateDiscount();
+
+    updateGrandTotal();
+
+    updateFreeShipping();
 
     updateCheckoutButton();
+
+    updateEmptyState();
+
+    updateSavedForLater();
+
+    updateCouponNote();
 
 }
 
@@ -901,9 +1533,7 @@ function wireCartEvents() {
                 );
 
 
-            if (
-                !button
-            ) {
+            if (!button) {
 
                 return;
 
@@ -924,6 +1554,15 @@ function wireCartEvents() {
             const size =
                 button.dataset.size ||
                 "Standard";
+
+
+            if (
+                !productId
+            ) {
+
+                return;
+
+            }
 
 
             /* INCREASE */
@@ -980,108 +1619,14 @@ function wireCartEvents() {
 
 
 /* ==========================================================================
-   CHECKOUT
-   ========================================================================== */
-
-function wireCheckout() {
-
-    const checkoutButtons =
-
-        $$(
-            "#checkoutBtn, [data-checkout]"
-        );
-
-
-    checkoutButtons.forEach(
-        button => {
-
-            button.addEventListener(
-
-                "click",
-
-                event => {
-
-                    event.preventDefault();
-
-
-                    if (
-                        cart.length === 0
-                    ) {
-
-                        showToast(
-                            "Your cart is empty"
-                        );
-
-                        return;
-
-                    }
-
-
-                    /*
-                       Redirect to payment page
-                    */
-
-                    window.location.href =
-                        "payment.html";
-
-                }
-
-            );
-
-        }
-    );
-
-}
-
-
-/* ==========================================================================
-   CONTINUE SHOPPING
-   ========================================================================== */
-
-function wireContinueShopping() {
-
-    const buttons =
-
-        $$(
-            "#continueShoppingBtn, [data-continue-shopping]"
-        );
-
-
-    buttons.forEach(
-        button => {
-
-            button.addEventListener(
-
-                "click",
-
-                event => {
-
-                    event.preventDefault();
-
-
-                    window.location.href =
-                        "shop.html";
-
-                }
-
-            );
-
-        }
-    );
-
-}
-
-
-/* ==========================================================================
    CLEAR CART BUTTON
    ========================================================================== */
 
 function wireClearCart() {
 
     const buttons =
-
         $$(
-            "#clearCartBtn, [data-clear-cart]"
+            "#clear-cart-btn, #clearCartBtn, [data-clear-cart]"
         );
 
 
@@ -1116,11 +1661,7 @@ function wireClearCart() {
                         confirmed
                     ) {
 
-                        clearCart();
-
-                        showToast(
-                            "Cart cleared successfully"
-                        );
+                        clearCart(true);
 
                     }
 
@@ -1129,77 +1670,395 @@ function wireClearCart() {
             );
 
         }
+
     );
 
 }
 
 
 /* ==========================================================================
-   TOAST
+   CHECKOUT
    ========================================================================== */
 
-let toastTimer = null;
+function wireCheckout() {
+
+    const checkoutButtons =
+        $$(
+            "#checkout-btn, #checkoutBtn, [data-checkout]"
+        );
 
 
-function showToast(message) {
+    checkoutButtons.forEach(
+        button => {
 
-    let toast =
-        $("#cartToast");
+            button.addEventListener(
+
+                "click",
+
+                event => {
+
+                    event.preventDefault();
+
+
+                    if (
+                        cart.length === 0
+                    ) {
+
+                        showToast(
+                            "Your cart is empty"
+                        );
+
+                        return;
+
+                    }
+
+
+                    /*
+                       Save latest cart before checkout
+                    */
+
+                    saveCart();
+
+
+                    /*
+                       Store order totals for
+                       payment.html if needed.
+                    */
+
+                    const checkoutData = {
+
+                        items:
+                            cart,
+
+                        subtotal:
+                            getSubtotal(),
+
+                        shipping:
+                            getShipping(
+                                getSubtotal()
+                            ),
+
+                        discount:
+                            getDiscount(
+                                getSubtotal()
+                            ),
+
+                        total:
+                            getGrandTotal(),
+
+                        createdAt:
+                            new Date().toISOString()
+
+                    };
+
+
+                    try {
+
+                        localStorage.setItem(
+                            "khz_checkout",
+                            JSON.stringify(
+                                checkoutData
+                            )
+                        );
+
+                    }
+
+                    catch (error) {
+
+                        console.error(
+                            "Could not save checkout data:",
+                            error
+                        );
+
+                    }
+
+
+                    window.location.href =
+                        "payment.html";
+
+                }
+
+            );
+
+        }
+
+    );
+
+}
+
+
+/* ==========================================================================
+   CONTINUE SHOPPING
+   ========================================================================== */
+
+function wireContinueShopping() {
+
+    const buttons =
+        $$(
+            "#continueShoppingBtn, [data-continue-shopping]"
+        );
+
+
+    buttons.forEach(
+        button => {
+
+            button.addEventListener(
+
+                "click",
+
+                event => {
+
+                    event.preventDefault();
+
+
+                    window.location.href =
+                        "shop.html";
+
+                }
+
+            );
+
+        }
+
+    );
+
+}
+
+
+/* ==========================================================================
+   COUPON SYSTEM
+   ========================================================================== */
+
+function wireCoupon() {
+
+    const applyButton =
+        $("#coupon-apply-btn");
+
+
+    const input =
+        $("#coupon-input");
 
 
     if (
-        !toast
+        !applyButton ||
+        !input
     ) {
 
-        toast =
-            document.createElement(
-                "div"
-            );
-
-
-        toast.id =
-            "cartToast";
-
-
-        toast.className =
-            "cart-toast";
-
-
-        document.body.appendChild(
-            toast
-        );
+        return;
 
     }
 
 
-    toast.textContent =
-        message;
+    applyButton.addEventListener(
+
+        "click",
+
+        event => {
+
+            event.preventDefault();
 
 
-    toast.classList.add(
-        "show"
-    );
+            const code =
+                input.value
+                    .trim()
+                    .toUpperCase();
 
 
-    clearTimeout(
-        toastTimer
-    );
+            if (!code) {
 
-
-    toastTimer =
-        setTimeout(
-
-            () => {
-
-                toast.classList.remove(
-                    "show"
+                showToast(
+                    "Enter a coupon code"
                 );
 
-            },
+                return;
 
-            2500
+            }
 
-        );
+
+            /*
+               Demo coupons.
+
+               You can connect these to
+               Supabase later.
+            */
+
+            const coupons = {
+
+                KHEL10: {
+
+                    code: "KHEL10",
+
+                    type: "percentage",
+
+                    value: 10
+
+                },
+
+                KHELZONE10: {
+
+                    code: "KHELZONE10",
+
+                    type: "percentage",
+
+                    value: 10
+
+                },
+
+                SAVE500: {
+
+                    code: "SAVE500",
+
+                    type: "fixed",
+
+                    value: 500
+
+                }
+
+            };
+
+
+            if (
+                !coupons[code]
+            ) {
+
+                appliedCoupon = null;
+
+                discountAmount = 0;
+
+                updateCouponNote();
+
+                updateDiscount();
+
+                updateGrandTotal();
+
+
+                showToast(
+                    "Invalid coupon code"
+                );
+
+                return;
+
+            }
+
+
+            appliedCoupon =
+                coupons[code];
+
+
+            discountAmount =
+                getDiscount(
+                    getSubtotal()
+                );
+
+
+            updateCouponNote();
+
+            updateDiscount();
+
+            updateGrandTotal();
+
+
+            showToast(
+                `${code} applied successfully`
+            );
+
+        }
+
+    );
+
+}
+
+
+/* ==========================================================================
+   ENTER KEY FOR COUPON
+   ========================================================================== */
+
+function wireCouponEnter() {
+
+    const input =
+        $("#coupon-input");
+
+
+    const button =
+        $("#coupon-apply-btn");
+
+
+    if (
+        !input ||
+        !button
+    ) {
+
+        return;
+
+    }
+
+
+    input.addEventListener(
+
+        "keydown",
+
+        event => {
+
+            if (
+                event.key ===
+                "Enter"
+            ) {
+
+                event.preventDefault();
+
+                button.click();
+
+            }
+
+        }
+
+    );
+
+}
+
+
+/* ==========================================================================
+   SELECT ALL
+   ========================================================================== */
+
+function wireSelectAll() {
+
+    const checkbox =
+        $("#select-all-checkbox");
+
+
+    if (!checkbox) {
+
+        return;
+
+    }
+
+
+    checkbox.addEventListener(
+
+        "change",
+
+        () => {
+
+            const itemCheckboxes =
+                $$(
+                    ".cart-item input[type='checkbox']"
+                );
+
+
+            itemCheckboxes.forEach(
+                itemCheckbox => {
+
+                    itemCheckbox.checked =
+                        checkbox.checked;
+
+                }
+
+            );
+
+        }
+
+    );
 
 }
 
@@ -1211,20 +2070,14 @@ function showToast(message) {
 function wireMobileMenu() {
 
     const toggle =
-
         $("#navToggle") ||
-
         $(".nav-toggle") ||
-
         $("[data-nav-toggle]");
 
 
     const mobileMenu =
-
         $("#navMobile") ||
-
         $(".mobile-nav") ||
-
         $("[data-mobile-nav]");
 
 
@@ -1280,6 +2133,74 @@ function wireMobileMenu() {
 
 
 /* ==========================================================================
+   TOAST
+   ========================================================================== */
+
+let toastTimer = null;
+
+
+function showToast(message) {
+
+    let toast =
+        $("#cartToast");
+
+
+    if (!toast) {
+
+        toast =
+            document.createElement(
+                "div"
+            );
+
+
+        toast.id =
+            "cartToast";
+
+
+        toast.className =
+            "cart-toast";
+
+
+        document.body.appendChild(
+            toast
+        );
+
+    }
+
+
+    toast.textContent =
+        message;
+
+
+    toast.classList.add(
+        "show"
+    );
+
+
+    clearTimeout(
+        toastTimer
+    );
+
+
+    toastTimer =
+        setTimeout(
+
+            () => {
+
+                toast.classList.remove(
+                    "show"
+                );
+
+            },
+
+            2500
+
+        );
+
+}
+
+
+/* ==========================================================================
    LISTEN FOR CART CHANGES FROM OTHER TABS
    ========================================================================== */
 
@@ -1306,6 +2227,32 @@ window.addEventListener(
 
 
 /* ==========================================================================
+   LISTEN FOR PAGE VISIBILITY
+   ========================================================================== */
+
+document.addEventListener(
+
+    "visibilitychange",
+
+    () => {
+
+        if (
+            document.visibilityState ===
+            "visible"
+        ) {
+
+            loadCart();
+
+            renderCart();
+
+        }
+
+    }
+
+);
+
+
+/* ==========================================================================
    INITIALIZE CART
    ========================================================================== */
 
@@ -1316,12 +2263,22 @@ function initializeCart() {
     );
 
 
-    /* Load saved cart */
+    /* Load cart saved by shop.js */
 
     loadCart();
 
 
-    /* Render cart */
+    /* Clean/normalize data */
+
+    normalizeCart();
+
+
+    /* Save normalized cart */
+
+    saveCart();
+
+
+    /* Render */
 
     renderCart();
 
@@ -1330,17 +2287,29 @@ function initializeCart() {
 
     wireCartEvents();
 
+    wireClearCart();
+
     wireCheckout();
 
     wireContinueShopping();
 
-    wireClearCart();
+    wireCoupon();
+
+    wireCouponEnter();
+
+    wireSelectAll();
 
     wireMobileMenu();
 
 
     console.log(
         "KHELZONE Cart initialized successfully."
+    );
+
+
+    console.log(
+        "KHELZONE Cart items:",
+        cart
     );
 
 }
@@ -1378,15 +2347,22 @@ else {
 
 window.KHELZONE_CART = {
 
-    getCart: () => cart,
+    getCart: () =>
+        cart,
 
     getSubtotal,
+
+    getShipping,
+
+    getDiscount,
 
     getGrandTotal,
 
     getCartItemCount,
 
     updateQuantity,
+
+    setQuantity,
 
     removeItem,
 

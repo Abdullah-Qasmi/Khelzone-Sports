@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Checkout & Payment — KHELZONE</title>
+
+    <meta name="description"
+        content="Complete your KHELZONE order securely with Cash on Delivery, Bank Transfer, Easypaisa, JazzCash or Card.">
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Material Icons -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        heading: ["Archivo Narrow", "sans-serif"],
+                        sans: ["Inter", "sans-serif"]
+                    },
+                    colors: {
+                        kzorange: "#ff6a00"
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            background:
+                radial-gradient(circle at 10% 0%, rgba(255, 106, 0, 0.08), transparent 28%),
+                radial-gradient(circle at 90% 20%, rgba(255, 106, 0, 0.05), transparent 25%),
+                #080a0d;
+            color: #fff;
+            font-family: "Inter", sans-serif;
+        }
+
+        .heading-font {
+            font-family: "Archivo Narrow", sans-serif;
+        }
+
+        .glass {
+            background: rgba(17, 20, 24, 0.88);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .input-field {
+            width: 100%;
+            background: #0c0f13;
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            color: #fff;
+            border-radius: 12px;
+            padding: 14px 15px;
+            outline: none;
+            transition: .2s ease;
+        }
+
+        .input-field:focus {
+            border-color: #ff6a00;
+            box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.10);
+        }
+
+        .input-field::placeholder {
+            color: #6b7280;
+        }
+
+        select.input-field {
+            cursor: pointer;
+        }
+
+        select.input-field option {
+            background: #11151a;
+            color: #fff;
+        }
+
+        .payment-option {
+            position: relative;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, .09);
+            background: rgba(255, 255, 255, .025);
+            border-radius: 15px;
+            transition: .2s ease;
+        }
+
+        .payment-option:hover {
+            border-color: rgba(255, 106, 0, .45);
+            transform: translateY(-1px);
+        }
+
+        .payment-option.active {
+            border-color: #ff6a00;
+            background: rgba(255, 106, 0, .07);
+            box-shadow: 0 0 0 1px rgba(255, 106, 0, .20);
+        }
+
+        .payment-radio {
+            width: 18px;
+            height: 18px;
+            accent-color: #ff6a00;
+        }
+
+        .orange-button {
+            background: linear-gradient(135deg, #ff7a00, #ff5b00);
+            color: #050505;
+            transition: .2s ease;
+        }
+
+        .orange-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 30px rgba(255, 106, 0, .20);
+        }
+
+        .orange-button:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .product-row {
+            border-bottom: 1px solid rgba(255, 255, 255, .07);
+        }
+
+        .product-row:last-child {
+            border-bottom: 0;
+        }
+
+        .success-overlay {
+            animation: fadeIn .25s ease;
+        }
+
+        .success-card {
+            animation: successPop .35s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes successPop {
+            from {
+                opacity: 0;
+                transform: translateY(15px) scale(.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(0, 0, 0, .25);
+            border-top-color: #000;
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .secure-line {
+            color: #8b949e;
+        }
+
+        @media (max-width: 768px) {
+            .desktop-nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- =========================================================
+         NAVBAR
+    ========================================================== -->
+
+    <header class="sticky top-0 z-50 border-b border-white/10 bg-[#080a0d]/90 backdrop-blur-xl">
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+
+            <a href="homepage.html" class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-black font-bold">
+                        sports
+                    </span>
+                </div>
+
+                <div>
+                    <div class="heading-font text-2xl font-bold tracking-wide">
+                        KHELZONE
+                    </div>
+
+                    <div class="text-[9px] uppercase tracking-[0.25em] text-gray-500">
+                        Engineered for Performance
+                    </div>
+                </div>
+            </a>
+
+            <div class="desktop-nav flex items-center gap-7 text-sm font-semibold">
+                <a href="homepage.html"
+                    class="text-gray-400 hover:text-white transition">
+                    HOME
+                </a>
+
+                <a href="shop.html"
+                    class="text-gray-400 hover:text-white transition">
+                    SHOP
+                </a>
+
+                <a href="cart.html"
+                    class="text-gray-400 hover:text-white transition flex items-center gap-1">
+                    CART
+                    <span id="navCartCount"
+                        class="min-w-5 h-5 px-1 rounded-full bg-orange-500 text-black text-[10px] font-black flex items-center justify-center">
+                        0
+                    </span>
+                </a>
+            </div>
+
+        </div>
+    </header>
+
+
+    <!-- =========================================================
+         MAIN
+    ========================================================== -->
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+
+        <!-- Breadcrumb -->
+        <div class="flex items-center gap-2 text-xs text-gray-500 mb-8">
+            <a href="cart.html" class="hover:text-white">
+                Cart
+            </a>
+
+            <span class="material-symbols-outlined text-sm">
+                chevron_right
+            </span>
+
+            <span class="text-orange-500">
+                Checkout
+            </span>
+        </div>
+
+
+        <!-- Header -->
+
+        <div class="mb-10">
+
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-bold uppercase tracking-wider">
+                <span class="material-symbols-outlined text-sm">
+                    lock
+                </span>
+
+                Secure Checkout
+            </div>
+
+            <h1 class="heading-font text-5xl sm:text-6xl lg:text-7xl uppercase font-bold mt-4 leading-none">
+                Complete Your Order
+            </h1>
+
+            <p class="text-gray-500 mt-3 max-w-2xl">
+                Enter your delivery details and select your preferred payment method.
+            </p>
+
+        </div>
+
+
+        <!-- Empty Cart -->
+
+        <section id="emptyCheckout"
+            class="hidden glass rounded-3xl p-10 sm:p-16 text-center">
+
+            <div class="w-20 h-20 mx-auto rounded-full bg-white/5 flex items-center justify-center">
+                <span class="material-symbols-outlined text-5xl text-gray-500">
+                    shopping_cart
+                </span>
+            </div>
+
+            <h2 class="heading-font text-3xl uppercase font-bold mt-6">
+                Your Cart Is Empty
+            </h2>
+
+            <p class="text-gray-500 mt-2">
+                Add some sports gear before proceeding to checkout.
+            </p>
+
+            <a href="shop.html"
+                class="inline-flex items-center gap-2 orange-button px-7 py-4 rounded-xl font-black uppercase text-sm mt-7">
+                Continue Shopping
+
+                <span class="material-symbols-outlined">
+                    arrow_forward
+                </span>
+            </a>
+
+        </section>
+
+
+        <!-- Checkout -->
+
+        <section id="checkoutContent"
+            class="grid lg:grid-cols-[1fr_420px] gap-7 items-start">
+
+
+            <!-- =================================================
+                 LEFT
+            ================================================== -->
+
+            <div class="space-y-6">
+
+
+                <!-- Customer Details -->
+
+                <div class="glass rounded-3xl p-5 sm:p-7">
+
+                    <div class="flex items-start gap-4 mb-7">
+
+                        <div class="w-11 h-11 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined">
+                                person
+                            </span>
+                        </div>
+
+                        <div>
+                            <h2 class="heading-font text-3xl uppercase font-bold">
+                                Delivery Details
+                            </h2>
+
+                            <p class="text-gray-500 text-sm mt-1">
+                                Where should we deliver your order?
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <form id="checkoutForm" novalidate>
+
+                        <div class="grid sm:grid-cols-2 gap-5">
+
+                            <!-- Name -->
+
+                            <div class="sm:col-span-2">
+
+                                <label for="customerName"
+                                    class="block text-xs uppercase tracking-wider font-bold text-gray-400 mb-2">
+                                    Full Name *
+                                </label>
+
+                                <input
+                                    id="customerName"
+                                    name="customerName"
+                                    type="text"
+                                    autocomplete="name"
+                                    class="input-field"
+                                    placeholder="Enter your full name"
+                                    required>
+
+                                <p id="nameError"
+                                    class="hidden text-red-400 text-xs mt-2">
+                                    Please enter your full name.
+                                </p>
+
+                            </div>
+
+
+                            <!-- Phone -->
+
+                            <div>
+
+                                <label for="customerPhone"
+                                    class="block text-xs uppercase tracking-wider font-bold text-gray-400 mb-2">
+                                    Phone Number *
+                                </label>
+
+                                <input
+                                    id="customerPhone"
+                                    name="customerPhone"
+                                    type="tel"
+                                    autocomplete="tel"
+                                    class="input-field"
+                                    placeholder="03XX XXXXXXX"
+                                    required>
+
+                                <p id="phoneError"
+                                    class="hidden text-red-400 text-xs mt-2">
+                                    Please enter a valid Pakistani phone number.
+                                </p>
+
+                            </div>
+
+
+                            <!-- Email -->
+
+                            <div>
+
+                                <label for="customerEmail"
+                                    class="block text-xs uppercase tracking-wider font-bold text-gray-400 mb-2">
+                                    Email Address
+                                </label>
+
+                                <input
+                                    id="customerEmail"
+                                    name="customerEmail"
+                                    type="email"
+                                    autocomplete="email"
+                                    class="input-field"
+                                    placeholder="you@example.com">
+
+                                <p class="text-gray-600 text-[11px] mt-2">
+                                    Optional — useful for order updates.
+                                </p>
+
+                            </div>
+
+
+                            <!-- City -->
+
+                            <div>
+
+                                <label for="customerCity"
+                                    class="block text-xs uppercase tracking-wider font-bold text-gray-400 mb-2">
+                                    City *
+                                </label>
+
+                                <input
+                                    id="customerCity"
+                                    name="customerCity"
+                                    type="text"
+                                    autocomplete="address-level2"
+                                    class="input-field"
+                                    placeholder="e.g. Karachi"
+                                    required>
+
+                            </div>
+
+
+                            <!-- Postal -->
+
+                            <div>
+
+                                <label for="customerPostal"
+                                    class="block text-xs uppercase tracking-wider font-bold text-gray-400 mb-2">
+                                    Postal Code
+                                </label>
+
+                                <input
+                                    id="customerPostal"
+                                    name="customerPostal"
+                                    type="text"
+                                    autocomplete="postal-code"
+                                    class="input-field"
+                                    placeholder="Optional">
+
+                            </div>
+
+
+                            <!-- Address -->
+
+                            <div class="sm:col-span-2">
+
+                                <label for="customerAddress"
+                                    class="block text-xs uppercase tracking-wider font-bold text-gray-400 mb-2">
+                                    Complete Address *
+                                </label>
+
+                                <textarea
+                                    id="customerAddress"
+                                    name="customerAddress"
+                                    rows="4"
+                                    autocomplete="street-address"
+                                    class="input-field resize-none"
+                                    placeholder="House / Flat / Street / Area"
+                                    required></textarea>
+
+                                <p id="addressError"
+                                    class="hidden text-red-400 text-xs mt-2">
+                                    Please enter your complete delivery address.
+                                </p>
+
+                            </div>
+
+
+                            <!-- Notes -->
+
+                            <div class="sm:col-span-2">
+
+                                <label for="orderNotes"
+                                    class="block text-xs uppercase tracking-wider font-bold text-gray-400 mb-2">
+                                    Order Notes
+                                </label>
+
+                                <textarea
+                                    id="orderNotes"
+                                    name="orderNotes"
+                                    rows="3"
+                                    class="input-field resize-none"
+                                    placeholder="Any special delivery instructions? (Optional)"></textarea>
+
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+
+                <!-- =================================================
+                     PAYMENT METHODS
+                ================================================== -->
+
+                <div class="glass rounded-3xl p-5 sm:p-7">
+
+                    <div class="flex items-start gap-4 mb-7">
+
+                        <div class="w-11 h-11 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined">
+                                payments
+                            </span>
+                        </div>
+
+                        <div>
+                            <h2 class="heading-font text-3xl uppercase font-bold">
+                                Payment Method
+                            </h2>
+
+                            <p class="text-gray-500 text-sm mt-1">
+                                Choose how you want to pay.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="space-y-3">
+
+
+                        <!-- CARD -->
+
+                        <label
+                            class="payment-option active block p-4"
+                            data-payment-option="card">
+
+                            <div class="flex items-center gap-4">
+
+                                <input
+                                    type="radio"
+                                    name="paymentMethod"
+                                    value="card"
+                                    class="payment-radio"
+                                    checked>
+
+                                <div class="w-11 h-11 rounded-xl bg-white/5 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-orange-500">
+                                        credit_card
+                                    </span>
+                                </div>
+
+                                <div class="flex-1">
+
+                                    <div class="font-bold">
+                                        Pay with Card
+                                    </div>
+
+                                    <div class="text-xs text-gray-500 mt-1">
+                                        Visa, Mastercard and other supported cards
+                                    </div>
+
+                                </div>
+
+                                <span class="material-symbols-outlined text-gray-600">
+                                    chevron_right
+                                </span>
+
+                            </div>
+
+                        </label>
+
+
+                        <!-- BANK -->
+
+                        <label
+                            class="payment-option block p-4"
+                            data-payment-option="bank">
+
+                            <div class="flex items-center gap-4">
+
+                                <input
+                                    type="radio"
+                                    name="paymentMethod"
+                                    value="bank"
+                                    class="payment-radio">
+
+                                <div class="w-11 h-11 rounded-xl bg-white/5 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-orange-500">
+                                        account_balance
+                                    </span>
+                                </div>
+
+                                <div class="flex-1">
+
+                                    <div class="font-bold">
+                                        Bank Transfer
+                                    </div>
+
+                                    <div class="text-xs text-gray-500 mt-1">
+                                        Transfer payment directly to KHELZONE
+                                    </div>
+
+                                </div>
+
+                                <span class="material-symbols-outlined text-gray-600">
+                                    chevron_right
+                                </span>
+
+                            </div>
+
+                        </label>
+
+
+                        <!-- COD -->
+
+                        <label
+                            class="payment-option block p-4"
+                            data-payment-option="cod">
+
+                            <div class="flex items-center gap-4">
+
+                                <input
+                                    type="radio"
+                                    name="paymentMethod"
+                                    value="cod"
+                                    class="payment-radio">
+
+                                <div class="w-11 h-11 rounded-xl bg-white/5 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-orange-500">
+                                        local_shipping
+                                    </span>
+                                </div>
+
+                                <div class="flex-1">
+
+                                    <div class="font-bold">
+                                        Cash on Delivery
+                                    </div>
+
+                                    <div class="text-xs text-gray-500 mt-1">
+                                        Pay when your order arrives
+                                    </div>
+
+                                </div>
+
+                                <span class="material-symbols-outlined text-gray-600">
+                                    chevron_right
+                                </span>
+
+                            </div>
+
+                        </label>
+
+
+                        <!-- EASYPAISA -->
+
+                        <label
+                            class="payment-option block p-4"
+                            data-payment-option="easypaisa">
+
+                            <div class="flex items-center gap-4">
+
+                                <input
+                                    type="radio"
+                                    name="paymentMethod"
+                                    value="easypaisa"
+                                    class="payment-radio">
+
+                                <div class="w-11 h-11 rounded-xl bg-white/5 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-orange-500">
+                                        smartphone
+                                    </span>
+                                </div>
+
+                                <div class="flex-1">
+
+                                    <div class="font-bold">
+                                        Easypaisa
+                                    </div>
+
+                                    <div class="text-xs text-gray-500 mt-1">
+                                        Pay using your Easypaisa account
+                                    </div>
+
+                                </div>
+
+                                <span class="material-symbols-outlined text-gray-600">
+                                    chevron_right
+                                </span>
+
+                            </div>
+
+                        </label>
+
+
+                        <!-- JAZZCASH -->
+
+                        <label
+                            class="payment-option block p-4"
+                            data-payment-option="jazzcash">
+
+                            <div class="flex items-center gap-4">
+
+                                <input
+                                    type="radio"
+                                    name="paymentMethod"
+                                    value="jazzcash"
+                                    class="payment-radio">
+
+                                <div class="w-11 h-11 rounded-xl bg-white/5 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-orange-500">
+                                        phone_iphone
+                                    </span>
+                                </div>
+
+                                <div class="flex-1">
+
+                                    <div class="font-bold">
+                                        JazzCash
+                                    </div>
+
+                                    <div class="text-xs text-gray-500 mt-1">
+                                        Pay using your JazzCash account
+                                    </div>
+
+                                </div>
+
+                                <span class="material-symbols-outlined text-gray-600">
+                                    chevron_right
+                                </span>
+
+                            </div>
+
+                        </label>
+
+                    </div>
+
+
+                    <!-- Dynamic Payment Details -->
+
+                    <div id="paymentDetails"
+                        class="mt-5">
+                    </div>
+
+                </div>
+
+
+                <!-- Security -->
+
+                <div class="glass rounded-2xl p-5 flex gap-4">
+
+                    <span class="material-symbols-outlined text-green-500">
+                        verified_user
+                    </span>
+
+                    <div>
+
+                        <div class="font-bold text-sm">
+                            Secure Checkout
+                        </div>
+
+                        <p class="secure-line text-xs mt-1 leading-relaxed">
+                            Your order details are handled securely. No card information is stored by this frontend.
+                            Real payment processing requires a verified payment gateway and backend integration.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 RIGHT — ORDER SUMMARY
+            ================================================== -->
+
+            <aside class="lg:sticky lg:top-28">
+
+                <div class="glass rounded-3xl overflow-hidden">
+
+                    <div class="p-5 sm:p-6 border-b border-white/10">
+
+                        <div class="flex items-center justify-between">
+
+                            <div>
+                                <h2 class="heading-font text-3xl uppercase font-bold">
+                                    Your Order
+                                </h2>
+
+                                <p id="summaryItemCount"
+                                    class="text-xs text-gray-500 mt-1">
+                                    0 items
+                                </p>
+                            </div>
+
+                            <a href="cart.html"
+                                class="text-xs text-orange-500 hover:text-orange-400 font-bold uppercase">
+                                Edit Cart
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Products -->
+
+                    <div id="orderItems"
+                        class="max-h-[430px] overflow-y-auto p-5 sm:p-6">
+                    </div>
+
+
+                    <!-- Totals -->
+
+                    <div class="p-5 sm:p-6 border-t border-white/10">
+
+                        <div class="space-y-3">
+
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">
+                                    Subtotal
+                                </span>
+
+                                <span id="subtotalValue"
+                                    class="font-semibold">
+                                    Rs. 0
+                                </span>
+                            </div>
+
+
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">
+                                    Shipping
+                                </span>
+
+                                <span id="shippingValue"
+                                    class="font-semibold">
+                                    Rs. 0
+                                </span>
+                            </div>
+
+
+                            <div id="discountRow"
+                                class="hidden flex justify-between text-sm">
+
+                                <span class="text-green-500">
+                                    Discount
+                                </span>
+
+                                <span id="discountValue"
+                                    class="font-semibold text-green-500">
+                                    - Rs. 0
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="border-t border-white/10 mt-5 pt-5 flex justify-between items-end">
+
+                            <div>
+
+                                <div class="text-xs uppercase tracking-wider text-gray-500">
+                                    Grand Total
+                                </div>
+
+                                <div class="text-[10px] text-gray-600 mt-1">
+                                    PKR
+                                </div>
+
+                            </div>
+
+                            <strong id="grandTotalValue"
+                                class="heading-font text-4xl text-orange-500">
+                                Rs. 0
+                            </strong>
+
+                        </div>
+
+
+                        <!-- Place Order -->
+
+                        <button
+                            id="placeOrderBtn"
+                            type="button"
+                            class="orange-button w-full rounded-xl py-4 mt-6 font-black uppercase flex items-center justify-center gap-2">
+
+                            <span id="placeOrderIcon"
+                                class="material-symbols-outlined">
+                                lock
+                            </span>
+
+                            <span id="placeOrderText">
+                                Place Order
+                            </span>
+
+                            <span id="placeOrderSpinner"
+                                class="spinner hidden">
+                            </span>
+
+                        </button>
+
+
+                        <p class="text-center text-[10px] text-gray-600 mt-3 leading-relaxed">
+                            By placing your order, you agree to KHELZONE's
+                            order and delivery terms.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </aside>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================================================
+         SUCCESS MODAL
+    ========================================================== -->
+
+    <div id="successModal"
+        class="success-overlay hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-md p-4 flex items-center justify-center">
+
+        <div class="success-card w-full max-w-lg glass rounded-3xl p-7 sm:p-10 text-center">
+
+            <div class="w-20 h-20 mx-auto rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center">
+
+                <span class="material-symbols-outlined text-green-500 text-5xl">
+                    check_circle
+                </span>
+
+            </div>
+
+
+            <div class="heading-font text-4xl sm:text-5xl uppercase font-bold mt-7">
+                Order Confirmed
+            </div>
+
+
+            <p class="text-gray-500 mt-3">
+                Thank you for shopping with KHELZONE.
+                Your order has been placed successfully.
+            </p>
+
+
+            <div class="mt-7 rounded-2xl bg-black/30 border border-white/10 p-5">
+
+                <div class="text-xs uppercase tracking-wider text-gray-500">
+                    Order ID
+                </div>
+
+                <div id="successOrderId"
+                    class="font-black text-xl text-orange-500 mt-2 tracking-wider">
+                    KZ-000000
+                </div>
+
+                <div class="h-px bg-white/10 my-4"></div>
+
+                <div class="flex justify-between text-sm">
+
+                    <span class="text-gray-500">
+                        Total
+                    </span>
+
+                    <strong id="successTotal">
+                        Rs. 0
+                    </strong>
+
+                </div>
+
+                <div class="flex justify-between text-sm mt-3">
+
+                    <span class="text-gray-500">
+                        Payment
+                    </span>
+
+                    <strong id="successPayment">
+                        Cash on Delivery
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="grid sm:grid-cols-2 gap-3 mt-7">
+
+                <button
+                    id="continueShoppingBtn"
+                    class="w-full rounded-xl bg-white/5 border border-white/10 py-4 font-bold hover:bg-white/10 transition">
+
+                    Continue Shopping
+
+                </button>
+
+
+                <button
+                    id="viewOrdersBtn"
+                    class="w-full orange-button rounded-xl py-4 font-black uppercase">
+
+                    View Order
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         TOAST
+    ========================================================== -->
+
+    <div id="toast"
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[150] translate-y-20 opacity-0 pointer-events-none transition-all duration-300">
+
+        <div class="glass rounded-xl px-5 py-3 flex items-center gap-3 shadow-2xl">
+
+            <span id="toastIcon"
+                class="material-symbols-outlined text-orange-500">
+                info
+            </span>
+
+            <span id="toastText"
+                class="text-sm font-semibold">
+                Done
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- JavaScript -->
+
+    <script src="payment.js"></script>
+
+</body>
+
+</html>
+

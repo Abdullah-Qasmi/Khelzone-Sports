@@ -156,6 +156,16 @@
 
                 </a>
 
+                <!-- ADMIN DASHBOARD - ADMIN USERS ONLY -->
+                <a
+                    id="adminDashboardLink"
+                    href="admin-dashboard.html"
+                    class="hidden xl:inline-flex ml-2 px-4 py-2.5 rounded-lg bg-orange-500 text-black px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-wider hover:bg-orange-400 transition">
+
+                    Admin Dashboard
+
+                </a>
+
             </div>
 
         </div>
@@ -209,6 +219,14 @@
                     class="mobile-link py-3"
                     href="cart.html">
                     Shopping Cart
+                </a>
+
+                <!-- ADMIN DASHBOARD - ADMIN USERS ONLY -->
+                <a
+                    id="adminDashboardMobileLink"
+                    class="mobile-link py-3 hidden text-orange-400 font-black"
+                    href="admin-dashboard.html">
+                    Admin Dashboard
                 </a>
 
             </nav>
@@ -2199,6 +2217,97 @@
     ========================================================== -->
 
     <script src="home.js"></script>
+
+    <!-- =========================================================
+         ADMIN DASHBOARD VISIBILITY
+         Shows Admin Dashboard ONLY to users listed in public.admins
+    ========================================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        (() => {
+            const SUPABASE_URL = "https://antqexjhlsaynunlmzqa.supabase.co";
+            const SUPABASE_KEY = "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
+
+            const supabaseClient = window.supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_KEY
+            );
+
+            const desktopAdminLink =
+                document.getElementById("adminDashboardLink");
+
+            const mobileAdminLink =
+                document.getElementById("adminDashboardMobileLink");
+
+            function showAdminDashboard() {
+                if (desktopAdminLink) {
+                    desktopAdminLink.classList.remove("hidden");
+                }
+
+                if (mobileAdminLink) {
+                    mobileAdminLink.classList.remove("hidden");
+                }
+            }
+
+            function hideAdminDashboard() {
+                if (desktopAdminLink) {
+                    desktopAdminLink.classList.add("hidden");
+                }
+
+                if (mobileAdminLink) {
+                    mobileAdminLink.classList.add("hidden");
+                }
+            }
+
+            async function checkAdminAccess() {
+                hideAdminDashboard();
+
+                try {
+                    const {
+                        data: { user },
+                        error: userError
+                    } = await supabaseClient.auth.getUser();
+
+                    if (userError || !user) {
+                        return;
+                    }
+
+                    const {
+                        data: admin,
+                        error: adminError
+                    } = await supabaseClient
+                        .from("admins")
+                        .select("id")
+                        .eq("id", user.id)
+                        .maybeSingle();
+
+                    if (adminError) {
+                        console.error(
+                            "Admin access check failed:",
+                            adminError
+                        );
+                        return;
+                    }
+
+                    if (admin) {
+                        showAdminDashboard();
+                    }
+                } catch (error) {
+                    console.error(
+                        "Admin dashboard visibility error:",
+                        error
+                    );
+                }
+            }
+
+            checkAdminAccess();
+
+            supabaseClient.auth.onAuthStateChange(() => {
+                checkAdminAccess();
+            });
+        })();
+    </script>
 
 </body>
 

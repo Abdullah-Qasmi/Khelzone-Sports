@@ -616,6 +616,43 @@ img {
 
 
 /* ==========================================================================
+   PRODUCT GRID — explicit, robust column sizing
+   -------------------------------------------------------------------------
+   The HTML relies on Tailwind's grid-cols-2 / lg:grid-cols-3 / xl:grid-cols-4
+   utility classes. Those classes reserve a FIXED number of equal-width
+   columns regardless of how many products actually render. With a small
+   result set (e.g. 2 filtered products) inside a 3- or 4-column track grid,
+   the browser still lays out 3-4 equal tracks and only fills the first
+   couple — so each card renders at 1/3 or 1/4 of the available width while
+   the rest of the row sits empty, which is exactly the squeezed-card /
+   dead-space-on-the-right bug being fixed here.
+
+   Overriding it with an explicit, content-aware grid (auto-fill + minmax)
+   makes the column count responsive to however many products are actually
+   in the grid, so cards always claim their fair share of the row no matter
+   the result count. This is defined with an ID selector so it reliably
+   wins over the class-based Tailwind utilities without touching the HTML.
+   ========================================================================== */
+
+#productGrid,
+#trendingGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+@media (max-width: 767px) {
+
+    #productGrid,
+    #trendingGrid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
+    }
+
+}
+
+
+/* ==========================================================================
    PRODUCT CARD — PREMIUM UI
    ========================================================================== */
 

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>KHELZONE - Wishlist</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="cart.tailwind.config.js"></script>
+  <link rel="stylesheet" href="cart.css"/>
+</head>
+
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased selection:bg-secondary-container selection:text-on-secondary-container">
+
+<header class="bg-background border-b border-outline-variant docked full-width top-0 sticky flex justify-between items-center w-full px-gutter h-16 z-50 bg-background/95 backdrop-blur-md">
+  <div class="flex items-center gap-lg">
+    <button id="mobile-menu-btn" class="text-on-surface hover:text-secondary-container transition-colors duration-200 lg:hidden" aria-label="Open menu">
+      <span class="material-symbols-outlined font-headline-md text-headline-md">menu</span>
+    </button>
+
+    <h1 class="font-display-xl text-headline-md text-secondary-container tracking-tighter uppercase">KHELZONE</h1>
+
+    <nav class="hidden lg:flex items-center gap-md ml-md">
+      <a href="index.html" class="font-label-caps text-label-caps text-on-surface hover:text-secondary-container transition-colors duration-200 tracking-wider">HOME</a>
+      <a href="shop.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">SHOP</a>
+      <a href="customize.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">CUSTOMIZE KIT</a>
+      <a href="wishlist.html" class="font-label-caps text-label-caps text-secondary-container border-b-2 border-secondary-container pb-1 tracking-wider">WISHLIST</a>
+      <a href="cart.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">CART</a>
+    </nav>
+  </div>
+
+  <div class="flex items-center gap-lg">
+    <a href="seller.html" class="become-seller-link font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 hidden md:flex items-center gap-1 border border-outline-variant hover:border-secondary-container rounded-full px-sm py-1 tracking-wider">
+      <span class="material-symbols-outlined text-[16px]">storefront</span>
+      Become a Seller
+    </a>
+  </div>
+</header>
+
+<div id="mobile-nav" class="mobile-nav hidden lg:hidden">
+  <a href="index.html">HOME</a>
+  <a href="shop.html">SHOP</a>
+  <a href="customize.html">CUSTOMIZE KIT</a>
+  <a href="wishlist.html" class="active">WISHLIST</a>
+  <a href="cart.html">CART</a>
+</div>
+
+<main class="flex-grow w-full max-w-container-max mx-auto px-gutter py-xl">
+
+  <div class="flex justify-between items-end border-b border-outline-variant pb-sm mb-sm">
+    <h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background tracking-tight">YOUR WISHLIST</h2>
+    <span id="wishlist-item-count-label" class="font-label-caps text-label-caps text-on-surface-variant">0 ITEMS</span>
+  </div>
+
+  <div id="wishlist-items-container" class="flex flex-col gap-sm mt-sm"></div>
+
+  <div id="empty-wishlist-state" class="flex-col items-center justify-center text-center gap-md py-xl bg-surface-container-low border border-surface-container-highest rounded-xl mt-sm">
+    <span class="material-symbols-outlined text-on-surface-variant" style="font-size:64px;">favorite_border</span>
+    <h3 class="font-headline-md text-headline-md text-on-background">Your Wishlist is Empty</h3>
+    <p class="font-body-md text-body-md text-on-surface-variant max-w-sm">Save your favorite gear here and come back when you're ready.</p>
+    <div class="flex flex-wrap justify-center gap-sm mt-sm">
+      <button class="continue-shopping-btn btn-primary px-md py-sm rounded-lg font-label-caps text-label-caps text-surface-container-lowest font-bold" data-href="shop.html">CONTINUE SHOPPING</button>
+    </div>
+  </div>
+
+</main>
+
+<footer class="bg-surface-container-lowest border-t border-outline-variant full-width mt-auto">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-lg px-gutter py-xl max-w-container-max mx-auto flat no-shadows">
+    <div class="flex flex-col gap-md">
+      <span class="font-display-xl text-on-surface text-headline-md uppercase tracking-tighter">KHELZONE</span>
+      <p class="font-body-md text-body-md text-on-surface-variant">© 2024 KHELZONE. Engineered for Performance.</p>
+    </div>
+
+    <div class="flex flex-col gap-sm">
+      <h4 class="font-label-caps text-label-caps text-on-surface-variant mb-xs">SHOP</h4>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="shop.html">Cricket Gear</a>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="shop.html">Football Kits</a>
+    </div>
+
+    <div class="flex flex-col gap-sm">
+      <h4 class="font-label-caps text-label-caps text-on-surface-variant mb-xs">B2B</h4>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="#">Sialkot Manufacturers</a>
+    </div>
+
+    <div class="flex flex-col gap-sm">
+      <h4 class="font-label-caps text-label-caps text-on-surface-variant mb-xs">LEGAL</h4>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="#">Terms of Service</a>
+    </div>
+  </div>
+</footer>
+
+<div id="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="wishlist.js"></script>
+</body>
+</html>

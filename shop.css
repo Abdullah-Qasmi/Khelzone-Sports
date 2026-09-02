@@ -61,6 +61,12 @@ body {
     overflow-x: hidden;
 }
 
+/* Lock page scroll while a drawer or the Quick View modal is open */
+body.drawer-open,
+body.modal-open {
+    overflow: hidden;
+}
+
 button,
 input,
 select {
@@ -92,6 +98,10 @@ img {
 ::selection {
     background: var(--khz-orange);
     color: white;
+}
+
+.hidden {
+    display: none !important;
 }
 
 
@@ -590,6 +600,22 @@ img {
 
 
 /* ==========================================================================
+   PRODUCT SECTION HEADER
+   ========================================================================== */
+
+.shop-heading {
+    font-size: clamp(30px, 4vw, 44px);
+    line-height: 1;
+}
+
+.shop-subtext {
+    color: var(--khz-gray);
+    font-size: 13px;
+    max-width: 480px;
+}
+
+
+/* ==========================================================================
    PRODUCT CARD — PREMIUM UI
    ========================================================================== */
 
@@ -783,6 +809,25 @@ img {
         0 6px 16px rgba(255, 90, 0, 0.3);
 }
 
+/* SALE badge — red accent, per "orange/red where appropriate" */
+.product-card__badge--sale {
+    background: var(--khz-red);
+
+    box-shadow:
+        0 6px 16px rgba(239, 68, 68, 0.3);
+}
+
+/* OUT OF STOCK badge — muted, never competes with live products */
+.product-card__badge--muted {
+    background: rgba(20, 22, 28, 0.92);
+
+    color: var(--khz-gray);
+
+    border: 1px solid var(--khz-line-light);
+
+    box-shadow: none;
+}
+
 
 /* ==========================================================================
    WISHLIST BUTTON
@@ -816,6 +861,7 @@ img {
     color: white;
 
     font-size: 20px;
+    line-height: 1;
 
     transition:
         transform 0.2s ease,
@@ -837,6 +883,10 @@ img {
 
     border-color:
         rgba(255, 90, 0, 0.5);
+}
+
+.product-card__wishlist:active {
+    transform: scale(0.94);
 }
 
 
@@ -968,6 +1018,12 @@ img {
 
     letter-spacing: -0.01em;
 
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+
     transition: color 0.2s ease;
 }
 
@@ -979,7 +1035,7 @@ img {
 /* DESCRIPTION */
 
 .product-card__description {
-    min-height: 36px;
+    min-height: 34px;
 
     margin-top: 7px;
 
@@ -989,6 +1045,10 @@ img {
 
     line-height: 1.6;
 
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
@@ -1008,12 +1068,14 @@ img {
     color: var(--khz-yellow);
 
     font-size: 11px;
+    letter-spacing: 0.02em;
 }
 
 .product-card__rating span {
     color: #7d838d;
 
     font-size: 10px;
+    font-weight: 700;
 }
 
 
@@ -1066,6 +1128,10 @@ img {
 
 .in-stock {
     color: var(--khz-green);
+}
+
+.low-stock {
+    color: var(--khz-yellow);
 }
 
 .out-stock {
@@ -1392,6 +1458,60 @@ img {
     font-weight: 900;
 }
 
+/* Quantity stepper inside a cart drawer item */
+.drawer-item-qty {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: 10px;
+
+    padding: 4px 6px;
+
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.04);
+
+    border: 1px solid var(--khz-line);
+}
+
+.drawer-item-qty button {
+    width: 22px;
+    height: 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    color: white;
+
+    font-size: 13px;
+    font-weight: 800;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.drawer-item-qty button:hover {
+    background: var(--khz-orange);
+}
+
+.drawer-item-qty span {
+    min-width: 14px;
+
+    text-align: center;
+
+    color: white;
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
 .drawer-remove {
     width: 30px;
     height: 30px;
@@ -1444,6 +1564,7 @@ img {
     color: #6d727c;
 
     font-size: 13px;
+    line-height: 1.6;
 }
 
 
@@ -1470,6 +1591,14 @@ img {
 
     backdrop-filter:
         blur(10px);
+
+    opacity: 0;
+
+    transition: opacity 0.25s ease;
+}
+
+.quick-view-modal.show {
+    opacity: 1;
 }
 
 .quick-view-box {
@@ -1501,6 +1630,14 @@ img {
         0 30px 100px rgba(0, 0, 0, 0.7);
 
     overflow: hidden;
+
+    transform: scale(0.96);
+
+    transition: transform 0.25s ease;
+}
+
+.quick-view-modal.show .quick-view-box {
+    transform: scale(1);
 }
 
 
@@ -1750,6 +1887,28 @@ img {
         rgba(255, 255, 255, 0.015);
 }
 
+.empty-state__icon {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 64px;
+    height: 64px;
+
+    margin: 0 auto 18px;
+
+    border-radius: 50%;
+
+    background: rgba(255, 90, 0, 0.08);
+
+    border: 1px solid rgba(255, 90, 0, 0.25);
+
+    color: var(--khz-orange);
+
+    font-size: 26px;
+}
+
 
 /* ==========================================================================
    LOAD MORE
@@ -1897,8 +2056,20 @@ footer button:hover {
         font-size: 7px;
     }
 
+    /* Quick View can't rely on hover on touch devices, so it stays
+       visible and pinned to the bottom of the image instead of hidden */
     .product-card__quick-wrap {
-        display: none;
+        opacity: 1;
+        transform: translateY(0);
+
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+    }
+
+    .product-card__quick {
+        padding: 9px 10px;
+        font-size: 8px;
     }
 
     .quick-view-box {
@@ -1927,6 +2098,11 @@ footer button:hover {
         padding: 8px 14px;
     }
 
+    .wishlist-drawer,
+    .cart-drawer {
+        width: 100vw;
+    }
+
 }
 
 
@@ -1937,25 +2113,26 @@ footer button:hover {
 @media (max-width: 420px) {
 
     #productGrid {
-        gap: 10px !important;
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
     }
 
     .product-card__content {
-        padding: 10px;
+        padding: 12px;
     }
 
     .product-card__title {
-        font-size: 11px;
-    }
-
-    .product-card__price strong {
         font-size: 13px;
     }
 
-    .product-card__cart {
-        padding: 9px 4px;
+    .product-card__price strong {
+        font-size: 15px;
+    }
 
-        font-size: 7px;
+    .product-card__cart {
+        padding: 11px 6px;
+
+        font-size: 9px;
     }
 
 }

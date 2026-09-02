@@ -1,508 +1,287 @@
 /* =========================================================
-   KHELZONE | SELL WITH US
-   COMPLETE ORANGE THEME CSS
-
-   NAVBAR + DROPDOWN + HERO + CARDS + FORM
-   ========================================================= */
-
-
-/* =========================================================
-   ROOT
-   ========================================================= */
-
-:root {
-    --orange: #FF7A00;
-    --orange-light: #FF9D3D;
-    --orange-dark: #C85F00;
-    --orange-soft: rgba(255, 122, 0, 0.10);
-    --orange-border: rgba(255, 122, 0, 0.35);
-    --orange-glow: rgba(255, 122, 0, 0.35);
-
-    --dark: #141313;
-    --dark-2: #111111;
-    --dark-3: #1b1918;
-
-    --text: #e5e2e1;
-    --text-muted: #bdb9b8;
-}
-
-
-/* =========================================================
    RESET
-   ========================================================= */
+========================================================= */
 
-*,
-*::before,
-*::after {
+* {
     box-sizing: border-box;
 }
-
-
-/* =========================================================
-   HTML
-   ========================================================= */
 
 html {
     scroll-behavior: smooth;
 }
 
-
-/* =========================================================
-   BODY
-   ========================================================= */
-
 body {
     margin: 0;
-    padding: 0;
-
-    background: var(--dark);
-    color: var(--text);
-
+    background: #141313;
+    color: #E5E2E1;
     min-height: 100vh;
-
-    overflow-x: hidden;
-
     font-family: "Inter", sans-serif;
+    overflow-x: hidden;
 }
 
 
 /* =========================================================
-   HEADINGS
-   ========================================================= */
+   ORANGE THEME
+========================================================= */
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    color: var(--orange);
+:root {
+    --orange: #FF6B00;
+    --orange-light: #FF8A2B;
+    --orange-dark: #D94F00;
+    --orange-glow: rgba(255, 107, 0, 0.35);
 }
 
 
 /* =========================================================
-   LOGO
-   ========================================================= */
+   NAVBAR
+========================================================= */
 
-.logo {
-    color: var(--orange) !important;
-    -webkit-text-fill-color: var(--orange) !important;
-}
+.kz-header {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 64px;
+    z-index: 99999;
 
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
 
-/* =========================================================
-   HEADER / NAVBAR
-   ========================================================= */
+    padding: 0 clamp(18px, 5vw, 60px);
 
-header {
-    position: sticky !important;
-
-    top: 0 !important;
-    left: 0 !important;
-
-    width: 100% !important;
-    height: 64px !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    z-index: 99999 !important;
-
-    background: rgba(20, 19, 19, 0.98) !important;
-
-    border-bottom:
-        1px solid rgba(255, 122, 0, 0.20) !important;
+    background: rgba(20, 19, 19, 0.97);
 
     backdrop-filter: blur(14px);
-
     -webkit-backdrop-filter: blur(14px);
-}
 
-
-/* =========================================================
-   HEADER INNER ELEMENTS
-   ========================================================= */
-
-header > * {
-    max-height: 64px;
-}
-
-
-/* =========================================================
-   HEADER LOGO
-   ========================================================= */
-
-header h1,
-header .logo,
-header .text-white {
-    color: var(--orange) !important;
-
-    -webkit-text-fill-color: var(--orange) !important;
-
-    position: relative;
-
-    z-index: 100002 !important;
-}
-
-
-/* =========================================================
-   HEADER LINKS
-   ========================================================= */
-
-header a {
-    color: var(--orange) !important;
-
-    text-decoration: none !important;
-}
-
-
-header a:hover {
-    color: var(--orange-light) !important;
-}
-
-
-/* =========================================================
-   HEADER NAV
-   ========================================================= */
-
-header nav {
-    position: relative;
-
-    z-index: 100001;
-
-    white-space: nowrap;
-}
-
-
-/* =========================================================
-   NAV LINKS
-   ========================================================= */
-
-header nav a {
-    color: var(--orange) !important;
-
-    white-space: nowrap;
-
-    transition:
-        color 0.25s ease,
-        background 0.25s ease;
-}
-
-
-header nav a:hover {
-    color: var(--orange-light) !important;
+    border-bottom: 1px solid #303030;
 }
 
 
 /* =========================================================
    MENU BUTTON
-   ========================================================= */
+========================================================= */
 
 #menuButton {
-    position: relative !important;
+    grid-column: 1;
+    justify-self: start;
 
-    z-index: 100005 !important;
+    width: 42px;
+    height: 42px;
 
-    display: flex !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    align-items: center !important;
-    justify-content: center !important;
-
-    width: 44px !important;
-    height: 44px !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    color: var(--orange) !important;
+    border: none !important;
+    outline: none !important;
 
     background: transparent !important;
 
-    border: none !important;
+    color: var(--orange) !important;
 
-    outline: none !important;
+    cursor: pointer;
 
-    cursor: pointer !important;
+    z-index: 100002;
 }
-
 
 #menuButton:hover {
     color: var(--orange-light) !important;
 }
 
-
-/* =========================================================
-   MENU ICON
-   ========================================================= */
-
-.menu-icon {
+#menuIcon {
+    font-size: 30px;
     color: var(--orange) !important;
-
-    cursor: pointer !important;
 
     transition:
-        color 0.25s ease,
-        transform 0.25s ease;
-}
-
-
-.menu-icon:hover {
-    color: var(--orange-light) !important;
-
-    transform: scale(1.08);
+        transform 0.2s ease,
+        color 0.2s ease;
 }
 
 
 /* =========================================================
-   MATERIAL SYMBOL
-   ========================================================= */
+   LOGO
+========================================================= */
 
-#menuButton .material-symbols-outlined {
+.kz-logo {
+    grid-column: 2;
+    justify-self: center;
+
     color: var(--orange) !important;
 
-    font-size: 28px !important;
+    text-decoration: none;
 
-    line-height: 1 !important;
+    font-size: 30px;
+    font-weight: 900;
+
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+
+    white-space: nowrap;
+    line-height: 1;
+
+    z-index: 100001;
 }
 
-
-#menuButton:hover .material-symbols-outlined {
+.kz-logo:hover {
     color: var(--orange-light) !important;
 }
 
 
 /* =========================================================
-   SVG
-   ========================================================= */
+   DESKTOP NAV
+========================================================= */
 
-header svg {
+.desktop-nav {
+    grid-column: 3;
+    justify-self: end;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 28px;
+
+    min-width: 0;
+}
+
+.desktop-nav a {
     color: var(--orange) !important;
+    text-decoration: none;
+    white-space: nowrap;
 
-    stroke: var(--orange) !important;
+    transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.desktop-nav a:hover {
+    color: var(--orange-light) !important;
 }
 
 
 /* =========================================================
-   PRIMARY BUTTON
-   ========================================================= */
+   DESKTOP SELLER BUTTON
+========================================================= */
 
-.btn-primary {
-    background:
-        linear-gradient(
-            135deg,
-            #FF7A00 0%,
-            #C85F00 100%
-        ) !important;
+.desktop-seller-btn {
+    padding: 12px 20px;
 
+    border: 1px solid var(--orange);
+    border-radius: 8px;
+
+    color: var(--orange) !important;
+    background: transparent;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.desktop-seller-btn:hover {
+    background: var(--orange) !important;
     color: #141313 !important;
 
-    border: none !important;
-
-    box-shadow:
-        0 4px 15px rgba(255, 122, 0, 0.40);
-
-    transition:
-        transform 0.3s ease,
-        box-shadow 0.3s ease;
-}
-
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 7px 24px rgba(255, 122, 0, 0.60);
+    transform: translateY(-1px);
 }
 
 
 /* =========================================================
-   SECONDARY BUTTON
-   ========================================================= */
-
-.btn-secondary {
-    border:
-        2px solid var(--orange) !important;
-
-    color: var(--orange) !important;
-
-    transition:
-        background 0.3s ease,
-        color 0.3s ease,
-        transform 0.3s ease;
-}
-
-
-.btn-secondary:hover {
-    background:
-        rgba(255, 122, 0, 0.10) !important;
-
-    color: var(--orange-light) !important;
-
-    transform: translateY(-2px);
-}
-
-
-/* =========================================================
-   SELLER BUTTON
-   ========================================================= */
-
-.btn-seller {
-    color: var(--orange) !important;
-
-    border-color: var(--orange) !important;
-
-    transition:
-        all 0.25s ease;
-}
-
-
-.btn-seller:hover {
-    background:
-        rgba(255, 122, 0, 0.10) !important;
-
-    color: var(--orange-light) !important;
-}
-
-
-/* =========================================================
-   MOBILE DROPDOWN
-   ========================================================= */
+   MOBILE MENU
+========================================================= */
 
 .mobile-menu {
-    position: absolute !important;
+    position: fixed !important;
 
-    top: 100% !important;
-
+    top: 64px !important;
     left: 0 !important;
-    right: 0 !important;
 
     width: 100% !important;
-
-    min-width: 100% !important;
-    max-width: 100% !important;
 
     margin: 0 !important;
     padding: 0 !important;
 
-    background: #141313 !important;
+    display: none !important;
 
-    border-top:
-        1px solid rgba(255, 122, 0, 0.35) !important;
+    background: rgba(20, 19, 19, 0.99);
 
-    border-bottom:
-        1px solid var(--orange) !important;
+    border-top: 1px solid rgba(255, 107, 0, 0.25);
+    border-bottom: 1px solid var(--orange);
 
     box-shadow:
-        0 15px 35px rgba(0, 0, 0, 0.75);
+        0 15px 40px rgba(0, 0, 0, 0.75);
 
-    z-index: 100000 !important;
+    z-index: 99998 !important;
 
-    overflow: hidden !important;
-
-    display: none !important;
+    overflow: hidden;
 }
 
-
-/* =========================================================
-   MENU OPEN
-   ========================================================= */
-
-.mobile-menu.show,
-.mobile-menu.active {
+.mobile-menu.show {
     display: block !important;
 
-    opacity: 1 !important;
-
-    visibility: visible !important;
-
     animation:
-        navbarDropdown 0.25s ease forwards;
+        dropdownOpen 0.22s ease forwards;
 }
 
-
-/* =========================================================
-   MENU ANIMATION
-   ========================================================= */
-
-@keyframes navbarDropdown {
+@keyframes dropdownOpen {
 
     from {
         opacity: 0;
-
-        transform:
-            translateY(-10px);
+        transform: translateY(-8px);
     }
 
     to {
         opacity: 1;
-
-        transform:
-            translateY(0);
+        transform: translateY(0);
     }
 }
 
 
 /* =========================================================
-   DROPDOWN LINKS
-   ========================================================= */
+   MOBILE LINKS
+========================================================= */
 
 .mobile-menu a {
     display: block !important;
 
     width: 100% !important;
 
-    margin: 0 !important;
-
     padding: 18px 24px !important;
+    margin: 0 !important;
 
     color: var(--orange) !important;
 
-    background: transparent !important;
-
     text-decoration: none !important;
 
-    font-family:
-        "JetBrains Mono",
-        monospace;
-
-    font-size: 14px !important;
-
-    font-weight: 700 !important;
-
-    line-height: 1.4 !important;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+    font-weight: 700;
 
     letter-spacing: 1.5px;
 
-    white-space: normal !important;
+    background: transparent !important;
 
     border: none !important;
 
     border-bottom:
-        1px solid rgba(255, 122, 0, 0.15) !important;
+        1px solid rgba(255, 107, 0, 0.14) !important;
 
     transition:
-        background 0.25s ease,
-        color 0.25s ease,
-        padding-left 0.25s ease;
+        background 0.2s ease,
+        color 0.2s ease,
+        padding-left 0.2s ease;
 }
-
-
-/* =========================================================
-   LAST LINK
-   ========================================================= */
 
 .mobile-menu a:last-child {
     border-bottom: none !important;
 }
 
-
-/* =========================================================
-   DROPDOWN HOVER
-   ========================================================= */
-
 .mobile-menu a:hover {
     background:
-        rgba(255, 122, 0, 0.08) !important;
+        rgba(255, 107, 0, 0.08) !important;
 
     color: var(--orange-light) !important;
 
@@ -511,95 +290,95 @@ header svg {
 
 
 /* =========================================================
-   HERO
-   ========================================================= */
+   PRIMARY BUTTON
+========================================================= */
 
-.hero h1 {
-    color: var(--orange) !important;
-}
-
-
-.hero p {
-    color: var(--text) !important;
-}
-
-
-/* =========================================================
-   HERO BADGE
-   ========================================================= */
-
-.hero-badge {
-    color: var(--orange) !important;
-
-    border-color: var(--orange) !important;
-
+.btn-primary {
     background:
-        rgba(255, 122, 0, 0.10) !important;
+        linear-gradient(
+            135deg,
+            #FF6B00 0%,
+            #D94F00 100%
+        ) !important;
+
+    color: #141313 !important;
+
+    box-shadow:
+        0 4px 15px rgba(255, 107, 0, 0.35);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 7px 22px rgba(255, 107, 0, 0.55);
 }
 
 
 /* =========================================================
-   HERO TITLE
-   ========================================================= */
+   SECONDARY BUTTON
+========================================================= */
+
+.btn-secondary {
+    border: 2px solid #FF6B00 !important;
+    color: #FF6B00 !important;
+
+    transition:
+        background 0.25s ease,
+        color 0.25s ease,
+        transform 0.25s ease;
+}
+
+.btn-secondary:hover {
+    background:
+        rgba(255, 107, 0, 0.10) !important;
+
+    color: var(--orange-light) !important;
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   ORANGE UTILITIES
+========================================================= */
+
+.text-vibrant-orange {
+    color: #FF6B00 !important;
+}
+
+.bg-vibrant-orange {
+    background-color: #FF6B00 !important;
+}
+
+.border-vibrant-orange {
+    border-color: #FF6B00 !important;
+}
+
+.text-secondary-fixed {
+    color: #FF6B00 !important;
+}
+
+.bg-secondary-fixed {
+    background-color: #FF6B00 !important;
+}
+
+.border-secondary-fixed {
+    border-color: #FF6B00 !important;
+}
 
 .hero-title {
-    color: var(--orange) !important;
-
-    -webkit-text-fill-color: var(--orange) !important;
-}
-
-
-/* =========================================================
-   HERO BACKGROUND
-   ========================================================= */
-
-.hero-bg {
-    background-image:
-        url("https://lh3.googleusercontent.com/aida-public/AB6AXuBRJx0KY5UR-HOc8TQGgRtpamRsmpgvBWPT3Np0ohqXRyFQO9gNztaHA6VUJW8PsamSRqVweRiHTGfYhf8BOPRAq_uwhGSGIlB1d1gIyY7dcMPNJOzmQxA2D8iaG9IPOjIImd_KkJFkuJXKtfev4GrxfXtKoAaQMQFovti7Nmb1BKBqVDsvJd7Smr4ujZyVUMW4I9pf3LoPrdbHnWkTeoSsaJ-syqive5L-NVYdy-mAzr-tS1QLsVPa_A");
-
-    background-size: cover;
-
-    background-position: center;
-
-    background-repeat: no-repeat;
-}
-
-
-/* =========================================================
-   SELLER SECTION 1
-   ========================================================= */
-
-.seller1-bg {
-    background-image:
-        url("https://lh3.googleusercontent.com/aida-public/AB6AXuCPkdnwUmsSuAO7iGcGLIqysRim_MaN6NHkc1v0zc-Rjd-bAqmFiiqb4UOJSvvjlb2VrQFcg_wiIog4dboyn7ZPfsqrhzDq-V_sIuxSWjndGgC4PO2qXFHTJdaxiqC6SbuFuKHb717-z6fsc9vwh3XhBSyJL3UBsWbHZGbILVuwcurAiBw5cJBO0liMxPrUBQ1qTeLHmzrB07knzbAqq50nx19YeU86y6a7pg6eNntI5PYe8VNCkU5p-w");
-
-    background-size: cover;
-
-    background-position: center;
-
-    background-repeat: no-repeat;
-}
-
-
-/* =========================================================
-   SELLER SECTION 2
-   ========================================================= */
-
-.seller2-bg {
-    background-image:
-        url("https://lh3.googleusercontent.com/aida-public/AB6AXuDzWdmLLzM7OddAjG3XGsxmmLm7K2jtqywQaV2sbzg5X4ts4D6GYA2hFxpQ48fMWm3zBFr3CVz1fpVjIO0-MmN0zAWVnbnMHQj6Kmmwp-iHQpIFqgyf_vS6EeAiIX1zdd2NTc1XIXs1Qjl250DOYgWFoafAwxBtNozow7qIHk7rRZuTt5jiKm0wmRbZyJdM4PhlUm7hmnvxEDuHMzLtVN8K4W3PdtSLwl9PYOtc9m2_VIPvw76H3wqLxg");
-
-    background-size: cover;
-
-    background-position: center;
-
-    background-repeat: no-repeat;
+    color: #FF6B00 !important;
 }
 
 
 /* =========================================================
    CARD HOVER
-   ========================================================= */
+========================================================= */
 
 .card-hover {
     transition:
@@ -608,717 +387,579 @@ header svg {
         border-color 0.3s ease;
 }
 
-
 .card-hover:hover {
-    transform:
-        translateY(-5px);
+    transform: translateY(-5px);
 
     box-shadow:
-        0 20px 40px rgba(0, 0, 0, 0.50),
-        inset 0 0 0 1px var(--orange);
-
-    border-color:
-        var(--orange) !important;
-}
-
-
-/* =========================================================
-   INPUT GLOW
-   ========================================================= */
-
-.input-glow:focus {
-    border-bottom-color:
-        var(--orange) !important;
-
-    box-shadow:
-        0 4px 15px rgba(255, 122, 0, 0.20);
-
-    outline: none;
-}
-
-
-/* =========================================================
-   GRADIENT TEXT
-   ========================================================= */
-
-.gradient-text {
-    background:
-        linear-gradient(
-            135deg,
-            #FF7A00 0%,
-            #FF9D3D 50%,
-            #C85F00 100%
-        );
-
-    background-clip: text;
-
-    -webkit-background-clip: text;
-
-    -webkit-text-fill-color: transparent;
-}
-
-
-/* =========================================================
-   ORANGE UTILITIES
-   ========================================================= */
-
-.text-gold {
-    color: var(--orange) !important;
-}
-
-.border-gold {
-    border-color: var(--orange) !important;
-}
-
-.force-gold {
-    color: var(--orange) !important;
-
-    -webkit-text-fill-color: var(--orange) !important;
-}
-
-
-/* =========================================================
-   TAILWIND ORANGE OVERRIDES
-   ========================================================= */
-
-.text-vibrant-orange {
-    color: var(--orange) !important;
-}
-
-.bg-vibrant-orange {
-    background-color: var(--orange) !important;
-}
-
-.border-vibrant-orange {
-    border-color: var(--orange) !important;
-}
-
-
-.text-secondary-fixed {
-    color: var(--orange) !important;
-}
-
-.bg-secondary-fixed {
-    background-color: var(--orange) !important;
-}
-
-.border-secondary-fixed {
-    border-color: var(--orange) !important;
-}
-
-
-/* =========================================================
-   INLINE GOLD OVERRIDE
-   ========================================================= */
-
-[style*="#F5B942"],
-[style*="#f5b942"] {
-    color: var(--orange) !important;
-}
-
-
-[style*="#F5B942"],
-[style*="#f5b942"] {
-    border-color: var(--orange) !important;
-}
-
-
-[style*="background:#F5B942"],
-[style*="background: #F5B942"],
-[style*="background:#f5b942"],
-[style*="background: #f5b942"] {
-    background-color: var(--orange) !important;
-}
-
-
-/* =========================================================
-   FORCE WHITE -> ORANGE
-   ========================================================= */
-
-.text-white {
-    color: var(--orange) !important;
-}
-
-
-[class*="text-white"] {
-    color: var(--orange) !important;
-}
-
-
-[class*="border-white"] {
-    border-color: var(--orange) !important;
-}
-
-
-/* =========================================================
-   HERO GOLD TEXT
-   ========================================================= */
-
-.hero-bg h1,
-.hero-bg h1.text-white,
-.hero-bg h1.text-gray-100,
-.hero-bg h1.text-gray-200 {
-    color: var(--orange) !important;
-
-    -webkit-text-fill-color: var(--orange) !important;
-
-    background: none !important;
-}
-
-
-/* =========================================================
-   HERO SPAN
-   ========================================================= */
-
-.hero-bg span,
-.hero-bg .text-white {
-    color: var(--orange) !important;
-}
-
-
-/* =========================================================
-   VERIFIED BADGE
-   ========================================================= */
-
-.bg-vibrant-orange,
-.bg-secondary-fixed {
-    background-color:
-        var(--orange) !important;
+        0 20px 40px rgba(0, 0, 0, 0.50);
 }
 
 
 /* =========================================================
    SCROLLBAR
-   ========================================================= */
+========================================================= */
 
 .hide-scrollbar::-webkit-scrollbar {
     display: none;
 }
 
-
 .hide-scrollbar {
     -ms-overflow-style: none;
-
     scrollbar-width: none;
 }
 
 
 /* =========================================================
+   BACKGROUND IMAGES
+========================================================= */
+
+.hero-bg {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.seller1-bg {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.seller2-bg {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+
+/* =========================================================
+   ADD PRODUCT BOX
+========================================================= */
+
+.add-product-box {
+    width: 100%;
+
+    padding: 32px;
+
+    background: #1d1d1d;
+
+    border: 1px solid #444748;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 15px 35px rgba(0, 0, 0, 0.25);
+}
+
+
+/* =========================================================
+   PRODUCT FORM GRID
+========================================================= */
+
+.product-form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 24px;
+}
+
+
+/* =========================================================
+   PRODUCT FIELD
+========================================================= */
+
+.product-field {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 9px;
+
+    margin-bottom: 22px;
+}
+
+.product-field label {
+    color: #E5E2E1;
+
+    font-family:
+        "JetBrains Mono",
+        monospace;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    letter-spacing: 1.2px;
+
+    text-transform: uppercase;
+}
+
+.product-field input,
+.product-field select,
+.product-field textarea {
+    width: 100%;
+
+    padding: 14px 16px;
+
+    background: #101010;
+
+    color: #E5E2E1;
+
+    border: 1px solid #444748;
+
+    border-radius: 9px;
+
+    outline: none;
+
+    font-family: "Inter", sans-serif;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.product-field textarea {
+    resize: vertical;
+}
+
+.product-field input::placeholder,
+.product-field textarea::placeholder {
+    color: #777;
+}
+
+.product-field input:focus,
+.product-field select:focus,
+.product-field textarea:focus {
+    border-color: var(--orange);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(255, 107, 0, 0.12);
+}
+
+
+/* =========================================================
+   IMAGE INPUT
+========================================================= */
+
+.product-image-field {
+    margin-top: 4px;
+}
+
+.product-image-field input {
+    padding: 12px;
+}
+
+
+/* =========================================================
+   ADD PRODUCT BUTTON
+========================================================= */
+
+.add-product-btn {
+    width: 100%;
+
+    min-height: 54px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    margin-top: 10px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #FF6B00,
+            #D94F00
+        );
+
+    color: #141313;
+
+    font-family:
+        "JetBrains Mono",
+        monospace;
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 5px 18px
+        rgba(255, 107, 0, 0.30);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.add-product-btn:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 9px 25px
+        rgba(255, 107, 0, 0.45);
+}
+
+.add-product-btn:active {
+    transform: translateY(0);
+}
+
+
+/* =========================================================
+   PRODUCT COUNT
+========================================================= */
+
+.product-count {
+    padding: 9px 14px;
+
+    border: 1px solid var(--orange);
+
+    border-radius: 999px;
+
+    color: var(--orange);
+
+    font-family:
+        "JetBrains Mono",
+        monospace;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    letter-spacing: 1px;
+}
+
+
+/* =========================================================
+   PRODUCT LIST
+========================================================= */
+
+.product-list {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 22px;
+}
+
+
+/* =========================================================
+   PRODUCT CARD
+========================================================= */
+
+.product-card {
+    overflow: hidden;
+
+    background: #1d1d1d;
+
+    border: 1px solid #444748;
+
+    border-radius: 14px;
+
+    transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+
+    border-color: var(--orange);
+
+    box-shadow:
+        0 18px 35px
+        rgba(0, 0, 0, 0.40);
+}
+
+.product-card-image {
+    width: 100%;
+
+    height: 220px;
+
+    object-fit: cover;
+
+    display: block;
+
+    background: #101010;
+}
+
+.product-card-content {
+    padding: 20px;
+}
+
+.product-card-category {
+    display: inline-block;
+
+    padding: 6px 10px;
+
+    margin-bottom: 10px;
+
+    color: var(--orange);
+
+    border: 1px solid
+        rgba(255, 107, 0, 0.35);
+
+    border-radius: 999px;
+
+    font-family:
+        "JetBrains Mono",
+        monospace;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+.product-card h4 {
+    margin: 0 0 8px;
+
+    color: #E5E2E1;
+
+    font-size: 21px;
+
+    font-weight: 800;
+}
+
+.product-card-description {
+    color: #BDB9B8;
+
+    font-size: 13px;
+
+    line-height: 1.7;
+
+    min-height: 45px;
+
+    margin-bottom: 16px;
+}
+
+.product-card-bottom {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding-top: 15px;
+
+    border-top: 1px solid #303030;
+}
+
+.product-price {
+    color: var(--orange);
+
+    font-size: 19px;
+
+    font-weight: 900;
+}
+
+.product-stock {
+    color: #BDB9B8;
+
+    font-size: 12px;
+}
+
+.delete-product-btn {
+    width: 100%;
+
+    margin-top: 15px;
+
+    padding: 10px;
+
+    border: 1px solid
+        rgba(255, 107, 0, 0.4);
+
+    border-radius: 7px;
+
+    background:
+        rgba(255, 107, 0, 0.06);
+
+    color: var(--orange);
+
+    font-family:
+        "JetBrains Mono",
+        monospace;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.delete-product-btn:hover {
+    background: var(--orange);
+
+    color: #141313;
+}
+
+
+/* =========================================================
+   EMPTY PRODUCTS
+========================================================= */
+
+.empty-products {
+    grid-column: 1 / -1;
+
+    padding: 60px 20px;
+
+    text-align: center;
+
+    background: #181818;
+
+    border: 1px dashed #444748;
+
+    border-radius: 14px;
+}
+
+.empty-products .material-symbols-outlined {
+    color: var(--orange);
+
+    font-size: 48px;
+
+    margin-bottom: 15px;
+}
+
+.empty-products h4 {
+    margin: 0 0 8px;
+
+    color: #E5E2E1;
+
+    font-size: 22px;
+
+    font-weight: 800;
+}
+
+.empty-products p {
+    margin: 0;
+
+    color: #BDB9B8;
+}
+
+
+/* =========================================================
    MOBILE
-   ========================================================= */
+========================================================= */
 
 @media (max-width: 768px) {
 
-    body {
-        overflow-x: hidden;
+    .kz-header {
+        grid-template-columns:
+            1fr auto 1fr;
+
+        padding: 0 18px;
     }
 
+    .kz-logo {
+        font-size: 24px;
 
-    /* Header */
-
-    header {
-        height: 64px !important;
-
-        position: sticky !important;
-
-        top: 0 !important;
-
-        z-index: 99999 !important;
+        letter-spacing: 0.10em;
     }
-
-
-    /* Desktop navigation */
-
-    header nav {
-        display: none !important;
-    }
-
 
     .desktop-nav {
         display: none !important;
     }
 
-
-    .nav-links {
-        display: none !important;
-    }
-
-
-    /* Logo */
-
-    header .logo,
-    header h1 {
-        position: relative;
-
-        z-index: 100002 !important;
-
-        white-space: nowrap;
-
-        color: var(--orange) !important;
-    }
-
-
-    /* Mobile menu */
-
     .mobile-menu {
-        top: 100% !important;
-
-        left: 0 !important;
-
-        right: 0 !important;
-
-        width: 100% !important;
-
-        min-width: 100% !important;
-
-        max-width: 100% !important;
+        top: 64px !important;
     }
-
-
-    .mobile-menu a {
-        padding: 20px 24px !important;
-
-        font-size: 14px !important;
-    }
-
-
-    .mobile-menu a:hover {
-        padding-left: 32px !important;
-    }
-
-
-    /* Hero */
-
-    .hero h1 {
-        color: var(--orange) !important;
-    }
-
 
     .hero-title {
         font-size: 48px !important;
 
         line-height: 0.95 !important;
-
-        color: var(--orange) !important;
     }
 
-
-    .logo {
-        color: var(--orange) !important;
+    .product-form-grid {
+        grid-template-columns: 1fr;
     }
+
+    .add-product-box {
+        padding: 22px;
+    }
+
+    .product-list {
+        grid-template-columns: 1fr;
+    }
+
+    .product-card-image {
+        height: 240px;
+    }
+
 }
 
 
 /* =========================================================
    SMALL MOBILE
-   ========================================================= */
+========================================================= */
 
 @media (max-width: 500px) {
+
+    .kz-logo {
+        font-size: 21px;
+    }
 
     .hero-title {
         font-size: 38px !important;
     }
 
-
     .mobile-menu a {
         padding: 18px 20px !important;
     }
+
+    .add-product-box {
+        padding: 17px;
+    }
+
+    .product-count {
+        font-size: 9px;
+        padding: 7px 9px;
+    }
+
 }
 
 
 /* =========================================================
-   VERY SMALL MOBILE
-   ========================================================= */
+   VERY SMALL SCREEN
+========================================================= */
 
 @media (max-width: 360px) {
 
-    #menuButton {
-        width: 38px !important;
-
-        height: 38px !important;
-    }
-
-
-    #menuButton .material-symbols-outlined {
-        font-size: 27px !important;
-    }
-
-
-    .logo,
-    header h1 {
-        font-size: 18px !important;
-    }
-}
-
-
-/* =========================================================
-   DESKTOP
-   ========================================================= */
-
-@media (min-width: 769px) {
-
-    /*
-       Desktop par hamburger menu hi rahega.
-       Normal navigation hidden rahegi.
-    */
-
-    header nav {
-        display: none !important;
-    }
-
-
-    #menuButton {
-        display: flex !important;
-    }
-
-
-    .mobile-menu {
-        position: absolute !important;
-
-        top: 100% !important;
-
-        left: 0 !important;
-
-        right: 0 !important;
-
-        width: 100% !important;
-
-        max-width: 100% !important;
-
-        min-width: 100% !important;
-    }
-
-
-    .mobile-menu a {
-        width: 100% !important;
-    }
-}
-/* =========================================================
-   KHELZONE - FORCE ORANGE THEME
-   ========================================================= */
-
-:root {
-    --gold: #FF6A00 !important;
-    --gold-light: #FF8A33 !important;
-    --gold-dark: #D94F00 !important;
-    --gold-glow: rgba(255, 106, 0, 0.35) !important;
-}
-
-
-/* =========================================================
-   ALL GOLD TEXT
-   ========================================================= */
-
-.text-gold,
-.force-gold,
-.text-vibrant-orange,
-.text-secondary-fixed,
-.hero-title,
-.logo {
-    color: #FF6A00 !important;
-    -webkit-text-fill-color: #FF6A00 !important;
-}
-
-
-/* =========================================================
-   ALL GOLD BACKGROUNDS
-   ========================================================= */
-
-.bg-vibrant-orange,
-.bg-secondary-fixed {
-    background-color: #FF6A00 !important;
-}
-
-
-/* =========================================================
-   ALL GOLD BORDERS
-   ========================================================= */
-
-.border-gold,
-.border-vibrant-orange,
-.border-secondary-fixed {
-    border-color: #FF6A00 !important;
-}
-
-
-/* =========================================================
-   NAVBAR
-   ========================================================= */
-
-header a,
-header nav a,
-#menuButton,
-#menuButton .material-symbols-outlined,
-.menu-icon {
-    color: #FF6A00 !important;
-}
-
-
-/* =========================================================
-   NAVBAR HOVER
-   ========================================================= */
-
-header a:hover,
-header nav a:hover,
-.menu-icon:hover {
-    color: #FF8A33 !important;
-}
-
-
-/* =========================================================
-   LOGO
-   ========================================================= */
-
-header .logo,
-header h1,
-.kz-logo {
-    color: #FF6A00 !important;
-    -webkit-text-fill-color: #FF6A00 !important;
-}
-
-
-/* =========================================================
-   MOBILE MENU
-   ========================================================= */
-
-.mobile-menu {
-    border-top-color: rgba(255, 106, 0, 0.35) !important;
-    border-bottom-color: #FF6A00 !important;
-}
-
-.mobile-menu a {
-    color: #FF6A00 !important;
-    border-bottom-color: rgba(255, 106, 0, 0.15) !important;
-}
-
-.mobile-menu a:hover {
-    color: #FF8A33 !important;
-    background: rgba(255, 106, 0, 0.08) !important;
-}
-
-
-/* =========================================================
-   PRIMARY BUTTON
-   ========================================================= */
-
-.btn-primary {
-    background: linear-gradient(
-        135deg,
-        #FF6A00 0%,
-        #D94F00 100%
-    ) !important;
-
-    color: #141313 !important;
-
-    box-shadow:
-        0 4px 15px rgba(255, 106, 0, 0.40) !important;
-}
-
-.btn-primary:hover {
-    background: linear-gradient(
-        135deg,
-        #FF8A33 0%,
-        #FF6A00 100%
-    ) !important;
-
-    box-shadow:
-        0 7px 22px rgba(255, 106, 0, 0.55) !important;
-}
-
-
-/* =========================================================
-   SECONDARY BUTTON
-   ========================================================= */
-
-.btn-secondary {
-    border-color: #FF6A00 !important;
-    color: #FF6A00 !important;
-}
-
-.btn-secondary:hover {
-    background: rgba(255, 106, 0, 0.10) !important;
-    color: #FF8A33 !important;
-}
-
-
-/* =========================================================
-   SELLER BUTTON
-   ========================================================= */
-
-.btn-seller,
-.desktop-seller-btn {
-    color: #FF6A00 !important;
-    border-color: #FF6A00 !important;
-}
-
-.btn-seller:hover,
-.desktop-seller-btn:hover {
-    background: #FF6A00 !important;
-    color: #141313 !important;
-}
-
-
-/* =========================================================
-   HERO
-   ========================================================= */
-
-.hero h1,
-.hero-title {
-    color: #FF6A00 !important;
-    -webkit-text-fill-color: #FF6A00 !important;
-}
-
-.hero-badge {
-    color: #FF6A00 !important;
-    border-color: #FF6A00 !important;
-}
-
-
-/* =========================================================
-   HERO INLINE ELEMENTS
-   ========================================================= */
-
-.hero span {
-    color: #FF6A00 !important;
-    border-color: #FF6A00 !important;
-}
-
-
-/* =========================================================
-   CARD ICONS
-   ========================================================= */
-
-.card-hover .material-symbols-outlined {
-    color: #FF6A00 !important;
-}
-
-
-/* =========================================================
-   STAR / VERIFIED / BADGES
-   ========================================================= */
-
-[style*="#F5B942"],
-[style*="#f5b942"] {
-    color: #FF6A00 !important;
-    border-color: #FF6A00 !important;
-    background-color: #FF6A00 !important;
-}
-
-
-/* =========================================================
-   INLINE BACKGROUND COLORS
-   ========================================================= */
-
-[style*="background:#F5B942"],
-[style*="background: #F5B942"],
-[style*="background:#f5b942"],
-[style*="background: #f5b942"] {
-    background: #FF6A00 !important;
-}
-
-
-/* =========================================================
-   INLINE COLOR
-   ========================================================= */
-
-[style*="color:#F5B942"],
-[style*="color: #F5B942"],
-[style*="color:#f5b942"],
-[style*="color: #f5b942"] {
-    color: #FF6A00 !important;
-}
-
-
-/* =========================================================
-   INPUT FOCUS
-   ========================================================= */
-
-.input-glow:focus {
-    border-bottom-color: #FF6A00 !important;
-
-    box-shadow:
-        0 4px 15px rgba(255, 106, 0, 0.20) !important;
-}
-
-
-/* =========================================================
-   GRADIENT TEXT
-   ========================================================= */
-
-.gradient-text {
-    background: linear-gradient(
-        135deg,
-        #FF6A00 0%,
-        #FF8A33 50%,
-        #D94F00 100%
-    ) !important;
-
-    background-clip: text !important;
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-}
-
-
-/* =========================================================
-   SECTION LINES
-   ========================================================= */
-
-.h-1 {
-    /* only orange lines used in your design */
-}
-
-
-/* =========================================================
-   FORCE WHITE/GOLD TO ORANGE
-   ========================================================= */
-
-.force-gold,
-.text-white,
-[class*="text-white"] {
-    color: #FF6A00 !important;
-}
-
-
-/* =========================================================
-   SVG
-   ========================================================= */
-
-header svg {
-    color: #FF6A00 !important;
-    stroke: #FF6A00 !important;
-}
-
-
-/* =========================================================
-   ORANGE GLOW
-   ========================================================= */
-
-.card-hover:hover {
-    box-shadow:
-        0 20px 40px rgba(0, 0, 0, 0.5),
-        inset 0 0 0 1px #FF6A00 !important;
-}
-
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
-
-@media (max-width: 768px) {
-
-    .hero-title {
-        color: #FF6A00 !important;
-        -webkit-text-fill-color: #FF6A00 !important;
-    }
-
-    #menuButton,
-    #menuButton .material-symbols-outlined {
-        color: #FF6A00 !important;
-    }
-
-    .logo,
     .kz-logo {
-        color: #FF6A00 !important;
-        -webkit-text-fill-color: #FF6A00 !important;
+        font-size: 18px;
     }
+
+    #menuButton {
+        width: 38px;
+        height: 38px;
+    }
+
+    #menuIcon {
+        font-size: 27px;
+    }
+
 }

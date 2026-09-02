@@ -819,7 +819,7 @@
       Apply to sell
     </h2>
 
-    <form>
+    <form id="sellerApplicationForm">
 
       <div class="row2">
 
@@ -1103,6 +1103,65 @@
 
   });
 
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  const SUPABASE_URL = "https://antqexjhlsaynunlmzqa.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
+  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const form = document.getElementById("sellerApplicationForm");
+  if (!form) return;
+
+  async function loadUser(){
+    const { data, error } = await client.auth.getUser();
+    if (error || !data.user) {
+      alert("Please log in first, then apply to become a seller.");
+      return null;
+    }
+    return data.user;
+  }
+
+  form.addEventListener("submit", async function(e){
+    e.preventDefault();
+    const button = form.querySelector("button[type=submit]");
+    const oldText = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = "SUBMITTING...";
+
+    try {
+      const user = await loadUser();
+      if (!user) throw new Error("You must be logged in to apply.");
+
+      const payload = {
+        id: user.id,
+        business_name: document.getElementById("bname").value.trim(),
+        owner_name: document.getElementById("oname").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        city: document.getElementById("city").value.trim(),
+        category: document.getElementById("category").value,
+        monthly_volume: document.getElementById("volume").value,
+        message: document.getElementById("message").value.trim(),
+        status: "pending"
+      };
+
+      const { error } = await client.from("sellers").upsert(payload, { onConflict: "id" });
+      if (error) throw error;
+
+      alert("Application submitted successfully! Your seller status is now PENDING.");
+      form.reset();
+    } catch (err) {
+      console.error(err);
+      alert("Application failed: " + (err.message || "Unknown error"));
+    } finally {
+      button.disabled = false;
+      button.innerHTML = oldText;
+    }
+  });
+})();
 </script>
 
 </body>

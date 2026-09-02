@@ -1,568 +1,1400 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KHELZONE | Admin Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Tailwind CSS CDN -->
-<script src="https://cdn.tailwindcss.com"></script>
+    <title>KHELZONE | Admin Dashboard</title>
 
-<!-- Google Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- =====================================================
+         TAILWIND CSS
+    ====================================================== -->
 
-<!-- Material Icons -->
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
 
-<!-- Custom CSS -->
-<link rel="stylesheet" href="admin-dashboard.css">
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+
+            theme: {
+                extend: {
+
+                    colors: {
+                        kzorange: "#ff5a00",
+                        kzorangeDark: "#d63f00",
+
+                        kzblack: "#090909",
+                        kzdark: "#111111",
+                        kzcard: "#181818",
+                        kzborder: "#2a2a2a"
+                    },
+
+                    boxShadow: {
+                        orange:
+                            "0 0 25px rgba(255,90,0,0.20)"
+                    }
+                }
+            }
+        };
+    </script>
+
+
+    <!-- =====================================================
+         SUPABASE
+    ====================================================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+    <!-- =====================================================
+         ICONS
+    ====================================================== -->
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         CUSTOM CSS
+    ====================================================== -->
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            background: #090909;
+            color: #f3f3f3;
+            font-family:
+                Inter,
+                ui-sans-serif,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #090909;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 999px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff5a00;
+        }
+
+        .material-symbols-outlined {
+            font-size: 22px;
+            line-height: 1;
+        }
+
+        .sidebar-link {
+            transition: 0.2s ease;
+        }
+
+        .sidebar-link:hover {
+            background: rgba(255, 90, 0, 0.10);
+            color: #ff5a00;
+        }
+
+        .sidebar-link.active {
+            background: #ff5a00;
+            color: #090909;
+        }
+
+        .admin-card {
+            background: #181818;
+            border: 1px solid #2a2a2a;
+            border-radius: 16px;
+        }
+
+        .orange-btn {
+            background: #ff5a00;
+            color: #090909;
+            font-weight: 900;
+            transition: 0.2s ease;
+        }
+
+        .orange-btn:hover {
+            background: #d63f00;
+            transform: translateY(-1px);
+        }
+
+        .danger-btn {
+            background: #dc2626;
+            color: white;
+            font-weight: 800;
+        }
+
+        .success-btn {
+            background: #16a34a;
+            color: white;
+            font-weight: 800;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            min-width: 750px;
+        }
+
+        th {
+            white-space: nowrap;
+        }
+
+        td {
+            vertical-align: middle;
+        }
+
+        .modal {
+            backdrop-filter: blur(8px);
+        }
+
+        @media (max-width: 1023px) {
+
+            .desktop-sidebar {
+                display: none;
+            }
+
+            .mobile-sidebar {
+                display: block;
+            }
+
+        }
+
+        @media (min-width: 1024px) {
+
+            .mobile-sidebar {
+                display: none;
+            }
+
+        }
+
+    </style>
+
 </head>
+
+
 <body>
 
-<!-- ============================================================
-     ADMIN CHECK SCREEN
-============================================================= -->
-<div id="checkingScreen" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#08090b]">
+
+<!-- =========================================================
+     CHECKING SCREEN
+========================================================= -->
+
+<div
+    id="checkingScreen"
+    class="fixed inset-0 z-[9999] flex items-center justify-center bg-[#090909]"
+>
+
     <div class="text-center">
-        <div class="spinner mx-auto mb-4"></div>
-        <p class="text-sm text-gray-400">Checking admin access...</p>
+
+        <div
+            class="w-16 h-16 mx-auto mb-6 rounded-full border-4 border-orange-500/20 border-t-orange-500 animate-spin"
+        ></div>
+
+        <h1 class="text-2xl font-black uppercase">
+            KHELZONE
+        </h1>
+
+        <p class="mt-2 text-gray-400">
+            Checking admin access...
+        </p>
+
     </div>
+
 </div>
 
-<!-- ============================================================
-     TOAST CONTAINER
-============================================================= -->
-<div id="toastContainer" class="toast-container"></div>
 
-<!-- ============================================================
-     MAIN DASHBOARD
-============================================================= -->
-<div id="dashboard" class="hidden min-h-screen">
 
-    <!-- MOBILE HEADER -->
-    <header class="fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between border-b border-white/10 bg-[#0d0f12] px-4 lg:hidden">
-        <div class="text-2xl font-black text-orange-500">KHELZONE</div>
-        <button id="mobileMenuBtn" class="rounded-lg border border-orange-500/30 bg-orange-500/10 p-2 text-orange-500">
-            <span class="material-symbols-outlined">menu</span>
+<!-- =========================================================
+     DASHBOARD
+========================================================= -->
+
+<div
+    id="dashboard"
+    class="hidden min-h-screen bg-[#090909]"
+>
+
+
+    <!-- =====================================================
+         MOBILE TOP BAR
+    ====================================================== -->
+
+    <header
+        class="lg:hidden sticky top-0 z-50 h-16 bg-[#111111] border-b border-[#2a2a2a] flex items-center justify-between px-4"
+    >
+
+        <div class="flex items-center gap-3">
+
+            <button
+                id="mobileMenuButton"
+                type="button"
+                class="w-10 h-10 rounded-lg bg-orange-500 text-black flex items-center justify-center"
+            >
+
+                <span class="material-symbols-outlined">
+                    menu
+                </span>
+
+            </button>
+
+
+            <div>
+
+                <div class="text-orange-500 font-black text-xl">
+                    KHELZONE
+                </div>
+
+                <div class="text-[10px] text-gray-400 uppercase tracking-widest">
+                    Admin Panel
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <button
+            id="logoutBtn"
+            type="button"
+            class="w-10 h-10 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center"
+        >
+
+            <span class="material-symbols-outlined">
+                logout
+            </span>
+
         </button>
+
     </header>
 
-    <!-- SIDEBAR -->
-    <aside id="sidebar" class="sidebar fixed bottom-0 left-0 top-0 z-50 w-72 -translate-x-full transition-transform duration-300 lg:translate-x-0 flex flex-col">
 
-        <div class="flex h-20 items-center px-7 shrink-0">
-            <div>
-                <div class="text-3xl font-black text-orange-500">KHELZONE</div>
-                <div class="text-[9px] font-bold tracking-[.25em] text-gray-500">ADMIN PANEL</div>
-            </div>
-        </div>
 
-        <nav class="flex-1 space-y-2 overflow-y-auto px-4">
-            <button class="nav-item active flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left font-bold" data-page="dashboard">
-                <span class="material-symbols-outlined">dashboard</span>
+    <!-- =====================================================
+         MOBILE SIDEBAR
+    ====================================================== -->
+
+    <aside
+        id="mobileMenu"
+        class="mobile-sidebar hidden lg:hidden fixed top-16 left-0 right-0 z-40 bg-[#111111] border-b border-[#2a2a2a] p-4"
+    >
+
+        <nav class="space-y-2">
+
+            <a
+                href="#"
+                data-section="dashboard"
+                class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded-xl font-bold"
+            >
+
+                <span class="material-symbols-outlined">
+                    dashboard
+                </span>
+
                 Dashboard
-            </button>
-            <button class="nav-item flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left font-bold text-gray-400" data-page="products">
-                <span class="material-symbols-outlined">inventory_2</span>
+
+            </a>
+
+
+            <a
+                href="#"
+                data-section="products"
+                class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-bold"
+            >
+
+                <span class="material-symbols-outlined">
+                    inventory_2
+                </span>
+
                 Products
-            </button>
-            <button class="nav-item flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left font-bold text-gray-400" data-page="sellers">
-                <span class="material-symbols-outlined">store</span>
-                Sellers
-                <span id="sellerPendingBadge" class="ml-auto hidden rounded-full bg-orange-500 px-2 py-0.5 text-[10px] font-black text-white">0</span>
-            </button>
-            <button class="nav-item flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left font-bold text-gray-400" data-page="customers">
-                <span class="material-symbols-outlined">group</span>
+
+            </a>
+
+
+            <a
+                href="#"
+                data-section="sellers"
+                class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-bold"
+            >
+
+                <span class="material-symbols-outlined">
+                    storefront
+                </span>
+
+                Seller Applications
+
+            </a>
+
+
+            <a
+                href="#"
+                data-section="customers"
+                class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-bold"
+            >
+
+                <span class="material-symbols-outlined">
+                    groups
+                </span>
+
                 Customers
-            </button>
-            <button class="nav-item flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left font-bold text-gray-400" data-page="orders">
-                <span class="material-symbols-outlined">shopping_bag</span>
+
+            </a>
+
+
+            <a
+                href="#"
+                data-section="orders"
+                class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-bold"
+            >
+
+                <span class="material-symbols-outlined">
+                    shopping_bag
+                </span>
+
                 Orders
-            </button>
+
+            </a>
+
         </nav>
 
-        <div class="border-t border-white/10 p-4 shrink-0">
-            <a href="homepage.html" class="mb-2 flex items-center gap-3 rounded-xl px-4 py-3 font-bold text-gray-400 hover:bg-white/5 hover:text-white">
-                <span class="material-symbols-outlined">home</span>
-                View Website
-            </a>
-            <button id="logoutBtn" class="flex w-full items-center gap-3 rounded-xl px-4 py-3 font-bold text-red-400 hover:bg-red-500/10">
-                <span class="material-symbols-outlined">logout</span>
-                Logout
-            </button>
-        </div>
     </aside>
 
-    <!-- MOBILE OVERLAY -->
-    <div id="mobileOverlay" class="fixed inset-0 z-40 hidden bg-black/60 lg:hidden"></div>
 
-    <!-- CONTENT -->
-    <main class="min-h-screen lg:ml-72">
 
-        <!-- TOP BAR -->
-        <div class="sticky top-0 z-30 hidden h-20 items-center justify-between border-b border-white/10 bg-[#08090b]/90 px-8 backdrop-blur lg:flex">
+    <!-- =====================================================
+         DESKTOP SIDEBAR
+    ====================================================== -->
+
+    <aside
+        class="desktop-sidebar fixed top-0 left-0 bottom-0 w-72 bg-[#111111] border-r border-[#2a2a2a] z-50"
+    >
+
+        <!-- Logo -->
+
+        <div class="h-20 px-6 flex items-center border-b border-[#2a2a2a]">
+
             <div>
-                <h1 id="pageTitle" class="text-2xl font-black">Admin Dashboard</h1>
-                <p id="pageSubtitle" class="text-sm text-gray-500">Manage your KHELZONE marketplace</p>
-            </div>
-            <div class="flex items-center gap-3">
-                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-orange-500/10 text-orange-500">
-                    <span class="material-symbols-outlined">admin_panel_settings</span>
+
+                <div class="text-3xl font-black tracking-tight text-orange-500">
+                    KHELZONE
                 </div>
-                <div>
-                    <p id="adminName" class="text-sm font-bold">Admin</p>
-                    <p id="adminEmail" class="text-xs text-gray-500">—</p>
+
+                <div class="text-[10px] uppercase tracking-[0.3em] text-gray-500">
+                    Admin Dashboard
                 </div>
+
             </div>
+
         </div>
 
-        <div class="h-16 lg:hidden"></div>
 
-        <div class="p-5 sm:p-7 lg:p-8">
+        <!-- Admin Info -->
 
-            <!-- ========================================================
-                 PAGE: DASHBOARD
-            ========================================================= -->
-            <section id="page-dashboard" class="page-section">
+        <div class="p-5 border-b border-[#2a2a2a]">
+
+            <div class="flex items-center gap-3">
+
+                <div
+                    class="w-12 h-12 rounded-full bg-orange-500 text-black flex items-center justify-center font-black"
+                >
+
+                    <span class="material-symbols-outlined">
+                        admin_panel_settings
+                    </span>
+
+                </div>
+
+
+                <div class="min-w-0">
+
+                    <div
+                        id="adminName"
+                        class="font-black truncate"
+                    >
+                        Admin
+                    </div>
+
+                    <div
+                        id="adminEmail"
+                        class="text-xs text-gray-500 truncate"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Navigation -->
+
+        <nav class="p-4 space-y-2">
+
+            <a
+                href="#"
+                data-section="dashboard"
+                class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded-xl font-bold"
+            >
+
+                <span class="material-symbols-outlined">
+                    dashboard
+                </span>
+
+                Dashboard
+
+            </a>
+
+
+            <a
+                href="#"
+                data-section="products"
+                class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-bold"
+            >
+
+                <span class="material-symbols-outlined">
+                    inventory_2
+                </span>
+
+                Products
+
+            </a>
+
+
+            <a
+                href="#"
+                data-section="sellers"
+                class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-bold"
+            >
+
+                <span class="material-symbols-outlined">
+                    storefront
+                </span>
+
+                Seller Applications
+
+            </a>
+
+
+            <a
+                href="#"
+                data-section="customers"
+                class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-bold"
+            >
+
+                <span class="material-symbols-outlined">
+                    groups
+                </span>
+
+                Customers
+
+            </a>
+
+
+            <a
+                href="#"
+                data-section="orders"
+                class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-bold"
+            >
+
+                <span class="material-symbols-outlined">
+                    shopping_bag
+                </span>
+
+                Orders
+
+            </a>
+
+        </nav>
+
+
+        <!-- Bottom -->
+
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-[#2a2a2a]">
+
+            <button
+                id="logoutButton"
+                type="button"
+                class="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition font-bold"
+            >
+
+                <span class="material-symbols-outlined">
+                    logout
+                </span>
+
+                Logout
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="lg:ml-72 min-h-screen">
+
+
+        <!-- =================================================
+             DESKTOP HEADER
+        ================================================== -->
+
+        <header
+            class="hidden lg:flex sticky top-0 z-30 h-20 bg-[#090909]/95 backdrop-blur border-b border-[#2a2a2a] items-center justify-between px-8"
+        >
+
+            <div>
+
+                <div
+                    id="pageTitle"
+                    class="text-2xl font-black uppercase"
+                >
+                    Dashboard
+                </div>
+
+                <div class="text-xs text-gray-500 mt-1">
+                    Manage your KHELZONE marketplace
+                </div>
+
+            </div>
+
+
+            <button
+                id="logoutBtnDesktop"
+                type="button"
+                data-logout
+                class="px-5 py-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition font-bold flex items-center gap-2"
+            >
+
+                <span class="material-symbols-outlined">
+                    logout
+                </span>
+
+                Logout
+
+            </button>
+
+        </header>
+
+
+
+        <!-- =================================================
+             PAGE CONTENT
+        ================================================== -->
+
+        <div class="p-4 sm:p-6 lg:p-8">
+
+
+            <!-- =================================================
+                 DASHBOARD SECTION
+            ================================================== -->
+
+            <section
+                data-dashboard-section="dashboard"
+            >
 
                 <div class="mb-8">
-                    <p class="text-sm font-bold text-orange-500">ADMIN CONTROL CENTER</p>
-                    <h2 class="mt-1 text-3xl font-black">Welcome back 👋</h2>
-                    <p class="mt-2 text-gray-500">Here's what's happening in your marketplace.</p>
+
+                    <h2 class="text-3xl font-black uppercase">
+                        Dashboard
+                    </h2>
+
+                    <p class="text-gray-500 mt-2">
+                        Welcome to KHELZONE Admin Panel.
+                    </p>
+
                 </div>
 
-                <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                    <div class="card rounded-2xl p-5">
-                        <div class="mb-5 flex items-center justify-between">
-                            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-500/10 text-orange-500">
-                                <span class="material-symbols-outlined">inventory_2</span>
+
+                <!-- Stats -->
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+
+
+                    <!-- Products -->
+
+                    <div class="admin-card p-6">
+
+                        <div class="flex items-center justify-between">
+
+                            <div>
+
+                                <p class="text-sm text-gray-500 uppercase font-bold">
+                                    Products
+                                </p>
+
+                                <p
+                                    id="totalProducts"
+                                    class="text-4xl font-black mt-2"
+                                >
+                                    0
+                                </p>
+
                             </div>
+
+
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center"
+                            >
+
+                                <span class="material-symbols-outlined text-3xl">
+                                    inventory_2
+                                </span>
+
+                            </div>
+
                         </div>
-                        <p class="text-sm text-gray-500">Total Products</p>
-                        <p id="productsCount" class="stat-number mt-1">—</p>
+
                     </div>
 
-                    <div class="card rounded-2xl p-5">
-                        <div class="mb-5 flex items-center justify-between">
-                            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400">
-                                <span class="material-symbols-outlined">store</span>
+
+
+                    <!-- Sellers -->
+
+                    <div class="admin-card p-6">
+
+                        <div class="flex items-center justify-between">
+
+                            <div>
+
+                                <p class="text-sm text-gray-500 uppercase font-bold">
+                                    Sellers
+                                </p>
+
+                                <p
+                                    id="totalSellers"
+                                    class="text-4xl font-black mt-2"
+                                >
+                                    0
+                                </p>
+
                             </div>
+
+
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center"
+                            >
+
+                                <span class="material-symbols-outlined text-3xl">
+                                    storefront
+                                </span>
+
+                            </div>
+
                         </div>
-                        <p class="text-sm text-gray-500">Sellers</p>
-                        <p id="sellersCount" class="stat-number mt-1">—</p>
+
                     </div>
 
-                    <div class="card rounded-2xl p-5">
-                        <div class="mb-5 flex items-center justify-between">
-                            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-green-500/10 text-green-400">
-                                <span class="material-symbols-outlined">group</span>
+
+
+                    <!-- Customers -->
+
+                    <div class="admin-card p-6">
+
+                        <div class="flex items-center justify-between">
+
+                            <div>
+
+                                <p class="text-sm text-gray-500 uppercase font-bold">
+                                    Customers
+                                </p>
+
+                                <p
+                                    id="totalCustomers"
+                                    class="text-4xl font-black mt-2"
+                                >
+                                    0
+                                </p>
+
                             </div>
+
+
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center"
+                            >
+
+                                <span class="material-symbols-outlined text-3xl">
+                                    groups
+                                </span>
+
+                            </div>
+
                         </div>
-                        <p class="text-sm text-gray-500">Customers</p>
-                        <p id="customersCount" class="stat-number mt-1">—</p>
+
                     </div>
 
-                    <div class="card rounded-2xl p-5">
-                        <div class="mb-5 flex items-center justify-between">
-                            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400">
-                                <span class="material-symbols-outlined">shopping_bag</span>
+
+
+                    <!-- Orders -->
+
+                    <div class="admin-card p-6">
+
+                        <div class="flex items-center justify-between">
+
+                            <div>
+
+                                <p class="text-sm text-gray-500 uppercase font-bold">
+                                    Orders
+                                </p>
+
+                                <p
+                                    id="totalOrders"
+                                    class="text-4xl font-black mt-2"
+                                >
+                                    0
+                                </p>
+
                             </div>
+
+
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center"
+                            >
+
+                                <span class="material-symbols-outlined text-3xl">
+                                    shopping_bag
+                                </span>
+
+                            </div>
+
                         </div>
-                        <p class="text-sm text-gray-500">Total Orders</p>
-                        <p id="ordersCount" class="stat-number mt-1">—</p>
+
                     </div>
+
                 </div>
 
-                <div class="mt-8">
-                    <h3 class="mb-4 text-xl font-black">Quick Actions</h3>
-                    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                        <button class="card rounded-2xl p-5 text-left transition hover:-translate-y-1 quick-action" data-page="products" data-action="add-product">
-                            <span class="material-symbols-outlined text-orange-500 text-3xl">add_box</span>
-                            <h4 class="mt-4 font-black">Add Product</h4>
-                            <p class="mt-1 text-sm text-gray-500">Create a new product.</p>
+
+
+                <!-- Seller Status -->
+
+                <div class="admin-card p-6">
+
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+
+                        <div>
+
+                            <h3 class="text-xl font-black">
+                                Seller Applications
+                            </h3>
+
+                            <p class="text-gray-500 text-sm mt-1">
+                                Current seller application status.
+                            </p>
+
+                        </div>
+
+
+                        <button
+                            type="button"
+                            data-section="sellers"
+                            class="orange-btn px-5 py-3 rounded-xl"
+                            onclick="showSection('sellers')"
+                        >
+                            View Sellers
                         </button>
-                        <button class="card rounded-2xl p-5 text-left transition hover:-translate-y-1 quick-action" data-page="sellers">
-                            <span class="material-symbols-outlined text-blue-400 text-3xl">manage_accounts</span>
-                            <h4 class="mt-4 font-black">Manage Sellers</h4>
-                            <p class="mt-1 text-sm text-gray-500">View and approve sellers.</p>
-                        </button>
-                        <button class="card rounded-2xl p-5 text-left transition hover:-translate-y-1 quick-action" data-page="customers">
-                            <span class="material-symbols-outlined text-green-400 text-3xl">group</span>
-                            <h4 class="mt-4 font-black">Customers</h4>
-                            <p class="mt-1 text-sm text-gray-500">View registered customers.</p>
-                        </button>
-                        <button class="card rounded-2xl p-5 text-left transition hover:-translate-y-1 quick-action" data-page="orders">
-                            <span class="material-symbols-outlined text-purple-400 text-3xl">shopping_bag</span>
-                            <h4 class="mt-4 font-black">Orders</h4>
-                            <p class="mt-1 text-sm text-gray-500">Manage marketplace orders.</p>
-                        </button>
+
                     </div>
+
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+                        <div class="rounded-xl bg-yellow-500/10 p-5">
+
+                            <p class="text-yellow-400 text-sm font-bold uppercase">
+                                Pending
+                            </p>
+
+                            <p
+                                id="pendingSellers"
+                                class="text-3xl font-black mt-2"
+                            >
+                                0
+                            </p>
+
+                        </div>
+
+
+                        <div class="rounded-xl bg-green-500/10 p-5">
+
+                            <p class="text-green-400 text-sm font-bold uppercase">
+                                Approved
+                            </p>
+
+                            <p
+                                id="approvedSellers"
+                                class="text-3xl font-black mt-2"
+                            >
+                                0
+                            </p>
+
+                        </div>
+
+
+                        <div class="rounded-xl bg-red-500/10 p-5">
+
+                            <p class="text-red-400 text-sm font-bold uppercase">
+                                Rejected
+                            </p>
+
+                            <p
+                                id="rejectedSellers"
+                                class="text-3xl font-black mt-2"
+                            >
+                                0
+                            </p>
+
+                        </div>
+
+                    </div>
+
                 </div>
 
-                <div class="mt-8">
-                    <div class="mb-4 flex items-center justify-between">
-                        <h3 class="text-xl font-black">Recent Products</h3>
-                        <button id="refreshDashboard" class="btn-ghost">
-                            <span class="material-symbols-outlined text-base">refresh</span>
-                            Refresh
-                        </button>
-                    </div>
-                    <div class="card overflow-hidden rounded-2xl">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left">
-                                <thead class="table-head">
-                                    <tr>
-                                        <th>Product</th>
-                                        <th>Sport</th>
-                                        <th>Price</th>
-                                        <th>Stock</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="recentProductsTable" class="divide-y divide-white/5">
-                                    <tr><td colspan="5" class="empty-row">Loading products...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
             </section>
 
-            <!-- ========================================================
-                 PAGE: PRODUCTS
-            ========================================================= -->
-            <section id="page-products" class="page-section hidden">
-                <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+
+
+            <!-- =================================================
+                 PRODUCTS SECTION
+            ================================================== -->
+
+            <section
+                data-dashboard-section="products"
+                class="hidden"
+            >
+
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+
                     <div>
-                        <h2 class="text-2xl font-black">Products</h2>
-                        <p class="text-sm text-gray-500">Manage marketplace products</p>
+
+                        <h2 class="text-3xl font-black uppercase">
+                            Products
+                        </h2>
+
+                        <p class="text-gray-500 mt-2">
+                            Manage marketplace products.
+                        </p>
+
                     </div>
-                    <button id="addProductBtn" class="btn-primary">
-                        <span class="material-symbols-outlined text-base">add</span>
-                        Add Product
-                    </button>
+
+
+                    <div class="flex gap-3">
+
+                        <input
+                            id="productSearch"
+                            type="search"
+                            placeholder="Search products..."
+                            class="bg-[#181818] border border-[#2a2a2a] rounded-xl px-4 py-3 outline-none focus:border-orange-500 w-full sm:w-64"
+                        >
+
+
+                        <button
+                            id="refreshProducts"
+                            type="button"
+                            class="orange-btn px-4 py-3 rounded-xl flex items-center gap-2"
+                        >
+
+                            <span class="material-symbols-outlined">
+                                refresh
+                            </span>
+
+                            <span class="hidden sm:inline">
+                                Refresh
+                            </span>
+
+                        </button>
+
+                    </div>
+
                 </div>
 
-                <div class="mb-4 flex flex-wrap items-center gap-3">
-                    <div class="search-wrap">
-                        <span class="material-symbols-outlined">search</span>
-                        <input id="productSearch" type="text" placeholder="Search products...">
-                    </div>
-                    <select id="productSportFilter" class="select-input">
-                        <option value="">All Sports</option>
-                    </select>
-                    <select id="productStatusFilter" class="select-input">
-                        <option value="">All Status</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
-                    <button id="refreshProducts" class="btn-ghost ml-auto">
-                        <span class="material-symbols-outlined text-base">refresh</span>
-                        Refresh
-                    </button>
-                </div>
 
-                <div class="card overflow-hidden rounded-2xl">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="table-head">
+                <div class="admin-card overflow-hidden">
+
+                    <div class="table-wrap">
+
+                        <table class="w-full">
+
+                            <thead class="bg-[#111111]">
+
                                 <tr>
-                                    <th>Product</th>
-                                    <th>Sport</th>
-                                    <th>Category</th>
-                                    <th>Price</th>
-                                    <th>Stock</th>
-                                    <th>Status</th>
-                                    <th class="text-right">Actions</th>
+
+                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
+                                        Image
+                                    </th>
+
+                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
+                                        Product
+                                    </th>
+
+                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
+                                        Category
+                                    </th>
+
+                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
+                                        Price
+                                    </th>
+
+                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
+                                        Stock
+                                    </th>
+
                                 </tr>
+
                             </thead>
-                            <tbody id="productsTable" class="divide-y divide-white/5">
-                                <tr><td colspan="7" class="empty-row">Loading products...</td></tr>
+
+
+                            <tbody
+                                id="productsTableBody"
+                                class="divide-y divide-[#2a2a2a]"
+                            >
+
+                                <tr>
+
+                                    <td
+                                        colspan="5"
+                                        class="text-center py-10 text-gray-500"
+                                    >
+                                        Loading products...
+                                    </td>
+
+                                </tr>
+
                             </tbody>
+
                         </table>
+
                     </div>
+
                 </div>
+
             </section>
 
-            <!-- ========================================================
-                 PAGE: SELLERS
-            ========================================================= -->
-            <section id="page-sellers" class="page-section hidden">
-                <div class="mb-6">
-                    <h2 class="text-2xl font-black">Sellers</h2>
-                    <p class="text-sm text-gray-500">Manage sellers &amp; approve new applications</p>
-                </div>
 
-                <div class="mb-4 flex flex-wrap items-center gap-3">
-                    <div class="search-wrap">
-                        <span class="material-symbols-outlined">search</span>
-                        <input id="sellerSearch" type="text" placeholder="Search sellers...">
+
+            <!-- =================================================
+                 SELLERS SECTION
+            ================================================== -->
+
+            <section
+                data-dashboard-section="sellers"
+                class="hidden"
+            >
+
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+
+                    <div>
+
+                        <h2 class="text-3xl font-black uppercase">
+                            Seller Applications
+                        </h2>
+
+                        <p class="text-gray-500 mt-2">
+                            Approve or reject seller applications.
+                        </p>
+
                     </div>
-                    <select id="sellerStatusFilter" class="select-input">
-                        <option value="">All Status</option>
-                        <option value="pending">Pending Approval</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
-                    </select>
-                    <button id="refreshSellers" class="btn-ghost ml-auto">
-                        <span class="material-symbols-outlined text-base">refresh</span>
-                        Refresh
-                    </button>
+
+
+                    <div class="flex gap-3">
+
+                        <input
+                            id="sellerSearch"
+                            type="search"
+                            placeholder="Search sellers..."
+                            class="bg-[#181818] border border-[#2a2a2a] rounded-xl px-4 py-3 outline-none focus:border-orange-500 w-full sm:w-64"
+                        >
+
+
+                        <button
+                            id="refreshSellers"
+                            type="button"
+                            class="orange-btn px-4 py-3 rounded-xl flex items-center gap-2"
+                        >
+
+                            <span class="material-symbols-outlined">
+                                refresh
+                            </span>
+
+                            <span class="hidden sm:inline">
+                                Refresh
+                            </span>
+
+                        </button>
+
+                    </div>
+
                 </div>
 
-                <div class="card overflow-hidden rounded-2xl">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="table-head">
+
+                <div class="admin-card overflow-hidden">
+
+                    <div class="table-wrap">
+
+                        <table class="w-full">
+
+                            <thead class="bg-[#111111]">
+
                                 <tr>
-                                    <th>Seller</th>
-                                    <th>Shop Name</th>
-                                    <th>Email</th>
-                                    <th>Applied</th>
-                                    <th>Status</th>
-                                    <th class="text-right">Actions</th>
+
+                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
+                                        Business / Owner
+                                    </th>
+
+                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
+                                        Email
+                                    </th>
+
+                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
+                                        Phone
+                                    </th>
+
+                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
+                                        City
+                                    </th>
+
+                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
+                                        Status
+                                    </th>
+
+                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
+                                        Actions
+                                    </th>
+
                                 </tr>
+
                             </thead>
-                            <tbody id="sellersTable" class="divide-y divide-white/5">
-                                <tr><td colspan="6" class="empty-row">Loading sellers...</td></tr>
+
+
+                            <tbody
+                                id="sellersTableBody"
+                                class="divide-y divide-[#2a2a2a]"
+                            >
+
+                                <tr>
+
+                                    <td
+                                        colspan="6"
+                                        class="text-center py-10 text-gray-500"
+                                    >
+                                        Loading seller applications...
+                                    </td>
+
+                                </tr>
+
                             </tbody>
+
                         </table>
+
                     </div>
+
                 </div>
+
             </section>
 
-            <!-- ========================================================
-                 PAGE: CUSTOMERS
-            ========================================================= -->
-            <section id="page-customers" class="page-section hidden">
-                <div class="mb-6">
-                    <h2 class="text-2xl font-black">Customers</h2>
-                    <p class="text-sm text-gray-500">View and manage registered customers</p>
-                </div>
 
-                <div class="mb-4 flex flex-wrap items-center gap-3">
-                    <div class="search-wrap">
-                        <span class="material-symbols-outlined">search</span>
-                        <input id="customerSearch" type="text" placeholder="Search customers...">
+
+            <!-- =================================================
+                 CUSTOMERS SECTION
+            ================================================== -->
+
+            <section
+                data-dashboard-section="customers"
+                class="hidden"
+            >
+
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+
+                    <div>
+
+                        <h2 class="text-3xl font-black uppercase">
+                            Customers
+                        </h2>
+
+                        <p class="text-gray-500 mt-2">
+                            View registered customers.
+                        </p>
+
                     </div>
-                    <button id="refreshCustomers" class="btn-ghost ml-auto">
-                        <span class="material-symbols-outlined text-base">refresh</span>
-                        Refresh
-                    </button>
+
+
+                    <div class="flex gap-3">
+
+                        <input
+                            id="customerSearch"
+                            type="search"
+                            placeholder="Search customers..."
+                            class="bg-[#181818] border border-[#2a2a2a] rounded-xl px-4 py-3 outline-none focus:border-orange-500 w-full sm:w-64"
+                        >
+
+
+                        <button
+                            id="refreshCustomers"
+                            type="button"
+                            class="orange-btn px-4 py-3 rounded-xl"
+                        >
+
+                            <span class="material-symbols-outlined">
+                                refresh
+                            </span>
+
+                        </button>
+
+                    </div>
+
                 </div>
 
-                <div class="card overflow-hidden rounded-2xl">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="table-head">
+
+                <div class="admin-card overflow-hidden">
+
+                    <div class="table-wrap">
+
+                        <table class="w-full">
+
+                            <thead class="bg-[#111111]">
+
                                 <tr>
-                                    <th>Customer</th>
-                                    <th>Email</th>
-                                    <th>Phone</th>
-                                    <th>Joined</th>
-                                    <th>Status</th>
-                                    <th class="text-right">Actions</th>
+
+                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
+                                        Name
+                                    </th>
+
+                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
+                                        Email
+                                    </th>
+
+                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
+                                        Phone
+                                    </th>
+
                                 </tr>
+
                             </thead>
-                            <tbody id="customersTable" class="divide-y divide-white/5">
-                                <tr><td colspan="6" class="empty-row">Loading customers...</td></tr>
+
+
+                            <tbody
+                                id="customersTableBody"
+                                class="divide-y divide-[#2a2a2a]"
+                            >
+
+                                <tr>
+
+                                    <td
+                                        colspan="3"
+                                        class="text-center py-10 text-gray-500"
+                                    >
+                                        Loading customers...
+                                    </td>
+
+                                </tr>
+
                             </tbody>
+
                         </table>
+
                     </div>
+
                 </div>
+
             </section>
 
-            <!-- ========================================================
-                 PAGE: ORDERS
-            ========================================================= -->
-            <section id="page-orders" class="page-section hidden">
-                <div class="mb-6">
-                    <h2 class="text-2xl font-black">Orders</h2>
-                    <p class="text-sm text-gray-500">Manage marketplace orders</p>
-                </div>
 
-                <div class="mb-4 flex flex-wrap items-center gap-3">
-                    <div class="search-wrap">
-                        <span class="material-symbols-outlined">search</span>
-                        <input id="orderSearch" type="text" placeholder="Search by order # or customer...">
+
+            <!-- =================================================
+                 ORDERS SECTION
+            ================================================== -->
+
+            <section
+                data-dashboard-section="orders"
+                class="hidden"
+            >
+
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+
+                    <div>
+
+                        <h2 class="text-3xl font-black uppercase">
+                            Orders
+                        </h2>
+
+                        <p class="text-gray-500 mt-2">
+                            View marketplace orders.
+                        </p>
+
                     </div>
-                    <select id="orderStatusFilter" class="select-input">
-                        <option value="">All Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="processing">Processing</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="delivered">Delivered</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
-                    <button id="refreshOrders" class="btn-ghost ml-auto">
-                        <span class="material-symbols-outlined text-base">refresh</span>
-                        Refresh
-                    </button>
+
+
+                    <div class="flex gap-3">
+
+                        <input
+                            id="orderSearch"
+                            type="search"
+                            placeholder="Search orders..."
+                            class="bg-[#181818] border border-[#2a2a2a] rounded-xl px-4 py-3 outline-none focus:border-orange-500 w-full sm:w-64"
+                        >
+
+
+                        <button
+                            id="refreshOrders"
+                            type="button"
+                            class="orange-btn px-4 py-3 rounded-xl"
+                        >
+
+                            <span class="material-symbols-outlined">
+                                refresh
+                            </span>
+
+                        </button>
+
+                    </div>
+
                 </div>
 
-                <div class="card overflow-hidden rounded-2xl">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="table-head">
+
+                <div class="admin-card overflow-hidden">
+
+                    <div class="table-wrap">
+
+                        <table class="w-full">
+
+                            <thead class="bg-[#111111]">
+
                                 <tr>
-                                    <th>Order #</th>
-                                    <th>Customer</th>
-                                    <th>Total</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
-                                    <th class="text-right">Actions</th>
+
+                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
+                                        Order ID
+                                    </th>
+
+                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
+                                        Total
+                                    </th>
+
+                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
+                                        Status
+                                    </th>
+
+                                    <th class="text-left px-4 py-4 text-xs uppercase text-gray-500">
+                                        Date
+                                    </th>
+
                                 </tr>
+
                             </thead>
-                            <tbody id="ordersTable" class="divide-y divide-white/5">
-                                <tr><td colspan="6" class="empty-row">Loading orders...</td></tr>
+
+
+                            <tbody
+                                id="ordersTableBody"
+                                class="divide-y divide-[#2a2a2a]"
+                            >
+
+                                <tr>
+
+                                    <td
+                                        colspan="4"
+                                        class="text-center py-10 text-gray-500"
+                                    >
+                                        Loading orders...
+                                    </td>
+
+                                </tr>
+
                             </tbody>
+
                         </table>
+
                     </div>
+
                 </div>
+
             </section>
+
 
         </div>
+
     </main>
+
 </div>
 
-<!-- ============================================================
-     MODAL: PRODUCT (ADD / EDIT)
-============================================================= -->
-<div id="productModal" class="modal-overlay hidden">
-    <div class="modal-box">
-        <div class="modal-head">
-            <h3 id="productModalTitle" class="text-lg font-black">Add Product</h3>
-            <button class="modal-close" data-close-modal="productModal">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-        </div>
-        <form id="productForm" class="modal-body space-y-4">
-            <input type="hidden" id="productId">
-            <div>
-                <label class="form-label">Product Name</label>
-                <input type="text" id="productName" class="form-input" required>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="form-label">Sport</label>
-                    <input type="text" id="productSport" class="form-input" required>
-                </div>
-                <div>
-                    <label class="form-label">Category</label>
-                    <input type="text" id="productCategory" class="form-input">
-                </div>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="form-label">Price (Rs.)</label>
-                    <input type="number" id="productPrice" class="form-input" min="0" step="0.01" required>
-                </div>
-                <div>
-                    <label class="form-label">Stock</label>
-                    <input type="number" id="productStock" class="form-input" min="0" required>
-                </div>
-            </div>
-            <div>
-                <label class="form-label">Image URL</label>
-                <input type="text" id="productImage" class="form-input" placeholder="https://...">
-            </div>
-            <label class="flex items-center gap-2 text-sm font-bold">
-                <input type="checkbox" id="productActive" class="checkbox-input" checked>
-                Active (visible on website)
-            </label>
-            <div class="modal-foot">
-                <button type="button" class="btn-ghost" data-close-modal="productModal">Cancel</button>
-                <button type="submit" class="btn-primary">Save Product</button>
-            </div>
-        </form>
-    </div>
-</div>
 
-<!-- ============================================================
-     MODAL: SELLER DETAILS / APPROVAL
-============================================================= -->
-<div id="sellerModal" class="modal-overlay hidden">
-    <div class="modal-box">
-        <div class="modal-head">
-            <h3 class="text-lg font-black">Seller Details</h3>
-            <button class="modal-close" data-close-modal="sellerModal">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-        </div>
-        <div class="modal-body space-y-3" id="sellerModalBody"></div>
-        <div class="modal-foot" id="sellerModalActions"></div>
-    </div>
-</div>
 
-<!-- ============================================================
-     MODAL: CUSTOMER DETAILS
-============================================================= -->
-<div id="customerModal" class="modal-overlay hidden">
-    <div class="modal-box">
-        <div class="modal-head">
-            <h3 class="text-lg font-black">Customer Details</h3>
-            <button class="modal-close" data-close-modal="customerModal">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-        </div>
-        <div class="modal-body space-y-3" id="customerModalBody"></div>
-        <div class="modal-foot" id="customerModalActions"></div>
-    </div>
-</div>
+<!-- =========================================================
+     ADMIN DASHBOARD JS
+     
+     IMPORTANT:
+     File ka naam exactly:
+     admin-dashboard.js
+========================================================= -->
 
-<!-- ============================================================
-     MODAL: ORDER DETAILS
-============================================================= -->
-<div id="orderModal" class="modal-overlay hidden">
-    <div class="modal-box">
-        <div class="modal-head">
-            <h3 class="text-lg font-black">Order Details</h3>
-            <button class="modal-close" data-close-modal="orderModal">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-        </div>
-        <div class="modal-body space-y-4" id="orderModalBody"></div>
-        <div class="modal-foot">
-            <select id="orderStatusSelect" class="select-input">
-                <option value="pending">Pending</option>
-                <option value="processing">Processing</option>
-                <option value="shipped">Shipped</option>
-                <option value="delivered">Delivered</option>
-                <option value="cancelled">Cancelled</option>
-            </select>
-            <button id="updateOrderStatusBtn" class="btn-primary">Update Status</button>
-        </div>
-    </div>
-</div>
-
-<!-- ============================================================
-     MODAL: CONFIRM ACTION
-============================================================= -->
-<div id="confirmModal" class="modal-overlay hidden">
-    <div class="modal-box modal-box-sm">
-        <div class="modal-head">
-            <h3 id="confirmModalTitle" class="text-lg font-black">Are you sure?</h3>
-            <button class="modal-close" data-close-modal="confirmModal">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-        </div>
-        <div class="modal-body">
-            <p id="confirmModalMessage" class="text-sm text-gray-400">This action cannot be undone.</p>
-        </div>
-        <div class="modal-foot">
-            <button class="btn-ghost" data-close-modal="confirmModal">Cancel</button>
-            <button id="confirmModalConfirmBtn" class="btn-danger">Confirm</button>
-        </div>
-    </div>
-</div>
-
-<!-- Supabase JS CDN -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- Custom JS -->
 <script src="admin-dashboard.js"></script>
+
+
+<!-- =========================================================
+     DESKTOP LOGOUT FIX
+========================================================= -->
+
+<script>
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            const desktopLogout =
+                document.getElementById(
+                    "logoutBtnDesktop"
+                );
+
+            if (desktopLogout) {
+
+                desktopLogout.addEventListener(
+                    "click",
+                    function () {
+
+                        const realLogout =
+                            document.querySelector(
+                                "#logoutButton"
+                            );
+
+                        if (realLogout) {
+                            realLogout.click();
+                        }
+
+                    }
+                );
+
+            }
+
+        }
+    );
+
+</script>
+
 
 </body>
 </html>

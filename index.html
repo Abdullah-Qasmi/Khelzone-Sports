@@ -41,6 +41,7 @@
             margin: 0;
             min-height: 100vh;
             font-family: "Inter", sans-serif;
+
             background:
                 radial-gradient(
                     circle at top right,
@@ -53,11 +54,13 @@
                     transparent 30%
                 ),
                 #08090b;
+
             color: #ffffff;
         }
 
         .login-card {
             background: rgba(18, 20, 24, 0.94);
+
             backdrop-filter: blur(18px);
             -webkit-backdrop-filter: blur(18px);
 
@@ -86,12 +89,15 @@
 
         .input-box {
             background: rgba(255, 255, 255, 0.04) !important;
+
             border: 1px solid rgba(255, 255, 255, 0.10) !important;
+
             color: #ffffff !important;
         }
 
         .input-box:focus {
             border-color: #ff5a00 !important;
+
             box-shadow:
                 0 0 0 3px rgba(255, 90, 0, 0.12) !important;
         }
@@ -105,6 +111,7 @@
             height: 19px;
 
             border: 2px solid rgba(255, 255, 255, 0.35);
+
             border-top-color: #ffffff;
 
             border-radius: 50%;
@@ -129,6 +136,7 @@
 
     <main class="w-full max-w-md">
 
+
         <!-- =====================================================
              LOGO
         ====================================================== -->
@@ -150,6 +158,7 @@
                 KHELZONE
             </div>
 
+
             <div
                 class="
                     mt-2
@@ -166,6 +175,7 @@
         </a>
 
 
+
         <!-- =====================================================
              LOGIN CARD
         ====================================================== -->
@@ -178,6 +188,7 @@
                 sm:p-8
             "
         >
+
 
             <!-- =================================================
                  TITLE
@@ -221,7 +232,7 @@
                         uppercase
                     "
                 >
-                    Welcome Back
+                    Welcome
                 </h1>
 
 
@@ -232,6 +243,7 @@
             </div>
 
 
+
             <!-- =================================================
                  LOGIN FORM
             ================================================== -->
@@ -240,6 +252,7 @@
                 id="loginForm"
                 class="space-y-5"
             >
+
 
                 <!-- EMAIL -->
 
@@ -281,6 +294,7 @@
                     >
 
                 </div>
+
 
 
                 <!-- PASSWORD -->
@@ -359,6 +373,7 @@
                 </div>
 
 
+
                 <!-- MESSAGE -->
 
                 <div
@@ -374,6 +389,7 @@
                         font-semibold
                     "
                 ></div>
+
 
 
                 <!-- LOGIN BUTTON -->
@@ -426,6 +442,7 @@
             </form>
 
 
+
             <!-- =================================================
                  SIGN UP
             ================================================== -->
@@ -451,77 +468,8 @@
 
             </div>
 
-
-            <!-- =================================================
-                 BECOME SELLER
-            ================================================== -->
-
-            <div class="mt-5 text-center">
-
-                <p class="text-sm text-gray-500">
-
-                    Want to sell on KHELZONE?
-
-                    <a
-                        href="become a seller.html"
-                        class="
-                            font-bold
-                            text-orange-400
-                            hover:text-orange-300
-                        "
-                    >
-                        Become a Seller
-                    </a>
-
-                </p>
-
-            </div>
-
-
-            <!-- =================================================
-                 HOME
-            ================================================== -->
-
-            <div
-                class="
-                    mt-7
-                    border-t
-                    border-white/10
-                    pt-6
-                "
-            >
-
-                <a
-                    href="homepage.html"
-
-                    class="
-                        flex
-                        items-center
-                        justify-center
-                        gap-2
-                        text-sm
-                        text-gray-500
-                        transition
-                        hover:text-white
-                    "
-                >
-
-                    <span
-                        class="
-                            material-symbols-outlined
-                            text-base
-                        "
-                    >
-                        arrow_back
-                    </span>
-
-                    Continue shopping
-
-                </a>
-
-            </div>
-
         </section>
+
 
 
         <!-- =====================================================
@@ -542,6 +490,7 @@
     </main>
 
 
+
 <script>
 
     /* =========================================================
@@ -552,16 +501,9 @@
         "https://antqexjhlsaynunlmzqa.supabase.co";
 
 
-    /*
-       CURRENT SUPABASE PUBLISHABLE KEY
-
-       IMPORTANT:
-       Agar ye key Supabase Dashboard ki current
-       Publishable key hai to isi ko use karo.
-    */
-
     const SUPABASE_PUBLISHABLE_KEY =
         "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
+
 
 
     /* =========================================================
@@ -581,6 +523,7 @@
     }
 
 
+
     /* =========================================================
        CREATE SUPABASE CLIENT
     ========================================================= */
@@ -590,6 +533,7 @@
             SUPABASE_URL,
             SUPABASE_PUBLISHABLE_KEY
         );
+
 
 
     /* =========================================================
@@ -627,6 +571,7 @@
         document.getElementById("message");
 
 
+
     /* =========================================================
        SHOW MESSAGE
     ========================================================= */
@@ -659,8 +604,11 @@
                 "border-red-500/20",
                 "text-red-300"
             );
+
         }
+
     }
+
 
 
     /* =========================================================
@@ -674,6 +622,7 @@
         message.classList.add("hidden");
 
     }
+
 
 
     /* =========================================================
@@ -720,8 +669,11 @@
                 "opacity-70",
                 "cursor-not-allowed"
             );
+
         }
+
     }
+
 
 
     /* =========================================================
@@ -759,10 +711,12 @@
                     "aria-label",
                     "Show password"
                 );
+
             }
 
         }
     );
+
 
 
     /* =========================================================
@@ -791,6 +745,7 @@
             throw new Error(
                 "Profile could not be loaded."
             );
+
         }
 
 
@@ -799,11 +754,14 @@
             throw new Error(
                 "Your KHELZONE profile was not found."
             );
+
         }
 
 
         return result.data;
+
     }
+
 
 
     /* =========================================================
@@ -847,7 +805,10 @@
         );
 
 
-        /* SAVE LOGIN INFORMATION */
+
+        /* =====================================================
+           SAVE LOGIN INFORMATION
+        ===================================================== */
 
         localStorage.setItem(
             "khelzone_role",
@@ -865,14 +826,23 @@
         );
 
 
+
         /* =====================================================
            ADMIN
+
+           ADMIN LOGIN
+                ↓
+           HOMEPAGE
+                ↓
+           ADMIN DASHBOARD BUTTON
+                ↓
+           ADMIN DASHBOARD
         ===================================================== */
 
         if (role === "admin") {
 
             showMessage(
-                "Admin login successful! Opening dashboard...",
+                "Admin login successful! Opening KHELZONE...",
                 "success"
             );
 
@@ -880,14 +850,16 @@
             setTimeout(function () {
 
                 window.location.replace(
-                    "admin-dashboard.html"
+                    "homepage.html"
                 );
 
             }, 700);
 
 
             return;
+
         }
+
 
 
         /* =====================================================
@@ -904,11 +876,6 @@
 
             setTimeout(function () {
 
-                /*
-                   IMPORTANT:
-                   Seller login ke baad seller.html open hoga.
-                */
-
                 window.location.replace(
                     "seller.html"
                 );
@@ -917,7 +884,9 @@
 
 
             return;
+
         }
+
 
 
         /* =====================================================
@@ -942,7 +911,9 @@
 
 
             return;
+
         }
+
 
 
         /* =====================================================
@@ -952,7 +923,9 @@
         throw new Error(
             "Invalid KHELZONE role: " + role
         );
+
     }
+
 
 
     /* =========================================================
@@ -981,7 +954,10 @@
                 passwordInput.value;
 
 
-            /* BASIC CHECK */
+
+            /* =================================================
+               BASIC CHECK
+            ================================================= */
 
             if (!email || !password) {
 
@@ -993,10 +969,13 @@
                 setLoading(false);
 
                 return;
+
             }
 
 
+
             try {
+
 
                 /* =================================================
                    SUPABASE AUTH LOGIN
@@ -1021,6 +1000,7 @@
                 );
 
 
+
                 /* =================================================
                    SUPABASE ERROR
                 ================================================= */
@@ -1030,6 +1010,7 @@
                     throw result.error;
 
                 }
+
 
 
                 /* =================================================
@@ -1046,6 +1027,7 @@
                     );
 
                 }
+
 
 
                 /* =================================================
@@ -1084,6 +1066,7 @@
                     errorMessage.toLowerCase();
 
 
+
                 /* =================================================
                    INVALID LOGIN
                 ================================================= */
@@ -1098,6 +1081,7 @@
                         "Incorrect email or password.";
 
                 }
+
 
 
                 /* =================================================
@@ -1116,6 +1100,7 @@
                 }
 
 
+
                 /* =================================================
                    PROFILE ERROR
                 ================================================= */
@@ -1130,6 +1115,7 @@
                         "Login successful hua, lekin profiles table se user profile load nahi ho saki.";
 
                 }
+
 
 
                 /* =================================================
@@ -1148,6 +1134,7 @@
                 }
 
 
+
                 /* =================================================
                    EMAIL NOT CONFIRMED
                 ================================================= */
@@ -1162,6 +1149,7 @@
                         "Email abhi confirm nahi hui. Supabase Authentication mein email confirm karo.";
 
                 }
+
 
 
                 /* =================================================
@@ -1180,6 +1168,7 @@
                 }
 
 
+
                 /* =================================================
                    SHOW ERROR
                 ================================================= */
@@ -1196,6 +1185,7 @@
 
         }
     );
+
 
 
     /* =========================================================
@@ -1219,6 +1209,7 @@
                 );
 
                 return;
+
             }
 
 
@@ -1241,8 +1232,11 @@
                 "SESSION CHECK ERROR:",
                 error
             );
+
         }
+
     }
+
 
 
     /* =========================================================

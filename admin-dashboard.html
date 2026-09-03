@@ -1,418 +1,844 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>KHELZONE | Admin Dashboard</title>
 
-    <!-- Tailwind -->
+
+    <!-- =====================================================
+         TAILWIND
+    ====================================================== -->
+
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Supabase -->
+
+    <!-- =====================================================
+         SUPABASE
+         IMPORTANT:
+         This MUST come before admin-dashboard.js
+    ====================================================== -->
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+
+    <!-- =====================================================
+         TAILWIND CONFIG
+    ====================================================== -->
+
     <script>
+
         tailwind.config = {
+
             darkMode: "class",
+
             theme: {
+
                 extend: {
+
                     colors: {
+
                         kzOrange: "#ff5a00",
+
                         kzOrangeDark: "#d63f00",
+
                         kzBlack: "#090909",
+
                         kzCard: "#151515",
+
                         kzBorder: "#292929"
+
                     }
+
                 }
+
             }
+
         };
+
     </script>
 
+
+    <!-- =====================================================
+         CUSTOM CSS
+    ====================================================== -->
+
     <style>
+
         * {
             box-sizing: border-box;
         }
 
+
+        html,
         body {
             margin: 0;
-            background: #090909;
-            color: #f5f5f5;
-            font-family: Arial, Helvetica, sans-serif;
+            padding: 0;
+            min-height: 100%;
         }
+
+
+        body {
+
+            background: #090909;
+
+            color: #f5f5f5;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+        }
+
 
         .hidden {
+
             display: none !important;
+
         }
 
-        /* ================================
+
+        /* =================================================
            CHECKING SCREEN
-        ================================= */
+        ================================================= */
+
         #checkingScreen {
+
             position: fixed;
+
             inset: 0;
+
             z-index: 999999;
+
             background: #090909;
+
             display: flex;
+
             align-items: center;
+
             justify-content: center;
+
             flex-direction: column;
+
             gap: 18px;
+
         }
+
 
         .checking-logo {
+
             font-size: 34px;
+
             font-weight: 900;
+
             color: #ff5a00;
+
             letter-spacing: 2px;
+
         }
+
 
         .loader {
+
             width: 45px;
+
             height: 45px;
+
             border: 4px solid #292929;
+
             border-top-color: #ff5a00;
+
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+
+            animation:
+                spin 0.8s linear infinite;
+
         }
+
 
         @keyframes spin {
+
             to {
-                transform: rotate(360deg);
+
+                transform:
+                    rotate(360deg);
+
             }
+
         }
 
-        /* ================================
+
+        /* =================================================
            ACCESS DENIED
-        ================================= */
+        ================================================= */
+
         #accessDenied {
+
             position: fixed;
+
             inset: 0;
+
             z-index: 999998;
+
             background: #090909;
+
             display: none;
+
             align-items: center;
+
             justify-content: center;
+
             padding: 20px;
+
         }
+
 
         .access-box {
+
             width: 100%;
+
             max-width: 500px;
+
             background: #151515;
-            border: 1px solid #292929;
+
+            border:
+                1px solid #292929;
+
             border-radius: 20px;
+
             padding: 40px;
+
             text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,.5);
+
+            box-shadow:
+                0 20px 60px
+                rgba(0, 0, 0, .5);
+
         }
+
 
         .access-icon {
+
             width: 80px;
+
             height: 80px;
-            margin: 0 auto 20px;
+
+            margin:
+                0 auto 20px;
+
             border-radius: 50%;
-            background: rgba(255,90,0,.1);
-            border: 2px solid #ff5a00;
+
+            background:
+                rgba(255, 90, 0, .1);
+
+            border:
+                2px solid #ff5a00;
+
             display: flex;
+
             align-items: center;
+
             justify-content: center;
+
             font-size: 38px;
+
         }
+
 
         .access-title {
+
             font-size: 28px;
+
             font-weight: 900;
+
             margin-bottom: 10px;
+
         }
+
 
         .access-text {
+
             color: #a5a5a5;
+
             line-height: 1.6;
+
             margin-bottom: 25px;
+
         }
+
 
         .home-btn {
+
             display: inline-flex;
+
             align-items: center;
+
             justify-content: center;
+
             min-height: 48px;
-            padding: 0 24px;
+
+            padding:
+                0 24px;
+
             border-radius: 10px;
+
             background: #ff5a00;
+
             color: white;
+
             font-weight: 800;
+
             text-decoration: none;
+
             transition: .2s;
+
+            border: none;
+
+            cursor: pointer;
+
         }
+
 
         .home-btn:hover {
+
             background: #d63f00;
+
         }
 
-        /* ================================
+
+        /* =================================================
            SIDEBAR
-        ================================= */
+        ================================================= */
+
         .sidebar {
+
             width: 260px;
+
             min-height: 100vh;
+
             background: #101010;
-            border-right: 1px solid #292929;
+
+            border-right:
+                1px solid #292929;
+
             position: fixed;
+
             left: 0;
+
             top: 0;
+
             bottom: 0;
+
             z-index: 100;
+
+            transition:
+                transform .25s ease;
+
         }
+
 
         .sidebar-logo {
+
             padding: 25px;
+
             font-size: 27px;
+
             font-weight: 900;
+
             color: #ff5a00;
-            border-bottom: 1px solid #292929;
+
+            border-bottom:
+                1px solid #292929;
+
         }
+
 
         .sidebar-nav {
+
             padding: 20px 12px;
+
         }
+
 
         .sidebar-link {
+
             width: 100%;
+
             display: flex;
+
             align-items: center;
+
             gap: 12px;
+
             padding: 13px 15px;
+
             margin-bottom: 6px;
+
             border-radius: 10px;
+
             color: #aaa;
+
             background: transparent;
+
             border: 0;
+
             cursor: pointer;
+
             font-weight: 700;
+
             text-align: left;
+
             transition: .2s;
+
         }
+
 
         .sidebar-link:hover {
+
             color: white;
+
             background: #1c1c1c;
+
         }
+
 
         .sidebar-link.active {
+
             color: white;
+
             background: #ff5a00;
+
         }
+
 
         .sidebar-bottom {
+
             position: absolute;
+
             bottom: 20px;
+
             left: 12px;
+
             right: 12px;
+
         }
+
 
         .logout-btn {
+
             width: 100%;
+
             padding: 13px;
-            border: 1px solid #333;
+
+            border:
+                1px solid #333;
+
             border-radius: 10px;
+
             background: #171717;
+
             color: #ddd;
+
             cursor: pointer;
+
             font-weight: 700;
+
+            transition: .2s;
+
         }
+
 
         .logout-btn:hover {
+
             background: #ff5a00;
+
             color: white;
-            border-color: #ff5a00;
+
+            border-color:
+                #ff5a00;
+
         }
 
-        /* ================================
+
+        /* =================================================
            MAIN
-        ================================= */
+        ================================================= */
+
         .main {
+
             margin-left: 260px;
+
             min-height: 100vh;
+
         }
+
 
         .topbar {
+
             min-height: 75px;
-            padding: 0 30px;
-            border-bottom: 1px solid #292929;
+
+            padding:
+                0 30px;
+
+            border-bottom:
+                1px solid #292929;
+
             background: #0d0d0d;
+
             display: flex;
+
             align-items: center;
+
             justify-content: space-between;
+
         }
+
 
         .page-title {
+
             font-size: 25px;
+
             font-weight: 900;
+
         }
+
 
         .admin-info {
+
             text-align: right;
+
         }
+
 
         .admin-name {
+
             font-weight: 800;
+
         }
+
 
         .admin-email {
+
             color: #888;
+
             font-size: 13px;
+
         }
+
 
         .content {
+
             padding: 30px;
+
         }
 
-        /* ================================
+
+        /* =================================================
            MOBILE
-        ================================= */
+        ================================================= */
+
         .mobile-header {
+
             display: none;
+
         }
+
 
         @media (max-width: 900px) {
 
             .sidebar {
-                transform: translateX(-100%);
-                transition: .25s;
+
+                transform:
+                    translateX(-100%);
+
             }
+
 
             .sidebar.mobile-open {
-                transform: translateX(0);
+
+                transform:
+                    translateX(0);
+
+                box-shadow:
+                    10px 0 40px
+                    rgba(0,0,0,.5);
+
             }
+
 
             .main {
+
                 margin-left: 0;
+
             }
+
 
             .mobile-header {
+
                 display: flex;
+
                 min-height: 65px;
-                padding: 0 18px;
+
+                padding:
+                    0 18px;
+
                 align-items: center;
+
                 justify-content: space-between;
+
                 background: #101010;
-                border-bottom: 1px solid #292929;
+
+                border-bottom:
+                    1px solid #292929;
+
             }
+
 
             .mobile-menu-btn {
+
                 width: 42px;
+
                 height: 42px;
+
                 border-radius: 9px;
-                border: 1px solid #ff5a00;
-                background: rgba(255,90,0,.08);
+
+                border:
+                    1px solid #ff5a00;
+
+                background:
+                    rgba(255,90,0,.08);
+
                 color: #ff5a00;
+
                 cursor: pointer;
+
                 font-size: 22px;
+
             }
+
 
             .content {
+
                 padding: 20px;
+
             }
+
 
             .topbar {
+
                 display: none;
+
             }
+
         }
 
-        /* ================================
+
+        /* =================================================
            CARDS
-        ================================= */
+        ================================================= */
+
         .dashboard-card {
+
             background: #151515;
-            border: 1px solid #292929;
+
+            border:
+                1px solid #292929;
+
             border-radius: 15px;
+
             padding: 22px;
+
+            transition: .2s;
+
         }
+
 
         .dashboard-card:hover {
-            border-color: #ff5a00;
+
+            border-color:
+                #ff5a00;
+
+            transform:
+                translateY(-2px);
+
         }
+
 
         .stat-value {
+
             font-size: 30px;
+
             font-weight: 900;
+
             margin-top: 8px;
+
+            color: #fff;
+
         }
+
 
         .stat-label {
+
             color: #888;
+
             font-size: 14px;
+
         }
 
-        /* ================================
+
+        /* =================================================
            TABLE
-        ================================= */
+        ================================================= */
+
         .table-wrapper {
+
             overflow-x: auto;
+
             background: #151515;
-            border: 1px solid #292929;
+
+            border:
+                1px solid #292929;
+
             border-radius: 15px;
+
         }
+
 
         table {
+
             width: 100%;
-            border-collapse: collapse;
+
+            border-collapse:
+                collapse;
+
             min-width: 700px;
+
         }
+
 
         th {
+
             background: #1b1b1b;
+
             color: #aaa;
+
             text-align: left;
+
             padding: 15px;
+
             font-size: 13px;
-            text-transform: uppercase;
+
+            text-transform:
+                uppercase;
+
+            white-space:
+                nowrap;
+
         }
+
 
         td {
+
             padding: 15px;
-            border-top: 1px solid #292929;
+
+            border-top:
+                1px solid #292929;
+
             color: #ddd;
+
         }
+
 
         tr:hover td {
+
             background: #191919;
+
         }
 
-        /* ================================
+
+        /* =================================================
            SECTION
-        ================================= */
+        ================================================= */
+
         .section {
+
             display: none;
+
         }
+
 
         .section.active {
+
             display: block;
+
         }
+
+
+        /* =================================================
+           SEARCH
+        ================================================= */
 
         .search-input {
+
             width: 100%;
+
             max-width: 400px;
+
             background: #151515;
-            border: 1px solid #333;
+
+            border:
+                1px solid #333;
+
             color: white;
-            padding: 13px 15px;
+
+            padding:
+                13px 15px;
+
             border-radius: 10px;
+
             outline: none;
+
         }
+
+
+        .search-input::placeholder {
+
+            color: #666;
+
+        }
+
 
         .search-input:focus {
-            border-color: #ff5a00;
+
+            border-color:
+                #ff5a00;
+
+            box-shadow:
+                0 0 0 2px
+                rgba(255,90,0,.08);
+
         }
+
     </style>
+
 </head>
 
+
 <body>
+
 
 <!-- =========================================================
      SECURITY CHECKING SCREEN
 ========================================================= -->
+
 <div id="checkingScreen">
 
     <div class="checking-logo">
@@ -431,6 +857,7 @@
 <!-- =========================================================
      ACCESS DENIED
 ========================================================= -->
+
 <div id="accessDenied">
 
     <div class="access-box">
@@ -439,16 +866,22 @@
             🔒
         </div>
 
+
         <div class="access-title">
             ACCESS DENIED
         </div>
+
 
         <div class="access-text">
             You do not have permission to access
             the KHELZONE Admin Dashboard.
         </div>
 
-        <a href="homepage.html" class="home-btn">
+
+        <a
+            href="homepage.html"
+            class="home-btn"
+        >
             BACK TO HOMEPAGE
         </a>
 
@@ -460,226 +893,404 @@
 <!-- =========================================================
      DASHBOARD
 ========================================================= -->
-<div id="dashboard" class="hidden">
 
-    <!-- SIDEBAR -->
-    <aside id="sidebar" class="sidebar">
+<div
+    id="dashboard"
+    class="hidden"
+>
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside
+        id="sidebar"
+        class="sidebar"
+    >
+
 
         <div class="sidebar-logo">
             KHELZONE
         </div>
 
+
         <nav class="sidebar-nav">
 
+
             <button
+                type="button"
                 class="sidebar-link active"
-                data-section="dashboardSection">
-                📊 Dashboard
+                data-section="dashboardSection"
+            >
+                📊
+                <span>Dashboard</span>
             </button>
 
-            <button
-                class="sidebar-link"
-                data-section="productsSection">
-                🛒 Products
-            </button>
 
             <button
+                type="button"
                 class="sidebar-link"
-                data-section="sellersSection">
-                🏪 Sellers
+                data-section="productsSection"
+            >
+                🛒
+                <span>Products</span>
             </button>
 
-            <button
-                class="sidebar-link"
-                data-section="customersSection">
-                👥 Customers
-            </button>
 
             <button
+                type="button"
                 class="sidebar-link"
-                data-section="ordersSection">
-                📦 Orders
+                data-section="sellersSection"
+            >
+                🏪
+                <span>Sellers</span>
             </button>
+
+
+            <button
+                type="button"
+                class="sidebar-link"
+                data-section="customersSection"
+            >
+                👥
+                <span>Customers</span>
+            </button>
+
+
+            <button
+                type="button"
+                class="sidebar-link"
+                data-section="ordersSection"
+            >
+                📦
+                <span>Orders</span>
+            </button>
+
 
         </nav>
 
+
         <div class="sidebar-bottom">
 
-            <button id="logoutBtn" class="logout-btn">
+            <button
+                id="logoutBtn"
+                type="button"
+                class="logout-btn"
+            >
                 Logout
             </button>
 
         </div>
 
+
     </aside>
 
 
-    <!-- MOBILE HEADER -->
+    <!-- =====================================================
+         MOBILE HEADER
+    ====================================================== -->
+
     <div class="mobile-header">
 
-        <div style="font-weight:900;color:#ff5a00;font-size:23px;">
+
+        <div
+            style="
+                font-weight:900;
+                color:#ff5a00;
+                font-size:23px;
+            "
+        >
             KHELZONE
         </div>
 
+
         <button
             id="mobileMenuBtn"
-            class="mobile-menu-btn">
+            type="button"
+            class="mobile-menu-btn"
+            aria-label="Open menu"
+        >
             ☰
         </button>
+
 
     </div>
 
 
-    <!-- MAIN -->
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
     <main class="main">
 
-        <!-- TOPBAR -->
+
+        <!-- =================================================
+             TOPBAR
+        ================================================== -->
+
         <div class="topbar">
 
+
             <div>
-                <div id="pageTitle" class="page-title">
+
+                <div
+                    id="pageTitle"
+                    class="page-title"
+                >
                     Dashboard
                 </div>
+
             </div>
+
 
             <div class="admin-info">
 
                 <div
                     id="adminName"
-                    class="admin-name">
+                    class="admin-name"
+                >
                     Admin
                 </div>
 
+
                 <div
                     id="adminEmail"
-                    class="admin-email">
+                    class="admin-email"
+                >
                     -
                 </div>
 
             </div>
 
+
         </div>
 
 
+        <!-- =================================================
+             CONTENT
+        ================================================== -->
+
         <div class="content">
 
-            <!-- ================= DASHBOARD ================= -->
+
+            <!-- =================================================
+                 DASHBOARD SECTION
+            ================================================== -->
+
             <section
                 id="dashboardSection"
-                class="section active">
+                class="section active"
+            >
+
 
                 <div class="mb-6">
+
                     <h1 class="text-3xl font-black">
                         Dashboard
                     </h1>
 
+
                     <p class="text-gray-500 mt-2">
                         KHELZONE administration overview
                     </p>
+
                 </div>
 
 
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+                <div
+                    class="
+                        grid
+                        grid-cols-1
+                        md:grid-cols-2
+                        xl:grid-cols-4
+                        gap-5
+                    "
+                >
+
+
+                    <!-- PRODUCTS -->
 
                     <div class="dashboard-card">
+
                         <div class="stat-label">
                             Products
                         </div>
 
+
                         <div
                             id="productCount"
-                            class="stat-value">
+                            class="stat-value"
+                        >
                             0
                         </div>
+
                     </div>
 
+
+                    <!-- SELLERS -->
+
                     <div class="dashboard-card">
+
                         <div class="stat-label">
                             Sellers
                         </div>
 
+
                         <div
                             id="sellerCount"
-                            class="stat-value">
+                            class="stat-value"
+                        >
                             0
                         </div>
+
                     </div>
 
+
+                    <!-- CUSTOMERS -->
+
                     <div class="dashboard-card">
+
                         <div class="stat-label">
                             Customers
                         </div>
 
+
                         <div
                             id="customerCount"
-                            class="stat-value">
+                            class="stat-value"
+                        >
                             0
                         </div>
+
                     </div>
 
+
+                    <!-- ORDERS -->
+
                     <div class="dashboard-card">
+
                         <div class="stat-label">
                             Orders
                         </div>
 
+
                         <div
                             id="orderCount"
-                            class="stat-value">
+                            class="stat-value"
+                        >
                             0
                         </div>
+
                     </div>
 
+
                 </div>
+
 
             </section>
 
 
-            <!-- ================= PRODUCTS ================= -->
+            <!-- =================================================
+                 PRODUCTS SECTION
+            ================================================== -->
+
             <section
                 id="productsSection"
-                class="section">
+                class="section"
+            >
 
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+
+                <div
+                    class="
+                        flex
+                        flex-col
+                        md:flex-row
+                        md:items-center
+                        md:justify-between
+                        gap-4
+                        mb-6
+                    "
+                >
+
 
                     <div>
+
                         <h1 class="text-3xl font-black">
                             Products
                         </h1>
 
+
                         <p class="text-gray-500 mt-2">
                             Manage KHELZONE products
                         </p>
+
                     </div>
+
 
                     <input
                         id="productSearch"
                         class="search-input"
                         type="text"
-                        placeholder="Search products...">
+                        autocomplete="off"
+                        placeholder="Search products..."
+                    >
+
 
                 </div>
+
 
                 <div class="table-wrapper">
 
                     <table>
 
                         <thead>
+
                             <tr>
-                                <th>Product</th>
-                                <th>Price</th>
-                                <th>Category</th>
-                                <th>Seller</th>
-                                <th>Status</th>
-                                <th>Action</th>
+
+                                <th>
+                                    Product
+                                </th>
+
+                                <th>
+                                    Price
+                                </th>
+
+                                <th>
+                                    Category
+                                </th>
+
+                                <th>
+                                    Seller
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Action
+                                </th>
+
                             </tr>
+
                         </thead>
+
 
                         <tbody id="productsTableBody">
 
                             <tr>
-                                <td colspan="6">
+
+                                <td
+                                    colspan="6"
+                                    style="
+                                        text-align:center;
+                                        color:#888;
+                                    "
+                                >
                                     Loading...
                                 </td>
+
                             </tr>
 
                         </tbody>
@@ -688,55 +1299,110 @@
 
                 </div>
 
+
             </section>
 
 
-            <!-- ================= SELLERS ================= -->
+            <!-- =================================================
+                 SELLERS SECTION
+            ================================================== -->
+
             <section
                 id="sellersSection"
-                class="section">
+                class="section"
+            >
 
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+
+                <div
+                    class="
+                        flex
+                        flex-col
+                        md:flex-row
+                        md:items-center
+                        md:justify-between
+                        gap-4
+                        mb-6
+                    "
+                >
+
 
                     <div>
+
                         <h1 class="text-3xl font-black">
                             Sellers
                         </h1>
 
+
                         <p class="text-gray-500 mt-2">
                             Manage sellers
                         </p>
+
                     </div>
+
 
                     <input
                         id="sellerSearch"
                         class="search-input"
                         type="text"
-                        placeholder="Search sellers...">
+                        autocomplete="off"
+                        placeholder="Search sellers..."
+                    >
+
 
                 </div>
+
 
                 <div class="table-wrapper">
 
                     <table>
 
                         <thead>
+
                             <tr>
-                                <th>Business</th>
-                                <th>Owner</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Status</th>
-                                <th>Action</th>
+
+                                <th>
+                                    Business
+                                </th>
+
+                                <th>
+                                    Owner
+                                </th>
+
+                                <th>
+                                    Email
+                                </th>
+
+                                <th>
+                                    Phone
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Action
+                                </th>
+
                             </tr>
+
                         </thead>
+
 
                         <tbody id="sellersTableBody">
 
                             <tr>
-                                <td colspan="6">
+
+                                <td
+                                    colspan="6"
+                                    style="
+                                        text-align:center;
+                                        color:#888;
+                                    "
+                                >
                                     Loading...
                                 </td>
+
                             </tr>
 
                         </tbody>
@@ -745,53 +1411,102 @@
 
                 </div>
 
+
             </section>
 
 
-            <!-- ================= CUSTOMERS ================= -->
+            <!-- =================================================
+                 CUSTOMERS SECTION
+            ================================================== -->
+
             <section
                 id="customersSection"
-                class="section">
+                class="section"
+            >
 
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+
+                <div
+                    class="
+                        flex
+                        flex-col
+                        md:flex-row
+                        md:items-center
+                        md:justify-between
+                        gap-4
+                        mb-6
+                    "
+                >
+
 
                     <div>
+
                         <h1 class="text-3xl font-black">
                             Customers
                         </h1>
 
+
                         <p class="text-gray-500 mt-2">
                             Manage customers
                         </p>
+
                     </div>
+
 
                     <input
                         id="customerSearch"
                         class="search-input"
                         type="text"
-                        placeholder="Search customers...">
+                        autocomplete="off"
+                        placeholder="Search customers..."
+                    >
+
 
                 </div>
+
 
                 <div class="table-wrapper">
 
                     <table>
 
                         <thead>
+
                             <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Action</th>
+
+                                <th>
+                                    Name
+                                </th>
+
+                                <th>
+                                    Email
+                                </th>
+
+                                <th>
+                                    Phone
+                                </th>
+
+                                <th>
+                                    Action
+                                </th>
+
                             </tr>
+
                         </thead>
+
 
                         <tbody id="customersTableBody">
 
                             <tr>
-                                <td colspan="4">
+
+                                <td
+                                    colspan="4"
+                                    style="
+                                        text-align:center;
+                                        color:#888;
+                                    "
+                                >
                                     Loading...
                                 </td>
+
                             </tr>
 
                         </tbody>
@@ -800,55 +1515,110 @@
 
                 </div>
 
+
             </section>
 
 
-            <!-- ================= ORDERS ================= -->
+            <!-- =================================================
+                 ORDERS SECTION
+            ================================================== -->
+
             <section
                 id="ordersSection"
-                class="section">
+                class="section"
+            >
 
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+
+                <div
+                    class="
+                        flex
+                        flex-col
+                        md:flex-row
+                        md:items-center
+                        md:justify-between
+                        gap-4
+                        mb-6
+                    "
+                >
+
 
                     <div>
+
                         <h1 class="text-3xl font-black">
                             Orders
                         </h1>
 
+
                         <p class="text-gray-500 mt-2">
                             Manage customer orders
                         </p>
+
                     </div>
+
 
                     <input
                         id="orderSearch"
                         class="search-input"
                         type="text"
-                        placeholder="Search orders...">
+                        autocomplete="off"
+                        placeholder="Search orders..."
+                    >
+
 
                 </div>
+
 
                 <div class="table-wrapper">
 
                     <table>
 
                         <thead>
+
                             <tr>
-                                <th>Order ID</th>
-                                <th>Customer</th>
-                                <th>Total</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                                <th>Action</th>
+
+                                <th>
+                                    Order ID
+                                </th>
+
+                                <th>
+                                    Customer
+                                </th>
+
+                                <th>
+                                    Total
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Date
+                                </th>
+
+                                <th>
+                                    Action
+                                </th>
+
                             </tr>
+
                         </thead>
+
 
                         <tbody id="ordersTableBody">
 
                             <tr>
-                                <td colspan="6">
+
+                                <td
+                                    colspan="6"
+                                    style="
+                                        text-align:center;
+                                        color:#888;
+                                    "
+                                >
                                     Loading...
                                 </td>
+
                             </tr>
 
                         </tbody>
@@ -857,39 +1627,42 @@
 
                 </div>
 
+
             </section>
+
 
         </div>
 
+
     </main>
+
 
 </div>
 
 
 <!-- =========================================================
-     SUPABASE + ADMIN SECURITY
+     IMPORTANT
+     
+     DO NOT CREATE supabaseClient HERE.
+     
+     admin-dashboard.js already creates:
+     
+     const supabaseClient =
+         window.supabase.createClient(...)
+     
+     Creating it again here causes:
+     
+     Identifier 'supabaseClient' has already been declared
+     
 ========================================================= -->
-<script>
-
-    const SUPABASE_URL =
-        "https://antqexjhlsaynunlmzqa.supabase.co";
-
-    const SUPABASE_KEY =
-        "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
-
-    const supabaseClient =
-        window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_KEY
-        );
-
-    window.supabaseClient = supabaseClient;
-
-</script>
 
 
-<!-- YOUR DASHBOARD JS -->
+<!-- =========================================================
+     ADMIN DASHBOARD JAVASCRIPT
+========================================================= -->
+
 <script src="admin-dashboard.js"></script>
+
 
 </body>
 </html>

@@ -213,6 +213,8 @@
                 </div>
 
 
+                <!-- CHANGED: Welcome Back -> Welcome -->
+
                 <h1
                     class="
                         mt-5
@@ -221,7 +223,7 @@
                         uppercase
                     "
                 >
-                    Welcome Back
+                    Welcome
                 </h1>
 
 
@@ -453,32 +455,6 @@
 
 
             <!-- =================================================
-                 BECOME SELLER
-            ================================================== -->
-
-            <div class="mt-5 text-center">
-
-                <p class="text-sm text-gray-500">
-
-                    Want to sell on KHELZONE?
-
-                    <a
-                        href="become a seller.html"
-                        class="
-                            font-bold
-                            text-orange-400
-                            hover:text-orange-300
-                        "
-                    >
-                        Become a Seller
-                    </a>
-
-                </p>
-
-            </div>
-
-
-            <!-- =================================================
                  HOME
             ================================================== -->
 
@@ -551,21 +527,12 @@
     const SUPABASE_URL =
         "https://antqexjhlsaynunlmzqa.supabase.co";
 
-
-    /*
-       CURRENT SUPABASE PUBLISHABLE KEY
-
-       IMPORTANT:
-       Agar ye key Supabase Dashboard ki current
-       Publishable key hai to isi ko use karo.
-    */
-
     const SUPABASE_PUBLISHABLE_KEY =
         "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
 
 
     /* =========================================================
-       CHECK SUPABASE LIBRARY
+       CHECK SUPABASE
     ========================================================= */
 
     if (!window.supabase) {
@@ -659,7 +626,9 @@
                 "border-red-500/20",
                 "text-red-300"
             );
+
         }
+
     }
 
 
@@ -720,7 +689,9 @@
                 "opacity-70",
                 "cursor-not-allowed"
             );
+
         }
+
     }
 
 
@@ -759,6 +730,7 @@
                     "aria-label",
                     "Show password"
                 );
+
             }
 
         }
@@ -791,6 +763,7 @@
             throw new Error(
                 "Profile could not be loaded."
             );
+
         }
 
 
@@ -799,10 +772,12 @@
             throw new Error(
                 "Your KHELZONE profile was not found."
             );
+
         }
 
 
         return result.data;
+
     }
 
 
@@ -887,6 +862,7 @@
 
 
             return;
+
         }
 
 
@@ -904,11 +880,6 @@
 
             setTimeout(function () {
 
-                /*
-                   IMPORTANT:
-                   Seller login ke baad seller.html open hoga.
-                */
-
                 window.location.replace(
                     "seller.html"
                 );
@@ -917,6 +888,7 @@
 
 
             return;
+
         }
 
 
@@ -942,6 +914,7 @@
 
 
             return;
+
         }
 
 
@@ -952,6 +925,7 @@
         throw new Error(
             "Invalid KHELZONE role: " + role
         );
+
     }
 
 
@@ -964,7 +938,6 @@
         async function (event) {
 
             event.preventDefault();
-
 
             hideMessage();
 
@@ -993,6 +966,7 @@
                 setLoading(false);
 
                 return;
+
             }
 
 
@@ -1084,9 +1058,7 @@
                     errorMessage.toLowerCase();
 
 
-                /* =================================================
-                   INVALID LOGIN
-                ================================================= */
+                /* INVALID LOGIN */
 
                 if (
                     lowerMessage.includes(
@@ -1100,9 +1072,7 @@
                 }
 
 
-                /* =================================================
-                   INVALID API KEY
-                ================================================= */
+                /* INVALID API KEY */
 
                 else if (
                     lowerMessage.includes(
@@ -1116,9 +1086,7 @@
                 }
 
 
-                /* =================================================
-                   PROFILE ERROR
-                ================================================= */
+                /* PROFILE ERROR */
 
                 else if (
                     lowerMessage.includes(
@@ -1132,9 +1100,7 @@
                 }
 
 
-                /* =================================================
-                   PROFILE NOT FOUND
-                ================================================= */
+                /* PROFILE NOT FOUND */
 
                 else if (
                     lowerMessage.includes(
@@ -1148,9 +1114,7 @@
                 }
 
 
-                /* =================================================
-                   EMAIL NOT CONFIRMED
-                ================================================= */
+                /* EMAIL NOT CONFIRMED */
 
                 else if (
                     lowerMessage.includes(
@@ -1164,9 +1128,7 @@
                 }
 
 
-                /* =================================================
-                   NETWORK
-                ================================================= */
+                /* NETWORK */
 
                 else if (
                     lowerMessage.includes(
@@ -1180,9 +1142,7 @@
                 }
 
 
-                /* =================================================
-                   SHOW ERROR
-                ================================================= */
+                /* SHOW ERROR */
 
                 showMessage(
                     errorMessage,
@@ -1219,6 +1179,7 @@
                 );
 
                 return;
+
             }
 
 
@@ -1241,7 +1202,9 @@
                 "SESSION CHECK ERROR:",
                 error
             );
+
         }
+
     }
 
 

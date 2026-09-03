@@ -25,14 +25,14 @@
     <nav class="hidden lg:flex items-center gap-md ml-md">
       <a href="index.html" class="font-label-caps text-label-caps text-on-surface hover:text-secondary-container transition-colors duration-200 tracking-wider">HOME</a>
       <a href="shop.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">SHOP</a>
-      <a href="customize.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">CUSTOMIZE KIT</a>
+      <a href="customization.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">CUSTOMIZE KIT</a>
       <a href="wishlist.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">WISHLIST</a>
       <a href="cart.html" class="font-label-caps text-label-caps text-secondary-container border-b-2 border-secondary-container pb-1 tracking-wider">CART</a>
     </nav>
   </div>
 
   <div class="flex items-center gap-lg">
-    <a href="seller.html" class="become-seller-link font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 hidden md:flex items-center gap-1 border border-outline-variant hover:border-secondary-container rounded-full px-sm py-1 tracking-wider">
+    <a href="seller.html" class="become-seller-link font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 hidden md:flex items-cente[...]">
       <span class="material-symbols-outlined text-[16px]">storefront</span>
       Become a Seller
     </a>
@@ -42,7 +42,7 @@
 <div id="mobile-nav" class="mobile-nav hidden lg:hidden">
   <a href="index.html">HOME</a>
   <a href="shop.html">SHOP</a>
-  <a href="customize.html">CUSTOMIZE KIT</a>
+  <a href="customization.html">CUSTOMIZE KIT</a>
   <a href="wishlist.html">WISHLIST</a>
   <a href="cart.html" class="active">CART</a>
 </div>
@@ -86,8 +86,8 @@
         <h3 class="font-headline-md text-headline-md text-on-background">Your Cart is Empty</h3>
         <p class="font-body-md text-body-md text-on-surface-variant max-w-sm">Looks like you haven't added any sports gear yet.</p>
         <div class="flex flex-wrap justify-center gap-sm mt-sm">
-          <button class="continue-shopping-btn btn-primary px-md py-sm rounded-lg font-label-caps text-label-caps text-surface-container-lowest font-bold" data-href="index.html">CONTINUE SHOPPING</button>
-          <button class="customize-kit-btn px-md py-sm rounded-lg font-label-caps text-label-caps border border-secondary-container text-secondary-container" data-href="customize.html">CUSTOMIZE YOUR KIT</button>
+          <button id="continueShoppingBtn" data-continue-shopping class="continue-shopping-btn btn-primary px-md py-sm rounded-lg font-label-caps text-label-caps text-surface-container-lowest font-bold" data-href="shop.html">CONTINUE SHOPPING</button>
+          <button class="customize-kit-btn px-md py-sm rounded-lg font-label-caps text-label-caps border border-secondary-container text-secondary-container" data-href="customization.html">CUSTOMIZE YOUR KIT</button>
         </div>
       </div>
 
@@ -139,7 +139,7 @@
           </div>
         </div>
 
-        <button id="checkout-btn" class="btn-primary w-full py-sm rounded-lg font-label-caps text-label-caps text-surface-container-lowest font-bold hover:scale-[1.02] transition-transform duration-200 mt-sm flex justify-center items-center gap-sm shadow-[0_4px_14px_0_rgba(255,106,0,0.25)]">
+        <button id="checkout-btn" class="btn-primary w-full py-sm rounded-lg font-label-caps text-label-caps text-surface-container-lowest font-bold hover:scale-[1.02] transition-transform duration-150 flex items-center justify-center gap-2">
           PROCEED TO CHECKOUT
           <span class="material-symbols-outlined">arrow_forward</span>
         </button>
@@ -171,12 +171,12 @@
 
     <div class="flex flex-col gap-sm">
       <h4 class="font-label-caps text-label-caps text-on-surface-variant mb-xs">B2B</h4>
-      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="#">Sialkot Manufacturers</a>
+      <!-- Sialkot Manufacturers removed as requested -->
     </div>
 
     <div class="flex flex-col gap-sm">
       <h4 class="font-label-caps text-label-caps text-on-surface-variant mb-xs">LEGAL</h4>
-      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="#">Terms of Service</a>
+      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="about.html">Contact Us</a>
     </div>
   </div>
 </footer>

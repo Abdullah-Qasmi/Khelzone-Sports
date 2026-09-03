@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Order Confirmed — KHELZONE</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Material Symbols -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            background: #080a0d;
+            color: #f5f5f5;
+            font-family: "Inter", sans-serif;
+        }
+
+        .heading-font {
+            font-family: "Archivo Narrow", sans-serif;
+        }
+
+        .orange {
+            color: #ff6a00;
+        }
+
+        .orange-bg {
+            background: #ff6a00;
+        }
+
+        .orange-border {
+            border-color: #ff6a00;
+        }
+
+        .glass {
+            background: rgba(17, 19, 23, 0.88);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+        }
+
+        .success-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 106, 0, 0.12);
+            border: 2px solid #ff6a00;
+            box-shadow:
+                0 0 30px rgba(255, 106, 0, 0.20),
+                inset 0 0 20px rgba(255, 106, 0, 0.08);
+        }
+
+        .success-circle .material-symbols-outlined {
+            font-size: 58px;
+            color: #ff6a00;
+            font-variation-settings:
+                'FILL' 1,
+                'wght' 700,
+                'GRAD' 0,
+                'opsz' 48;
+        }
+
+        .order-number-box {
+            background: rgba(255, 106, 0, 0.08);
+            border: 1px solid rgba(255, 106, 0, 0.35);
+        }
+
+        .product-image {
+            width: 82px;
+            height: 82px;
+            object-fit: cover;
+            border-radius: 12px;
+            background: #15181d;
+        }
+
+        .product-placeholder {
+            width: 82px;
+            height: 82px;
+            border-radius: 12px;
+            background: #15181d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-placeholder span {
+            color: #666;
+            font-size: 34px;
+        }
+
+        .btn-orange {
+            background: #ff6a00;
+            color: #ffffff;
+            transition: all 0.2s ease;
+        }
+
+        .btn-orange:hover {
+            background: #d95300;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 30px rgba(255, 106, 0, 0.20);
+        }
+
+        .btn-dark {
+            background: #15181d;
+            color: #ffffff;
+            border: 1px solid #30343a;
+            transition: all 0.2s ease;
+        }
+
+        .btn-dark:hover {
+            background: #20242a;
+            border-color: #ff6a00;
+            color: #ff6a00;
+        }
+
+        .info-row {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            color: #ff6a00;
+            background: rgba(255, 106, 0, 0.10);
+            border: 1px solid rgba(255, 106, 0, 0.30);
+        }
+
+        .loading {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .success-circle {
+                width: 82px;
+                height: 82px;
+            }
+
+            .success-circle .material-symbols-outlined {
+                font-size: 48px;
+            }
+
+            .product-image,
+            .product-placeholder {
+                width: 68px;
+                height: 68px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <header class="sticky top-0 z-50 bg-[#080a0d]/95 backdrop-blur-md border-b border-[#ff6a00]/40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+
+            <a href="homepage.html"
+                class="text-2xl sm:text-3xl font-black tracking-tight text-[#ff6a00]">
+                KHELZONE
+            </a>
+
+            <a href="shop.html"
+                class="flex items-center gap-2 text-sm font-bold text-white hover:text-[#ff6a00] transition">
+                <span class="material-symbols-outlined text-[20px]">
+                    shopping_bag
+                </span>
+                Continue Shopping
+            </a>
+
+        </div>
+    </header>
+
+
+    <!-- MAIN -->
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+
+        <!-- SUCCESS HEADER -->
+        <section class="text-center mb-10">
+
+            <div class="flex justify-center mb-6">
+                <div class="success-circle">
+                    <span class="material-symbols-outlined">
+                        check
+                    </span>
+                </div>
+            </div>
+
+            <p class="text-[#ff6a00] font-bold uppercase tracking-[0.2em] text-sm mb-3">
+                KHELZONE
+            </p>
+
+            <h1 class="heading-font text-5xl sm:text-6xl font-bold uppercase tracking-tight mb-4">
+                Order Confirmed!
+            </h1>
+
+            <p class="text-gray-400 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
+                Thank you for your order. Your order has been successfully placed
+                and is now being processed.
+            </p>
+
+        </section>
+
+
+        <!-- ORDER NUMBER -->
+        <section class="order-number-box rounded-2xl p-5 sm:p-6 mb-6 text-center">
+
+            <p class="text-xs uppercase tracking-widest text-gray-500 font-bold mb-2">
+                Your Order Number
+            </p>
+
+            <div id="orderNumber"
+                class="text-xl sm:text-2xl font-black text-[#ff6a00] break-all">
+                Loading...
+            </div>
+
+        </section>
+
+
+        <!-- ORDER DETAILS GRID -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- LEFT: CUSTOMER + PAYMENT -->
+            <div class="lg:col-span-1 space-y-6">
+
+                <!-- CUSTOMER DETAILS -->
+                <div class="glass rounded-2xl overflow-hidden">
+
+                    <div class="px-5 py-4 border-b border-white/10">
+                        <h2 class="heading-font text-2xl font-bold uppercase">
+                            Customer Details
+                        </h2>
+                    </div>
+
+                    <div class="px-5">
+
+                        <div class="info-row py-4">
+                            <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">
+                                Name
+                            </p>
+                            <p id="customerName" class="font-semibold">
+                                —
+                            </p>
+                        </div>
+
+                        <div class="info-row py-4">
+                            <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">
+                                Phone
+                            </p>
+                            <p id="customerPhone" class="font-semibold">
+                                —
+                            </p>
+                        </div>
+
+                        <div class="info-row py-4">
+                            <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">
+                                Email
+                            </p>
+                            <p id="customerEmail" class="font-semibold break-all">
+                                —
+                            </p>
+                        </div>
+
+                        <div class="info-row py-4">
+                            <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">
+                                City
+                            </p>
+                            <p id="customerCity" class="font-semibold">
+                                —
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- SHIPPING -->
+                <div class="glass rounded-2xl overflow-hidden">
+
+                    <div class="px-5 py-4 border-b border-white/10">
+                        <h2 class="heading-font text-2xl font-bold uppercase">
+                            Shipping Address
+                        </h2>
+                    </div>
+
+                    <div class="p-5">
+
+                        <div class="flex gap-3">
+
+                            <span class="material-symbols-outlined text-[#ff6a00]">
+                                location_on
+                            </span>
+
+                            <p id="shippingAddress"
+                                class="text-gray-300 leading-relaxed">
+                                —
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PAYMENT -->
+                <div class="glass rounded-2xl overflow-hidden">
+
+                    <div class="px-5 py-4 border-b border-white/10">
+                        <h2 class="heading-font text-2xl font-bold uppercase">
+                            Payment
+                        </h2>
+                    </div>
+
+                    <div class="p-5 flex items-center justify-between gap-4">
+
+                        <div>
+                            <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">
+                                Payment Method
+                            </p>
+
+                            <p id="paymentMethod"
+                                class="font-bold text-lg">
+                                —
+                            </p>
+                        </div>
+
+                        <span id="orderStatus"
+                            class="status-badge px-3 py-1.5 rounded-full text-xs font-bold uppercase">
+                            Pending
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- RIGHT: PRODUCTS + TOTAL -->
+            <div class="lg:col-span-2">
+
+                <div class="glass rounded-2xl overflow-hidden">
+
+                    <!-- HEADER -->
+                    <div class="px-5 sm:px-6 py-5 border-b border-white/10 flex items-center justify-between">
+
+                        <div>
+                            <h2 class="heading-font text-3xl font-bold uppercase">
+                                Order Details
+                            </h2>
+
+                            <p id="orderDate"
+                                class="text-sm text-gray-500 mt-1">
+                                —
+                            </p>
+                        </div>
+
+                        <span class="material-symbols-outlined text-[#ff6a00] text-3xl">
+                            receipt_long
+                        </span>
+
+                    </div>
+
+
+                    <!-- PRODUCTS -->
+                    <div id="orderItems" class="divide-y divide-white/10">
+
+                        <div class="p-6 text-center text-gray-500 loading">
+                            Loading order items...
+                        </div>
+
+                    </div>
+
+
+                    <!-- TOTALS -->
+                    <div class="px-5 sm:px-6 py-6 bg-[#0d1014] border-t border-white/10">
+
+                        <div class="space-y-3">
+
+                            <div class="flex justify-between gap-4 text-gray-400">
+                                <span>Subtotal</span>
+                                <span id="subtotal">
+                                    Rs. 0
+                                </span>
+                            </div>
+
+                            <div class="flex justify-between gap-4 text-gray-400">
+                                <span>Shipping</span>
+                                <span id="shipping">
+                                    Free
+                                </span>
+                            </div>
+
+                            <div id="discountRow"
+                                class="hidden flex justify-between gap-4 text-green-400">
+                                <span>Discount</span>
+                                <span id="discount">
+                                    - Rs. 0
+                                </span>
+                            </div>
+
+                            <div class="border-t border-white/10 pt-4 mt-4 flex justify-between gap-4">
+
+                                <span class="font-bold text-lg">
+                                    Grand Total
+                                </span>
+
+                                <span id="grandTotal"
+                                    class="text-[#ff6a00] font-black text-2xl">
+                                    Rs. 0
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BUTTONS -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+
+                    <a href="shop.html"
+                        class="btn-orange rounded-xl py-4 px-5 flex items-center justify-center gap-2 font-bold text-center">
+
+                        <span class="material-symbols-outlined">
+                            shopping_bag
+                        </span>
+
+                        Continue Shopping
+
+                    </a>
+
+
+                    <a href="homepage.html"
+                        class="btn-dark rounded-xl py-4 px-5 flex items-center justify-center gap-2 font-bold text-center">
+
+                        <span class="material-symbols-outlined">
+                            home
+                        </span>
+
+                        Back to Home
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- FOOTER MESSAGE -->
+        <section class="text-center mt-12">
+
+            <span class="material-symbols-outlined text-[#ff6a00] text-3xl mb-2">
+                verified
+            </span>
+
+            <p class="text-gray-500 text-sm">
+                Your order information has been saved successfully.
+            </p>
+
+            <p class="text-gray-600 text-xs mt-2">
+                Thank you for shopping with KHELZONE.
+            </p>
+
+        </section>
+
+    </main>
+
+
+    <!-- JAVASCRIPT -->
+    <script>
+
+        const ORDER_KEY = "khz_last_order";
+
+
+        // ============================================
+        // FORMAT PRICE
+        // ============================================
+
+        function formatPrice(value) {
+
+            const number = Number(value) || 0;
+
+            return "Rs. " + number.toLocaleString("en-PK");
+        }
+
+
+        // ============================================
+        // PAYMENT METHOD
+        // ============================================
+
+        function getPaymentName(method) {
+
+            const methods = {
+
+                card: "Card",
+
+                bank: "Bank Transfer",
+
+                cod: "Cash on Delivery",
+
+                easypaisa: "Easypaisa",
+
+                jazzcash: "JazzCash"
+
+            };
+
+            return methods[method] || method || "Cash on Delivery";
+        }
+
+
+        // ============================================
+        // DATE
+        // ============================================
+
+        function formatDate(dateString) {
+
+            if (!dateString) {
+                return "Date unavailable";
+            }
+
+            const date = new Date(dateString);
+
+            if (Number.isNaN(date.getTime())) {
+                return "Date unavailable";
+            }
+
+            return date.toLocaleString("en-PK", {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+        }
+
+
+        // ============================================
+        // SAFE TEXT
+        // ============================================
+
+        function escapeHTML(value) {
+
+            if (value === null || value === undefined) {
+                return "";
+            }
+
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+
+        // ============================================
+        // LOAD ORDER
+        // ============================================
+
+        function loadOrder() {
+
+            const orderNumberFromURL =
+                new URLSearchParams(window.location.search).get("order");
+
+
+            const savedOrder =
+                localStorage.getItem(ORDER_KEY);
+
+
+            // No order found
+            if (!savedOrder) {
+
+                showNoOrder();
+
+                return;
+            }
+
+
+            let order;
+
+            try {
+
+                order = JSON.parse(savedOrder);
+
+            } catch (error) {
+
+                console.error("Invalid saved order:", error);
+
+                showNoOrder();
+
+                return;
+            }
+
+
+            // Make sure the order number belongs to this saved order
+            if (
+                orderNumberFromURL &&
+                order.orderNumber &&
+                order.orderNumber !== orderNumberFromURL
+            ) {
+
+                console.warn(
+                    "URL order number does not match saved order."
+                );
+
+            }
+
+
+            renderOrder(order);
+
+        }
+
+
+        // ============================================
+        // RENDER ORDER
+        // ============================================
+
+        function renderOrder(order) {
+
+            // Order Number
+            document.getElementById("orderNumber").textContent =
+                order.orderNumber || "N/A";
+
+
+            // Customer
+            document.getElementById("customerName").textContent =
+                order.customer_name || "N/A";
+
+
+            document.getElementById("customerPhone").textContent =
+                order.customer_phone || "N/A";
+
+
+            document.getElementById("customerEmail").textContent =
+                order.customer_email || "N/A";
+
+
+            document.getElementById("customerCity").textContent =
+                order.city || "N/A";
+
+
+            // Address
+            document.getElementById("shippingAddress").textContent =
+                order.shipping_address || "N/A";
+
+
+            // Payment
+            document.getElementById("paymentMethod").textContent =
+                getPaymentName(order.payment_method);
+
+
+            // Status
+            const status =
+                order.status || "pending";
+
+            document.getElementById("orderStatus").textContent =
+                status;
+
+
+            // Date
+            document.getElementById("orderDate").textContent =
+                formatDate(order.created_at);
+
+
+            // Totals
+            document.getElementById("subtotal").textContent =
+                formatPrice(order.subtotal);
+
+
+            const shippingValue =
+                Number(order.shipping) || 0;
+
+
+            document.getElementById("shipping").textContent =
+                shippingValue === 0
+                    ? "Free"
+                    : formatPrice(shippingValue);
+
+
+            const discountValue =
+                Number(order.discount) || 0;
+
+
+            if (discountValue > 0) {
+
+                const discountRow =
+                    document.getElementById("discountRow");
+
+                discountRow.classList.remove("hidden");
+                discountRow.classList.add("flex");
+
+                document.getElementById("discount").textContent =
+                    "- " + formatPrice(discountValue);
+
+            }
+
+
+            document.getElementById("grandTotal").textContent =
+                formatPrice(order.total);
+
+
+            // Products
+            renderItems(order.items || []);
+
+        }
+
+
+        // ============================================
+        // RENDER ITEMS
+        // ============================================
+
+        function renderItems(items) {
+
+            const container =
+                document.getElementById("orderItems");
+
+
+            if (!Array.isArray(items) || items.length === 0) {
+
+                container.innerHTML = `
+                    <div class="p-8 text-center">
+                        <span class="material-symbols-outlined text-gray-600 text-5xl mb-3">
+                            inventory_2
+                        </span>
+
+                        <p class="text-gray-400">
+                            No product details available.
+                        </p>
+                    </div>
+                `;
+
+                return;
+            }
+
+
+            container.innerHTML = items.map((item) => {
+
+                const name =
+                    item.name || "Sports Product";
+
+
+                const quantity =
+                    Number(item.quantity) || 1;
+
+
+                const price =
+                    Number(item.price) || 0;
+
+
+                const lineTotal =
+                    price * quantity;
+
+
+                const image =
+                    item.image_url ||
+                    item.image ||
+                    "";
+
+
+                const category =
+                    item.category || "";
+
+
+                const size =
+                    item.size || "";
+
+
+                let imageHTML;
+
+
+                if (image) {
+
+                    imageHTML = `
+                        <img
+                            src="${escapeHTML(image)}"
+                            alt="${escapeHTML(name)}"
+                            class="product-image"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                        >
+
+                        <div
+                            class="product-placeholder"
+                            style="display:none;">
+                            <span class="material-symbols-outlined">
+                                sports
+                            </span>
+                        </div>
+                    `;
+
+                } else {
+
+                    imageHTML = `
+                        <div class="product-placeholder">
+                            <span class="material-symbols-outlined">
+                                sports
+                            </span>
+                        </div>
+                    `;
+
+                }
+
+
+                return `
+
+                    <div class="p-5 sm:p-6 flex gap-4">
+
+                        <div class="shrink-0">
+                            ${imageHTML}
+                        </div>
+
+
+                        <div class="flex-1 min-w-0">
+
+                            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+
+                                <div>
+
+                                    <h3 class="font-bold text-base sm:text-lg truncate">
+                                        ${escapeHTML(name)}
+                                    </h3>
+
+
+                                    ${category ? `
+                                        <p class="text-xs text-gray-500 mt-1">
+                                            ${escapeHTML(category)}
+                                        </p>
+                                    ` : ""}
+
+                                </div>
+
+
+                                <p class="font-black text-[#ff6a00] whitespace-nowrap">
+                                    ${formatPrice(lineTotal)}
+                                </p>
+
+                            </div>
+
+
+                            <div class="flex flex-wrap gap-x-5 gap-y-2 mt-3 text-sm text-gray-400">
+
+                                <span>
+                                    Qty:
+                                    <strong class="text-white">
+                                        ${quantity}
+                                    </strong>
+                                </span>
+
+
+                                <span>
+                                    Price:
+                                    <strong class="text-white">
+                                        ${formatPrice(price)}
+                                    </strong>
+                                </span>
+
+
+                                ${size ? `
+                                    <span>
+                                        Size:
+                                        <strong class="text-white">
+                                            ${escapeHTML(size)}
+                                        </strong>
+                                    </span>
+                                ` : ""}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }).join("");
+
+        }
+
+
+        // ============================================
+        // NO ORDER
+        // ============================================
+
+        function showNoOrder() {
+
+            document.getElementById("orderNumber").textContent =
+                "Order information not found";
+
+
+            document.getElementById("orderItems").innerHTML = `
+
+                <div class="p-10 text-center">
+
+                    <span class="material-symbols-outlined text-gray-600 text-6xl mb-4">
+                        receipt_long
+                    </span>
+
+                    <h2 class="heading-font text-3xl font-bold uppercase mb-2">
+                        Order Not Found
+                    </h2>
+
+                    <p class="text-gray-500 text-sm max-w-md mx-auto">
+                        We could not find the saved order information on this device.
+                    </p>
+
+                </div>
+
+            `;
+
+            document.getElementById("customerName").textContent = "—";
+            document.getElementById("customerPhone").textContent = "—";
+            document.getElementById("customerEmail").textContent = "—";
+            document.getElementById("customerCity").textContent = "—";
+            document.getElementById("shippingAddress").textContent = "—";
+            document.getElementById("paymentMethod").textContent = "—";
+            document.getElementById("orderDate").textContent = "—";
+
+        }
+
+
+        // ============================================
+        // START
+        // ============================================
+
+        document.addEventListener("DOMContentLoaded", () => {
+
+            loadOrder();
+
+        });
+
+    </script>
+
+</body>
+
+</html>

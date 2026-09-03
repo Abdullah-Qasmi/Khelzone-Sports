@@ -1,221 +1,146 @@
-/* ==========================================================================
-   KHELZONE CHECKOUT / PAYMENT
-   ========================================================================== */
+/* =========================================================
+   KHELZONE - PAYMENT / CHECKOUT
+   ========================================================= */
 
-"use strict";
+const SUPABASE_URL =
+    "https://antqexjhlsaynunlmzqa.supabase.co";
 
+const SUPABASE_KEY =
+    "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
 
-/* ==========================================================================
-   CONFIG
-========================================================================== */
-
-const CART_STORAGE_KEY = "khz_cart";
-const ORDERS_STORAGE_KEY = "khz_orders";
-const LAST_ORDER_STORAGE_KEY = "khz_last_order";
-
-const FREE_SHIPPING_LIMIT = 5000;
-const STANDARD_SHIPPING = 250;
-
-
-/* ==========================================================================
-   STATE
-========================================================================== */
-
-let cart = [];
-let selectedPaymentMethod = "card";
-let isProcessingOrder = false;
-
-let orderTotals = {
-    subtotal: 0,
-    shipping: 0,
-    discount: 0,
-    total: 0
-};
+const supabaseClient = window.supabase
+    ? window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    )
+    : null;
 
 
-/* ==========================================================================
-   DOM HELPERS
-========================================================================== */
+/* =========================================================
+   GLOBALS
+   ========================================================= */
 
-function $(selector) {
-    return document.querySelector(selector);
-}
+const CART_KEY = "khz_cart";
 
-function $$(selector) {
-    return Array.from(document.querySelectorAll(selector));
-}
+let cartItems = [];
+let currentUser = null;
 
-
-/* ==========================================================================
-   MONEY
-========================================================================== */
-
-function money(value) {
-    const amount = Number(value) || 0;
-
-    return "Rs. " + amount.toLocaleString("en-PK");
-}
+let subtotal = 0;
+let shipping = 0;
+let discount = 0;
+let grandTotal = 0;
 
 
-/* ==========================================================================
-   HTML ESCAPE
-========================================================================== */
+/* =========================================================
+   HELPERS
+   ========================================================= */
 
-function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, function (char) {
-        const entities = {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#039;"
-        };
-
-        return entities[char];
-    });
-}
-
-
-/* ==========================================================================
-   PRODUCT IMAGE
-========================================================================== */
-
-function getProductImage(item) {
-
-    const image =
-        item.image_url ||
-        item.image ||
-        item.product_image ||
-        item.thumbnail ||
-        "";
-
-    if (String(image).trim()) {
-        return String(image);
+function escapeHtml(value) {
+    if (value === null || value === undefined) {
+        return "";
     }
 
-    const name = escapeHTML(
-        item.name ||
-        item.title ||
-        item.product_name ||
-        "KHELZONE Product"
-    );
-
-    const svg = `
-        <svg xmlns="http://www.w3.org/2000/svg"
-             width="300"
-             height="300"
-             viewBox="0 0 300 300">
-
-            <rect width="300" height="300" fill="#141414"/>
-
-            <rect x="15"
-                  y="15"
-                  width="270"
-                  height="270"
-                  rx="15"
-                  fill="none"
-                  stroke="#ff6a00"
-                  stroke-width="2"/>
-
-            <text x="150"
-                  y="140"
-                  fill="#ff6a00"
-                  font-family="Arial"
-                  font-size="22"
-                  font-weight="900"
-                  text-anchor="middle">
-                KHELZONE
-            </text>
-
-            <text x="150"
-                  y="172"
-                  fill="#888"
-                  font-family="Arial"
-                  font-size="12"
-                  text-anchor="middle">
-                ${name.substring(0, 28)}
-            </text>
-
-        </svg>
-    `;
-
-    return "data:image/svg+xml;charset=UTF-8," +
-        encodeURIComponent(svg);
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 
-/* ==========================================================================
-   LOAD CART
-========================================================================== */
+function formatPrice(value) {
+    const number = Number(value) || 0;
+    return `Rs. ${number.toLocaleString("en-PK")}`;
+}
+
+
+function getElement(id) {
+    return document.getElementById(id);
+}
+
+
+/* =========================================================
+   CART
+   ========================================================= */
 
 function loadCart() {
-
     try {
+        const savedCart =
+            localStorage.getItem(CART_KEY);
 
-        const saved = localStorage.getItem(CART_STORAGE_KEY);
-
-        if (!saved) {
-            return [];
+        if (!savedCart) {
+            cartItems = [];
+            return;
         }
 
-        const parsed = JSON.parse(saved);
+        const parsed =
+            JSON.parse(savedCart);
 
-        if (!Array.isArray(parsed)) {
-            console.warn("khz_cart is not an array.");
-            return [];
+        if (Array.isArray(parsed)) {
+            cartItems = parsed;
+        } else if (
+            parsed &&
+            Array.isArray(parsed.items)
+        ) {
+            cartItems = parsed.items;
+        } else {
+            cartItems = [];
         }
-
-        return parsed;
 
     } catch (error) {
+        console.error(
+            "Cart loading error:",
+            error
+        );
 
-        console.error("KHELZONE cart loading error:", error);
-
-        return [];
-
+        cartItems = [];
     }
 }
 
 
-/* ==========================================================================
+/* =========================================================
    NORMALIZE CART ITEM
-========================================================================== */
+   ========================================================= */
 
 function normalizeCartItem(item, index) {
 
-    if (!item || typeof item !== "object") {
+    if (
+        !item ||
+        typeof item !== "object"
+    ) {
         return null;
     }
 
-    const rawQuantity =
-        item.quantity ??
-        item.qty ??
-        1;
+    const quantity =
+        Number(
+            item.quantity ??
+            item.qty ??
+            item.count ??
+            1
+        ) || 1;
 
-    const quantity = Math.max(
-        1,
-        parseInt(rawQuantity, 10) || 1
-    );
-
-    const rawPrice =
-        item.price ??
-        item.sale_price ??
-        item.salePrice ??
-        item.unit_price ??
-        item.unitPrice ??
-        0;
-
-    const price = Math.max(
-        0,
-        Number(rawPrice) || 0
-    );
+    const price =
+        Number(
+            item.price ??
+            item.productPrice ??
+            item.unit_price ??
+            0
+        ) || 0;
 
     const name =
-        item.name ||
-        item.title ||
-        item.product_name ||
-        item.productName ||
-        "KHELZONE Product";
+        item.name ??
+        item.productName ??
+        item.title ??
+        "Sports Product";
+
+    const image =
+        item.image_url ??
+        item.imageUrl ??
+        item.image ??
+        item.productImage ??
+        item.thumbnail ??
+        "";
 
     const id =
         item.id ??
@@ -223,234 +148,290 @@ function normalizeCartItem(item, index) {
         item.productId ??
         `cart-item-${index}`;
 
+    const category =
+        item.category ??
+        item.sport ??
+        item.productCategory ??
+        "";
+
+    const size =
+        item.size ??
+        item.productSize ??
+        "";
+
     return {
-
-        ...item,
-
-        id: String(id),
-
-        name: String(name),
-
-        price: price,
-
-        quantity: quantity,
-
-        image:
-            item.image_url ||
-            item.image ||
-            item.product_image ||
-            item.thumbnail ||
-            "",
-
-        size:
-            item.size ||
-            item.selectedSize ||
-            "",
-
-        color:
-            item.color ||
-            item.selectedColor ||
-            "",
-
-        sport:
-            item.sport ||
-            item.category ||
-            ""
-
+        id,
+        name,
+        price,
+        quantity,
+        image,
+        category,
+        size,
+        total: price * quantity,
+        original: item
     };
 }
 
 
-/* ==========================================================================
+/* =========================================================
    PREPARE CART
-========================================================================== */
+   ========================================================= */
 
 function prepareCart() {
 
-    const rawCart = loadCart();
+    const normalized = [];
 
-    cart = rawCart
-        .map(normalizeCartItem)
-        .filter(function (item) {
-            return item !== null &&
-                item.quantity > 0 &&
-                item.price >= 0;
-        });
+    cartItems.forEach(
+        (item, index) => {
 
+            const normalizedItem =
+                normalizeCartItem(
+                    item,
+                    index
+                );
+
+            if (normalizedItem) {
+                normalized.push(
+                    normalizedItem
+                );
+            }
+        }
+    );
+
+    cartItems = normalized;
 }
 
 
-/* ==========================================================================
-   CART COUNT
-========================================================================== */
-
-function getCartItemCount() {
-
-    return cart.reduce(function (total, item) {
-
-        return total +
-            (Number(item.quantity) || 0);
-
-    }, 0);
-}
-
-
-/* ==========================================================================
+/* =========================================================
    CALCULATE TOTALS
-========================================================================== */
+   ========================================================= */
 
 function calculateTotals() {
 
-    const subtotal = cart.reduce(function (total, item) {
+    subtotal =
+        cartItems.reduce(
+            (total, item) => {
+                return total +
+                    (
+                        Number(item.price) *
+                        Number(item.quantity)
+                    );
+            },
+            0
+        );
 
-        const price = Number(item.price) || 0;
-        const quantity = Number(item.quantity) || 0;
+    /*
+       Free shipping above Rs. 3000.
+       Otherwise Rs. 200.
+    */
 
-        return total + (price * quantity);
-
-    }, 0);
-
-
-    let shipping = 0;
-
-    if (subtotal > 0 && subtotal < FREE_SHIPPING_LIMIT) {
-        shipping = STANDARD_SHIPPING;
+    if (subtotal <= 0) {
+        shipping = 0;
+    } else if (subtotal >= 3000) {
+        shipping = 0;
+    } else {
+        shipping = 200;
     }
 
+    discount = 0;
 
-    const discount = 0;
+    grandTotal =
+        subtotal +
+        shipping -
+        discount;
 
-    const total = Math.max(
-        0,
-        subtotal + shipping - discount
-    );
-
-
-    orderTotals = {
-        subtotal: subtotal,
-        shipping: shipping,
-        discount: discount,
-        total: total
-    };
-
-
-    return orderTotals;
+    if (grandTotal < 0) {
+        grandTotal = 0;
+    }
 }
 
 
-/* ==========================================================================
+/* =========================================================
    RENDER ORDER ITEMS
-========================================================================== */
+   ========================================================= */
 
 function renderOrderItems() {
 
-    const container = $("#orderItems");
+    const container =
+        getElement("orderItems");
 
     if (!container) {
+        console.error(
+            "orderItems element not found."
+        );
         return;
     }
 
+    container.innerHTML = "";
 
-    if (!cart.length) {
+    if (!cartItems.length) {
 
         container.innerHTML = `
-            <div class="text-center py-10 text-gray-500">
-                Your cart is empty.
+            <div class="py-10 text-center">
+
+                <div
+                    class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/5"
+                >
+                    <span
+                        class="material-symbols-outlined text-3xl text-white/40"
+                    >
+                        shopping_cart
+                    </span>
+                </div>
+
+                <h3
+                    class="text-base font-black text-white"
+                >
+                    Your cart is empty
+                </h3>
+
+                <p
+                    class="mt-2 text-sm text-white/50"
+                >
+                    Add some sports products before placing your order.
+                </p>
+
+                <a
+                    href="shop.html"
+                    class="mt-5 inline-flex items-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-black uppercase tracking-wide text-black transition hover:bg-orange-400"
+                >
+                    <span
+                        class="material-symbols-outlined text-[20px]"
+                    >
+                        shopping_bag
+                    </span>
+
+                    Continue Shopping
+                </a>
+
             </div>
         `;
 
         return;
     }
 
-
-    container.innerHTML = cart.map(function (item) {
-
-        const name = escapeHTML(item.name);
-
-        const image = getProductImage(item);
-
-        const quantity =
-            Number(item.quantity) || 1;
+    cartItems.forEach((item) => {
 
         const itemTotal =
-            Number(item.price) * quantity;
+            Number(item.price) *
+            Number(item.quantity);
 
+        let imageHtml = "";
 
-        const variants = [];
+        if (item.image) {
 
+            imageHtml = `
+                <img
+                    src="${escapeHtml(item.image)}"
+                    alt="${escapeHtml(item.name)}"
+                    class="h-20 w-20 rounded-xl object-cover bg-black/20"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                />
 
-        if (item.size) {
+                <div
+                    class="hidden h-20 w-20 items-center justify-center rounded-xl bg-white/5"
+                >
+                    <span
+                        class="material-symbols-outlined text-2xl text-white/30"
+                    >
+                        sports
+                    </span>
+                </div>
+            `;
 
-            variants.push(
-                "Size: " +
-                escapeHTML(item.size)
-            );
+        } else {
 
+            imageHtml = `
+                <div
+                    class="flex h-20 w-20 items-center justify-center rounded-xl bg-white/5"
+                >
+                    <span
+                        class="material-symbols-outlined text-2xl text-white/30"
+                    >
+                        sports
+                    </span>
+                </div>
+            `;
         }
 
+        const itemHtml = `
+            <div
+                class="flex gap-4 border-b border-white/10 py-5 first:pt-0 last:border-b-0 last:pb-0"
+            >
 
-        if (item.color) {
+                <div class="shrink-0">
+                    ${imageHtml}
+                </div>
 
-            variants.push(
-                "Color: " +
-                escapeHTML(item.color)
-            );
+                <div class="min-w-0 flex-1">
 
-        }
+                    <div
+                        class="flex items-start justify-between gap-3"
+                    >
 
+                        <div class="min-w-0">
 
-        const variantHTML =
-            variants.length > 0
-                ? `
-                    <div class="text-[10px] text-gray-500 mt-1">
-                        ${variants.join(" • ")}
-                    </div>
-                  `
-                : "";
+                            <h3
+                                class="truncate text-sm font-black text-white sm:text-base"
+                                title="${escapeHtml(item.name)}"
+                            >
+                                ${escapeHtml(item.name)}
+                            </h3>
 
+                            ${
+                                item.category
+                                    ? `
+                                        <p
+                                            class="mt-1 text-xs font-bold uppercase tracking-wide text-orange-400"
+                                        >
+                                            ${escapeHtml(item.category)}
+                                        </p>
+                                    `
+                                    : ""
+                            }
 
-        const safeImage =
-            escapeHTML(image);
+                            ${
+                                item.size
+                                    ? `
+                                        <p
+                                            class="mt-1 text-xs text-white/50"
+                                        >
+                                            Size: ${escapeHtml(item.size)}
+                                        </p>
+                                    `
+                                    : ""
+                            }
 
+                        </div>
 
-        return `
-            <div class="product-row py-4 border-b border-white/5">
-
-                <div class="flex gap-3">
-
-                    <div class="w-16 h-16 rounded-xl overflow-hidden bg-white/5 shrink-0">
-
-                        <img
-                            src="${safeImage}"
-                            alt="${name}"
-                            class="w-full h-full object-cover"
-                            onerror="this.onerror=null;this.src='${escapeHTML(
-                                getProductImage({
-                                    name: "KHELZONE Product"
-                                })
-                            )}';"
+                        <div
+                            class="shrink-0 text-right"
                         >
-
-                    </div>
-
-
-                    <div class="min-w-0 flex-1">
-
-                        <div class="font-semibold text-sm truncate">
-                            ${name}
-                        </div>
-
-                        ${variantHTML}
-
-                        <div class="text-xs text-gray-500 mt-2">
-                            Qty: ${quantity}
+                            <p
+                                class="text-sm font-black text-orange-400 sm:text-base"
+                            >
+                                ${formatPrice(itemTotal)}
+                            </p>
                         </div>
 
                     </div>
 
+                    <div
+                        class="mt-3 flex items-center justify-between gap-3"
+                    >
 
-                    <div class="text-sm font-bold whitespace-nowrap">
-                        ${money(itemTotal)}
+                        <p
+                            class="text-xs text-white/50"
+                        >
+                            ${formatPrice(item.price)} × ${item.quantity}
+                        </p>
+
+                        <div
+                            class="flex h-8 min-w-8 items-center justify-center rounded-lg bg-white/5 px-2 text-xs font-black text-white"
+                        >
+                            Qty: ${item.quantity}
+                        </div>
+
                     </div>
 
                 </div>
@@ -458,1321 +439,728 @@ function renderOrderItems() {
             </div>
         `;
 
-    }).join("");
+        container.insertAdjacentHTML(
+            "beforeend",
+            itemHtml
+        );
+    });
 }
 
 
-/* ==========================================================================
+/* =========================================================
    RENDER TOTALS
-========================================================================== */
+   ========================================================= */
 
 function renderTotals() {
 
-    const totals = calculateTotals();
+    const summaryItemCount =
+        getElement("summaryItemCount");
 
+    const subtotalValue =
+        getElement("subtotalValue");
 
-    const subtotalElement = $("#subtotalValue");
+    const shippingValue =
+        getElement("shippingValue");
 
-    if (subtotalElement) {
-        subtotalElement.textContent =
-            money(totals.subtotal);
-    }
+    const discountRow =
+        getElement("discountRow");
 
+    const discountValue =
+        getElement("discountValue");
 
-    const shippingElement = $("#shippingValue");
+    const grandTotalValue =
+        getElement("grandTotalValue");
 
-    if (shippingElement) {
-
-        shippingElement.textContent =
-            totals.shipping === 0
-                ? "FREE"
-                : money(totals.shipping);
-
-        shippingElement.classList.toggle(
-            "text-green-500",
-            totals.shipping === 0
+    const totalQuantity =
+        cartItems.reduce(
+            (total, item) =>
+                total +
+                Number(item.quantity),
+            0
         );
 
+    if (summaryItemCount) {
+        summaryItemCount.textContent =
+            `${totalQuantity} ${
+                totalQuantity === 1
+                    ? "item"
+                    : "items"
+            }`;
     }
 
+    if (subtotalValue) {
+        subtotalValue.textContent =
+            formatPrice(subtotal);
+    }
 
-    const discountRow = $("#discountRow");
+    if (shippingValue) {
+
+        if (
+            shipping === 0 &&
+            subtotal > 0
+        ) {
+            shippingValue.textContent =
+                "FREE";
+
+            shippingValue.classList.add(
+                "text-green-400"
+            );
+
+        } else {
+
+            shippingValue.textContent =
+                formatPrice(shipping);
+
+            shippingValue.classList.remove(
+                "text-green-400"
+            );
+        }
+    }
 
     if (discountRow) {
 
-        discountRow.classList.toggle(
-            "hidden",
-            totals.discount <= 0
-        );
+        if (discount > 0) {
 
+            discountRow.classList.remove(
+                "hidden"
+            );
+
+            if (discountValue) {
+                discountValue.textContent =
+                    `- ${formatPrice(discount)}`;
+            }
+
+        } else {
+
+            discountRow.classList.add(
+                "hidden"
+            );
+        }
     }
 
-
-    const discountElement = $("#discountValue");
-
-    if (discountElement) {
-
-        discountElement.textContent =
-            "- " + money(totals.discount);
-
+    if (grandTotalValue) {
+        grandTotalValue.textContent =
+            formatPrice(grandTotal);
     }
-
-
-    const grandTotalElement =
-        $("#grandTotalValue");
-
-    if (grandTotalElement) {
-
-        grandTotalElement.textContent =
-            money(totals.total);
-
-    }
-
-
-    const itemCountElement =
-        $("#summaryItemCount");
-
-    if (itemCountElement) {
-
-        const count = getCartItemCount();
-
-        itemCountElement.textContent =
-            count +
-            (count === 1 ? " item" : " items");
-
-    }
-
-
-    const navCartCount =
-        $("#navCartCount");
-
-    if (navCartCount) {
-
-        navCartCount.textContent =
-            getCartItemCount();
-
-    }
-
 }
 
 
-/* ==========================================================================
+/* =========================================================
    CHECKOUT VISIBILITY
-========================================================================== */
+   ========================================================= */
 
 function updateCheckoutVisibility() {
 
-    const emptyCheckout =
-        $("#emptyCheckout");
+    const placeOrderBtn =
+        getElement("placeOrderBtn");
 
-    const checkoutContent =
-        $("#checkoutContent");
+    if (!placeOrderBtn) {
+        return;
+    }
 
+    if (!cartItems.length) {
 
-    if (!cart.length) {
+        placeOrderBtn.disabled = true;
 
-        emptyCheckout?.classList.remove("hidden");
+        placeOrderBtn.classList.add(
+            "opacity-50",
+            "cursor-not-allowed"
+        );
 
-        checkoutContent?.classList.add("hidden");
+        placeOrderBtn.setAttribute(
+            "aria-disabled",
+            "true"
+        );
 
     } else {
 
-        emptyCheckout?.classList.add("hidden");
+        placeOrderBtn.disabled = false;
 
-        checkoutContent?.classList.remove("hidden");
+        placeOrderBtn.classList.remove(
+            "opacity-50",
+            "cursor-not-allowed"
+        );
 
+        placeOrderBtn.removeAttribute(
+            "aria-disabled"
+        );
     }
-
 }
 
 
-/* ==========================================================================
-   PAYMENT METHOD NAME
-========================================================================== */
+/* =========================================================
+   CURRENT USER
+   ========================================================= */
 
-function getPaymentMethodName(method) {
+async function loadCurrentUser() {
 
-    const names = {
+    if (!supabaseClient) {
 
-        card: "Credit / Debit Card",
+        console.error(
+            "Supabase client not available."
+        );
 
-        bank: "Bank Transfer",
+        currentUser = null;
+        return null;
+    }
 
-        cod: "Cash on Delivery",
+    try {
 
-        easypaisa: "Easypaisa",
+        const {
+            data: sessionData,
+            error: sessionError
+        } =
+            await supabaseClient.auth.getSession();
 
-        jazzcash: "JazzCash"
+        if (sessionError) {
 
-    };
+            console.error(
+                "Session loading error:",
+                sessionError
+            );
 
-    return names[method] || "Cash on Delivery";
+            currentUser = null;
+            return null;
+        }
+
+        const session =
+            sessionData?.session;
+
+        if (!session?.user) {
+
+            console.warn(
+                "No active Supabase session."
+            );
+
+            currentUser = null;
+            return null;
+        }
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient.auth.getUser();
+
+        if (error) {
+
+            console.error(
+                "User loading error:",
+                error
+            );
+
+            currentUser = null;
+            return null;
+        }
+
+        currentUser =
+            data?.user || session.user;
+
+        console.log(
+            "Logged in user:",
+            currentUser
+        );
+
+        console.log(
+            "Authenticated UUID:",
+            currentUser.id
+        );
+
+        return currentUser;
+
+    } catch (error) {
+
+        console.error(
+            "Current user error:",
+            error
+        );
+
+        currentUser = null;
+        return null;
+    }
 }
 
 
-/* ==========================================================================
-   PAYMENT DETAILS
-========================================================================== */
-
-function renderPaymentDetails(method) {
-
-    const container =
-        $("#paymentDetails");
-
-    if (!container) {
-        return;
-    }
-
-
-    /* CARD */
-
-    if (method === "card") {
-
-        container.innerHTML = `
-
-            <div class="rounded-2xl border border-white/10 bg-black/20 p-5">
-
-                <div class="flex items-center gap-2 mb-5">
-
-                    <span class="material-symbols-outlined text-orange-500">
-                        credit_card
-                    </span>
-
-                    <div class="font-bold">
-                        Card Details
-                    </div>
-
-                </div>
-
-
-                <div class="space-y-4">
-
-                    <div>
-
-                        <label class="block text-xs uppercase tracking-wider font-bold text-gray-400 mb-2">
-                            Card Number
-                        </label>
-
-                        <input
-                            id="cardNumber"
-                            type="text"
-                            inputmode="numeric"
-                            autocomplete="cc-number"
-                            maxlength="19"
-                            class="input-field"
-                            placeholder="1234 5678 9012 3456">
-
-                    </div>
-
-
-                    <div class="grid grid-cols-2 gap-4">
-
-                        <div>
-
-                            <label class="block text-xs uppercase tracking-wider font-bold text-gray-400 mb-2">
-                                Expiry
-                            </label>
-
-                            <input
-                                id="cardExpiry"
-                                type="text"
-                                inputmode="numeric"
-                                autocomplete="cc-exp"
-                                maxlength="5"
-                                class="input-field"
-                                placeholder="MM/YY">
-
-                        </div>
-
-
-                        <div>
-
-                            <label class="block text-xs uppercase tracking-wider font-bold text-gray-400 mb-2">
-                                CVV
-                            </label>
-
-                            <input
-                                id="cardCVV"
-                                type="password"
-                                inputmode="numeric"
-                                autocomplete="cc-csc"
-                                maxlength="4"
-                                class="input-field"
-                                placeholder="123">
-
-                        </div>
-
-                    </div>
-
-
-                    <div>
-
-                        <label class="block text-xs uppercase tracking-wider font-bold text-gray-400 mb-2">
-                            Cardholder Name
-                        </label>
-
-                        <input
-                            id="cardName"
-                            type="text"
-                            autocomplete="cc-name"
-                            class="input-field"
-                            placeholder="Name on card">
-
-                    </div>
-
-                </div>
-
-
-                <div class="mt-4 text-xs text-gray-500 flex gap-2">
-
-                    <span class="material-symbols-outlined text-sm">
-                        lock
-                    </span>
-
-                    <span>
-                        Demo checkout only. Do not use real card details.
-                    </span>
-
-                </div>
-
-            </div>
-
-        `;
-
-        setupCardFormatting();
-
-        return;
-    }
-
-
-    /* BANK */
-
-    if (method === "bank") {
-
-        container.innerHTML = `
-
-            <div class="rounded-2xl border border-white/10 bg-black/20 p-5">
-
-                <div class="flex items-center gap-3 mb-5">
-
-                    <div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
-
-                        <span class="material-symbols-outlined text-orange-500">
-                            account_balance
-                        </span>
-
-                    </div>
-
-                    <div>
-
-                        <div class="font-bold">
-                            Bank Transfer
-                        </div>
-
-                        <div class="text-xs text-gray-500">
-                            Transfer the order amount to:
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="space-y-3">
-
-                    <div class="flex justify-between gap-4 bg-white/5 rounded-xl p-4">
-
-                        <span class="text-gray-500 text-sm">
-                            Bank
-                        </span>
-
-                        <strong class="text-sm">
-                            KHELZONE Business Account
-                        </strong>
-
-                    </div>
-
-
-                    <div class="flex justify-between gap-4 bg-white/5 rounded-xl p-4">
-
-                        <span class="text-gray-500 text-sm">
-                            Account Title
-                        </span>
-
-                        <strong class="text-sm">
-                            KHELZONE
-                        </strong>
-
-                    </div>
-
-
-                    <div class="flex justify-between gap-4 bg-white/5 rounded-xl p-4">
-
-                        <span class="text-gray-500 text-sm">
-                            Account Number
-                        </span>
-
-                        <strong class="text-sm tracking-wider">
-                            XXXXXXXX
-                        </strong>
-
-                    </div>
-
-
-                    <div class="flex justify-between gap-4 bg-white/5 rounded-xl p-4">
-
-                        <span class="text-gray-500 text-sm">
-                            IBAN
-                        </span>
-
-                        <strong class="text-sm tracking-wider">
-                            PKXX XXXX XXXX XXXX
-                        </strong>
-
-                    </div>
-
-                </div>
-
-
-                <div class="mt-5 text-xs text-yellow-500 bg-yellow-500/5 border border-yellow-500/10 rounded-xl p-4">
-
-                    Replace these placeholder bank details with your real business bank details.
-
-                </div>
-
-            </div>
-
-        `;
-
-        return;
-    }
-
-
-    /* EASYPAISA */
-
-    if (method === "easypaisa") {
-
-        container.innerHTML = `
-
-            <div class="rounded-2xl border border-white/10 bg-black/20 p-5">
-
-                <div class="flex items-center gap-3 mb-5">
-
-                    <div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
-
-                        <span class="material-symbols-outlined text-orange-500">
-                            smartphone
-                        </span>
-
-                    </div>
-
-                    <div>
-
-                        <div class="font-bold">
-                            Easypaisa
-                        </div>
-
-                        <div class="text-xs text-gray-500">
-                            Enter your Easypaisa number.
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <label class="block text-xs uppercase tracking-wider font-bold text-gray-400 mb-2">
-                    Easypaisa Mobile Number
-                </label>
-
-                <input
-                    id="easypaisaNumber"
-                    type="tel"
-                    inputmode="numeric"
-                    autocomplete="tel"
-                    maxlength="13"
-                    class="input-field"
-                    placeholder="03XX XXXXXXX">
-
-
-                <div class="mt-4 text-xs text-gray-500">
-
-                    Frontend demo only. Real Easypaisa payment requires merchant/gateway integration.
-
-                </div>
-
-            </div>
-
-        `;
-
-        return;
-    }
-
-
-    /* JAZZCASH */
-
-    if (method === "jazzcash") {
-
-        container.innerHTML = `
-
-            <div class="rounded-2xl border border-white/10 bg-black/20 p-5">
-
-                <div class="flex items-center gap-3 mb-5">
-
-                    <div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
-
-                        <span class="material-symbols-outlined text-orange-500">
-                            phone_iphone
-                        </span>
-
-                    </div>
-
-                    <div>
-
-                        <div class="font-bold">
-                            JazzCash
-                        </div>
-
-                        <div class="text-xs text-gray-500">
-                            Enter your JazzCash number.
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <label class="block text-xs uppercase tracking-wider font-bold text-gray-400 mb-2">
-                    JazzCash Mobile Number
-                </label>
-
-                <input
-                    id="jazzcashNumber"
-                    type="tel"
-                    inputmode="numeric"
-                    autocomplete="tel"
-                    maxlength="13"
-                    class="input-field"
-                    placeholder="03XX XXXXXXX">
-
-
-                <div class="mt-4 text-xs text-gray-500">
-
-                    Frontend demo only. Real JazzCash payment requires merchant/gateway integration.
-
-                </div>
-
-            </div>
-
-        `;
-
-        return;
-    }
-
-
-    /* COD */
-
-    if (method === "cod") {
-
-        container.innerHTML = `
-
-            <div class="rounded-2xl border border-green-500/10 bg-green-500/5 p-5">
-
-                <div class="flex items-start gap-3">
-
-                    <span class="material-symbols-outlined text-green-500">
-                        local_shipping
-                    </span>
-
-                    <div>
-
-                        <div class="font-bold">
-                            Cash on Delivery Selected
-                        </div>
-
-                        <p class="text-xs text-gray-500 mt-1 leading-relaxed">
-                            Pay in cash when your KHELZONE order arrives.
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        `;
-
-    }
-
-}
-
-
-/* ==========================================================================
-   PAYMENT METHODS
-========================================================================== */
+/* =========================================================
+   PAYMENT METHOD
+   ========================================================= */
 
 function setupPaymentMethods() {
 
-    const options =
-        $$(".payment-option");
+    const paymentMethods =
+        document.querySelectorAll(
+            'input[name="paymentMethod"]'
+        );
 
-
-    options.forEach(function (option) {
-
-        option.addEventListener("click", function (event) {
-
-            const radio =
-                option.querySelector(
-                    'input[type="radio"]'
-                );
-
-
-            if (!radio) {
-                return;
-            }
-
-
-            radio.checked = true;
-
-            selectedPaymentMethod =
-                radio.value;
-
-
-            options.forEach(function (item) {
-
-                item.classList.toggle(
-                    "active",
-                    item === option
-                );
-
-            });
-
-
-            renderPaymentDetails(
-                selectedPaymentMethod
-            );
-
-        });
-
-    });
-
-
-    /* Also handle radio change directly */
-
-    $$('input[name="paymentMethod"]')
-        .forEach(function (radio) {
+    paymentMethods.forEach(
+        (radio) => {
 
             radio.addEventListener(
                 "change",
-                function () {
+                () => {
 
-                    if (!radio.checked) {
-                        return;
-                    }
-
-
-                    selectedPaymentMethod =
-                        radio.value;
-
-
-                    options.forEach(function (option) {
-
-                        const optionRadio =
-                            option.querySelector(
-                                'input[type="radio"]'
-                            );
-
-                        option.classList.toggle(
-                            "active",
-                            optionRadio === radio
-                        );
-
-                    });
-
-
-                    renderPaymentDetails(
-                        selectedPaymentMethod
+                    updatePaymentDetails(
+                        radio.value
                     );
-
                 }
             );
+        }
+    );
 
-        });
-
-
-    const checked =
+    const selected =
         document.querySelector(
             'input[name="paymentMethod"]:checked'
         );
 
-
-    if (checked) {
-
-        selectedPaymentMethod =
-            checked.value;
-
-    }
-
-
-    const activeOption =
-        options.find(function (option) {
-
-            const radio =
-                option.querySelector(
-                    'input[type="radio"]'
-                );
-
-            return radio &&
-                radio.value === selectedPaymentMethod;
-
-        });
-
-
-    options.forEach(function (option) {
-
-        option.classList.toggle(
-            "active",
-            option === activeOption
+    if (selected) {
+        updatePaymentDetails(
+            selected.value
         );
-
-    });
-
-
-    renderPaymentDetails(
-        selectedPaymentMethod
-    );
-
+    }
 }
 
 
-/* ==========================================================================
-   CARD FORMATTING
-========================================================================== */
+/* =========================================================
+   PAYMENT DETAILS
+   ========================================================= */
 
-function setupCardFormatting() {
+function updatePaymentDetails(method) {
 
-    const cardNumber =
-        $("#cardNumber");
+    const cardDetails =
+        getElement("cardDetails");
 
-    const expiry =
-        $("#cardExpiry");
+    const cashDetails =
+        getElement("cashDetails");
 
-    const cvv =
-        $("#cardCVV");
-
-
-    if (cardNumber) {
-
-        cardNumber.addEventListener(
-            "input",
-            function (event) {
-
-                let value =
-                    event.target.value
-                        .replace(/\D/g, "")
-                        .slice(0, 16);
-
-
-                const chunks =
-                    value.match(/.{1,4}/g);
-
-
-                event.target.value =
-                    chunks
-                        ? chunks.join(" ")
-                        : "";
-
-            }
+    if (cardDetails) {
+        cardDetails.classList.add(
+            "hidden"
         );
-
     }
 
-
-    if (expiry) {
-
-        expiry.addEventListener(
-            "input",
-            function (event) {
-
-                let value =
-                    event.target.value
-                        .replace(/\D/g, "")
-                        .slice(0, 4);
-
-
-                if (value.length > 2) {
-
-                    value =
-                        value.slice(0, 2) +
-                        "/" +
-                        value.slice(2);
-
-                }
-
-
-                event.target.value =
-                    value;
-
-            }
+    if (cashDetails) {
+        cashDetails.classList.add(
+            "hidden"
         );
-
     }
 
+    if (method === "card") {
 
-    if (cvv) {
-
-        cvv.addEventListener(
-            "input",
-            function (event) {
-
-                event.target.value =
-                    event.target.value
-                        .replace(/\D/g, "")
-                        .slice(0, 4);
-
-            }
-        );
-
+        if (cardDetails) {
+            cardDetails.classList.remove(
+                "hidden"
+            );
+        }
     }
 
+    if (
+        method === "cod" ||
+        method === "cash_on_delivery"
+    ) {
+
+        if (cashDetails) {
+            cashDetails.classList.remove(
+                "hidden"
+            );
+        }
+    }
 }
 
 
-/* ==========================================================================
-   PHONE VALIDATION
-========================================================================== */
-
-function isValidPakistaniPhone(value) {
-
-    const cleaned =
-        String(value || "")
-            .replace(/[\s-]/g, "");
-
-
-    return /^(\+92|0092|0)3\d{9}$/
-        .test(cleaned);
-}
-
-
-/* ==========================================================================
-   EMAIL VALIDATION
-========================================================================== */
-
-function isValidEmail(value) {
-
-    const email =
-        String(value || "").trim();
-
-
-    if (!email) {
-        return true;
-    }
-
-
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        .test(email);
-}
-
-
-/* ==========================================================================
-   FIELD ERROR
-========================================================================== */
-
-function showFieldError(id, show) {
-
-    const element =
-        $("#" + id);
-
-
-    if (!element) {
-        return;
-    }
-
-
-    element.classList.toggle(
-        "hidden",
-        !show
-    );
-}
-
-
-/* ==========================================================================
+/* =========================================================
    CUSTOMER VALIDATION
-========================================================================== */
+   ========================================================= */
 
 function validateCustomerDetails() {
 
+    const form =
+        getElement("checkoutForm");
+
+    if (!form) {
+        return true;
+    }
+
+    const requiredFields =
+        form.querySelectorAll(
+            "input[required], select[required], textarea[required]"
+        );
+
     let valid = true;
 
+    requiredFields.forEach(
+        (field) => {
 
-    const name =
-        $("#customerName")?.value.trim() || "";
+            if (!field.value.trim()) {
 
-    const phone =
-        $("#customerPhone")?.value.trim() || "";
+                field.classList.add(
+                    "border-red-500"
+                );
 
-    const city =
-        $("#customerCity")?.value.trim() || "";
+                valid = false;
 
-    const address =
-        $("#customerAddress")?.value.trim() || "";
+            } else {
+
+                field.classList.remove(
+                    "border-red-500"
+                );
+            }
+        }
+    );
 
     const email =
-        $("#customerEmail")?.value.trim() || "";
-
-
-    const nameInvalid =
-        name.length < 2;
-
-    const phoneInvalid =
-        !isValidPakistaniPhone(phone);
-
-    const cityInvalid =
-        city.length < 2;
-
-    const addressInvalid =
-        address.length < 8;
-
-    const emailInvalid =
-        !isValidEmail(email);
-
-
-    showFieldError(
-        "nameError",
-        nameInvalid
-    );
-
-    showFieldError(
-        "phoneError",
-        phoneInvalid
-    );
-
-    showFieldError(
-        "addressError",
-        addressInvalid
-    );
-
-
-    if (nameInvalid) {
-        valid = false;
-    }
-
-
-    if (phoneInvalid) {
-        valid = false;
-    }
-
-
-    if (cityInvalid) {
-
-        showToast(
-            "Please enter your city.",
-            "error"
+        form.querySelector(
+            'input[type="email"]'
         );
 
-        valid = false;
+    if (
+        email &&
+        email.value.trim()
+    ) {
 
+        const emailRegex =
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (
+            !emailRegex.test(
+                email.value.trim()
+            )
+        ) {
+
+            email.classList.add(
+                "border-red-500"
+            );
+
+            valid = false;
+        }
     }
 
-
-    if (addressInvalid) {
-        valid = false;
-    }
-
-
-    if (emailInvalid) {
-
-        showToast(
-            "Please enter a valid email address.",
-            "error"
+    const phone =
+        form.querySelector(
+            'input[type="tel"]'
         );
 
-        valid = false;
+    if (
+        phone &&
+        phone.value.trim()
+    ) {
 
+        const cleanPhone =
+            phone.value
+                .replace(/[\s-]/g, "")
+                .trim();
+
+        const phoneRegex =
+            /^(?:\+92|0092|0)3\d{9}$/;
+
+        if (
+            !phoneRegex.test(
+                cleanPhone
+            )
+        ) {
+
+            phone.classList.add(
+                "border-red-500"
+            );
+
+            valid = false;
+        }
     }
-
 
     if (!valid) {
 
-        if (nameInvalid) {
-            $("#customerName")?.focus();
-        } else if (phoneInvalid) {
-            $("#customerPhone")?.focus();
-        } else if (cityInvalid) {
-            $("#customerCity")?.focus();
-        } else if (addressInvalid) {
-            $("#customerAddress")?.focus();
-        }
-
+        alert(
+            "Please fill all required customer details correctly."
+        );
     }
-
 
     return valid;
 }
 
 
-/* ==========================================================================
+/* =========================================================
    PAYMENT VALIDATION
-========================================================================== */
+   ========================================================= */
 
-function validatePaymentDetails() {
+function validatePaymentMethod() {
 
-
-    /* COD */
-
-    if (selectedPaymentMethod === "cod") {
-        return true;
-    }
-
-
-    /* BANK */
-
-    if (selectedPaymentMethod === "bank") {
-        return true;
-    }
-
-
-    /* CARD */
-
-    if (selectedPaymentMethod === "card") {
-
-        const number =
-            $("#cardNumber")?.value
-                .replace(/\D/g, "") || "";
-
-        const expiry =
-            $("#cardExpiry")?.value.trim() || "";
-
-        const cvv =
-            $("#cardCVV")?.value.trim() || "";
-
-        const cardName =
-            $("#cardName")?.value.trim() || "";
-
-
-        if (!/^\d{16}$/.test(number)) {
-
-            showToast(
-                "Please enter a valid 16-digit card number.",
-                "error"
-            );
-
-            $("#cardNumber")?.focus();
-
-            return false;
-        }
-
-
-        if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) {
-
-            showToast(
-                "Please enter expiry in MM/YY format.",
-                "error"
-            );
-
-            $("#cardExpiry")?.focus();
-
-            return false;
-        }
-
-
-        if (!/^\d{3,4}$/.test(cvv)) {
-
-            showToast(
-                "Please enter a valid CVV.",
-                "error"
-            );
-
-            $("#cardCVV")?.focus();
-
-            return false;
-        }
-
-
-        if (cardName.length < 2) {
-
-            showToast(
-                "Please enter the cardholder name.",
-                "error"
-            );
-
-            $("#cardName")?.focus();
-
-            return false;
-        }
-
-
-        return true;
-    }
-
-
-    /* EASYPAISA */
-
-    if (selectedPaymentMethod === "easypaisa") {
-
-        const number =
-            $("#easypaisaNumber")
-                ?.value.trim() || "";
-
-
-        if (!isValidPakistaniPhone(number)) {
-
-            showToast(
-                "Please enter a valid Easypaisa mobile number.",
-                "error"
-            );
-
-            $("#easypaisaNumber")?.focus();
-
-            return false;
-        }
-
-
-        return true;
-    }
-
-
-    /* JAZZCASH */
-
-    if (selectedPaymentMethod === "jazzcash") {
-
-        const number =
-            $("#jazzcashNumber")
-                ?.value.trim() || "";
-
-
-        if (!isValidPakistaniPhone(number)) {
-
-            showToast(
-                "Please enter a valid JazzCash mobile number.",
-                "error"
-            );
-
-            $("#jazzcashNumber")?.focus();
-
-            return false;
-        }
-
-
-        return true;
-    }
-
-
-    showToast(
-        "Please select a payment method.",
-        "error"
-    );
-
-
-    return false;
-}
-
-
-/* ==========================================================================
-   ORDER ID
-========================================================================== */
-
-function generateOrderId() {
-
-    const timestamp =
-        Date.now()
-            .toString()
-            .slice(-8);
-
-    const random =
-        Math.floor(
-            100 +
-            Math.random() * 900
+    const selected =
+        document.querySelector(
+            'input[name="paymentMethod"]:checked'
         );
 
+    if (!selected) {
 
-    return `KZ-${timestamp}-${random}`;
+        alert(
+            "Please select a payment method."
+        );
+
+        return false;
+    }
+
+    const method =
+        selected.value;
+
+    if (method === "card") {
+
+        const cardNumber =
+            getElement("cardNumber");
+
+        const expiry =
+            getElement("expiry");
+
+        const cvv =
+            getElement("cvv");
+
+        if (
+            cardNumber &&
+            !cardNumber.value.trim()
+        ) {
+
+            alert(
+                "Please enter card details."
+            );
+
+            cardNumber.focus();
+
+            return false;
+        }
+
+        if (
+            expiry &&
+            !expiry.value.trim()
+        ) {
+
+            alert(
+                "Please enter card expiry."
+            );
+
+            expiry.focus();
+
+            return false;
+        }
+
+        if (
+            cvv &&
+            !cvv.value.trim()
+        ) {
+
+            alert(
+                "Please enter CVV."
+            );
+
+            cvv.focus();
+
+            return false;
+        }
+
+        /*
+           Demo checkout only.
+           Do not use real card details.
+        */
+
+        if (expiry) {
+
+            const expiryRegex =
+                /^(0[1-9]|1[0-2])\/\d{2}$/;
+
+            if (
+                expiry.value.trim() &&
+                !expiryRegex.test(
+                    expiry.value.trim()
+                )
+            ) {
+
+                alert(
+                    "Expiry must be in MM/YY format."
+                );
+
+                expiry.focus();
+
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 
-/* ==========================================================================
-   CUSTOMER DATA
-========================================================================== */
+/* =========================================================
+   GET FORM DATA
+   ========================================================= */
 
-function getCustomerData() {
+function getFormValue(...ids) {
 
-    return {
+    for (const id of ids) {
 
-        name:
-            $("#customerName")
-                ?.value.trim() || "",
+        const element =
+            getElement(id);
 
-        phone:
-            $("#customerPhone")
-                ?.value.trim() || "",
+        if (element) {
+            return element.value.trim();
+        }
+    }
 
-        email:
-            $("#customerEmail")
-                ?.value.trim() || "",
-
-        city:
-            $("#customerCity")
-                ?.value.trim() || "",
-
-        postal:
-            $("#customerPostal")
-                ?.value.trim() || "",
-
-        address:
-            $("#customerAddress")
-                ?.value.trim() || "",
-
-        notes:
-            $("#orderNotes")
-                ?.value.trim() || ""
-
-    };
+    return "";
 }
 
 
-/* ==========================================================================
+/* =========================================================
    BUILD ORDER
-========================================================================== */
+   ========================================================= */
 
 function buildOrder() {
 
-    const customer =
-        getCustomerData();
+    const customerName =
+        getFormValue(
+            "customerName",
+            "name",
+            "fullName"
+        );
 
+    const customerEmail =
+        getFormValue(
+            "customerEmail",
+            "email"
+        );
 
-    const orderItems =
-        cart.map(function (item) {
+    const customerPhone =
+        getFormValue(
+            "customerPhone",
+            "phone"
+        );
 
-            return {
+    const customerAddress =
+        getFormValue(
+            "customerAddress",
+            "address"
+        );
 
-                id: item.id,
+    const customerCity =
+        getFormValue(
+            "customerCity",
+            "city"
+        );
 
-                name: item.name,
+    const selectedPayment =
+        document.querySelector(
+            'input[name="paymentMethod"]:checked'
+        );
 
-                price: Number(item.price) || 0,
+    const paymentMethod =
+        selectedPayment
+            ? selectedPayment.value
+            : "cod";
 
-                quantity: Number(item.quantity) || 1,
-
-                image:
-                    item.image ||
-                    item.image_url ||
-                    "",
-
-                size:
-                    item.size || "",
-
-                color:
-                    item.color || "",
-
-                sport:
-                    item.sport || ""
-
-            };
-
-        });
-
+    const orderNumber =
+        `KZ-${Date.now()}-${Math.floor(
+            Math.random() * 1000
+        )}`;
 
     return {
 
-        id:
-            generateOrderId(),
+        orderNumber,
 
-        createdAt:
-            new Date().toISOString(),
+        user_id:
+            currentUser?.id || null,
+
+        customer_id:
+            currentUser?.id || null,
+
+        customer_name:
+            customerName,
+
+        customer_email:
+            customerEmail,
+
+        customer_phone:
+            customerPhone,
+
+        shipping_address:
+            customerAddress,
+
+        city:
+            customerCity,
+
+        payment_method:
+            paymentMethod,
+
+        items:
+            cartItems.map(
+                (item) => ({
+
+                    product_id:
+                        item.id,
+
+                    name:
+                        item.name,
+
+                    price:
+                        Number(item.price),
+
+                    quantity:
+                        Number(item.quantity),
+
+                    size:
+                        item.size || "",
+
+                    image_url:
+                        item.image || "",
+
+                    category:
+                        item.category || ""
+                })
+            ),
+
+        subtotal:
+            Number(subtotal),
+
+        shipping:
+            Number(shipping),
+
+        discount:
+            Number(discount),
+
+        total:
+            Number(grandTotal),
 
         status:
             "pending",
 
-        paymentMethod:
-            selectedPaymentMethod,
-
-        paymentMethodName:
-            getPaymentMethodName(
-                selectedPaymentMethod
-            ),
-
-        customer:
-            customer,
-
-        items:
-            orderItems,
-
-        subtotal:
-            Number(orderTotals.subtotal) || 0,
-
-        shipping:
-            Number(orderTotals.shipping) || 0,
-
-        discount:
-            Number(orderTotals.discount) || 0,
-
-        total:
-            Number(orderTotals.total) || 0
-
+        created_at:
+            new Date().toISOString()
     };
 }
 
 
-/* ==========================================================================
-   SAVE ORDER
-========================================================================== */
+/* =========================================================
+   SAVE ORDER LOCALLY
+   ========================================================= */
 
-function saveOrder(order) {
+function saveOrderLocally(order) {
 
     try {
 
-        let existing = [];
-
-
-        const saved =
-            localStorage.getItem(
-                ORDERS_STORAGE_KEY
+        const existing =
+            JSON.parse(
+                localStorage.getItem(
+                    "khz_orders"
+                ) || "[]"
             );
 
-
-        if (saved) {
-
-            try {
-
-                const parsed =
-                    JSON.parse(saved);
-
-                if (Array.isArray(parsed)) {
-                    existing = parsed;
-                }
-
-            } catch (parseError) {
-
-                console.warn(
-                    "Existing orders data was invalid. Resetting it."
-                );
-
-            }
-
-        }
-
-
-        existing.unshift(order);
-
+        existing.push(order);
 
         localStorage.setItem(
-            ORDERS_STORAGE_KEY,
+            "khz_orders",
             JSON.stringify(existing)
         );
-
-
-        localStorage.setItem(
-            LAST_ORDER_STORAGE_KEY,
-            JSON.stringify(order)
-        );
-
 
         return true;
 
     } catch (error) {
 
         console.error(
-            "KHELZONE order save error:",
+            "Local order save error:",
             error
         );
 
@@ -1781,164 +1169,261 @@ function saveOrder(order) {
 }
 
 
-/* ==========================================================================
+/* =========================================================
+   SAVE ORDER TO SUPABASE
+   ========================================================= */
+
+async function saveOrderToSupabase(order) {
+
+    if (!supabaseClient) {
+
+        return {
+            success: false,
+            error:
+                "Supabase client not available."
+        };
+    }
+
+    try {
+
+        /*
+           Get the REAL authenticated session.
+        */
+
+        const {
+            data: sessionData,
+            error: sessionError
+        } =
+            await supabaseClient.auth.getSession();
+
+        if (sessionError) {
+
+            console.error(
+                "Session error:",
+                sessionError
+            );
+
+            return {
+                success: false,
+                error:
+                    sessionError.message
+            };
+        }
+
+        const session =
+            sessionData?.session;
+
+        const user =
+            session?.user;
+
+        if (!user) {
+
+            return {
+                success: false,
+                error:
+                    "User is not logged in. Please login again."
+            };
+        }
+
+
+        /* =================================================
+           DEBUG - AUTH USER
+           ================================================= */
+
+        console.log(
+            "========== ORDER AUTH DEBUG =========="
+        );
+
+        console.log(
+            "AUTH USER ID:",
+            user.id
+        );
+
+        console.log(
+            "CURRENT USER ID:",
+            currentUser?.id
+        );
+
+        console.log(
+            "======================================"
+        );
+
+
+        /*
+           IMPORTANT:
+           user.id comes directly from Supabase Auth.
+        */
+
+        const userId =
+            user.id;
+
+
+        console.log(
+            "AUTH USER ID:",
+            userId
+        );
+
+
+        /* =================================================
+           ORDER DATA
+           ================================================= */
+
+        const orderData = {
+
+            user_id:
+                userId,
+
+            customer_id:
+                userId,
+
+            total_amount:
+                Number(order.total),
+
+            status:
+                "pending",
+
+            shipping_name:
+                order.customer_name ||
+                null,
+
+            shipping_phone:
+                order.customer_phone ||
+                null,
+
+            shipping_address:
+                order.shipping_address ||
+                null,
+
+            order_number:
+                order.orderNumber
+        };
+
+
+        /*
+           EXTRA DEBUG
+        */
+
+        console.log(
+            "ORDER DATA BEING SENT:",
+            orderData
+        );
+
+        console.log(
+            "RLS CHECK:",
+            {
+                authUserId: user.id,
+                orderUserId: orderData.user_id,
+                sameUser:
+                    user.id === orderData.user_id
+            }
+        );
+
+
+        /* =================================================
+           INSERT
+           ================================================= */
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from("orders")
+                .insert([
+                    orderData
+                ])
+                .select()
+                .single();
+
+
+        if (error) {
+
+            console.error(
+                "SUPABASE ORDER INSERT ERROR:",
+                error
+            );
+
+            console.error(
+                "AUTH USER ID:",
+                userId
+            );
+
+            console.error(
+                "ORDER USER ID:",
+                orderData.user_id
+            );
+
+            return {
+                success: false,
+                error:
+                    error.message,
+
+                details:
+                    error
+            };
+        }
+
+
+        console.log(
+            "ORDER SUCCESSFULLY SAVED:",
+            data
+        );
+
+
+        return {
+
+            success: true,
+
+            data:
+                data
+        };
+
+
+    } catch (error) {
+
+        console.error(
+            "Order insert exception:",
+            error
+        );
+
+        return {
+
+            success: false,
+
+            error:
+                error.message
+        };
+    }
+}
+
+
+/* =========================================================
    CLEAR CART
-========================================================================== */
+   ========================================================= */
 
 function clearCart() {
 
     try {
 
         localStorage.removeItem(
-            CART_STORAGE_KEY
+            CART_KEY
         );
 
-        cart = [];
-
-        return true;
+        cartItems = [];
 
     } catch (error) {
 
         console.error(
-            "KHELZONE cart clear error:",
+            "Clear cart error:",
             error
         );
-
-        return false;
     }
 }
 
 
-/* ==========================================================================
-   SUCCESS MODAL
-========================================================================== */
-
-function showSuccessModal(order) {
-
-    const modal =
-        $("#successModal");
-
-
-    if (!modal) {
-
-        alert(
-            "Order placed successfully!\n\n" +
-            "Order ID: " +
-            order.id
-        );
-
-        return;
-    }
-
-
-    const orderId =
-        $("#successOrderId");
-
-    const total =
-        $("#successTotal");
-
-    const payment =
-        $("#successPayment");
-
-
-    if (orderId) {
-        orderId.textContent =
-            order.id;
-    }
-
-
-    if (total) {
-        total.textContent =
-            money(order.total);
-    }
-
-
-    if (payment) {
-        payment.textContent =
-            order.paymentMethodName;
-    }
-
-
-    modal.classList.remove(
-        "hidden"
-    );
-
-}
-
-
-/* ==========================================================================
-   LOADING BUTTON
-========================================================================== */
-
-function setPlaceOrderLoading(loading) {
-
-    const button =
-        $("#placeOrderBtn");
-
-    if (!button) {
-        return;
-    }
-
-
-    button.disabled =
-        loading;
-
-
-    button.classList.toggle(
-        "opacity-70",
-        loading
-    );
-
-    button.classList.toggle(
-        "cursor-not-allowed",
-        loading
-    );
-
-
-    const text =
-        $("#placeOrderText");
-
-    if (text) {
-
-        text.textContent =
-            loading
-                ? "Processing..."
-                : "Place Order";
-
-    }
-
-
-    const icon =
-        $("#placeOrderIcon");
-
-    if (icon) {
-
-        icon.classList.toggle(
-            "hidden",
-            loading
-        );
-
-    }
-
-
-    const spinner =
-        $("#placeOrderSpinner");
-
-    if (spinner) {
-
-        spinner.classList.toggle(
-            "hidden",
-            !loading
-        );
-
-    }
-
-}
-
-
-/* ==========================================================================
+/* =========================================================
    PLACE ORDER
-========================================================================== */
+   ========================================================= */
 
 async function placeOrder(event) {
 
@@ -1946,279 +1431,214 @@ async function placeOrder(event) {
         event.preventDefault();
     }
 
+    if (!cartItems.length) {
 
-    /* Prevent duplicate clicks */
-
-    if (isProcessingOrder) {
-        return;
-    }
-
-
-    if (!cart.length) {
-
-        showToast(
-            "Your cart is empty.",
-            "error"
+        alert(
+            "Your cart is empty."
         );
 
         return;
     }
-
 
     if (!validateCustomerDetails()) {
-
-        showToast(
-            "Please complete your delivery details.",
-            "error"
-        );
-
         return;
     }
 
-
-    if (!validatePaymentDetails()) {
+    if (!validatePaymentMethod()) {
         return;
     }
 
+    const button =
+        getElement("placeOrderBtn");
 
-    isProcessingOrder = true;
+    if (button) {
 
-    setPlaceOrderLoading(true);
+        button.disabled = true;
 
+        button.dataset.originalText =
+            button.innerHTML;
+
+        button.innerHTML = `
+            <span
+                class="material-symbols-outlined animate-spin"
+            >
+                progress_activity
+            </span>
+
+            Placing Order...
+        `;
+    }
 
     try {
 
         /*
-           Demo processing delay.
-           No real payment is processed here.
+           Make sure user is logged in.
         */
 
-        await new Promise(function (resolve) {
+        const user =
+            await loadCurrentUser();
 
-            setTimeout(
-                resolve,
-                700
+        if (!user) {
+
+            alert(
+                "Please login before placing your order."
             );
 
-        });
+            if (button) {
+
+                button.disabled = false;
+
+                button.innerHTML =
+                    button.dataset.originalText ||
+                    "Place Order";
+            }
+
+            return;
+        }
 
 
         /*
-           Recalculate totals immediately
-           before creating the order.
+           Build order.
         */
-
-        calculateTotals();
-
 
         const order =
             buildOrder();
 
 
-        const saved =
-            saveOrder(order);
+        console.log(
+            "FINAL ORDER:",
+            order
+        );
 
 
-        if (!saved) {
+        /*
+           Save to Supabase FIRST.
+        */
 
-            throw new Error(
-                "Could not save order."
+        const supabaseResult =
+            await saveOrderToSupabase(
+                order
             );
 
+
+        /*
+           If Supabase fails,
+           DO NOT clear cart.
+        */
+
+        if (
+            !supabaseResult ||
+            !supabaseResult.success
+        ) {
+
+            console.error(
+                "Order was NOT saved to Supabase:",
+                supabaseResult?.error
+            );
+
+            alert(
+                "Order could not be saved.\n\n" +
+                (
+                    supabaseResult?.error ||
+                    "Unknown Supabase error."
+                )
+            );
+
+            if (button) {
+
+                button.disabled = false;
+
+                button.innerHTML =
+                    button.dataset.originalText ||
+                    "Place Order";
+            }
+
+            return;
         }
 
+
+        /*
+           Supabase successful.
+        */
+
+        console.log(
+            "Order successfully connected to Supabase."
+        );
+
+
+        /*
+           Save local copy.
+        */
+
+        saveOrderLocally(order);
+
+
+        /*
+           Clear cart.
+        */
 
         clearCart();
 
 
-        showSuccessModal(order);
+        /*
+           Save last order.
+        */
+
+        localStorage.setItem(
+            "khz_last_order",
+            JSON.stringify(order)
+        );
 
 
         /*
-           Update page UI after cart is cleared.
+           Success redirect.
         */
 
-        updateCheckoutVisibility();
-
-        renderOrderItems();
-
-        renderTotals();
+        window.location.href =
+            `order-success.html?order=${encodeURIComponent(
+                order.orderNumber
+            )}`;
 
 
     } catch (error) {
 
         console.error(
-            "KHELZONE place order error:",
+            "Place order error:",
             error
         );
 
-
-        showToast(
-            "Something went wrong while placing your order. Please try again.",
-            "error"
+        alert(
+            "Something went wrong while placing your order.\n\n" +
+            (
+                error?.message ||
+                "Please try again."
+            )
         );
 
+        if (button) {
 
-    } finally {
+            button.disabled = false;
 
-        isProcessingOrder = false;
-
-        setPlaceOrderLoading(false);
-
-    }
-
-}
-
-
-/* ==========================================================================
-   TOAST
-========================================================================== */
-
-let toastTimer = null;
-
-
-function showToast(message, type = "info") {
-
-    const toast =
-        $("#toast");
-
-    const text =
-        $("#toastText");
-
-    const icon =
-        $("#toastIcon");
-
-
-    if (!toast || !text) {
-
-        console.log(
-            `[KHELZONE ${type}] ${message}`
-        );
-
-        return;
-    }
-
-
-    text.textContent =
-        message;
-
-
-    if (icon) {
-
-        if (type === "error") {
-
-            icon.textContent =
-                "error";
-
-            icon.className =
-                "material-symbols-outlined text-red-500";
-
-        } else {
-
-            icon.textContent =
-                "check_circle";
-
-            icon.className =
-                "material-symbols-outlined text-orange-500";
-
+            button.innerHTML =
+                button.dataset.originalText ||
+                "Place Order";
         }
-
     }
-
-
-    toast.classList.remove(
-        "translate-y-20",
-        "opacity-0"
-    );
-
-
-    clearTimeout(toastTimer);
-
-
-    toastTimer =
-        setTimeout(function () {
-
-            toast.classList.add(
-                "translate-y-20",
-                "opacity-0"
-            );
-
-        }, 2800);
-
 }
 
 
-/* ==========================================================================
-   SUCCESS BUTTONS
-========================================================================== */
-
-function setupSuccessButtons() {
-
-    const continueButton =
-        $("#continueShoppingBtn");
-
-
-    if (continueButton) {
-
-        continueButton.addEventListener(
-            "click",
-            function () {
-
-                window.location.href =
-                    "shop.html";
-
-            }
-        );
-
-    }
-
-
-    const ordersButton =
-        $("#viewOrdersBtn");
-
-
-    if (ordersButton) {
-
-        ordersButton.addEventListener(
-            "click",
-            function () {
-
-                /*
-                   Change to orders.html when
-                   your orders page is ready.
-                */
-
-                window.location.href =
-                    "homepage.html";
-
-            }
-        );
-
-    }
-
-}
-
-
-/* ==========================================================================
+/* =========================================================
    CHECKOUT FORM
-========================================================================== */
+   ========================================================= */
 
 function setupCheckoutForm() {
 
     const form =
-        $("#checkoutForm");
-
+        getElement("checkoutForm");
 
     if (!form) {
         return;
     }
-
-
-    /*
-       IMPORTANT:
-       Only the form submit handles the order.
-       This prevents duplicate orders.
-    */
 
     form.addEventListener(
         "submit",
@@ -2226,131 +1646,339 @@ function setupCheckoutForm() {
     );
 
 
-    /* Clear validation errors */
+    const placeOrderBtn =
+        getElement("placeOrderBtn");
 
-    $("#customerName")
-        ?.addEventListener(
-            "input",
-            function () {
+    if (placeOrderBtn) {
 
-                showFieldError(
-                    "nameError",
-                    false
-                );
+        placeOrderBtn.addEventListener(
+            "click",
+            function (event) {
 
+                /*
+                   If button is outside form,
+                   manually trigger placeOrder.
+                */
+
+                if (
+                    !form.contains(
+                        placeOrderBtn
+                    )
+                ) {
+
+                    event.preventDefault();
+
+                    placeOrder(event);
+                }
             }
         );
-
-
-    $("#customerPhone")
-        ?.addEventListener(
-            "input",
-            function () {
-
-                showFieldError(
-                    "phoneError",
-                    false
-                );
-
-            }
-        );
-
-
-    $("#customerAddress")
-        ?.addEventListener(
-            "input",
-            function () {
-
-                showFieldError(
-                    "addressError",
-                    false
-                );
-
-            }
-        );
-
+    }
 }
 
 
-/* ==========================================================================
-   PLACE ORDER BUTTON
-========================================================================== */
+/* =========================================================
+   INPUT FORMATTING
+   ========================================================= */
 
-function setupPlaceOrderButton() {
+function setupInputFormatting() {
 
-    const button =
-        $("#placeOrderBtn");
+    const cardNumber =
+        getElement("cardNumber");
 
+    if (cardNumber) {
 
-    if (!button) {
-        return;
+        cardNumber.addEventListener(
+            "input",
+            function () {
+
+                let value =
+                    this.value
+                        .replace(/\D/g, "")
+                        .slice(0, 16);
+
+                value =
+                    value
+                        .match(/.{1,4}/g)
+                        ?.join(" ") || "";
+
+                this.value =
+                    value;
+            }
+        );
     }
 
 
-    /*
-       If button is inside a form and has:
-       
-       type="submit"
+    const expiry =
+        getElement("expiry");
 
-       then the form submit event handles it.
+    if (expiry) {
 
-       We intentionally DO NOT add another click handler here.
-       This prevents duplicate orders.
-    */
+        expiry.addEventListener(
+            "input",
+            function () {
 
-    button.setAttribute(
-        "type",
-        "submit"
-    );
+                let value =
+                    this.value
+                        .replace(/\D/g, "")
+                        .slice(0, 4);
 
+                if (value.length > 2) {
+
+                    value =
+                        value.slice(0, 2) +
+                        "/" +
+                        value.slice(2);
+                }
+
+                this.value =
+                    value;
+            }
+        );
+    }
+
+
+    const cvv =
+        getElement("cvv");
+
+    if (cvv) {
+
+        cvv.addEventListener(
+            "input",
+            function () {
+
+                this.value =
+                    this.value
+                        .replace(/\D/g, "")
+                        .slice(0, 4);
+            }
+        );
+    }
+
+
+    const phone =
+        getElement("customerPhone");
+
+    if (phone) {
+
+        phone.addEventListener(
+            "input",
+            function () {
+
+                this.classList.remove(
+                    "border-red-500"
+                );
+            }
+        );
+    }
 }
 
 
-/* ==========================================================================
-   INITIALIZE
-========================================================================== */
+/* =========================================================
+   AUTO REMOVE ERROR BORDER
+   ========================================================= */
 
-function initCheckout() {
+function setupValidationFeedback() {
+
+    const form =
+        getElement("checkoutForm");
+
+    if (!form) {
+        return;
+    }
+
+    const fields =
+        form.querySelectorAll(
+            "input, select, textarea"
+        );
+
+    fields.forEach(
+        (field) => {
+
+            field.addEventListener(
+                "input",
+                function () {
+
+                    this.classList.remove(
+                        "border-red-500"
+                    );
+                }
+            );
+
+            field.addEventListener(
+                "change",
+                function () {
+
+                    this.classList.remove(
+                        "border-red-500"
+                    );
+                }
+            );
+        }
+    );
+}
+
+
+/* =========================================================
+   AUTH STATE
+   ========================================================= */
+
+function setupAuthListener() {
+
+    if (!supabaseClient) {
+        return;
+    }
+
+    supabaseClient.auth.onAuthStateChange(
+        (_event, session) => {
+
+            currentUser =
+                session?.user || null;
+
+            console.log(
+                "Auth state changed:",
+                currentUser
+            );
+        }
+    );
+}
+
+
+/* =========================================================
+   INIT
+   ========================================================= */
+
+async function initializePaymentPage() {
 
     console.log(
-        "KHELZONE checkout initialized."
+        "KHELZONE payment page initializing..."
     );
 
+
+    /*
+       1. Load cart
+    */
+
+    loadCart();
+
+
+    /*
+       2. Normalize cart
+    */
 
     prepareCart();
 
+
+    /*
+       3. Calculate totals
+    */
+
     calculateTotals();
 
-    updateCheckoutVisibility();
+
+    /*
+       4. Render products
+    */
 
     renderOrderItems();
 
+
+    /*
+       5. Render totals
+    */
+
     renderTotals();
+
+
+    /*
+       6. Enable/disable Place Order
+    */
+
+    updateCheckoutVisibility();
+
+
+    /*
+       7. Get logged-in user
+    */
+
+    await loadCurrentUser();
+
+
+    /*
+       8. Setup payment methods
+    */
 
     setupPaymentMethods();
 
+
+    /*
+       9. Setup form
+    */
+
     setupCheckoutForm();
 
-    setupPlaceOrderButton();
 
-    setupSuccessButtons();
+    /*
+       10. Input formatting
+    */
 
+    setupInputFormatting();
+
+
+    /*
+       11. Validation feedback
+    */
+
+    setupValidationFeedback();
+
+
+    /*
+       12. Auth listener
+    */
+
+    setupAuthListener();
+
+
+    console.log(
+        "Cart loaded:",
+        cartItems
+    );
+
+    console.log(
+        "Subtotal:",
+        subtotal
+    );
+
+    console.log(
+        "Shipping:",
+        shipping
+    );
+
+    console.log(
+        "Grand total:",
+        grandTotal
+    );
+
+    console.log(
+        "Current user:",
+        currentUser
+    );
 }
 
 
-/* ==========================================================================
+/* =========================================================
    START
-========================================================================== */
+   ========================================================= */
 
-if (document.readyState === "loading") {
+if (
+    document.readyState === "loading"
+) {
 
     document.addEventListener(
         "DOMContentLoaded",
-        initCheckout
+        initializePaymentPage
     );
 
 } else {
 
-    initCheckout();
-
+    initializePaymentPage();
 }

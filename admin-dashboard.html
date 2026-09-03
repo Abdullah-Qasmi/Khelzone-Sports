@@ -22,11 +22,46 @@
 
     <!-- =====================================================
          SUPABASE
-         IMPORTANT:
-         This MUST come before admin-dashboard.js
     ====================================================== -->
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+    <!-- =====================================================
+         SUPABASE CONFIG
+         MUST LOAD BEFORE admin-dashboard.js
+    ====================================================== -->
+
+    <script>
+
+        const SUPABASE_URL =
+            "https://antqexjhlsaynunlmzqa.supabase.co";
+
+        const SUPABASE_PUBLISHABLE_KEY =
+            "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
+
+
+        if (!window.supabase) {
+
+            console.error(
+                "Supabase library failed to load."
+            );
+
+        } else {
+
+            window.supabaseClient =
+                window.supabase.createClient(
+                    SUPABASE_URL,
+                    SUPABASE_PUBLISHABLE_KEY
+                );
+
+            console.log(
+                "KHELZONE Supabase client initialized."
+            );
+
+        }
+
+    </script>
 
 
     <!-- =====================================================
@@ -79,9 +114,13 @@
 
         html,
         body {
+
             margin: 0;
+
             padding: 0;
+
             min-height: 100%;
+
         }
 
 
@@ -866,17 +905,14 @@
             🔒
         </div>
 
-
         <div class="access-title">
             ACCESS DENIED
         </div>
-
 
         <div class="access-text">
             You do not have permission to access
             the KHELZONE Admin Dashboard.
         </div>
-
 
         <a
             href="homepage.html"
@@ -900,15 +936,12 @@
 >
 
 
-    <!-- =====================================================
-         SIDEBAR
-    ====================================================== -->
+    <!-- SIDEBAR -->
 
     <aside
         id="sidebar"
         class="sidebar"
     >
-
 
         <div class="sidebar-logo">
             KHELZONE
@@ -916,7 +949,6 @@
 
 
         <nav class="sidebar-nav">
-
 
             <button
                 type="button"
@@ -967,7 +999,6 @@
                 <span>Orders</span>
             </button>
 
-
         </nav>
 
 
@@ -983,16 +1014,12 @@
 
         </div>
 
-
     </aside>
 
 
-    <!-- =====================================================
-         MOBILE HEADER
-    ====================================================== -->
+    <!-- MOBILE HEADER -->
 
     <div class="mobile-header">
-
 
         <div
             style="
@@ -1014,23 +1041,17 @@
             ☰
         </button>
 
-
     </div>
 
 
-    <!-- =====================================================
-         MAIN
-    ====================================================== -->
+    <!-- MAIN -->
 
     <main class="main">
 
 
-        <!-- =================================================
-             TOPBAR
-        ================================================== -->
+        <!-- TOPBAR -->
 
         <div class="topbar">
-
 
             <div>
 
@@ -1063,33 +1084,26 @@
 
             </div>
 
-
         </div>
 
 
-        <!-- =================================================
-             CONTENT
-        ================================================== -->
+        <!-- CONTENT -->
 
         <div class="content">
 
 
-            <!-- =================================================
-                 DASHBOARD SECTION
-            ================================================== -->
+            <!-- DASHBOARD -->
 
             <section
                 id="dashboardSection"
                 class="section active"
             >
 
-
                 <div class="mb-6">
 
                     <h1 class="text-3xl font-black">
                         Dashboard
                     </h1>
-
 
                     <p class="text-gray-500 mt-2">
                         KHELZONE administration overview
@@ -1108,15 +1122,11 @@
                     "
                 >
 
-
-                    <!-- PRODUCTS -->
-
                     <div class="dashboard-card">
 
                         <div class="stat-label">
                             Products
                         </div>
-
 
                         <div
                             id="productCount"
@@ -1128,14 +1138,11 @@
                     </div>
 
 
-                    <!-- SELLERS -->
-
                     <div class="dashboard-card">
 
                         <div class="stat-label">
                             Sellers
                         </div>
-
 
                         <div
                             id="sellerCount"
@@ -1147,14 +1154,11 @@
                     </div>
 
 
-                    <!-- CUSTOMERS -->
-
                     <div class="dashboard-card">
 
                         <div class="stat-label">
                             Customers
                         </div>
-
 
                         <div
                             id="customerCount"
@@ -1166,14 +1170,11 @@
                     </div>
 
 
-                    <!-- ORDERS -->
-
                     <div class="dashboard-card">
 
                         <div class="stat-label">
                             Orders
                         </div>
-
 
                         <div
                             id="orderCount"
@@ -1184,22 +1185,17 @@
 
                     </div>
 
-
                 </div>
-
 
             </section>
 
 
-            <!-- =================================================
-                 PRODUCTS SECTION
-            ================================================== -->
+            <!-- PRODUCTS -->
 
             <section
                 id="productsSection"
                 class="section"
             >
-
 
                 <div
                     class="
@@ -1213,13 +1209,11 @@
                     "
                 >
 
-
                     <div>
 
                         <h1 class="text-3xl font-black">
                             Products
                         </h1>
-
 
                         <p class="text-gray-500 mt-2">
                             Manage KHELZONE products
@@ -1236,7 +1230,6 @@
                         placeholder="Search products..."
                     >
 
-
                 </div>
 
 
@@ -1248,29 +1241,17 @@
 
                             <tr>
 
-                                <th>
-                                    Product
-                                </th>
+                                <th>Product</th>
 
-                                <th>
-                                    Price
-                                </th>
+                                <th>Price</th>
 
-                                <th>
-                                    Category
-                                </th>
+                                <th>Category</th>
 
-                                <th>
-                                    Seller
-                                </th>
+                                <th>Seller</th>
 
-                                <th>
-                                    Status
-                                </th>
+                                <th>Status</th>
 
-                                <th>
-                                    Action
-                                </th>
+                                <th>Action</th>
 
                             </tr>
 
@@ -1299,19 +1280,15 @@
 
                 </div>
 
-
             </section>
 
 
-            <!-- =================================================
-                 SELLERS SECTION
-            ================================================== -->
+            <!-- SELLERS -->
 
             <section
                 id="sellersSection"
                 class="section"
             >
-
 
                 <div
                     class="
@@ -1325,13 +1302,11 @@
                     "
                 >
 
-
                     <div>
 
                         <h1 class="text-3xl font-black">
                             Sellers
                         </h1>
-
 
                         <p class="text-gray-500 mt-2">
                             Manage sellers
@@ -1348,7 +1323,6 @@
                         placeholder="Search sellers..."
                     >
 
-
                 </div>
 
 
@@ -1360,29 +1334,17 @@
 
                             <tr>
 
-                                <th>
-                                    Business
-                                </th>
+                                <th>Seller</th>
 
-                                <th>
-                                    Owner
-                                </th>
+                                <th>Email</th>
 
-                                <th>
-                                    Email
-                                </th>
+                                <th>Phone</th>
 
-                                <th>
-                                    Phone
-                                </th>
+                                <th>Status</th>
 
-                                <th>
-                                    Status
-                                </th>
+                                <th>Date</th>
 
-                                <th>
-                                    Action
-                                </th>
+                                <th>Action</th>
 
                             </tr>
 
@@ -1411,19 +1373,15 @@
 
                 </div>
 
-
             </section>
 
 
-            <!-- =================================================
-                 CUSTOMERS SECTION
-            ================================================== -->
+            <!-- CUSTOMERS -->
 
             <section
                 id="customersSection"
                 class="section"
             >
-
 
                 <div
                     class="
@@ -1437,13 +1395,11 @@
                     "
                 >
 
-
                     <div>
 
                         <h1 class="text-3xl font-black">
                             Customers
                         </h1>
-
 
                         <p class="text-gray-500 mt-2">
                             Manage customers
@@ -1460,7 +1416,6 @@
                         placeholder="Search customers..."
                     >
 
-
                 </div>
 
 
@@ -1472,21 +1427,17 @@
 
                             <tr>
 
-                                <th>
-                                    Name
-                                </th>
+                                <th>Name</th>
 
-                                <th>
-                                    Email
-                                </th>
+                                <th>Email</th>
 
-                                <th>
-                                    Phone
-                                </th>
+                                <th>Phone</th>
 
-                                <th>
-                                    Action
-                                </th>
+                                <th>City</th>
+
+                                <th>Date</th>
+
+                                <th>Action</th>
 
                             </tr>
 
@@ -1498,7 +1449,7 @@
                             <tr>
 
                                 <td
-                                    colspan="4"
+                                    colspan="6"
                                     style="
                                         text-align:center;
                                         color:#888;
@@ -1515,19 +1466,15 @@
 
                 </div>
 
-
             </section>
 
 
-            <!-- =================================================
-                 ORDERS SECTION
-            ================================================== -->
+            <!-- ORDERS -->
 
             <section
                 id="ordersSection"
                 class="section"
             >
-
 
                 <div
                     class="
@@ -1541,13 +1488,11 @@
                     "
                 >
 
-
                     <div>
 
                         <h1 class="text-3xl font-black">
                             Orders
                         </h1>
-
 
                         <p class="text-gray-500 mt-2">
                             Manage customer orders
@@ -1564,7 +1509,6 @@
                         placeholder="Search orders..."
                     >
 
-
                 </div>
 
 
@@ -1576,29 +1520,17 @@
 
                             <tr>
 
-                                <th>
-                                    Order ID
-                                </th>
+                                <th>Order ID</th>
 
-                                <th>
-                                    Customer
-                                </th>
+                                <th>Customer</th>
 
-                                <th>
-                                    Total
-                                </th>
+                                <th>Total</th>
 
-                                <th>
-                                    Status
-                                </th>
+                                <th>Status</th>
 
-                                <th>
-                                    Date
-                                </th>
+                                <th>Date</th>
 
-                                <th>
-                                    Action
-                                </th>
+                                <th>Action</th>
 
                             </tr>
 
@@ -1627,38 +1559,18 @@
 
                 </div>
 
-
             </section>
 
 
         </div>
 
-
     </main>
-
 
 </div>
 
 
 <!-- =========================================================
-     IMPORTANT
-     
-     DO NOT CREATE supabaseClient HERE.
-     
-     admin-dashboard.js already creates:
-     
-     const supabaseClient =
-         window.supabase.createClient(...)
-     
-     Creating it again here causes:
-     
-     Identifier 'supabaseClient' has already been declared
-     
-========================================================= -->
-
-
-<!-- =========================================================
-     ADMIN DASHBOARD JAVASCRIPT
+     ADMIN DASHBOARD JS
 ========================================================= -->
 
 <script src="admin-dashboard.js"></script>

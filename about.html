@@ -952,7 +952,122 @@ button:focus-visible {
   .hero__actions { flex-direction: column; align-items: stretch; }
   .hero__actions .btn { justify-content: center; }
 }
+/* =========================================================
+   MOBILE NAVBAR / LOGO FIX
+   ========================================================= */
 
+.kz-nav__inner {
+    min-width: 0;
+}
+
+.kz-nav__logo {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    flex-shrink: 0;
+    min-width: max-content;
+    white-space: nowrap;
+}
+
+.kz-nav__actions {
+    flex: 0 0 auto;
+    margin-left: auto;
+}
+
+@media (max-width: 768px) {
+
+    .kz-nav__inner {
+        height: 64px;
+        padding: 0 1rem;
+        gap: 0.5rem;
+    }
+
+    .kz-nav__logo {
+        font-size: 1.25rem;
+        letter-spacing: 0.01em;
+    }
+
+    .kz-nav__actions {
+        gap: 0.35rem;
+    }
+
+    .kz-nav__cart {
+        width: 36px;
+        height: 36px;
+    }
+
+    .kz-nav__toggle {
+        padding: 7px;
+    }
+}
+
+@media (max-width: 380px) {
+
+    .kz-nav__inner {
+        padding: 0 0.75rem;
+    }
+
+    .kz-nav__logo {
+        font-size: 1.1rem;
+    }
+
+    .kz-nav__cart {
+        width: 34px;
+        height: 34px;
+    }
+
+    .kz-nav__toggle {
+        padding: 6px;
+    }
+
+    .kz-nav__toggle span {
+        width: 20px;
+    }
+}
+
+/* Hero watermark mobile fix */
+@media (max-width: 560px) {
+
+    .hero__watermark {
+        font-size: 4.5rem;
+        opacity: 0.7;
+    }
+}
+/* =========================================================
+   KZ LOGO + GEAR UP OVERLAP FIX
+   ========================================================= */
+
+.hero__visual {
+    position: relative !important;
+    overflow: hidden;
+}
+
+.hero__visual-kz {
+    position: relative !important;
+    z-index: 2 !important;
+    display: block;
+}
+
+/* GEAR UP / small label */
+.hero__visual .hero__visual-label,
+.hero__visual .gear-up,
+.hero__visual [class*="gear"] {
+    position: absolute;
+    z-index: 3;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+
+    .hero__visual {
+        min-height: 280px;
+    }
+
+    .hero__visual-kz {
+        font-size: clamp(7rem, 28vw, 11rem) !important;
+        line-height: 0.9 !important;
+    }
+}
 </style>
 </head>
 <body>

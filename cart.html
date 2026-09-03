@@ -1,188 +1,859 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
+
 <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+
   <title>KHELZONE - Cart</title>
 
+  <meta name="description"
+    content="Review your KHELZONE sports gear cart and discover more premium sports equipment." />
+
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <!-- Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Material Symbols -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+
+  <!-- Cart Tailwind Config -->
   <script src="cart.tailwind.config.js"></script>
-  <link rel="stylesheet" href="cart.css"/>
+
+  <!-- Cart CSS -->
+  <link rel="stylesheet" href="cart.css" />
 </head>
 
-<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased selection:bg-secondary-container selection:text-on-secondary-container">
 
-<header class="bg-background border-b border-outline-variant docked full-width top-0 sticky flex justify-between items-center w-full px-gutter h-16 z-50 bg-background/95 backdrop-blur-md">
-  <div class="flex items-center gap-lg">
-    <button id="mobile-menu-btn" class="text-on-surface hover:text-secondary-container transition-colors duration-200 lg:hidden" aria-label="Open menu">
-      <span class="material-symbols-outlined font-headline-md text-headline-md">menu</span>
-    </button>
+<body
+  class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased selection:bg-secondary-container selection:text-on-secondary-container">
 
-    <a href="index.html" class="font-display-xl text-headline-md text-secondary-container tracking-tighter uppercase">KHELZONE</a>
 
-    <nav class="hidden lg:flex items-center gap-md ml-md">
-      <a href="index.html" class="font-label-caps text-label-caps text-on-surface hover:text-secondary-container transition-colors duration-200 tracking-wider">HOME</a>
-      <a href="shop.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">SHOP</a>
-      <a href="customization.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">CUSTOMIZE KIT</a>
-      <a href="wishlist.html" class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">WISHLIST</a>
-      <a href="cart.html" class="font-label-caps text-label-caps text-secondary-container border-b-2 border-secondary-container pb-1 tracking-wider">CART</a>
-    </nav>
-  </div>
+  <!-- ================================================================
+       HEADER / NAVBAR
+       ================================================================ -->
 
-  <div class="flex items-center gap-lg">
-    <a href="seller.html" class="become-seller-link font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 hidden md:flex items-center gap-1 border border-outline-variant hover:border-secondary-container rounded-full px-sm py-1 tracking-wider">
-      <span class="material-symbols-outlined text-[16px]">storefront</span>
-      Become a Seller
+  <header
+    class="bg-background border-b border-outline-variant docked full-width top-0 sticky flex justify-between items-center w-full px-gutter h-16 z-50 bg-background/95 backdrop-blur-md">
+
+    <div class="flex items-center gap-lg">
+
+      <!-- Mobile Menu -->
+      <button
+        id="mobile-menu-btn"
+        class="text-on-surface hover:text-secondary-container transition-colors duration-200 lg:hidden"
+        aria-label="Open menu"
+        aria-expanded="false">
+
+        <span class="material-symbols-outlined font-headline-md text-headline-md">
+          menu
+        </span>
+
+      </button>
+
+
+      <!-- Logo -->
+      <a
+        href="index.html"
+        class="font-display-xl text-headline-md text-secondary-container tracking-tighter uppercase">
+
+        KHELZONE
+
+      </a>
+
+
+      <!-- Desktop Navigation -->
+      <nav class="hidden lg:flex items-center gap-md ml-md">
+
+        <a
+          href="index.html"
+          class="font-label-caps text-label-caps text-on-surface hover:text-secondary-container transition-colors duration-200 tracking-wider">
+          HOME
+        </a>
+
+        <a
+          href="shop.html"
+          class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">
+          SHOP
+        </a>
+
+        <a
+          href="customization.html"
+          class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">
+          CUSTOMIZE KIT
+        </a>
+
+        <a
+          href="wishlist.html"
+          class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 tracking-wider">
+          WISHLIST
+        </a>
+
+        <a
+          href="cart.html"
+          class="font-label-caps text-label-caps text-secondary-container border-b-2 border-secondary-container pb-1 tracking-wider">
+          CART
+        </a>
+
+      </nav>
+
+    </div>
+
+
+    <!-- Seller -->
+    <div class="flex items-center gap-lg">
+
+      <a
+        href="seller.html"
+        class="become-seller-link font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors duration-200 hidden md:flex items-center gap-1 border border-outline-variant hover:border-secondary-container rounded-full px-sm py-1 tracking-wider">
+
+        <span class="material-symbols-outlined text-[16px]">
+          storefront
+        </span>
+
+        Become a Seller
+
+      </a>
+
+    </div>
+
+  </header>
+
+
+
+  <!-- ================================================================
+       MOBILE NAVIGATION
+       ================================================================ -->
+
+  <div id="mobile-nav" class="mobile-nav hidden lg:hidden">
+
+    <a href="index.html">
+      HOME
     </a>
+
+    <a href="shop.html">
+      SHOP
+    </a>
+
+    <a href="customization.html">
+      CUSTOMIZE KIT
+    </a>
+
+    <a href="wishlist.html">
+      WISHLIST
+    </a>
+
+    <a href="cart.html" class="active">
+      CART
+    </a>
+
   </div>
-</header>
 
-<div id="mobile-nav" class="mobile-nav hidden lg:hidden">
-  <a href="index.html">HOME</a>
-  <a href="shop.html">SHOP</a>
-  <a href="customization.html">CUSTOMIZE KIT</a>
-  <a href="wishlist.html">WISHLIST</a>
-  <a href="cart.html" class="active">CART</a>
-</div>
 
-<main class="flex-grow w-full max-w-container-max mx-auto px-gutter py-xl">
-  <div class="flex flex-col md:flex-row gap-lg">
 
-    <section class="w-full md:w-2/3 flex flex-col gap-md">
-      <div class="flex justify-between items-end border-b border-outline-variant pb-sm">
-        <h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background tracking-tight uppercase">YOUR CART</h2>
-        <span id="item-count-label" class="font-label-caps text-label-caps text-on-surface-variant">0 ITEMS</span>
-      </div>
+  <!-- ================================================================
+       MAIN CART
+       ================================================================ -->
 
-      <div class="flex items-center justify-between">
-        <label class="flex items-center gap-sm cursor-pointer select-none">
-          <input type="checkbox" id="select-all-checkbox" class="khel-checkbox"/>
-          <span class="font-label-caps text-label-caps text-on-surface-variant">SELECT ALL</span>
-        </label>
-        <button id="clear-cart-btn" class="font-label-caps text-label-caps text-error hover:text-error-container flex items-center gap-1 transition-colors">
-          <span class="material-symbols-outlined text-sm">delete_sweep</span>
-          CLEAR CART
-        </button>
-      </div>
+  <main class="flex-grow w-full max-w-container-max mx-auto px-gutter py-xl">
 
-      <div id="free-ship-wrap" class="bg-surface-container-low border border-outline-variant/50 rounded-xl p-md flex flex-col gap-sm" style="display:none;">
-        <div class="flex items-center gap-sm">
-          <span class="material-symbols-outlined text-secondary-container text-sm">local_shipping</span>
-          <p id="free-ship-msg" class="font-body-md text-body-md text-on-background"></p>
-        </div>
-        <div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
-          <div id="free-ship-bar-fill" class="bg-secondary-container h-full rounded-full transition-all duration-500 progress-glow w-0"></div>
-        </div>
-      </div>
+    <div class="flex flex-col md:flex-row gap-lg">
 
-      <div id="cart-content-wrap">
-        <div id="cart-items-container" class="flex flex-col gap-sm mt-xs"></div>
-      </div>
 
-      <div id="empty-cart-state" class="flex-col items-center justify-center text-center gap-md py-xl px-md bg-surface-container-low border border-surface-container-highest rounded-xl mt-sm">
-        <span class="material-symbols-outlined text-on-surface-variant/50" style="font-size:56px;">shopping_cart_off</span>
-        <div class="flex flex-col gap-xs max-w-sm">
-          <h3 class="font-headline-md text-headline-md text-on-background">Your Cart is Empty</h3>
-          <p class="font-body-md text-body-md text-on-surface-variant">Gear up for your next match. Explore our high-performance sports equipment and kit collections.</p>
-        </div>
-        <div class="flex flex-wrap justify-center gap-sm mt-sm">
-          <button class="continue-shopping-btn btn-primary px-md py-sm rounded-lg font-label-caps text-label-caps text-surface-container-lowest font-bold hover:opacity-90 transition-opacity" data-href="shop.html">CONTINUE SHOPPING</button>
-          <button class="customize-kit-btn px-md py-sm rounded-lg font-label-caps text-label-caps border border-secondary-container text-secondary-container hover:bg-secondary-container/10 transition-colors" data-href="customization.html">CUSTOMIZE YOUR KIT</button>
-        </div>
-      </div>
+      <!-- ============================================================
+           LEFT SIDE — CART
+           ============================================================ -->
 
-      <section id="saved-for-later-section" class="flex-col gap-sm mt-lg" style="display:none;">
-        <h3 class="font-headline-md text-headline-md text-on-background border-b border-outline-variant pb-sm uppercase">SAVED FOR LATER</h3>
-        <div id="saved-items-container" class="flex flex-col gap-sm mt-sm"></div>
-      </section>
+      <section class="w-full md:w-2/3 flex flex-col gap-md">
 
-      <section class="flex flex-col gap-sm mt-lg">
-        <h3 class="font-headline-md text-headline-md text-on-background border-b border-outline-variant pb-sm uppercase">YOU MAY ALSO LIKE</h3>
-        <div id="recommendations-container" class="grid grid-cols-2 md:grid-cols-3 gap-sm mt-sm"></div>
-      </section>
-    </section>
 
-    <section class="w-full md:w-1/3">
-      <div class="bg-surface-charcoal border border-outline-variant/50 rounded-xl p-md flex flex-col gap-md sticky top-24 shadow-2xl">
-        <h3 class="font-headline-md text-headline-md text-on-background border-b border-outline-variant pb-sm uppercase">ORDER SUMMARY</h3>
+        <!-- Cart Heading -->
+        <div class="flex justify-between items-end border-b border-outline-variant pb-sm">
 
-        <div class="flex flex-col gap-xs">
-          <div class="flex gap-sm">
-            <input id="coupon-input" type="text" placeholder="Promo code (e.g. KHEL10)" autocomplete="off" class="form-input flex-grow"/>
-            <button id="coupon-apply-btn" class="font-label-caps text-label-caps px-sm py-1 rounded-lg border border-secondary-container text-secondary-container hover:bg-secondary-container/10 transition-colors">APPLY</button>
-          </div>
-          <p id="coupon-applied-note" class="font-label-caps text-label-caps text-secondary-container mt-1"></p>
+          <h2
+            class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background tracking-tight uppercase">
+
+            YOUR CART
+
+          </h2>
+
+          <span
+            id="item-count-label"
+            class="font-label-caps text-label-caps text-on-surface-variant">
+
+            0 ITEMS
+
+          </span>
+
         </div>
 
-        <div class="flex flex-col gap-sm">
-          <div class="flex justify-between items-center text-on-surface-variant">
-            <span class="font-body-md text-body-md">Subtotal</span>
-            <span id="subtotal-value" class="font-price-display text-[16px]">PKR 0</span>
-          </div>
 
-          <div id="discount-row" class="flex justify-between items-center text-secondary-container" style="display:none;">
-            <span class="font-body-md text-body-md flex items-center gap-xs">
-              <span class="material-symbols-outlined text-sm">info</span>
-              Discount
+
+        <!-- Select All / Clear -->
+        <div class="flex items-center justify-between">
+
+          <label class="flex items-center gap-sm cursor-pointer select-none">
+
+            <input
+              type="checkbox"
+              id="select-all-checkbox"
+              class="khel-checkbox" />
+
+            <span
+              class="font-label-caps text-label-caps text-on-surface-variant">
+
+              SELECT ALL
+
             </span>
-            <span id="discount-value" class="font-price-display text-[16px]">- PKR 0</span>
-          </div>
 
-          <div class="flex justify-between items-center text-on-surface-variant border-b border-outline-variant pb-sm">
-            <span class="font-body-md text-body-md">Shipping</span>
-            <span id="shipping-value" class="font-price-display text-[16px]">PKR 0</span>
-          </div>
+          </label>
 
-          <div class="flex justify-between items-center pt-xs">
-            <span class="font-headline-md text-headline-md text-on-background">TOTAL</span>
-            <span id="total-value" class="font-price-display text-headline-md text-secondary-container font-bold tracking-tight">PKR 0</span>
-          </div>
+
+          <button
+            id="clear-cart-btn"
+            class="font-label-caps text-label-caps text-error hover:text-error-container flex items-center gap-1 transition-colors">
+
+            <span class="material-symbols-outlined text-sm">
+              delete_sweep
+            </span>
+
+            CLEAR CART
+
+          </button>
+
         </div>
 
-        <button id="checkout-btn" class="btn-primary w-full py-sm rounded-lg font-label-caps text-label-caps text-surface-container-lowest font-bold hover:scale-[1.01] active:scale-[0.99] transition-transform duration-200 mt-sm flex justify-center items-center gap-sm shadow-[0_4px_14px_0_rgba(255,106,0,0.25)]">
-          PROCEED TO CHECKOUT
-          <span class="material-symbols-outlined">arrow_forward</span>
-        </button>
 
-        <div class="mt-xs bg-secondary-container/5 border border-secondary-container/20 rounded-lg p-sm flex items-start gap-sm">
-          <span class="material-symbols-outlined text-secondary-container mt-xs shrink-0" style="font-variation-settings: 'FILL' 1;">verified</span>
-          <div>
-            <h4 class="font-label-caps text-label-caps text-secondary-container">KHELZONE GUARANTEE</h4>
-            <p class="font-body-md text-[13px] text-on-surface-variant mt-xs leading-snug">100% authentic athletic equipment. Express national delivery & easy athlete returns.</p>
+
+        <!-- ==========================================================
+             FREE SHIPPING PROGRESS
+             ========================================================== -->
+
+        <div
+          id="free-ship-wrap"
+          class="bg-surface-container-low border border-outline-variant/50 rounded-xl p-md flex flex-col gap-sm"
+          style="display:none;">
+
+          <div class="flex items-center gap-sm">
+
+            <span class="material-symbols-outlined text-secondary-container text-sm">
+              local_shipping
+            </span>
+
+            <p
+              id="free-ship-msg"
+              class="font-body-md text-body-md text-on-background">
+            </p>
+
           </div>
+
+
+          <div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
+
+            <div
+              id="free-ship-bar-fill"
+              class="bg-secondary-container h-full rounded-full transition-all duration-500 progress-glow w-0">
+            </div>
+
+          </div>
+
         </div>
+
+
+
+        <!-- ==========================================================
+             CART PRODUCTS
+             ========================================================== -->
+
+        <div id="cart-content-wrap">
+
+          <div
+            id="cart-items-container"
+            class="flex flex-col gap-sm mt-xs">
+          </div>
+
+        </div>
+
+
+
+        <!-- ==========================================================
+             EMPTY CART
+             ========================================================== -->
+
+        <div
+          id="empty-cart-state"
+          class="flex-col items-center justify-center text-center gap-md py-xl px-md bg-surface-container-low border border-surface-container-highest rounded-xl mt-sm">
+
+          <span
+            class="material-symbols-outlined text-on-surface-variant/50"
+            style="font-size:56px;">
+            shopping_cart_off
+          </span>
+
+
+          <div class="flex flex-col gap-xs max-w-sm">
+
+            <h3 class="font-headline-md text-headline-md text-on-background">
+              Your Cart is Empty
+            </h3>
+
+            <p class="font-body-md text-body-md text-on-surface-variant">
+
+              Gear up for your next match. Explore our high-performance
+              sports equipment and kit collections.
+
+            </p>
+
+          </div>
+
+
+          <div class="flex flex-wrap justify-center gap-sm mt-sm">
+
+            <button
+              class="continue-shopping-btn btn-primary px-md py-sm rounded-lg font-label-caps text-label-caps text-surface-container-lowest font-bold hover:opacity-90 transition-opacity"
+              data-href="shop.html">
+
+              CONTINUE SHOPPING
+
+            </button>
+
+
+            <button
+              class="customize-kit-btn px-md py-sm rounded-lg font-label-caps text-label-caps border border-secondary-container text-secondary-container hover:bg-secondary-container/10 transition-colors"
+              data-href="customization.html">
+
+              CUSTOMIZE YOUR KIT
+
+            </button>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- ==========================================================
+             SAVED FOR LATER
+             ========================================================== -->
+
+        <section
+          id="saved-for-later-section"
+          class="flex-col gap-sm mt-lg"
+          style="display:none;">
+
+          <h3
+            class="font-headline-md text-headline-md text-on-background border-b border-outline-variant pb-sm uppercase">
+
+            SAVED FOR LATER
+
+          </h3>
+
+          <div
+            id="saved-items-container"
+            class="flex flex-col gap-sm mt-sm">
+          </div>
+
+        </section>
+
+
+
+        <!-- ==========================================================
+             YOU MAY ALSO LIKE
+             ========================================================== -->
+
+        <section
+          id="recommendations-section"
+          class="flex flex-col gap-sm mt-lg">
+
+          <div class="flex items-end justify-between border-b border-outline-variant pb-sm">
+
+            <div>
+
+              <p
+                class="font-label-caps text-label-caps text-secondary-container tracking-widest mb-xs">
+                COMPLETE YOUR GEAR
+              </p>
+
+              <h3
+                class="font-headline-md text-headline-md text-on-background uppercase">
+
+                YOU MAY ALSO LIKE
+
+              </h3>
+
+            </div>
+
+
+            <a
+              href="shop.html"
+              class="hidden sm:flex items-center gap-1 font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container transition-colors">
+
+              VIEW ALL
+
+              <span class="material-symbols-outlined text-sm">
+                arrow_forward
+              </span>
+
+            </a>
+
+          </div>
+
+
+
+          <!--
+            cart.js will populate this container with
+            3–4 real products from the Supabase products
+            used by shop.js.
+          -->
+
+          <div
+            id="recommendations-container"
+            class="recommendation-grid grid grid-cols-2 md:grid-cols-3 gap-sm mt-sm"
+            data-source="shop-products">
+
+            <!-- Loading state -->
+            <div class="recommendation-loading col-span-full">
+
+              <div class="recommendation-loading-card">
+                <div class="recommendation-loading-image"></div>
+
+                <div class="recommendation-loading-line"></div>
+
+                <div class="recommendation-loading-line short"></div>
+              </div>
+
+
+              <div class="recommendation-loading-card">
+                <div class="recommendation-loading-image"></div>
+
+                <div class="recommendation-loading-line"></div>
+
+                <div class="recommendation-loading-line short"></div>
+              </div>
+
+
+              <div class="recommendation-loading-card hidden md:block">
+                <div class="recommendation-loading-image"></div>
+
+                <div class="recommendation-loading-line"></div>
+
+                <div class="recommendation-loading-line short"></div>
+              </div>
+
+            </div>
+
+          </div>
+
+
+
+          <!-- Mobile View All -->
+          <a
+            href="shop.html"
+            class="flex sm:hidden items-center justify-center gap-1 mt-xs py-sm border border-outline-variant rounded-lg font-label-caps text-label-caps text-on-surface-variant hover:text-secondary-container hover:border-secondary-container transition-colors">
+
+            VIEW ALL PRODUCTS
+
+            <span class="material-symbols-outlined text-sm">
+              arrow_forward
+            </span>
+
+          </a>
+
+        </section>
+
+      </section>
+
+
+
+      <!-- ============================================================
+           RIGHT SIDE — ORDER SUMMARY
+           ============================================================ -->
+
+      <section class="w-full md:w-1/3">
+
+        <div
+          class="bg-surface-charcoal border border-outline-variant/50 rounded-xl p-md flex flex-col gap-md sticky top-24 shadow-2xl">
+
+
+          <!-- Summary Title -->
+          <h3
+            class="font-headline-md text-headline-md text-on-background border-b border-outline-variant pb-sm uppercase">
+
+            ORDER SUMMARY
+
+          </h3>
+
+
+
+          <!-- ========================================================
+               COUPON
+               ======================================================== -->
+
+          <div class="flex flex-col gap-xs">
+
+            <div class="flex gap-sm">
+
+              <input
+                id="coupon-input"
+                type="text"
+                placeholder="Promo code (e.g. KHEL10)"
+                autocomplete="off"
+                class="form-input flex-grow" />
+
+              <button
+                id="coupon-apply-btn"
+                class="font-label-caps text-label-caps px-sm py-1 rounded-lg border border-secondary-container text-secondary-container hover:bg-secondary-container/10 transition-colors">
+
+                APPLY
+
+              </button>
+
+            </div>
+
+
+            <p
+              id="coupon-applied-note"
+              class="font-label-caps text-label-caps text-secondary-container mt-1">
+            </p>
+
+          </div>
+
+
+
+          <!-- ========================================================
+               PRICE DETAILS
+               ======================================================== -->
+
+          <div class="flex flex-col gap-sm">
+
+
+            <!-- Subtotal -->
+            <div class="flex justify-between items-center text-on-surface-variant">
+
+              <span class="font-body-md text-body-md">
+                Subtotal
+              </span>
+
+              <span
+                id="subtotal-value"
+                class="font-price-display text-[16px]">
+
+                PKR 0
+
+              </span>
+
+            </div>
+
+
+
+            <!-- Discount -->
+            <div
+              id="discount-row"
+              class="flex justify-between items-center text-secondary-container"
+              style="display:none;">
+
+              <span
+                class="font-body-md text-body-md flex items-center gap-xs">
+
+                <span class="material-symbols-outlined text-sm">
+                  info
+                </span>
+
+                Discount
+
+              </span>
+
+
+              <span
+                id="discount-value"
+                class="font-price-display text-[16px]">
+
+                - PKR 0
+
+              </span>
+
+            </div>
+
+
+
+            <!-- Shipping -->
+            <div
+              class="flex justify-between items-center text-on-surface-variant border-b border-outline-variant pb-sm">
+
+              <span class="font-body-md text-body-md">
+                Shipping
+              </span>
+
+              <span
+                id="shipping-value"
+                class="font-price-display text-[16px]">
+
+                PKR 0
+
+              </span>
+
+            </div>
+
+
+
+            <!-- Total -->
+            <div class="flex justify-between items-center pt-xs">
+
+              <span class="font-headline-md text-headline-md text-on-background">
+                TOTAL
+              </span>
+
+              <span
+                id="total-value"
+                class="font-price-display text-headline-md text-secondary-container font-bold tracking-tight">
+
+                PKR 0
+
+              </span>
+
+            </div>
+
+          </div>
+
+
+
+          <!-- ========================================================
+               CHECKOUT
+               ======================================================== -->
+
+          <button
+            id="checkout-btn"
+            class="btn-primary w-full py-sm rounded-lg font-label-caps text-label-caps text-surface-container-lowest font-bold hover:scale-[1.01] active:scale-[0.99] transition-transform duration-200 mt-sm flex justify-center items-center gap-sm shadow-[0_4px_14px_0_rgba(255,106,0,0.25)]">
+
+            PROCEED TO CHECKOUT
+
+            <span class="material-symbols-outlined">
+              arrow_forward
+            </span>
+
+          </button>
+
+
+
+          <!-- ========================================================
+               GUARANTEE
+               ======================================================== -->
+
+          <div
+            class="mt-xs bg-secondary-container/5 border border-secondary-container/20 rounded-lg p-sm flex items-start gap-sm">
+
+            <span
+              class="material-symbols-outlined text-secondary-container mt-xs shrink-0"
+              style="font-variation-settings: 'FILL' 1;">
+
+              verified
+
+            </span>
+
+
+            <div>
+
+              <h4
+                class="font-label-caps text-label-caps text-secondary-container">
+
+                KHELZONE GUARANTEE
+
+              </h4>
+
+              <p
+                class="font-body-md text-[13px] text-on-surface-variant mt-xs leading-snug">
+
+                100% authentic athletic equipment.
+                Express national delivery & easy athlete returns.
+
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+
+
+  <!-- ================================================================
+       FOOTER
+       ================================================================ -->
+
+  <footer
+    class="bg-surface-container-lowest border-t border-outline-variant full-width mt-auto">
+
+    <div
+      class="grid grid-cols-1 md:grid-cols-3 gap-lg px-gutter py-xl max-w-container-max mx-auto flat no-shadows">
+
+
+      <!-- Brand -->
+      <div class="flex flex-col gap-sm">
+
+        <span
+          class="font-display-xl text-on-surface text-headline-md uppercase tracking-tighter">
+
+          KHELZONE
+
+        </span>
+
+        <p
+          class="font-body-md text-body-md text-on-surface-variant">
+
+          © 2026 KHELZONE. Engineered for Performance.
+
+        </p>
+
       </div>
-    </section>
-  </div>
-</main>
 
-<footer class="bg-surface-container-lowest border-t border-outline-variant full-width mt-auto">
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-lg px-gutter py-xl max-w-container-max mx-auto flat no-shadows">
-    <div class="flex flex-col gap-sm">
-      <span class="font-display-xl text-on-surface text-headline-md uppercase tracking-tighter">KHELZONE</span>
-      <p class="font-body-md text-body-md text-on-surface-variant">© 2026 KHELZONE. Engineered for Performance.</p>
+
+
+      <!-- Shop -->
+      <div class="flex flex-col gap-sm">
+
+        <h4
+          class="font-label-caps text-label-caps text-on-surface-variant mb-xs">
+
+          SHOP
+
+        </h4>
+
+        <a
+          class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors"
+          href="shop.html">
+
+          Cricket Gear
+
+        </a>
+
+        <a
+          class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors"
+          href="shop.html">
+
+          Football Kits
+
+        </a>
+
+        <a
+          class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors"
+          href="customization.html">
+
+          Customized Jerseys
+
+        </a>
+
+      </div>
+
+
+
+      <!-- Support -->
+      <div class="flex flex-col gap-sm">
+
+        <h4
+          class="font-label-caps text-label-caps text-on-surface-variant mb-xs">
+
+          SUPPORT & LEGAL
+
+        </h4>
+
+        <a
+          class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors"
+          href="about.html">
+
+          Contact Us
+
+        </a>
+
+      </div>
+
     </div>
 
-    <div class="flex flex-col gap-sm">
-      <h4 class="font-label-caps text-label-caps text-on-surface-variant mb-xs">SHOP</h4>
-      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="shop.html">Cricket Gear</a>
-      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="shop.html">Football Kits</a>
-      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="customization.html">Customized Jerseys</a>
-    </div>
+  </footer>
 
-    <div class="flex flex-col gap-sm">
-      <h4 class="font-label-caps text-label-caps text-on-surface-variant mb-xs">SUPPORT & LEGAL</h4>
-      <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-container transition-colors" href="about.html">Contact Us</a>
-    </div>
-  </div>
-</footer>
 
-<div id="toast-container"></div>
-<div id="modal-root"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="cart.js"></script>
+  <!-- ================================================================
+       TOAST / MODAL ROOT
+       ================================================================ -->
+
+  <div id="toast-container"></div>
+
+  <div id="modal-root"></div>
+
+
+
+  <!-- ================================================================
+       SUPABASE
+       ================================================================ -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+  <!-- ================================================================
+       CART JAVASCRIPT
+       ================================================================ -->
+
+  <script src="cart.js"></script>
+
+
+  <!-- ================================================================
+       MOBILE NAV FALLBACK
+       ================================================================ -->
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+      const mobileBtn = document.getElementById("mobile-menu-btn");
+      const mobileNav = document.getElementById("mobile-nav");
+
+      if (!mobileBtn || !mobileNav) return;
+
+      mobileBtn.addEventListener("click", function () {
+
+        const isHidden = mobileNav.classList.contains("hidden");
+
+        mobileNav.classList.toggle("hidden", !isHidden);
+        mobileNav.classList.toggle("open", isHidden);
+
+        mobileBtn.setAttribute(
+          "aria-expanded",
+          isHidden ? "true" : "false"
+        );
+
+      });
+
+
+      mobileNav.querySelectorAll("a").forEach(function (link) {
+
+        link.addEventListener("click", function () {
+
+          mobileNav.classList.add("hidden");
+          mobileNav.classList.remove("open");
+
+          mobileBtn.setAttribute(
+            "aria-expanded",
+            "false"
+          );
+
+        });
+
+      });
+
+    });
+  </script>
+
 </body>
+
 </html>

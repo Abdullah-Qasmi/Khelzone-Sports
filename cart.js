@@ -23,6 +23,8 @@
    - Checkout
    - Empty cart state
    - Cross-tab cart updates
+   - You May Also Like
+   - Real products from Supabase
    ========================================================================== */
 
 "use strict";
@@ -33,6 +35,54 @@
    ========================================================================== */
 
 const CART_STORAGE_KEY = "khz_cart";
+
+
+/* ==========================================================================
+   SUPABASE
+   ========================================================================== */
+
+const SUPABASE_URL =
+    "https://antqexjhlsaynunlmzqa.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
+
+let cartSupabaseClient = null;
+
+if (window.supabase) {
+
+    try {
+
+        cartSupabaseClient =
+            window.supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_PUBLISHABLE_KEY
+            );
+
+        console.log(
+            "KHELZONE: Supabase connected for recommendations."
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "KHELZONE: Supabase initialization failed:",
+            error
+        );
+
+    }
+
+}
+
+else {
+
+    console.warn(
+        "KHELZONE: Supabase library not found."
+    );
+
+}
 
 
 /* ==========================================================================
@@ -48,7 +98,9 @@ const $$ = (selector, context = document) =>
 
 
 function money(value) {
+
     return `Rs. ${Number(value || 0).toLocaleString("en-PK")}`;
+
 }
 
 
@@ -344,8 +396,6 @@ function getShipping(subtotal) {
     }
 
 
-    /* Free delivery above Rs. 10,000 */
-
     if (subtotal >= 10000) {
 
         return 0;
@@ -550,14 +600,14 @@ function updateQuantity(
         newQuantity;
 
 
-    /* Remove old quantity property if it exists */
-
     delete item.quantity;
 
 
     saveCart();
 
     renderCart();
+
+    loadRecommendations();
 
 }
 
@@ -618,6 +668,8 @@ function setQuantity(
 
     renderCart();
 
+    loadRecommendations();
+
 }
 
 
@@ -676,6 +728,9 @@ function removeItem(
 
     renderCart();
 
+    loadRecommendations();
+
+
     showToast(
         "Item removed from cart"
     );
@@ -703,6 +758,8 @@ function clearCart(
 
     renderCart();
 
+    loadRecommendations();
+
 
     if (showMessage) {
 
@@ -714,10 +771,6 @@ function clearCart(
 
 }
 
-
-/* ==========================================================================
-   CART ITEM HTML
-   ========================================================================== */
 
 /* ==========================================================================
    CART ITEM HTML
@@ -767,8 +820,6 @@ function cartItemHTML(item) {
             data-size="${escapeHTML(size)}"
         >
 
-            <!-- PRODUCT IMAGE -->
-
             <div
                 class="cart-item__image"
                 style="
@@ -814,8 +865,6 @@ function cartItemHTML(item) {
             </div>
 
 
-            <!-- PRODUCT INFORMATION -->
-
             <div class="cart-item__info">
 
                 <span class="cart-item__category">
@@ -858,8 +907,6 @@ function cartItemHTML(item) {
             </div>
 
 
-            <!-- QUANTITY -->
-
             <div class="cart-item__quantity">
 
                 <button
@@ -899,16 +946,12 @@ function cartItemHTML(item) {
             </div>
 
 
-            <!-- ITEM TOTAL -->
-
             <div class="cart-item__total">
 
                 ${money(total)}
 
             </div>
 
-
-            <!-- REMOVE -->
 
             <button
                 type="button"
@@ -983,11 +1026,6 @@ function emptyCartHTML() {
    ========================================================================== */
 
 function getCartItemsContainer() {
-
-    /*
-       Supports all possible IDs used by the
-       current KHELZONE cart page.
-    */
 
     return (
 
@@ -1072,8 +1110,6 @@ function updateItemCountLabel() {
     );
 
 
-    /* Support older cart IDs */
-
     $$(
         "#cartItemCount, [data-cart-item-count]"
     )
@@ -1147,8 +1183,6 @@ function updateSubtotal() {
         );
 
 
-    /* Support alternative IDs */
-
     $$(
         "#cartSubtotal, [data-cart-subtotal]"
     )
@@ -1194,8 +1228,6 @@ function updateShipping() {
             }
         );
 
-
-    /* Alternative IDs */
 
     $$(
         "#cartShipping, [data-cart-shipping]"
@@ -1284,8 +1316,6 @@ function updateGrandTotal() {
             }
         );
 
-
-    /* Alternative IDs */
 
     $$(
         "#cartTotal, #cartGrandTotal, [data-cart-total]"
@@ -1480,12 +1510,6 @@ function updateSavedForLater() {
     }
 
 
-    /*
-       No saved-for-later products are currently
-       stored by shop.js, so keep this section
-       hidden until that feature is implemented.
-    */
-
     section.style.display =
         "none";
 
@@ -1600,16 +1624,12 @@ function wireCartEvents() {
                 "Standard";
 
 
-            if (
-                !productId
-            ) {
+            if (!productId) {
 
                 return;
 
             }
 
-
-            /* INCREASE */
 
             if (
                 action ===
@@ -1625,8 +1645,6 @@ function wireCartEvents() {
             }
 
 
-            /* DECREASE */
-
             else if (
                 action ===
                 "decrease"
@@ -1640,8 +1658,6 @@ function wireCartEvents() {
 
             }
 
-
-            /* REMOVE */
 
             else if (
                 action ===
@@ -1757,17 +1773,8 @@ function wireCheckout() {
                     }
 
 
-                    /*
-                       Save latest cart before checkout
-                    */
-
                     saveCart();
 
-
-                    /*
-                       Store order totals for
-                       payment.html if needed.
-                    */
 
                     const checkoutData = {
 
@@ -1918,13 +1925,6 @@ function wireCoupon() {
 
             }
 
-
-            /*
-               Demo coupons.
-
-               You can connect these to
-               Supabase later.
-            */
 
             const coupons = {
 
@@ -2245,6 +2245,743 @@ function showToast(message) {
 
 
 /* ==========================================================================
+   ============================================================
+   YOU MAY ALSO LIKE
+   ============================================================
+   Real products are loaded from Supabase products table.
+   ========================================================================== */
+
+
+/* ==========================================================================
+   GET RECOMMENDATION IMAGE
+   ========================================================================== */
+
+function getRecommendationImage(product) {
+
+    if (
+        product?.image
+    ) {
+
+        return product.image;
+
+    }
+
+
+    if (
+        product?.image_url
+    ) {
+
+        return product.image_url;
+
+    }
+
+
+    if (
+        Array.isArray(product?.images) &&
+        product.images.length
+    ) {
+
+        return product.images[0];
+
+    }
+
+
+    if (
+        typeof product?.images === "string" &&
+        product.images.trim()
+    ) {
+
+        return product.images;
+
+    }
+
+
+    if (
+        product?.thumbnail
+    ) {
+
+        return product.thumbnail;
+
+    }
+
+
+    return "https://placehold.co/400x400/111111/ffffff?text=KHELZONE";
+
+}
+
+
+/* ==========================================================================
+   RECOMMENDATION CARD
+   ========================================================================== */
+
+function recommendationCardHTML(product) {
+
+    const id =
+        product.id;
+
+
+    const name =
+        product.name ||
+        product.title ||
+        "Sports Product";
+
+
+    const price =
+        Number(
+            product.price ??
+            product.sale_price ??
+            0
+        );
+
+
+    const oldPrice =
+        Number(
+            product.old_price ??
+            product.compare_at_price ??
+            0
+        );
+
+
+    const category =
+        product.category ||
+        product.sport ||
+        "SPORTS";
+
+
+    const image =
+        getRecommendationImage(
+            product
+        );
+
+
+    return `
+
+        <article
+            class="recommendation-product"
+            data-recommendation-product="${escapeHTML(String(id))}"
+        >
+
+            <!-- PRODUCT IMAGE -->
+
+            <div class="recommendation-product__image">
+
+                <img
+                    src="${escapeHTML(image)}"
+                    alt="${escapeHTML(name)}"
+                    loading="lazy"
+                    decoding="async"
+                    onerror="
+                        this.onerror=null;
+                        this.src='https://placehold.co/400x400/111111/ffffff?text=KHELZONE';
+                    "
+                >
+
+
+                <span class="recommendation-product__badge">
+
+                    PICK
+
+                </span>
+
+            </div>
+
+
+            <!-- PRODUCT CONTENT -->
+
+            <div class="recommendation-product__content">
+
+                <div class="recommendation-product__category">
+
+                    ${escapeHTML(category)}
+
+                </div>
+
+
+                <h4 class="recommendation-product__name">
+
+                    ${escapeHTML(name)}
+
+                </h4>
+
+
+                <div class="recommendation-product__rating">
+
+                    <span>★</span>
+
+                    <span>4.8</span>
+
+                    <small>
+                        • Popular
+                    </small>
+
+                </div>
+
+
+                <div class="recommendation-product__bottom">
+
+                    <div class="recommendation-product__prices">
+
+                        <strong>
+
+                            ${money(price)}
+
+                        </strong>
+
+
+                        ${
+                            oldPrice > price
+                                ? `
+                                    <del>
+                                        ${money(oldPrice)}
+                                    </del>
+                                `
+                                : ""
+                        }
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="recommendation-product__add"
+                        data-recommendation-add="${escapeHTML(String(id))}"
+                        aria-label="Add ${escapeHTML(name)} to cart"
+                    >
+
+                        <span class="material-symbols-outlined">
+
+                            add
+
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </article>
+
+    `;
+
+}
+
+
+/* ==========================================================================
+   LOAD RECOMMENDATIONS
+   ========================================================================== */
+
+async function loadRecommendations() {
+
+    const container =
+        $("#recommendations-container");
+
+
+    if (!container) {
+
+        console.warn(
+            "KHELZONE: recommendations-container not found."
+        );
+
+        return;
+
+    }
+
+
+    if (!cartSupabaseClient) {
+
+        console.warn(
+            "KHELZONE: Supabase client unavailable."
+        );
+
+        container.innerHTML = "";
+
+        return;
+
+    }
+
+
+    /* Loading */
+
+    container.innerHTML = `
+
+        <div class="recommendation-loading"></div>
+
+        <div class="recommendation-loading"></div>
+
+        <div class="recommendation-loading"></div>
+
+        <div class="recommendation-loading"></div>
+
+    `;
+
+
+    try {
+
+        /*
+           IMPORTANT:
+           We do NOT use .eq("is_active", true)
+
+           because shop.js accepts products where
+           is_active is true, null, or missing.
+
+           Only products explicitly marked false
+           are removed below.
+        */
+
+        const {
+            data,
+            error
+        } =
+            await cartSupabaseClient
+
+                .from("products")
+
+                .select("*")
+
+                .order(
+                    "created_at",
+                    {
+                        ascending: false
+                    }
+                )
+
+                .limit(30);
+
+
+        if (error) {
+
+            console.error(
+                "KHELZONE: Recommendation query failed:",
+                error
+            );
+
+            container.innerHTML = "";
+
+            return;
+
+        }
+
+
+        let products =
+            Array.isArray(data)
+                ? data.filter(
+                    product =>
+                        product &&
+                        product.is_active !== false
+                )
+                : [];
+
+
+        /*
+           Remove products already in cart
+        */
+
+        const cartProductIds =
+            new Set(
+
+                cart.map(
+                    item =>
+                        String(
+                            item.productId ||
+                            item.id
+                        )
+                )
+
+            );
+
+
+        products =
+            products.filter(
+                product =>
+                    !cartProductIds.has(
+                        String(product.id)
+                    )
+            );
+
+
+        /*
+           Prioritize featured/trending products
+        */
+
+        products.sort(
+
+            (a, b) => {
+
+                const scoreA =
+                    (a.featured ? 3 : 0) +
+                    (a.is_featured ? 3 : 0) +
+                    (a.trending ? 2 : 0) +
+                    (a.is_trending ? 2 : 0);
+
+
+                const scoreB =
+                    (b.featured ? 3 : 0) +
+                    (b.is_featured ? 3 : 0) +
+                    (b.trending ? 2 : 0) +
+                    (b.is_trending ? 2 : 0);
+
+
+                return scoreB - scoreA;
+
+            }
+
+        );
+
+
+        /*
+           Show maximum 4 products
+        */
+
+        products =
+            products.slice(
+                0,
+                4
+            );
+
+
+        if (!products.length) {
+
+            container.innerHTML = "";
+
+            return;
+
+        }
+
+
+        /*
+           Render cards
+        */
+
+        container.innerHTML =
+            products
+                .map(
+                    recommendationCardHTML
+                )
+                .join("");
+
+
+        wireRecommendationEvents();
+
+
+        console.log(
+            "KHELZONE: Recommendations loaded:",
+            products
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "KHELZONE: Recommendation loading error:",
+            error
+        );
+
+        container.innerHTML = "";
+
+    }
+
+}
+
+
+/* ==========================================================================
+   RECOMMENDATION BUTTON EVENTS
+   ========================================================================== */
+
+function wireRecommendationEvents() {
+
+    const buttons =
+        $$(
+            "[data-recommendation-add]"
+        );
+
+
+    buttons.forEach(
+
+        button => {
+
+            button.addEventListener(
+
+                "click",
+
+                async () => {
+
+                    const productId =
+                        button.dataset.recommendationAdd;
+
+
+                    if (!productId) {
+
+                        return;
+
+                    }
+
+
+                    if (
+                        button.disabled
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    button.disabled =
+                        true;
+
+
+                    const originalHTML =
+                        button.innerHTML;
+
+
+                    button.innerHTML = `
+
+                        <span
+                            class="material-symbols-outlined recommendation-spinner"
+                        >
+                            progress_activity
+                        </span>
+
+                    `;
+
+
+                    const success =
+                        await addRecommendationToCart(
+                            productId
+                        );
+
+
+                    if (!success) {
+
+                        button.disabled =
+                            false;
+
+                        button.innerHTML =
+                            originalHTML;
+
+                    }
+
+                }
+
+            );
+
+        }
+
+    );
+
+}
+
+
+/* ==========================================================================
+   ADD RECOMMENDATION TO CART
+   ========================================================================== */
+
+async function addRecommendationToCart(
+    productId
+) {
+
+    if (!cartSupabaseClient) {
+
+        showToast(
+            "Products are temporarily unavailable"
+        );
+
+        return false;
+
+    }
+
+
+    try {
+
+        const {
+            data: product,
+            error
+        } =
+            await cartSupabaseClient
+
+                .from("products")
+
+                .select("*")
+
+                .eq(
+                    "id",
+                    productId
+                )
+
+                .single();
+
+
+        if (
+            error ||
+            !product
+        ) {
+
+            console.error(
+                "KHELZONE: Could not find recommendation product:",
+                error
+            );
+
+            showToast(
+                "Could not add product"
+            );
+
+            return false;
+
+        }
+
+
+        /*
+           Check if product already exists
+        */
+
+        const existingIndex =
+            cart.findIndex(
+
+                item =>
+
+                    String(
+                        item.productId ||
+                        item.id
+                    ) ===
+                    String(
+                        product.id
+                    )
+
+            );
+
+
+        if (
+            existingIndex !== -1
+        ) {
+
+            cart[existingIndex].qty =
+                Number(
+                    cart[existingIndex].qty ||
+                    1
+                ) + 1;
+
+        }
+
+        else {
+
+            const image =
+                getRecommendationImage(
+                    product
+                );
+
+
+            let defaultSize =
+                "Standard";
+
+
+            /*
+               If product has sizes,
+               use first available size.
+            */
+
+            if (
+                Array.isArray(
+                    product.sizes
+                ) &&
+                product.sizes.length
+            ) {
+
+                defaultSize =
+                    product.sizes[0];
+
+            }
+
+
+            cart.push({
+
+                id:
+                    product.id,
+
+                productId:
+                    product.id,
+
+                name:
+                    product.name ||
+                    product.title ||
+                    "Sports Product",
+
+                price:
+                    Number(
+                        product.price ??
+                        product.sale_price ??
+                        0
+                    ),
+
+                image:
+                    image,
+
+                size:
+                    defaultSize,
+
+                qty:
+                    1,
+
+                category:
+                    product.category ||
+                    product.sport ||
+                    ""
+
+            });
+
+        }
+
+
+        /*
+           Save
+        */
+
+        saveCart();
+
+
+        /*
+           Refresh cart UI
+        */
+
+        renderCart();
+
+
+        /*
+           Refresh recommendation products
+           so added product disappears.
+        */
+
+        await loadRecommendations();
+
+
+        showToast(
+            "Product added to cart"
+        );
+
+
+        return true;
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "KHELZONE: Recommendation add error:",
+            error
+        );
+
+        showToast(
+            "Could not add product"
+        );
+
+        return false;
+
+    }
+
+}
+
+
+/* ==========================================================================
    LISTEN FOR CART CHANGES FROM OTHER TABS
    ========================================================================== */
 
@@ -2262,6 +2999,8 @@ window.addEventListener(
             loadCart();
 
             renderCart();
+
+            loadRecommendations();
 
         }
 
@@ -2288,6 +3027,8 @@ document.addEventListener(
             loadCart();
 
             renderCart();
+
+            loadRecommendations();
 
         }
 
@@ -2344,6 +3085,15 @@ function initializeCart() {
     wireSelectAll();
 
     wireMobileMenu();
+
+
+    /*
+       IMPORTANT:
+       Load real products from Supabase
+       for You May Also Like.
+    */
+
+    loadRecommendations();
 
 
     console.log(
@@ -2412,6 +3162,8 @@ window.KHELZONE_CART = {
 
     clearCart,
 
-    renderCart
+    renderCart,
+
+    loadRecommendations
 
 };

@@ -719,6 +719,10 @@ function clearCart(
    CART ITEM HTML
    ========================================================================== */
 
+/* ==========================================================================
+   CART ITEM HTML
+   ========================================================================== */
+
 function cartItemHTML(item) {
 
     const quantity =
@@ -763,12 +767,44 @@ function cartItemHTML(item) {
             data-size="${escapeHTML(size)}"
         >
 
-            <div class="cart-item__image">
+            <!-- PRODUCT IMAGE -->
+
+            <div
+                class="cart-item__image"
+                style="
+                    width:72px;
+                    height:72px;
+                    min-width:72px;
+                    max-width:72px;
+                    min-height:72px;
+                    max-height:72px;
+                    flex:0 0 72px;
+                    overflow:hidden;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                "
+            >
 
                 <img
+                    class="cart-item__image-img"
                     src="${escapeHTML(image)}"
                     alt="${escapeHTML(item.name)}"
                     loading="lazy"
+                    decoding="async"
+                    width="72"
+                    height="72"
+                    style="
+                        width:100%;
+                        height:100%;
+                        min-width:0;
+                        min-height:0;
+                        max-width:100%;
+                        max-height:100%;
+                        object-fit:contain;
+                        object-position:center;
+                        display:block;
+                    "
                     onerror="
                         this.onerror=null;
                         this.src='https://placehold.co/300x300/111111/ffffff?text=KHELZONE';
@@ -777,6 +813,8 @@ function cartItemHTML(item) {
 
             </div>
 
+
+            <!-- PRODUCT INFORMATION -->
 
             <div class="cart-item__info">
 
@@ -820,6 +858,8 @@ function cartItemHTML(item) {
             </div>
 
 
+            <!-- QUANTITY -->
+
             <div class="cart-item__quantity">
 
                 <button
@@ -859,12 +899,16 @@ function cartItemHTML(item) {
             </div>
 
 
+            <!-- ITEM TOTAL -->
+
             <div class="cart-item__total">
 
                 ${money(total)}
 
             </div>
 
+
+            <!-- REMOVE -->
 
             <button
                 type="button"

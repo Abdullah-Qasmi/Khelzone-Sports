@@ -2,18 +2,23 @@
    KHELZONE - PAYMENT / CHECKOUT
    ========================================================= */
 
+/* =========================================================
+   SUPABASE
+   ========================================================= */
+
 const SUPABASE_URL =
     "https://antqexjhlsaynunlmzqa.supabase.co";
 
 const SUPABASE_KEY =
     "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
 
-const supabaseClient = window.supabase
-    ? window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    )
-    : null;
+const supabaseClient =
+    window.supabase
+        ? window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
+        )
+        : null;
 
 
 /* =========================================================
@@ -35,8 +40,17 @@ let grandTotal = 0;
    HELPERS
    ========================================================= */
 
+function getElement(id) {
+    return document.getElementById(id);
+}
+
+
 function escapeHtml(value) {
-    if (value === null || value === undefined) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
         return "";
     }
 
@@ -50,27 +64,29 @@ function escapeHtml(value) {
 
 
 function formatPrice(value) {
-    const number = Number(value) || 0;
+
+    const number =
+        Number(value) || 0;
+
     return `Rs. ${number.toLocaleString("en-PK")}`;
 }
 
 
-function getElement(id) {
-    return document.getElementById(id);
-}
-
-
 /* =========================================================
-   CART
+   LOAD CART
    ========================================================= */
 
 function loadCart() {
+
     try {
+
         const savedCart =
             localStorage.getItem(CART_KEY);
 
         if (!savedCart) {
+
             cartItems = [];
+
             return;
         }
 
@@ -78,17 +94,24 @@ function loadCart() {
             JSON.parse(savedCart);
 
         if (Array.isArray(parsed)) {
+
             cartItems = parsed;
+
         } else if (
             parsed &&
             Array.isArray(parsed.items)
         ) {
-            cartItems = parsed.items;
+
+            cartItems =
+                parsed.items;
+
         } else {
+
             cartItems = [];
         }
 
     } catch (error) {
+
         console.error(
             "Cart loading error:",
             error
@@ -100,10 +123,13 @@ function loadCart() {
 
 
 /* =========================================================
-   NORMALIZE CART ITEM
+   NORMALIZE CART
    ========================================================= */
 
-function normalizeCartItem(item, index) {
+function normalizeCartItem(
+    item,
+    index
+) {
 
     if (
         !item ||
@@ -160,22 +186,29 @@ function normalizeCartItem(item, index) {
         "";
 
     return {
+
         id,
+
         name,
+
         price,
+
         quantity,
+
         image,
+
         category,
+
         size,
-        total: price * quantity,
-        original: item
+
+        total:
+            price * quantity,
+
+        original:
+            item
     };
 }
 
-
-/* =========================================================
-   PREPARE CART
-   ========================================================= */
 
 function prepareCart() {
 
@@ -191,6 +224,7 @@ function prepareCart() {
                 );
 
             if (normalizedItem) {
+
                 normalized.push(
                     normalizedItem
                 );
@@ -198,7 +232,8 @@ function prepareCart() {
         }
     );
 
-    cartItems = normalized;
+    cartItems =
+        normalized;
 }
 
 
@@ -210,26 +245,34 @@ function calculateTotals() {
 
     subtotal =
         cartItems.reduce(
-            (total, item) => {
-                return total +
+            (
+                total,
+                item
+            ) => {
+
+                return (
+                    total +
                     (
                         Number(item.price) *
                         Number(item.quantity)
-                    );
+                    )
+                );
             },
             0
         );
 
-    /*
-       Free shipping above Rs. 3000.
-       Otherwise Rs. 200.
-    */
-
     if (subtotal <= 0) {
+
         shipping = 0;
-    } else if (subtotal >= 3000) {
+
+    } else if (
+        subtotal >= 3000
+    ) {
+
         shipping = 0;
+
     } else {
+
         shipping = 200;
     }
 
@@ -241,6 +284,7 @@ function calculateTotals() {
         discount;
 
     if (grandTotal < 0) {
+
         grandTotal = 0;
     }
 }
@@ -256,52 +300,99 @@ function renderOrderItems() {
         getElement("orderItems");
 
     if (!container) {
-        console.error(
+
+        console.warn(
             "orderItems element not found."
         );
+
         return;
     }
 
     container.innerHTML = "";
 
+
     if (!cartItems.length) {
 
         container.innerHTML = `
+
             <div class="py-10 text-center">
 
                 <div
-                    class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/5"
+                    class="
+                        mx-auto
+                        mb-4
+                        flex
+                        h-14
+                        w-14
+                        items-center
+                        justify-center
+                        rounded-full
+                        bg-white/5
+                    "
                 >
+
                     <span
-                        class="material-symbols-outlined text-3xl text-white/40"
+                        class="
+                            material-symbols-outlined
+                            text-3xl
+                            text-white/40
+                        "
                     >
                         shopping_cart
                     </span>
+
                 </div>
 
                 <h3
-                    class="text-base font-black text-white"
+                    class="
+                        text-base
+                        font-black
+                        text-white
+                    "
                 >
                     Your cart is empty
                 </h3>
 
                 <p
-                    class="mt-2 text-sm text-white/50"
+                    class="
+                        mt-2
+                        text-sm
+                        text-white/50
+                    "
                 >
                     Add some sports products before placing your order.
                 </p>
 
                 <a
                     href="shop.html"
-                    class="mt-5 inline-flex items-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-black uppercase tracking-wide text-black transition hover:bg-orange-400"
+                    class="
+                        mt-5
+                        inline-flex
+                        items-center
+                        gap-2
+                        rounded-xl
+                        bg-orange-500
+                        px-5
+                        py-3
+                        text-sm
+                        font-black
+                        uppercase
+                        tracking-wide
+                        text-black
+                    "
                 >
+
                     <span
-                        class="material-symbols-outlined text-[20px]"
+                        class="
+                            material-symbols-outlined
+                            text-[20px]
+                        "
                     >
                         shopping_bag
                     </span>
 
                     Continue Shopping
+
                 </a>
 
             </div>
@@ -310,140 +401,259 @@ function renderOrderItems() {
         return;
     }
 
-    cartItems.forEach((item) => {
 
-        const itemTotal =
-            Number(item.price) *
-            Number(item.quantity);
+    cartItems.forEach(
+        (item) => {
 
-        let imageHtml = "";
+            const itemTotal =
+                Number(item.price) *
+                Number(item.quantity);
 
-        if (item.image) {
+            let imageHtml = "";
 
-            imageHtml = `
-                <img
-                    src="${escapeHtml(item.image)}"
-                    alt="${escapeHtml(item.name)}"
-                    class="h-20 w-20 rounded-xl object-cover bg-black/20"
-                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                />
 
-                <div
-                    class="hidden h-20 w-20 items-center justify-center rounded-xl bg-white/5"
-                >
-                    <span
-                        class="material-symbols-outlined text-2xl text-white/30"
+            if (item.image) {
+
+                imageHtml = `
+
+                    <img
+                        src="${escapeHtml(item.image)}"
+                        alt="${escapeHtml(item.name)}"
+                        class="
+                            h-20
+                            w-20
+                            rounded-xl
+                            object-cover
+                            bg-black/20
+                        "
+                        onerror="
+                            this.style.display='none';
+                            this.nextElementSibling.style.display='flex';
+                        "
                     >
-                        sports
-                    </span>
-                </div>
-            `;
-
-        } else {
-
-            imageHtml = `
-                <div
-                    class="flex h-20 w-20 items-center justify-center rounded-xl bg-white/5"
-                >
-                    <span
-                        class="material-symbols-outlined text-2xl text-white/30"
-                    >
-                        sports
-                    </span>
-                </div>
-            `;
-        }
-
-        const itemHtml = `
-            <div
-                class="flex gap-4 border-b border-white/10 py-5 first:pt-0 last:border-b-0 last:pb-0"
-            >
-
-                <div class="shrink-0">
-                    ${imageHtml}
-                </div>
-
-                <div class="min-w-0 flex-1">
 
                     <div
-                        class="flex items-start justify-between gap-3"
+                        class="
+                            hidden
+                            h-20
+                            w-20
+                            items-center
+                            justify-center
+                            rounded-xl
+                            bg-white/5
+                        "
                     >
 
-                        <div class="min-w-0">
+                        <span
+                            class="
+                                material-symbols-outlined
+                                text-2xl
+                                text-white/30
+                            "
+                        >
+                            sports
+                        </span>
 
-                            <h3
-                                class="truncate text-sm font-black text-white sm:text-base"
-                                title="${escapeHtml(item.name)}"
+                    </div>
+                `;
+
+            } else {
+
+                imageHtml = `
+
+                    <div
+                        class="
+                            flex
+                            h-20
+                            w-20
+                            items-center
+                            justify-center
+                            rounded-xl
+                            bg-white/5
+                        "
+                    >
+
+                        <span
+                            class="
+                                material-symbols-outlined
+                                text-2xl
+                                text-white/30
+                            "
+                        >
+                            sports
+                        </span>
+
+                    </div>
+                `;
+            }
+
+
+            const itemHtml = `
+
+                <div
+                    class="
+                        flex
+                        gap-4
+                        border-b
+                        border-white/10
+                        py-5
+                    "
+                >
+
+                    <div class="shrink-0">
+
+                        ${imageHtml}
+
+                    </div>
+
+
+                    <div
+                        class="
+                            min-w-0
+                            flex-1
+                        "
+                    >
+
+                        <div
+                            class="
+                                flex
+                                items-start
+                                justify-between
+                                gap-3
+                            "
+                        >
+
+                            <div class="min-w-0">
+
+                                <h3
+                                    class="
+                                        truncate
+                                        text-sm
+                                        font-black
+                                        text-white
+                                    "
+                                    title="${escapeHtml(item.name)}"
+                                >
+                                    ${escapeHtml(item.name)}
+                                </h3>
+
+
+                                ${
+                                    item.category
+                                        ? `
+                                            <p
+                                                class="
+                                                    mt-1
+                                                    text-xs
+                                                    font-bold
+                                                    uppercase
+                                                    tracking-wide
+                                                    text-orange-400
+                                                "
+                                            >
+                                                ${escapeHtml(item.category)}
+                                            </p>
+                                        `
+                                        : ""
+                                }
+
+
+                                ${
+                                    item.size
+                                        ? `
+                                            <p
+                                                class="
+                                                    mt-1
+                                                    text-xs
+                                                    text-white/50
+                                                "
+                                            >
+                                                Size:
+                                                ${escapeHtml(item.size)}
+                                            </p>
+                                        `
+                                        : ""
+                                }
+
+                            </div>
+
+
+                            <div
+                                class="
+                                    shrink-0
+                                    text-right
+                                "
                             >
-                                ${escapeHtml(item.name)}
-                            </h3>
 
-                            ${
-                                item.category
-                                    ? `
-                                        <p
-                                            class="mt-1 text-xs font-bold uppercase tracking-wide text-orange-400"
-                                        >
-                                            ${escapeHtml(item.category)}
-                                        </p>
-                                    `
-                                    : ""
-                            }
+                                <p
+                                    class="
+                                        text-sm
+                                        font-black
+                                        text-orange-400
+                                    "
+                                >
+                                    ${formatPrice(itemTotal)}
+                                </p>
 
-                            ${
-                                item.size
-                                    ? `
-                                        <p
-                                            class="mt-1 text-xs text-white/50"
-                                        >
-                                            Size: ${escapeHtml(item.size)}
-                                        </p>
-                                    `
-                                    : ""
-                            }
+                            </div>
 
                         </div>
 
+
                         <div
-                            class="shrink-0 text-right"
+                            class="
+                                mt-3
+                                flex
+                                items-center
+                                justify-between
+                                gap-3
+                            "
                         >
+
                             <p
-                                class="text-sm font-black text-orange-400 sm:text-base"
+                                class="
+                                    text-xs
+                                    text-white/50
+                                "
                             >
-                                ${formatPrice(itemTotal)}
+                                ${formatPrice(item.price)}
+                                ×
+                                ${item.quantity}
                             </p>
-                        </div>
 
-                    </div>
 
-                    <div
-                        class="mt-3 flex items-center justify-between gap-3"
-                    >
+                            <div
+                                class="
+                                    flex
+                                    h-8
+                                    min-w-8
+                                    items-center
+                                    justify-center
+                                    rounded-lg
+                                    bg-white/5
+                                    px-2
+                                    text-xs
+                                    font-black
+                                    text-white
+                                "
+                            >
+                                Qty:
+                                ${item.quantity}
+                            </div>
 
-                        <p
-                            class="text-xs text-white/50"
-                        >
-                            ${formatPrice(item.price)} × ${item.quantity}
-                        </p>
-
-                        <div
-                            class="flex h-8 min-w-8 items-center justify-center rounded-lg bg-white/5 px-2 text-xs font-black text-white"
-                        >
-                            Qty: ${item.quantity}
                         </div>
 
                     </div>
 
                 </div>
+            `;
 
-            </div>
-        `;
-
-        container.insertAdjacentHTML(
-            "beforeend",
-            itemHtml
-        );
-    });
+            container.insertAdjacentHTML(
+                "beforeend",
+                itemHtml
+            );
+        }
+    );
 }
 
 
@@ -454,32 +664,54 @@ function renderOrderItems() {
 function renderTotals() {
 
     const summaryItemCount =
-        getElement("summaryItemCount");
+        getElement(
+            "summaryItemCount"
+        );
 
     const subtotalValue =
-        getElement("subtotalValue");
+        getElement(
+            "subtotalValue"
+        );
 
     const shippingValue =
-        getElement("shippingValue");
+        getElement(
+            "shippingValue"
+        );
 
     const discountRow =
-        getElement("discountRow");
+        getElement(
+            "discountRow"
+        );
 
     const discountValue =
-        getElement("discountValue");
+        getElement(
+            "discountValue"
+        );
 
     const grandTotalValue =
-        getElement("grandTotalValue");
+        getElement(
+            "grandTotalValue"
+        );
+
 
     const totalQuantity =
         cartItems.reduce(
-            (total, item) =>
-                total +
-                Number(item.quantity),
+            (
+                total,
+                item
+            ) => {
+
+                return (
+                    total +
+                    Number(item.quantity)
+                );
+            },
             0
         );
 
+
     if (summaryItemCount) {
+
         summaryItemCount.textContent =
             `${totalQuantity} ${
                 totalQuantity === 1
@@ -488,10 +720,15 @@ function renderTotals() {
             }`;
     }
 
+
     if (subtotalValue) {
+
         subtotalValue.textContent =
-            formatPrice(subtotal);
+            formatPrice(
+                subtotal
+            );
     }
+
 
     if (shippingValue) {
 
@@ -499,6 +736,7 @@ function renderTotals() {
             shipping === 0 &&
             subtotal > 0
         ) {
+
             shippingValue.textContent =
                 "FREE";
 
@@ -509,13 +747,16 @@ function renderTotals() {
         } else {
 
             shippingValue.textContent =
-                formatPrice(shipping);
+                formatPrice(
+                    shipping
+                );
 
             shippingValue.classList.remove(
                 "text-green-400"
             );
         }
     }
+
 
     if (discountRow) {
 
@@ -526,8 +767,11 @@ function renderTotals() {
             );
 
             if (discountValue) {
+
                 discountValue.textContent =
-                    `- ${formatPrice(discount)}`;
+                    `- ${formatPrice(
+                        discount
+                    )}`;
             }
 
         } else {
@@ -538,50 +782,57 @@ function renderTotals() {
         }
     }
 
+
     if (grandTotalValue) {
+
         grandTotalValue.textContent =
-            formatPrice(grandTotal);
+            formatPrice(
+                grandTotal
+            );
     }
 }
 
 
 /* =========================================================
-   CHECKOUT VISIBILITY
+   CHECKOUT BUTTON
    ========================================================= */
 
 function updateCheckoutVisibility() {
 
-    const placeOrderBtn =
-        getElement("placeOrderBtn");
+    const button =
+        getElement(
+            "placeOrderBtn"
+        );
 
-    if (!placeOrderBtn) {
+    if (!button) {
         return;
     }
 
+
     if (!cartItems.length) {
 
-        placeOrderBtn.disabled = true;
+        button.disabled = true;
 
-        placeOrderBtn.classList.add(
+        button.classList.add(
             "opacity-50",
             "cursor-not-allowed"
         );
 
-        placeOrderBtn.setAttribute(
+        button.setAttribute(
             "aria-disabled",
             "true"
         );
 
     } else {
 
-        placeOrderBtn.disabled = false;
+        button.disabled = false;
 
-        placeOrderBtn.classList.remove(
+        button.classList.remove(
             "opacity-50",
             "cursor-not-allowed"
         );
 
-        placeOrderBtn.removeAttribute(
+        button.removeAttribute(
             "aria-disabled"
         );
     }
@@ -601,30 +852,36 @@ async function loadCurrentUser() {
         );
 
         currentUser = null;
+
         return null;
     }
+
 
     try {
 
         const {
-            data: sessionData,
-            error: sessionError
+            data,
+            error
         } =
             await supabaseClient.auth.getSession();
 
-        if (sessionError) {
+
+        if (error) {
 
             console.error(
-                "Session loading error:",
-                sessionError
+                "Session error:",
+                error
             );
 
             currentUser = null;
+
             return null;
         }
 
+
         const session =
-            sessionData?.session;
+            data?.session;
+
 
         if (!session?.user) {
 
@@ -633,28 +890,14 @@ async function loadCurrentUser() {
             );
 
             currentUser = null;
+
             return null;
         }
 
-        const {
-            data,
-            error
-        } =
-            await supabaseClient.auth.getUser();
-
-        if (error) {
-
-            console.error(
-                "User loading error:",
-                error
-            );
-
-            currentUser = null;
-            return null;
-        }
 
         currentUser =
-            data?.user || session.user;
+            session.user;
+
 
         console.log(
             "Logged in user:",
@@ -666,6 +909,7 @@ async function loadCurrentUser() {
             currentUser.id
         );
 
+
         return currentUser;
 
     } catch (error) {
@@ -676,23 +920,25 @@ async function loadCurrentUser() {
         );
 
         currentUser = null;
+
         return null;
     }
 }
 
 
 /* =========================================================
-   PAYMENT METHOD
+   PAYMENT METHODS
    ========================================================= */
 
 function setupPaymentMethods() {
 
-    const paymentMethods =
+    const methods =
         document.querySelectorAll(
             'input[name="paymentMethod"]'
         );
 
-    paymentMethods.forEach(
+
+    methods.forEach(
         (radio) => {
 
             radio.addEventListener(
@@ -707,12 +953,15 @@ function setupPaymentMethods() {
         }
     );
 
+
     const selected =
         document.querySelector(
             'input[name="paymentMethod"]:checked'
         );
 
+
     if (selected) {
+
         updatePaymentDetails(
             selected.value
         );
@@ -720,38 +969,49 @@ function setupPaymentMethods() {
 }
 
 
-/* =========================================================
-   PAYMENT DETAILS
-   ========================================================= */
-
-function updatePaymentDetails(method) {
+function updatePaymentDetails(
+    method
+) {
 
     const cardDetails =
-        getElement("cardDetails");
+        getElement(
+            "cardDetails"
+        );
 
     const cashDetails =
-        getElement("cashDetails");
+        getElement(
+            "cashDetails"
+        );
+
 
     if (cardDetails) {
+
         cardDetails.classList.add(
             "hidden"
         );
     }
 
+
     if (cashDetails) {
+
         cashDetails.classList.add(
             "hidden"
         );
     }
 
-    if (method === "card") {
+
+    if (
+        method === "card"
+    ) {
 
         if (cardDetails) {
+
             cardDetails.classList.remove(
                 "hidden"
             );
         }
     }
+
 
     if (
         method === "cod" ||
@@ -759,11 +1019,35 @@ function updatePaymentDetails(method) {
     ) {
 
         if (cashDetails) {
+
             cashDetails.classList.remove(
                 "hidden"
             );
         }
     }
+}
+
+
+/* =========================================================
+   FORM VALUE
+   ========================================================= */
+
+function getFormValue(...ids) {
+
+    for (
+        const id of ids
+    ) {
+
+        const element =
+            getElement(id);
+
+        if (element) {
+
+            return element.value.trim();
+        }
+    }
+
+    return "";
 }
 
 
@@ -774,23 +1058,32 @@ function updatePaymentDetails(method) {
 function validateCustomerDetails() {
 
     const form =
-        getElement("checkoutForm");
+        getElement(
+            "checkoutForm"
+        );
+
 
     if (!form) {
+
         return true;
     }
+
 
     const requiredFields =
         form.querySelectorAll(
             "input[required], select[required], textarea[required]"
         );
 
+
     let valid = true;
+
 
     requiredFields.forEach(
         (field) => {
 
-            if (!field.value.trim()) {
+            if (
+                !field.value.trim()
+            ) {
 
                 field.classList.add(
                     "border-red-500"
@@ -807,10 +1100,12 @@ function validateCustomerDetails() {
         }
     );
 
+
     const email =
         form.querySelector(
             'input[type="email"]'
         );
+
 
     if (
         email &&
@@ -819,6 +1114,7 @@ function validateCustomerDetails() {
 
         const emailRegex =
             /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 
         if (
             !emailRegex.test(
@@ -834,10 +1130,12 @@ function validateCustomerDetails() {
         }
     }
 
+
     const phone =
         form.querySelector(
             'input[type="tel"]'
         );
+
 
     if (
         phone &&
@@ -846,11 +1144,16 @@ function validateCustomerDetails() {
 
         const cleanPhone =
             phone.value
-                .replace(/[\s-]/g, "")
+                .replace(
+                    /[\s-]/g,
+                    ""
+                )
                 .trim();
+
 
         const phoneRegex =
             /^(?:\+92|0092|0)3\d{9}$/;
+
 
         if (
             !phoneRegex.test(
@@ -866,12 +1169,14 @@ function validateCustomerDetails() {
         }
     }
 
+
     if (!valid) {
 
         alert(
             "Please fill all required customer details correctly."
         );
     }
+
 
     return valid;
 }
@@ -888,6 +1193,7 @@ function validatePaymentMethod() {
             'input[name="paymentMethod"]:checked'
         );
 
+
     if (!selected) {
 
         alert(
@@ -897,19 +1203,30 @@ function validatePaymentMethod() {
         return false;
     }
 
+
     const method =
         selected.value;
 
-    if (method === "card") {
+
+    if (
+        method === "card"
+    ) {
 
         const cardNumber =
-            getElement("cardNumber");
+            getElement(
+                "cardNumber"
+            );
 
         const expiry =
-            getElement("expiry");
+            getElement(
+                "expiry"
+            );
 
         const cvv =
-            getElement("cvv");
+            getElement(
+                "cvv"
+            );
+
 
         if (
             cardNumber &&
@@ -925,6 +1242,7 @@ function validatePaymentMethod() {
             return false;
         }
 
+
         if (
             expiry &&
             !expiry.value.trim()
@@ -938,6 +1256,7 @@ function validatePaymentMethod() {
 
             return false;
         }
+
 
         if (
             cvv &&
@@ -953,15 +1272,12 @@ function validatePaymentMethod() {
             return false;
         }
 
-        /*
-           Demo checkout only.
-           Do not use real card details.
-        */
 
         if (expiry) {
 
             const expiryRegex =
                 /^(0[1-9]|1[0-2])\/\d{2}$/;
+
 
             if (
                 expiry.value.trim() &&
@@ -981,27 +1297,8 @@ function validatePaymentMethod() {
         }
     }
 
+
     return true;
-}
-
-
-/* =========================================================
-   GET FORM DATA
-   ========================================================= */
-
-function getFormValue(...ids) {
-
-    for (const id of ids) {
-
-        const element =
-            getElement(id);
-
-        if (element) {
-            return element.value.trim();
-        }
-    }
-
-    return "";
 }
 
 
@@ -1018,11 +1315,13 @@ function buildOrder() {
             "fullName"
         );
 
+
     const customerEmail =
         getFormValue(
             "customerEmail",
             "email"
         );
+
 
     const customerPhone =
         getFormValue(
@@ -1030,11 +1329,13 @@ function buildOrder() {
             "phone"
         );
 
+
     const customerAddress =
         getFormValue(
             "customerAddress",
             "address"
         );
+
 
     const customerCity =
         getFormValue(
@@ -1042,20 +1343,24 @@ function buildOrder() {
             "city"
         );
 
+
     const selectedPayment =
         document.querySelector(
             'input[name="paymentMethod"]:checked'
         );
+
 
     const paymentMethod =
         selectedPayment
             ? selectedPayment.value
             : "cod";
 
+
     const orderNumber =
         `KZ-${Date.now()}-${Math.floor(
             Math.random() * 1000
         )}`;
+
 
     return {
 
@@ -1134,7 +1439,7 @@ function buildOrder() {
 
 
 /* =========================================================
-   SAVE ORDER LOCALLY
+   SAVE LOCAL ORDER
    ========================================================= */
 
 function saveOrderLocally(order) {
@@ -1148,12 +1453,19 @@ function saveOrderLocally(order) {
                 ) || "[]"
             );
 
-        existing.push(order);
+
+        existing.push(
+            order
+        );
+
 
         localStorage.setItem(
             "khz_orders",
-            JSON.stringify(existing)
+            JSON.stringify(
+                existing
+            )
         );
+
 
         return true;
 
@@ -1173,70 +1485,85 @@ function saveOrderLocally(order) {
    SAVE ORDER TO SUPABASE
    ========================================================= */
 
-async function saveOrderToSupabase(order) {
+async function saveOrderToSupabase(
+    order
+) {
 
     if (!supabaseClient) {
 
         return {
+
             success: false,
+
             error:
-                "Supabase client not available."
+                "Supabase client is not available."
         };
     }
+
 
     try {
 
         /*
-           Get the REAL authenticated session.
-        */
+         * IMPORTANT:
+         * Get the authenticated user directly
+         * from Supabase Auth.
+         */
 
         const {
-            data: sessionData,
-            error: sessionError
+            data,
+            error
         } =
             await supabaseClient.auth.getSession();
 
-        if (sessionError) {
+
+        if (error) {
 
             console.error(
                 "Session error:",
-                sessionError
+                error
             );
 
             return {
+
                 success: false,
+
                 error:
-                    sessionError.message
+                    error.message
             };
         }
 
+
         const session =
-            sessionData?.session;
+            data?.session;
+
 
         const user =
             session?.user;
 
+
         if (!user) {
 
             return {
+
                 success: false,
+
                 error:
-                    "User is not logged in. Please login again."
+                    "You are not logged in. Please login again."
             };
         }
 
 
-        /* =================================================
-           DEBUG - AUTH USER
-           ================================================= */
+        const userId =
+            user.id;
+
 
         console.log(
-            "========== ORDER AUTH DEBUG =========="
+            "========== ORDER DEBUG =========="
         );
 
         console.log(
             "AUTH USER ID:",
-            user.id
+            userId
         );
 
         console.log(
@@ -1244,29 +1571,12 @@ async function saveOrderToSupabase(order) {
             currentUser?.id
         );
 
-        console.log(
-            "======================================"
-        );
-
 
         /*
-           IMPORTANT:
-           user.id comes directly from Supabase Auth.
-        */
-
-        const userId =
-            user.id;
-
-
-        console.log(
-            "AUTH USER ID:",
-            userId
-        );
-
-
-        /* =================================================
-           ORDER DATA
-           ================================================= */
+         * IMPORTANT:
+         * user_id and customer_id are taken
+         * directly from auth.uid().
+         */
 
         const orderData = {
 
@@ -1299,48 +1609,40 @@ async function saveOrderToSupabase(order) {
         };
 
 
-        /*
-           EXTRA DEBUG
-        */
-
         console.log(
-            "ORDER DATA BEING SENT:",
+            "ORDER DATA:",
             orderData
         );
 
-        console.log(
-            "RLS CHECK:",
-            {
-                authUserId: user.id,
-                orderUserId: orderData.user_id,
-                sameUser:
-                    user.id === orderData.user_id
-            }
-        );
 
-
-        /* =================================================
-           INSERT
-           ================================================= */
+        /*
+         * IMPORTANT RLS FIX:
+         *
+         * DO NOT use:
+         *
+         * .select()
+         * .single()
+         *
+         * after INSERT.
+         *
+         * Customer only needs INSERT permission.
+         */
 
         const {
-            data,
-            error
+            error: insertError
         } =
             await supabaseClient
                 .from("orders")
                 .insert([
                     orderData
-                ])
-                .select()
-                .single();
+                ]);
 
 
-        if (error) {
+        if (insertError) {
 
             console.error(
                 "SUPABASE ORDER INSERT ERROR:",
-                error
+                insertError
             );
 
             console.error(
@@ -1353,20 +1655,22 @@ async function saveOrderToSupabase(order) {
                 orderData.user_id
             );
 
+
             return {
+
                 success: false,
+
                 error:
-                    error.message,
+                    insertError.message,
 
                 details:
-                    error
+                    insertError
             };
         }
 
 
         console.log(
-            "ORDER SUCCESSFULLY SAVED:",
-            data
+            "ORDER SUCCESSFULLY SAVED TO SUPABASE"
         );
 
 
@@ -1375,23 +1679,25 @@ async function saveOrderToSupabase(order) {
             success: true,
 
             data:
-                data
+                orderData
         };
 
 
     } catch (error) {
 
         console.error(
-            "Order insert exception:",
+            "Order save exception:",
             error
         );
+
 
         return {
 
             success: false,
 
             error:
-                error.message
+                error?.message ||
+                "Unable to save order."
         };
     }
 }
@@ -1425,11 +1731,15 @@ function clearCart() {
    PLACE ORDER
    ========================================================= */
 
-async function placeOrder(event) {
+async function placeOrder(
+    event
+) {
 
     if (event) {
+
         event.preventDefault();
     }
+
 
     if (!cartItems.length) {
 
@@ -1440,16 +1750,28 @@ async function placeOrder(event) {
         return;
     }
 
-    if (!validateCustomerDetails()) {
+
+    if (
+        !validateCustomerDetails()
+    ) {
+
         return;
     }
 
-    if (!validatePaymentMethod()) {
+
+    if (
+        !validatePaymentMethod()
+    ) {
+
         return;
     }
+
 
     const button =
-        getElement("placeOrderBtn");
+        getElement(
+            "placeOrderBtn"
+        );
+
 
     if (button) {
 
@@ -1459,8 +1781,12 @@ async function placeOrder(event) {
             button.innerHTML;
 
         button.innerHTML = `
+
             <span
-                class="material-symbols-outlined animate-spin"
+                class="
+                    material-symbols-outlined
+                    animate-spin
+                "
             >
                 progress_activity
             </span>
@@ -1469,20 +1795,23 @@ async function placeOrder(event) {
         `;
     }
 
+
     try {
 
         /*
-           Make sure user is logged in.
-        */
+         * Check login.
+         */
 
         const user =
             await loadCurrentUser();
+
 
         if (!user) {
 
             alert(
                 "Please login before placing your order."
             );
+
 
             if (button) {
 
@@ -1493,13 +1822,21 @@ async function placeOrder(event) {
                     "Place Order";
             }
 
+
             return;
         }
 
 
         /*
-           Build order.
-        */
+         * Recalculate totals.
+         */
+
+        calculateTotals();
+
+
+        /*
+         * Build order.
+         */
 
         const order =
             buildOrder();
@@ -1512,37 +1849,39 @@ async function placeOrder(event) {
 
 
         /*
-           Save to Supabase FIRST.
-        */
+         * Save to Supabase FIRST.
+         */
 
-        const supabaseResult =
+        const result =
             await saveOrderToSupabase(
                 order
             );
 
 
         /*
-           If Supabase fails,
-           DO NOT clear cart.
-        */
+         * If Supabase fails,
+         * DO NOT clear cart.
+         */
 
         if (
-            !supabaseResult ||
-            !supabaseResult.success
+            !result ||
+            !result.success
         ) {
 
             console.error(
-                "Order was NOT saved to Supabase:",
-                supabaseResult?.error
+                "ORDER NOT SAVED:",
+                result?.error
             );
+
 
             alert(
                 "Order could not be saved.\n\n" +
                 (
-                    supabaseResult?.error ||
+                    result?.error ||
                     "Unknown Supabase error."
                 )
             );
+
 
             if (button) {
 
@@ -1553,46 +1892,51 @@ async function placeOrder(event) {
                     "Place Order";
             }
 
+
             return;
         }
 
 
         /*
-           Supabase successful.
-        */
+         * Supabase success.
+         */
 
         console.log(
-            "Order successfully connected to Supabase."
+            "Order saved successfully."
         );
 
 
         /*
-           Save local copy.
-        */
+         * Local backup.
+         */
 
-        saveOrderLocally(order);
+        saveOrderLocally(
+            order
+        );
 
 
         /*
-           Clear cart.
-        */
+         * Save last order.
+         */
+
+        localStorage.setItem(
+            "khz_last_order",
+            JSON.stringify(
+                order
+            )
+        );
+
+
+        /*
+         * Clear cart.
+         */
 
         clearCart();
 
 
         /*
-           Save last order.
-        */
-
-        localStorage.setItem(
-            "khz_last_order",
-            JSON.stringify(order)
-        );
-
-
-        /*
-           Success redirect.
-        */
+         * Redirect.
+         */
 
         window.location.href =
             `order-success.html?order=${encodeURIComponent(
@@ -1607,6 +1951,7 @@ async function placeOrder(event) {
             error
         );
 
+
         alert(
             "Something went wrong while placing your order.\n\n" +
             (
@@ -1614,6 +1959,7 @@ async function placeOrder(event) {
                 "Please try again."
             )
         );
+
 
         if (button) {
 
@@ -1634,11 +1980,16 @@ async function placeOrder(event) {
 function setupCheckoutForm() {
 
     const form =
-        getElement("checkoutForm");
+        getElement(
+            "checkoutForm"
+        );
+
 
     if (!form) {
+
         return;
     }
+
 
     form.addEventListener(
         "submit",
@@ -1646,32 +1997,30 @@ function setupCheckoutForm() {
     );
 
 
-    const placeOrderBtn =
-        getElement("placeOrderBtn");
-
-    if (placeOrderBtn) {
-
-        placeOrderBtn.addEventListener(
-            "click",
-            function (event) {
-
-                /*
-                   If button is outside form,
-                   manually trigger placeOrder.
-                */
-
-                if (
-                    !form.contains(
-                        placeOrderBtn
-                    )
-                ) {
-
-                    event.preventDefault();
-
-                    placeOrder(event);
-                }
-            }
+    const button =
+        getElement(
+            "placeOrderBtn"
         );
+
+
+    if (button) {
+
+        /*
+         * Only manually submit if button
+         * is outside the form.
+         */
+
+        if (
+            !form.contains(
+                button
+            )
+        ) {
+
+            button.addEventListener(
+                "click",
+                placeOrder
+            );
+        }
     }
 }
 
@@ -1683,7 +2032,10 @@ function setupCheckoutForm() {
 function setupInputFormatting() {
 
     const cardNumber =
-        getElement("cardNumber");
+        getElement(
+            "cardNumber"
+        );
+
 
     if (cardNumber) {
 
@@ -1693,13 +2045,25 @@ function setupInputFormatting() {
 
                 let value =
                     this.value
-                        .replace(/\D/g, "")
-                        .slice(0, 16);
+                        .replace(
+                            /\D/g,
+                            ""
+                        )
+                        .slice(
+                            0,
+                            16
+                        );
+
 
                 value =
                     value
-                        .match(/.{1,4}/g)
-                        ?.join(" ") || "";
+                        .match(
+                            /.{1,4}/g
+                        )
+                        ?.join(
+                            " "
+                        ) || "";
+
 
                 this.value =
                     value;
@@ -1709,7 +2073,10 @@ function setupInputFormatting() {
 
 
     const expiry =
-        getElement("expiry");
+        getElement(
+            "expiry"
+        );
+
 
     if (expiry) {
 
@@ -1719,16 +2086,31 @@ function setupInputFormatting() {
 
                 let value =
                     this.value
-                        .replace(/\D/g, "")
-                        .slice(0, 4);
+                        .replace(
+                            /\D/g,
+                            ""
+                        )
+                        .slice(
+                            0,
+                            4
+                        );
 
-                if (value.length > 2) {
+
+                if (
+                    value.length > 2
+                ) {
 
                     value =
-                        value.slice(0, 2) +
+                        value.slice(
+                            0,
+                            2
+                        ) +
                         "/" +
-                        value.slice(2);
+                        value.slice(
+                            2
+                        );
                 }
+
 
                 this.value =
                     value;
@@ -1738,7 +2120,10 @@ function setupInputFormatting() {
 
 
     const cvv =
-        getElement("cvv");
+        getElement(
+            "cvv"
+        );
+
 
     if (cvv) {
 
@@ -1748,15 +2133,24 @@ function setupInputFormatting() {
 
                 this.value =
                     this.value
-                        .replace(/\D/g, "")
-                        .slice(0, 4);
+                        .replace(
+                            /\D/g,
+                            ""
+                        )
+                        .slice(
+                            0,
+                            4
+                        );
             }
         );
     }
 
 
     const phone =
-        getElement("customerPhone");
+        getElement(
+            "customerPhone"
+        );
+
 
     if (phone) {
 
@@ -1774,22 +2168,28 @@ function setupInputFormatting() {
 
 
 /* =========================================================
-   AUTO REMOVE ERROR BORDER
+   VALIDATION FEEDBACK
    ========================================================= */
 
 function setupValidationFeedback() {
 
     const form =
-        getElement("checkoutForm");
+        getElement(
+            "checkoutForm"
+        );
+
 
     if (!form) {
+
         return;
     }
+
 
     const fields =
         form.querySelectorAll(
             "input, select, textarea"
         );
+
 
     fields.forEach(
         (field) => {
@@ -1803,6 +2203,7 @@ function setupValidationFeedback() {
                     );
                 }
             );
+
 
             field.addEventListener(
                 "change",
@@ -1819,24 +2220,38 @@ function setupValidationFeedback() {
 
 
 /* =========================================================
-   AUTH STATE
+   AUTH LISTENER
    ========================================================= */
 
 function setupAuthListener() {
 
     if (!supabaseClient) {
+
         return;
     }
 
+
     supabaseClient.auth.onAuthStateChange(
-        (_event, session) => {
+        (
+            event,
+            session
+        ) => {
 
             currentUser =
-                session?.user || null;
+                session?.user ||
+                null;
+
 
             console.log(
-                "Auth state changed:",
-                currentUser
+                "Auth state:",
+                event
+            );
+
+
+            console.log(
+                "Current auth user:",
+                currentUser?.id ||
+                null
             );
         }
     );
@@ -1844,7 +2259,7 @@ function setupAuthListener() {
 
 
 /* =========================================================
-   INIT
+   INITIALIZE
    ========================================================= */
 
 async function initializePaymentPage() {
@@ -1855,112 +2270,117 @@ async function initializePaymentPage() {
 
 
     /*
-       1. Load cart
-    */
+     * 1. Load cart
+     */
 
     loadCart();
 
 
     /*
-       2. Normalize cart
-    */
+     * 2. Normalize cart
+     */
 
     prepareCart();
 
 
     /*
-       3. Calculate totals
-    */
+     * 3. Calculate totals
+     */
 
     calculateTotals();
 
 
     /*
-       4. Render products
-    */
+     * 4. Render products
+     */
 
     renderOrderItems();
 
 
     /*
-       5. Render totals
-    */
+     * 5. Render totals
+     */
 
     renderTotals();
 
 
     /*
-       6. Enable/disable Place Order
-    */
+     * 6. Checkout button
+     */
 
     updateCheckoutVisibility();
 
 
     /*
-       7. Get logged-in user
-    */
+     * 7. Get logged-in user
+     */
 
     await loadCurrentUser();
 
 
     /*
-       8. Setup payment methods
-    */
+     * 8. Payment methods
+     */
 
     setupPaymentMethods();
 
 
     /*
-       9. Setup form
-    */
+     * 9. Checkout form
+     */
 
     setupCheckoutForm();
 
 
     /*
-       10. Input formatting
-    */
+     * 10. Formatting
+     */
 
     setupInputFormatting();
 
 
     /*
-       11. Validation feedback
-    */
+     * 11. Validation
+     */
 
     setupValidationFeedback();
 
 
     /*
-       12. Auth listener
-    */
+     * 12. Auth listener
+     */
 
     setupAuthListener();
 
 
     console.log(
-        "Cart loaded:",
+        "Cart:",
         cartItems
     );
+
 
     console.log(
         "Subtotal:",
         subtotal
     );
 
+
     console.log(
         "Shipping:",
         shipping
     );
+
 
     console.log(
         "Grand total:",
         grandTotal
     );
 
+
     console.log(
         "Current user:",
-        currentUser
+        currentUser?.id ||
+        null
     );
 }
 
@@ -1970,7 +2390,8 @@ async function initializePaymentPage() {
    ========================================================= */
 
 if (
-    document.readyState === "loading"
+    document.readyState ===
+    "loading"
 ) {
 
     document.addEventListener(

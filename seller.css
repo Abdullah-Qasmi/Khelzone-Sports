@@ -963,3 +963,23 @@ body {
     }
 
 }
+/* ===== SELLER PRODUCT FORM TEXT BLACK ===== */
+
+#productForm input,
+#productForm textarea,
+#productForm select {
+    color: #000000 !important;
+}
+
+/* Placeholder bhi black */
+#productForm input::placeholder,
+#productForm textarea::placeholder {
+    color: #000000 !important;
+    opacity: 1 !important;
+}
+
+/* Select option text */
+#productForm select option {
+    color: #000000 !important;
+    background: #ffffff !important;
+}

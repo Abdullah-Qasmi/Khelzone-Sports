@@ -46,6 +46,27 @@ document.addEventListener("DOMContentLoaded", () => {
         "polo": "M136 78 Q160 90 184 78 M150 78 L150 92 M170 78 L170 92"
     };
 
+    /* -----------------------------------------------------
+       LOGO DRAG-TO-REPOSITION
+       The <image class="js-logo-front"> in the SVG template
+       sits at this base x/y by default. We keep a per-jersey
+       offset (logoOffsetX/Y) and add it on top of the base
+       position, clamped so the logo can't be dragged off
+       the chest area.
+    ----------------------------------------------------- */
+
+    const JERSEY_LOGO_BASE_X = 138;
+    const JERSEY_LOGO_BASE_Y = 118;
+    const JERSEY_LOGO_OFFSET_X_RANGE = [-40, 40];
+    const JERSEY_LOGO_OFFSET_Y_RANGE = [-20, 90];
+
+    function clampLogoOffset(jersey) {
+        const [minX, maxX] = JERSEY_LOGO_OFFSET_X_RANGE;
+        const [minY, maxY] = JERSEY_LOGO_OFFSET_Y_RANGE;
+        jersey.logoOffsetX = Math.max(minX, Math.min(maxX, Number(jersey.logoOffsetX) || 0));
+        jersey.logoOffsetY = Math.max(minY, Math.min(maxY, Number(jersey.logoOffsetY) || 0));
+    }
+
     const gearItems = [
         {
             id: "jersey",
@@ -156,7 +177,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
-       LOCAL STORAGE (kept exactly as the existing project uses it)
+       BUILDER DRAFT STORAGE
+       (this is ONLY the "resume where I left off" state for the
+       kit builder itself — separate from the shopping cart)
        ===================================================== */
 
     function saveState() {
@@ -280,6 +303,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 baseState.collar = "round";
                 baseState.sleeve = "short";
                 baseState.logo = null;
+                baseState.logoOffsetX = 0;
+                baseState.logoOffsetY = 0;
             }
 
             selectedItems[itemId] = baseState;
@@ -449,10 +474,12 @@ document.addEventListener("DOMContentLoaded", () => {
                                 ${state.logo ? "REPLACE LOGO" : "UPLOAD LOGO"}
                             </label>
                             <input type="file" id="logoFileInput" accept="image/*" hidden />
+                            ${state.logo ? `<button type="button" class="logo-upload__btn" id="logoResetPosBtn">CENTER LOGO</button>` : ""}
                             ${state.logo ? `<button type="button" class="logo-upload__remove" id="logoRemoveBtn">REMOVE</button>` : ""}
                         </div>
                     </div>
                     <p class="field-hint" id="logoError"></p>
+                    ${state.logo ? `<p class="field-hint">Tip: drag the logo directly on the jersey preview (front view) to reposition it.</p>` : ""}
                     <p class="field-hint">A logo adds ${formatPrice(JERSEY_LOGO_ADDON)} to the total.</p>
                 </div>
 
@@ -666,6 +693,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 reader.onload = e => {
                     state.logo = e.target.result;
+                    /* New upload always starts centered */
+                    state.logoOffsetX = 0;
+                    state.logoOffsetY = 0;
                     saveState();
                     renderCustomPanel();
                     renderYourKit();
@@ -687,10 +717,22 @@ document.addEventListener("DOMContentLoaded", () => {
         if (logoRemoveBtn) {
             logoRemoveBtn.addEventListener("click", () => {
                 state.logo = null;
+                state.logoOffsetX = 0;
+                state.logoOffsetY = 0;
                 saveState();
                 renderCustomPanel();
                 renderYourKit();
                 updateTotal();
+                updatePreview();
+            });
+        }
+
+        const logoResetPosBtn = document.getElementById("logoResetPosBtn");
+        if (logoResetPosBtn) {
+            logoResetPosBtn.addEventListener("click", () => {
+                state.logoOffsetX = 0;
+                state.logoOffsetY = 0;
+                saveState();
                 updatePreview();
             });
         }
@@ -899,6 +941,89 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
+       LOGO DRAG-TO-REPOSITION (pointer events on the SVG <image>)
+       ===================================================== */
+
+    function toSVGPoint(svg, evt) {
+        if (!svg) return { x: 0, y: 0 };
+        const pt = svg.createSVGPoint();
+        pt.x = evt.clientX;
+        pt.y = evt.clientY;
+        const ctm = svg.getScreenCTM();
+        if (!ctm) return { x: 0, y: 0 };
+        const svgPoint = pt.matrixTransform(ctm.inverse());
+        return { x: svgPoint.x, y: svgPoint.y };
+    }
+
+    function attachLogoDrag(container, imageEl) {
+
+        if (!imageEl || imageEl.dataset.dragBound === "1") return;
+        imageEl.dataset.dragBound = "1";
+
+        let dragging = false;
+        let startPointer = { x: 0, y: 0 };
+        let startOffset = { x: 0, y: 0 };
+
+        /* Always read the live jersey state — the DOM node is reused
+           across selections/removals, so we never capture a stale
+           reference in this closure. */
+        function getJersey() {
+            return selectedItems.jersey;
+        }
+
+        imageEl.addEventListener("pointerdown", evt => {
+
+            const jersey = getJersey();
+            if (!jersey || !jersey.logo || currentView !== "front") return;
+
+            const svg = container.querySelector(".kit-figure");
+
+            evt.preventDefault();
+            dragging = true;
+
+            imageEl.classList.add("is-dragging");
+
+            try { imageEl.setPointerCapture(evt.pointerId); } catch (e) { /* no-op */ }
+
+            startPointer = toSVGPoint(svg, evt);
+            startOffset = { x: jersey.logoOffsetX || 0, y: jersey.logoOffsetY || 0 };
+
+        });
+
+        imageEl.addEventListener("pointermove", evt => {
+
+            if (!dragging) return;
+
+            const jersey = getJersey();
+            if (!jersey) return;
+
+            const svg = container.querySelector(".kit-figure");
+            const current = toSVGPoint(svg, evt);
+
+            jersey.logoOffsetX = startOffset.x + (current.x - startPointer.x);
+            jersey.logoOffsetY = startOffset.y + (current.y - startPointer.y);
+
+            clampLogoOffset(jersey);
+
+            updatePreview();
+
+        });
+
+        function endDrag() {
+            if (!dragging) return;
+            dragging = false;
+            imageEl.classList.remove("is-dragging");
+            saveState();
+        }
+
+        imageEl.addEventListener("pointerup", endDrag);
+        imageEl.addEventListener("pointercancel", endDrag);
+        imageEl.addEventListener("lostpointercapture", endDrag);
+
+    }
+
+
+    /* =====================================================
        UPDATE PREVIEW
        ===================================================== */
 
@@ -960,18 +1085,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (sleeveFront) sleeveFront.style.display = isLong ? "block" : "none";
                 if (sleeveBack) sleeveBack.style.display = isLong ? "block" : "none";
 
-                /* Logo image (front only) */
+                /* Logo image (front only, draggable) */
                 const logoImage = container.querySelector(".js-logo-front");
                 const logoText = container.querySelector(".js-jersey-logo-text");
                 if (logoImage) {
                     if (jersey.logo) {
+                        clampLogoOffset(jersey);
                         logoImage.setAttribute("href", jersey.logo);
                         logoImage.setAttribute("xlink:href", jersey.logo);
-                        logoImage.classList.add("is-visible");
+                        logoImage.setAttribute("x", JERSEY_LOGO_BASE_X + jersey.logoOffsetX);
+                        logoImage.setAttribute("y", JERSEY_LOGO_BASE_Y + jersey.logoOffsetY);
+                        logoImage.classList.add("is-visible", "logo-draggable");
                         if (logoText) logoText.style.display = "none";
+                        attachLogoDrag(container, logoImage);
                     } else {
                         logoImage.removeAttribute("href");
-                        logoImage.classList.remove("is-visible");
+                        logoImage.removeAttribute("xlink:href");
+                        logoImage.setAttribute("x", JERSEY_LOGO_BASE_X);
+                        logoImage.setAttribute("y", JERSEY_LOGO_BASE_Y);
+                        logoImage.classList.remove("is-visible", "logo-draggable", "is-dragging");
                         if (logoText) logoText.style.display = "";
                     }
                 }
@@ -1166,27 +1298,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
-       CART
-       (kept on the existing "khelzoneCart" key + single combined
-       "custom-kit" line item, exactly as the current project uses —
-       cart.html/cart.js were not provided, so this format is untouched.)
+       SHOPPING CART INTEGRATION
+       (Uses the SAME localStorage key + item shape that
+       cart.js / cart.html already read, so customized kits
+       land in the exact same cart as normal shop products.
+       No second/parallel cart system.)
        ===================================================== */
+
+    const CART_STORAGE_KEY = "khz_cart";
 
     function getCart() {
         try {
-            return JSON.parse(localStorage.getItem("khelzoneCart")) || [];
+            const parsed = JSON.parse(localStorage.getItem(CART_STORAGE_KEY));
+            return Array.isArray(parsed) ? parsed : [];
         } catch {
             return [];
         }
     }
 
-    function saveCart(cart) {
-        localStorage.setItem("khelzoneCart", JSON.stringify(cart));
+    function saveCart(cartData) {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartData));
     }
 
     function updateCartBadge() {
-        const cart = getCart();
-        const count = cart.reduce((total, item) => total + Number(item.quantity || 1), 0);
+        const cartData = getCart();
+        const count = cartData.reduce((total, item) => total + Number(item.qty ?? item.quantity ?? 1), 0);
         if (cartBadge) {
             cartBadge.textContent = count;
             cartBadge.hidden = count === 0;
@@ -1195,19 +1331,208 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
-       CREATE CUSTOM KIT CART ITEM
+       CAPTURE A PREVIEW IMAGE OF THE CURRENT KIT
+       Serializes the live SVG preview into a self-contained
+       data URI so it can travel with the cart item without
+       needing any server-side rendering.
+
+       A data-URI SVG rendered inside an <img> tag on cart.html
+       can't reach customization.css, so anything that was being
+       driven purely by CSS classes (jersey font choice, the
+       .part.is-selected opacity rule that nothing in this file
+       ever actually toggles) would otherwise be silently lost —
+       leaving every accent/shade/trim on a selected item stuck
+       at its default 35% "unselected" opacity and making the
+       thumbnail look washed out no matter what was picked.
+       To fix that we bake the handful of relevant styles in by
+       hand before serializing, strip the editor-only guide
+       lines, and add a clean backdrop + a little padding so it
+       reads as an actual product shot.
+       ========================================================= */
+
+    const FALLBACK_KIT_IMAGE = "https://placehold.co/300x300/111111/ffffff?text=KHELZONE";
+
+    const THUMBNAIL_FONT_STACKS = {
+        classic: "'Playfair Display', Georgia, serif",
+        athletic: "'Oswald', 'Arial Narrow', sans-serif",
+        modern: "'Space Grotesk', system-ui, sans-serif",
+        bold: "'Anton', Impact, sans-serif",
+        performance: "'Barlow Condensed', sans-serif"
+    };
+
+    function buildThumbnailStyleBlock() {
+        const fontRules = Object.entries(THUMBNAIL_FONT_STACKS)
+            .map(([id, stack]) => `.jersey-font-${id} { font-family: ${stack} !important; }`)
+            .join(" ");
+        return `
+            text { font-family: 'Space Grotesk', system-ui, sans-serif; }
+            ${fontRules}
+            .jersey-font-classic { font-style: italic; }
+            .jersey-font-athletic { letter-spacing: 1px; }
+            .jersey-font-performance { font-style: italic; }
+        `;
+    }
+
+    function captureKitPreviewImage() {
+
+        try {
+
+            const source = (desktopPreviewStageWrap || mobilePreviewStageWrap);
+            const svg = source && source.querySelector(".kit-figure");
+
+            if (!svg) return FALLBACK_KIT_IMAGE;
+
+            const clone = svg.cloneNode(true);
+            clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+            clone.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+            clone.style.transform = "";
+
+            /* Widen the viewBox a touch so the figure gets breathing
+               room instead of touching the thumbnail's edges. */
+            clone.setAttribute("viewBox", "-14 -10 348 440");
+            clone.removeAttribute("width");
+            clone.removeAttribute("height");
+            clone.setAttribute("preserveAspectRatio", "xMidYMid meet");
+
+            /* The faint body silhouette is an editing guide only —
+               it isn't part of the actual product, drop it. */
+            const silhouette = clone.querySelector(".kit-figure__silhouette");
+            if (silhouette) silhouette.remove();
+
+            /* Clean, neutral backdrop so the thumbnail reads as a
+               real product shot instead of a transparent cutout
+               floating on whatever background cart.html uses. */
+            const backdrop = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            backdrop.setAttribute("x", "-14");
+            backdrop.setAttribute("y", "-10");
+            backdrop.setAttribute("width", "348");
+            backdrop.setAttribute("height", "440");
+            backdrop.setAttribute("rx", "18");
+            backdrop.setAttribute("fill", "#161616");
+
+            /* Inline the only CSS the thumbnail actually needs
+               (jersey font choice) since data-URI SVGs can't load
+               customization.css. */
+            const styleEl = document.createElementNS("http://www.w3.org/2000/svg", "style");
+            styleEl.textContent = buildThumbnailStyleBlock();
+
+            clone.insertBefore(styleEl, clone.firstChild);
+            clone.insertBefore(backdrop, styleEl.nextSibling);
+
+            /* Only the parts actually selected by the customer should
+               render at full strength. Baked in explicitly here since
+               the live builder never toggles the CSS class this was
+               meant to come from — without this every accent/trim on
+               a selected item would render at 35% opacity. */
+            clone.querySelectorAll(".part").forEach(part => {
+                const isVisible = part.style.display !== "none";
+                if (!isVisible) return;
+                part.querySelectorAll(".part__fill, .part__accent, .part__stroke, .part__shade, .part__logo")
+                    .forEach(el => { el.style.opacity = "1"; });
+            });
+
+            /* Uploaded logo image: bake its visibility in explicitly too. */
+            clone.querySelectorAll(".part__logo-image").forEach(imgEl => {
+                imgEl.style.opacity = imgEl.classList.contains("is-visible") ? "1" : "0";
+                imgEl.classList.remove("is-dragging");
+            });
+
+            const serializer = new XMLSerializer();
+            const svgString = serializer.serializeToString(clone);
+
+            if (!svgString) return FALLBACK_KIT_IMAGE;
+
+            return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgString);
+
+        } catch (error) {
+            return FALLBACK_KIT_IMAGE;
+        }
+
+    }
+
+
+    /* =====================================================
+       BUILD PER-ITEM CUSTOMIZATION DETAILS
        ===================================================== */
 
-    function createCartItem() {
+    function buildCustomizationDetails() {
+
+        return Object.values(selectedItems).map(item => {
+
+            const isJersey = item.id === "jersey";
+
+            const detail = {
+                id: item.id,
+                name: item.name,
+                size: item.size,
+                color: item.color,
+                price: itemEffectivePrice(item)
+            };
+
+            if (isJersey) {
+                detail.design = item.design;
+                detail.font = item.font;
+                detail.collar = item.collar;
+                detail.sleeve = item.sleeve;
+                detail.teamName = item.teamName || "";
+                detail.playerName = item.playerName || "";
+                detail.number = item.number || "";
+                detail.hasLogo = Boolean(item.logo);
+                detail.logo = item.logo || null;
+                detail.logoOffsetX = item.logoOffsetX || 0;
+                detail.logoOffsetY = item.logoOffsetY || 0;
+            }
+
+            return detail;
+
+        });
+
+    }
+
+
+    /* =====================================================
+       STABLE HASH (so identical configurations map to the
+       same cart line, and different ones never collide)
+       ===================================================== */
+
+    function hashString(value) {
+        let hash = 0;
+        for (let i = 0; i < value.length; i++) {
+            hash = (hash << 5) - hash + value.charCodeAt(i);
+            hash |= 0;
+        }
+        return Math.abs(hash).toString(36);
+    }
+
+
+    /* =====================================================
+       BUILD THE ACTUAL khz_cart-COMPATIBLE ITEM
+       ===================================================== */
+
+    function buildCustomCartItem() {
+
+        const itemsDetail = buildCustomizationDetails();
+
+        const name = itemsDetail.length === 1
+            ? `Custom ${itemsDetail[0].name}`
+            : `Custom Kit (${itemsDetail.map(d => d.name).join(" + ")})`;
+
+        const configKey = JSON.stringify(itemsDetail);
+        const id = "custom-" + hashString(configKey);
 
         return {
-            id: "custom-kit-" + Date.now(),
-            type: "custom-kit",
-            name: "Custom Sports Kit",
+            id,
+            productId: id,
+            isCustom: true,
+            name,
+            category: "Custom Kit",
             price: calculateTotal(),
-            quantity: 1,
-            customization: JSON.parse(JSON.stringify(selectedItems)),
-            addedAt: new Date().toISOString()
+            image: captureKitPreviewImage(),
+            size: "Custom",
+            qty: 1,
+            customization: {
+                items: itemsDetail
+            }
         };
 
     }
@@ -1314,16 +1639,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* =====================================================
        CONFIRM CART
+       Pushes into the SAME khz_cart array cart.js reads.
+       If an identical configuration already exists (same
+       hash), its quantity is incremented instead of creating
+       a duplicate line. Any different configuration (name,
+       number, color, design, logo, etc.) always gets its own
+       separate line, since its hash will differ.
        ===================================================== */
 
     if (summaryConfirmBtn) {
         summaryConfirmBtn.addEventListener("click", () => {
 
-            const cart = getCart();
-            const customKit = createCartItem();
+            const cartData = getCart();
+            const newItem = buildCustomCartItem();
 
-            cart.push(customKit);
-            saveCart(cart);
+            const existingIndex = cartData.findIndex(cartItem => String(cartItem.id) === String(newItem.id));
+
+            if (existingIndex !== -1) {
+                const existing = cartData[existingIndex];
+                existing.qty = Number(existing.qty ?? existing.quantity ?? 1) + 1;
+                delete existing.quantity;
+                /* Keep the freshest snapshot of the customization/image in case
+                   anything about the build changed since it was first added. */
+                existing.customization = newItem.customization;
+                existing.image = newItem.image;
+                existing.price = newItem.price;
+            } else {
+                cartData.push(newItem);
+            }
+
+            saveCart(cartData);
             updateCartBadge();
             closeSummaryModal();
             showToast("CUSTOM KIT ADDED TO CART");
@@ -1464,6 +1809,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (j.collar === undefined) j.collar = "round";
         if (j.sleeve === undefined) j.sleeve = "short";
         if (j.logo === undefined) j.logo = null;
+        if (j.logoOffsetX === undefined) j.logoOffsetX = 0;
+        if (j.logoOffsetY === undefined) j.logoOffsetY = 0;
     }
 
     renderItemGrid();

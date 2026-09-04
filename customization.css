@@ -1393,6 +1393,10 @@ textarea:focus-visible {
   padding: 0 0.25rem;
 }
 
+/* NOTE: sticky-while-scrolling behaviour for the mobile/tablet preview
+   is enabled inside the "RESPONSIVE — TABLET" media query below, where
+   .mobile-preview actually becomes visible (display:block). */
+
 
 /* ==========================================================================
    MODALS
@@ -1843,6 +1847,26 @@ textarea:focus-visible {
 
   .mobile-preview {
     display: block;
+
+    /* Keep the live jersey preview on screen while the customer
+       scrolls through the controls below it. */
+    position: sticky;
+    top: 72px; /* sits right under the sticky navbar */
+    z-index: 45;
+
+    background: rgba(8, 8, 8, 0.97);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+
+    box-shadow: 0 16px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  .mobile-preview .preview-stage-wrap {
+    /* shrink a bit once it's pinned, so it doesn't eat the whole screen */
+    max-height: 260px;
   }
 
   .mobile-sticky-bar {

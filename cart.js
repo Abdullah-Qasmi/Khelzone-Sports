@@ -5,12 +5,14 @@
    - shop.js
    - shop.html
    - cart.html
+   - customization.js (adds "isCustom" cart items into this same store)
 
    Storage Key:
    khz_cart
 
    Features:
    - Shop → Cart
+   - Customization → Cart (customized kits, shown with full detail)
    - Quantity + / -
    - Remove item
    - Clear cart
@@ -241,7 +243,7 @@ function normalizeCartItem(item) {
         );
 
 
-    return {
+    const normalized = {
 
         id:
             item.id ??
@@ -285,6 +287,26 @@ function normalizeCartItem(item) {
                 : 1
 
     };
+
+
+    /*
+       Preserve customization data added by customization.js
+       (customized jerseys / kits) without disturbing normal
+       shop products, which simply won't have this field.
+    */
+
+    if (item.isCustom) {
+
+        normalized.isCustom = true;
+
+        normalized.customization =
+            item.customization ||
+            null;
+
+    }
+
+
+    return normalized;
 
 }
 
@@ -773,6 +795,60 @@ function clearCart(
 
 
 /* ==========================================================================
+   CUSTOMIZATION DETAILS (rendered inside a customized cart item)
+   ========================================================================== */
+
+function customizationDetailsHTML(customization) {
+
+    if (
+        !customization ||
+        !Array.isArray(customization.items)
+    ) {
+
+        return "";
+
+    }
+
+
+    const blocks = customization.items.map(detail => {
+
+        const lines = [];
+
+        if (detail.size) lines.push(`Size: ${escapeHTML(detail.size)}`);
+        if (detail.color) lines.push(`Color: ${escapeHTML(detail.color)}`);
+
+        if (detail.design && detail.design !== "solid") {
+            lines.push(`Design: ${escapeHTML(String(detail.design).replace("-", " "))}`);
+        }
+
+        if (detail.teamName) lines.push(`Team: ${escapeHTML(detail.teamName)}`);
+        if (detail.playerName) lines.push(`Name: ${escapeHTML(detail.playerName)}`);
+        if (detail.number) lines.push(`Number: #${escapeHTML(detail.number)}`);
+        if (detail.font) lines.push(`Font: ${escapeHTML(detail.font)}`);
+        if (detail.collar) lines.push(`Collar: ${escapeHTML(detail.collar)}`);
+        if (detail.sleeve) lines.push(`Sleeve: ${escapeHTML(detail.sleeve)}`);
+        if (detail.hasLogo) lines.push(`Logo: Uploaded`);
+
+        return `
+            <div style="margin-top:6px;padding-top:6px;border-top:1px dashed rgba(255,255,255,0.12);">
+                <p style="margin:0 0 2px;font-weight:700;font-size:12px;letter-spacing:0.03em;text-transform:uppercase;opacity:0.85;">
+                    ${escapeHTML(detail.name || "Item")}
+                </p>
+                <p style="margin:0;font-size:12.5px;line-height:1.5;opacity:0.8;">
+                    ${lines.join(" &nbsp;•&nbsp; ")}
+                </p>
+            </div>
+        `;
+
+    });
+
+
+    return blocks.join("");
+
+}
+
+
+/* ==========================================================================
    CART ITEM HTML
    ========================================================================== */
 
@@ -812,10 +888,45 @@ function cartItemHTML(item) {
         "Standard";
 
 
+    const isCustom =
+        Boolean(item.isCustom);
+
+
+    const detailsHTML = isCustom
+        ? customizationDetailsHTML(item.customization)
+        : `
+            <p class="cart-item__size">
+                Size: <strong>${escapeHTML(size)}</strong>
+            </p>
+        `;
+
+
+    const customBadgeHTML = isCustom
+        ? `
+            <span style="
+                display:inline-block;
+                margin-right:6px;
+                padding:2px 8px;
+                border-radius:999px;
+                background:rgba(255,106,0,0.15);
+                border:1px solid rgba(255,106,0,0.4);
+                color:#ff6a00;
+                font-size:10px;
+                font-weight:700;
+                letter-spacing:0.05em;
+                text-transform:uppercase;
+                vertical-align:middle;
+            ">
+                Customized
+            </span>
+        `
+        : "";
+
+
     return `
 
         <article
-            class="cart-item"
+            class="cart-item${isCustom ? " cart-item--custom" : ""}"
             data-product-id="${escapeHTML(productId)}"
             data-size="${escapeHTML(size)}"
         >
@@ -834,6 +945,7 @@ function cartItemHTML(item) {
                     display:flex;
                     align-items:center;
                     justify-content:center;
+                    ${isCustom ? "background:#0d0d0d;border-radius:8px;" : ""}
                 "
             >
 
@@ -869,7 +981,7 @@ function cartItemHTML(item) {
 
                 <span class="cart-item__category">
 
-                    ${escapeHTML(
+                    ${customBadgeHTML}${escapeHTML(
                         item.category ||
                         "KHELZONE"
                     )}
@@ -887,15 +999,7 @@ function cartItemHTML(item) {
                 </h3>
 
 
-                <p class="cart-item__size">
-
-                    Size:
-
-                    <strong>
-                        ${escapeHTML(size)}
-                    </strong>
-
-                </p>
+                ${detailsHTML}
 
 
                 <div class="cart-item__price">
@@ -1005,7 +1109,7 @@ function emptyCartHTML() {
             </p>
 
 
-            <a
+            
                 href="shop.html"
                 class="btn btn--primary"
             >
@@ -3048,7 +3152,7 @@ function initializeCart() {
     );
 
 
-    /* Load cart saved by shop.js */
+    /* Load cart saved by shop.js AND customization.js */
 
     loadCart();
 

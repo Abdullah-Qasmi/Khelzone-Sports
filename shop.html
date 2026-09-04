@@ -11,65 +11,99 @@
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind Config -->
     <script src="tailwind.config.js"></script>
 
-    <link rel="stylesheet" href="shop.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    <!--
-        NOTE: the old inline <style> block that used to live here has been
-        removed. It duplicated almost every rule already in shop.css
-        (header, hero, category cards, filters, product cards, drawers,
-        quick view, toast, responsive breakpoints) and, because it was
-        declared after shop.css with equal specificity, it was silently
-        winning the cascade — that's why the premium product-card styles
-        already written in shop.css never actually showed up. shop.css is
-        now the single source of truth for all of this page's styling.
-    -->
+    <!-- Shop CSS -->
+    <link rel="stylesheet" href="shop.css">
 
 </head>
 
 <body class="antialiased">
 
-    <!-- HEADER -->
+    <!-- =========================================================
+         HEADER / NAVBAR
+         ========================================================= -->
+
     <header class="khz-header sticky top-0 z-40">
 
         <div class="max-w-7xl mx-auto px-4 lg:px-6">
 
             <div class="flex items-center justify-between h-16 gap-4">
 
+                <!-- LOGO + MOBILE MENU -->
                 <div class="flex items-center gap-3">
 
-                    <button id="mobileMenuBtn" class="lg:hidden icon-btn p-1" aria-label="Open menu"
+                    <button id="mobileMenuBtn"
+                        class="lg:hidden icon-btn p-1"
+                        aria-label="Open menu"
                         aria-expanded="false">
                         ☰
                     </button>
 
+                    <!-- LOGO -->
                     <a href="homepage.html" class="flex items-center gap-2">
+
                         <span class="logo-mark w-8 h-8 flex items-center justify-center">
-                            <span class="font-display text-[#0A0A0A] text-lg leading-none">K</span>
+                            <span class="font-display text-[#0A0A0A] text-lg leading-none">
+                                K
+                            </span>
                         </span>
 
                         <span class="font-display text-xl tracking-wide">
                             KHELZONE
                         </span>
+
                     </a>
 
                 </div>
 
+
+                <!-- DESKTOP NAV -->
                 <nav class="hidden lg:flex items-center gap-8">
 
-                    <a href="#shopGrid" class="nav-link active">Shop</a>
-                    <a href="#categorySection" class="nav-link">Categories</a>
-                    <a href="#trendingSection" class="nav-link">Trending</a>
-                    <a href="#offerBanner" class="nav-link">Sale</a>
-                    <a href="about.html" class="nav-link">About</a>
+                    <!-- HOME -->
+                    <a href="homepage.html" class="nav-link">
+                        Home
+                    </a>
+
+                    <!-- SHOP -->
+                    <a href="#shopGrid" class="nav-link active">
+                        Shop
+                    </a>
+
+                    <!-- CATEGORIES -->
+                    <a href="#categorySection" class="nav-link">
+                        Categories
+                    </a>
+
+                    <!-- TRENDING -->
+                    <a href="#trendingSection" class="nav-link">
+                        Trending
+                    </a>
+
+                    <!-- SALE -->
+                    <a href="#offerBanner" class="nav-link">
+                        Sale
+                    </a>
+
+                    <!-- ABOUT -->
+                    <a href="about.html" class="nav-link">
+                        About
+                    </a>
 
                 </nav>
 
+
+                <!-- SEARCH -->
                 <div class="hidden md:flex flex-1 max-w-md relative">
 
-                    <input id="searchInput" type="text"
+                    <input
+                        id="searchInput"
+                        type="text"
                         placeholder="Search football, cricket, jerseys, shoes..."
                         class="w-full bg-white/5 border border-white/10 rounded-full pl-11 pr-9 py-2.5 text-sm placeholder:text-white/35 focus:outline-none focus:border-orange-500 transition">
 
@@ -77,42 +111,104 @@
                         🔎
                     </span>
 
-                    <button id="searchClearBtn"
+                    <button
+                        id="searchClearBtn"
                         class="hidden absolute right-3 top-1/2 -translate-y-1/2 opacity-60 hover:opacity-100">
                         ×
                     </button>
 
                 </div>
 
+
+                <!-- WISHLIST + CART -->
                 <div class="flex items-center gap-4">
 
-                    <button id="wishlistIconBtn" class="icon-btn" aria-label="Wishlist">
-                        <span class="text-xl">♡</span>
-                        <span id="wishlistCount" class="badge-count hidden">0</span>
+                    <button
+                        id="wishlistIconBtn"
+                        class="icon-btn"
+                        aria-label="Wishlist">
+
+                        <span class="text-xl">
+                            ♡
+                        </span>
+
+                        <span
+                            id="wishlistCount"
+                            class="badge-count hidden">
+                            0
+                        </span>
+
                     </button>
 
-                    <button id="cartIconBtn" class="icon-btn" aria-label="Cart">
+
+                    <button
+                        id="cartIconBtn"
+                        class="icon-btn"
+                        aria-label="Cart">
+
                         🛒
-                        <span id="cartCount" class="badge-count hidden">0</span>
+
+                        <span
+                            id="cartCount"
+                            class="badge-count hidden">
+                            0
+                        </span>
+
                     </button>
 
                 </div>
 
             </div>
 
-            <!-- MOBILE MENU -->
+
+            <!-- =====================================================
+                 MOBILE MENU
+                 ===================================================== -->
+
             <div id="mobileMenu" class="mobile-menu lg:hidden">
-                <a href="#shopGrid">Shop</a>
-                <a href="#categorySection">Categories</a>
-                <a href="#trendingSection">Trending</a>
-                <a href="#offerBanner">Sale</a>
-                <a href="about.html">About</a>
+
+                <!-- HOME -->
+                <a href="homepage.html">
+                    Home
+                </a>
+
+                <!-- SHOP -->
+                <a href="#shopGrid">
+                    Shop
+                </a>
+
+                <!-- CATEGORIES -->
+                <a href="#categorySection">
+                    Categories
+                </a>
+
+                <!-- TRENDING -->
+                <a href="#trendingSection">
+                    Trending
+                </a>
+
+                <!-- SALE -->
+                <a href="#offerBanner">
+                    Sale
+                </a>
+
+                <!-- ABOUT -->
+                <a href="about.html">
+                    About
+                </a>
+
             </div>
 
-            <!-- MOBILE SEARCH -->
+
+            <!-- =====================================================
+                 MOBILE SEARCH
+                 ===================================================== -->
+
             <div class="md:hidden pb-3 relative">
 
-                <input id="searchInputMobile" type="text"
+                <input
+                    id="searchInputMobile"
+                    type="text"
                     placeholder="Search KHELZONE..."
                     class="w-full bg-white/5 border border-white/10 rounded-full pl-11 pr-4 py-2.5 text-sm placeholder:text-white/35 focus:outline-none focus:border-orange-500">
 
@@ -129,7 +225,10 @@
     </header>
 
 
-    <!-- HERO -->
+    <!-- =========================================================
+         HERO
+         ========================================================= -->
+
     <section class="hero-section speed-stripes relative py-16 lg:py-24 px-4 lg:px-6">
 
         <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center relative">
@@ -153,11 +252,13 @@
 
                 <div class="flex flex-wrap gap-4 mb-10">
 
-                    <a href="#shopGrid" class="cta-primary px-8 py-4 inline-block text-sm">
+                    <a href="#shopGrid"
+                        class="cta-primary px-8 py-4 inline-block text-sm">
                         SHOP NOW
                     </a>
 
-                    <a href="#categorySection" class="cta-outline px-8 py-4 inline-block text-sm">
+                    <a href="#categorySection"
+                        class="cta-outline px-8 py-4 inline-block text-sm">
                         BROWSE CATEGORIES
                     </a>
 
@@ -166,32 +267,52 @@
                 <div class="flex gap-8">
 
                     <div>
-                        <p class="font-display text-2xl text-orange-500">350+</p>
-                        <p class="text-xs text-white/50 uppercase">Premium Products</p>
+                        <p class="font-display text-2xl text-orange-500">
+                            350+
+                        </p>
+
+                        <p class="text-xs text-white/50 uppercase">
+                            Premium Products
+                        </p>
                     </div>
 
                     <div>
-                        <p class="font-display text-2xl text-orange-500">11</p>
-                        <p class="text-xs text-white/50 uppercase">Sports Covered</p>
+                        <p class="font-display text-2xl text-orange-500">
+                            11
+                        </p>
+
+                        <p class="text-xs text-white/50 uppercase">
+                            Sports Covered
+                        </p>
                     </div>
 
                     <div>
-                        <p class="font-display text-2xl text-orange-500">4.6★</p>
-                        <p class="text-xs text-white/50 uppercase">Avg. Rating</p>
+                        <p class="font-display text-2xl text-orange-500">
+                            4.6★
+                        </p>
+
+                        <p class="text-xs text-white/50 uppercase">
+                            Avg. Rating
+                        </p>
                     </div>
 
                 </div>
 
             </div>
 
+
             <div class="hero-visual-frame">
 
-                <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1000&q=80"
-                    alt="Sports equipment" class="w-full h-[320px] lg:h-[460px] object-cover">
+                <img
+                    src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1000&q=80"
+                    alt="Sports equipment"
+                    class="w-full h-[320px] lg:h-[460px] object-cover">
 
                 <div class="hero-stat-chip absolute bottom-5 left-5 rounded-xl px-4 py-3">
 
-                    <p class="text-xs text-white/50">Trending now</p>
+                    <p class="text-xs text-white/50">
+                        Trending now
+                    </p>
 
                     <p class="font-bold text-sm">
                         Cricket & Football Gear
@@ -206,88 +327,211 @@
     </section>
 
 
-    <!-- CATEGORIES -->
+    <!-- =========================================================
+         CATEGORIES
+         ========================================================= -->
+
     <section id="categorySection" class="py-16 px-4 lg:px-6">
 
         <div class="max-w-7xl mx-auto">
 
             <div class="mb-8">
-                <p class="section-eyebrow mb-2">Shop by Sport</p>
-                <h2 class="font-display text-3xl lg:text-4xl">FIND YOUR GAME</h2>
+
+                <p class="section-eyebrow mb-2">
+                    Shop by Sport
+                </p>
+
+                <h2 class="font-display text-3xl lg:text-4xl">
+                    FIND YOUR GAME
+                </h2>
+
             </div>
+
 
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
 
+
+                <!-- FOOTBALL -->
                 <div class="cat-card h-56" data-sport="Football">
-                    <img src="https://images.unsplash.com/photo-1614632537197-38a17061c2bd?w=600&q=80"
-                        class="absolute inset-0 w-full h-full object-cover" alt="Football">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1614632537197-38a17061c2bd?w=600&q=80"
+                        class="absolute inset-0 w-full h-full object-cover"
+                        alt="Football">
+
                     <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-                        <h3 class="font-display text-lg">FOOTBALL</h3>
-                        <p class="text-xs text-white/60">Boots, jerseys & balls</p>
+
+                        <h3 class="font-display text-lg">
+                            FOOTBALL
+                        </h3>
+
+                        <p class="text-xs text-white/60">
+                            Boots, jerseys & balls
+                        </p>
+
                     </div>
+
                 </div>
 
+
+                <!-- CRICKET -->
                 <div class="cat-card h-56" data-sport="Cricket">
-                    <img src="https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=600&q=80"
-                        class="absolute inset-0 w-full h-full object-cover" alt="Cricket">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=600&q=80"
+                        class="absolute inset-0 w-full h-full object-cover"
+                        alt="Cricket">
+
                     <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-                        <h3 class="font-display text-lg">CRICKET</h3>
-                        <p class="text-xs text-white/60">Bats, pads & gloves</p>
+
+                        <h3 class="font-display text-lg">
+                            CRICKET
+                        </h3>
+
+                        <p class="text-xs text-white/60">
+                            Bats, pads & gloves
+                        </p>
+
                     </div>
+
                 </div>
 
+
+                <!-- TENNIS -->
                 <div class="cat-card h-56" data-sport="Tennis">
-                    <img src="https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=600&q=80"
-                        class="absolute inset-0 w-full h-full object-cover" alt="Tennis">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=600&q=80"
+                        class="absolute inset-0 w-full h-full object-cover"
+                        alt="Tennis">
+
                     <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-                        <h3 class="font-display text-lg">TENNIS</h3>
-                        <p class="text-xs text-white/60">Rackets & apparel</p>
+
+                        <h3 class="font-display text-lg">
+                            TENNIS
+                        </h3>
+
+                        <p class="text-xs text-white/60">
+                            Rackets & apparel
+                        </p>
+
                     </div>
+
                 </div>
 
+
+                <!-- BASKETBALL -->
                 <div class="cat-card h-56" data-sport="Basketball">
-                    <img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&q=80"
-                        class="absolute inset-0 w-full h-full object-cover" alt="Basketball">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&q=80"
+                        class="absolute inset-0 w-full h-full object-cover"
+                        alt="Basketball">
+
                     <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-                        <h3 class="font-display text-lg">BASKETBALL</h3>
-                        <p class="text-xs text-white/60">Shoes & jerseys</p>
+
+                        <h3 class="font-display text-lg">
+                            BASKETBALL
+                        </h3>
+
+                        <p class="text-xs text-white/60">
+                            Shoes & jerseys
+                        </p>
+
                     </div>
+
                 </div>
 
+
+                <!-- VOLLEYBALL -->
                 <div class="cat-card h-56" data-sport="Volleyball">
-                    <img src="https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=900&q=85"
-                        class="absolute inset-0 w-full h-full object-cover" alt="Volleyball">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=900&q=85"
+                        class="absolute inset-0 w-full h-full object-cover"
+                        alt="Volleyball">
+
                     <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-                        <h3 class="font-display text-lg">VOLLEYBALL</h3>
-                        <p class="text-xs text-white/60">Balls, nets & gear</p>
+
+                        <h3 class="font-display text-lg">
+                            VOLLEYBALL
+                        </h3>
+
+                        <p class="text-xs text-white/60">
+                            Balls, nets & gear
+                        </p>
+
                     </div>
+
                 </div>
 
+
+                <!-- BADMINTON -->
                 <div class="cat-card h-56" data-sport="Badminton">
-                    <img src="https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=600&q=80"
-                        class="absolute inset-0 w-full h-full object-cover" alt="Badminton">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=600&q=80"
+                        class="absolute inset-0 w-full h-full object-cover"
+                        alt="Badminton">
+
                     <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-                        <h3 class="font-display text-lg">BADMINTON</h3>
-                        <p class="text-xs text-white/60">Rackets & shuttles</p>
+
+                        <h3 class="font-display text-lg">
+                            BADMINTON
+                        </h3>
+
+                        <p class="text-xs text-white/60">
+                            Rackets & shuttles
+                        </p>
+
                     </div>
+
                 </div>
 
+
+                <!-- FITNESS -->
                 <div class="cat-card h-56" data-sport="Fitness">
-                    <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80"
-                        class="absolute inset-0 w-full h-full object-cover" alt="Fitness">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80"
+                        class="absolute inset-0 w-full h-full object-cover"
+                        alt="Fitness">
+
                     <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-                        <h3 class="font-display text-lg">FITNESS</h3>
-                        <p class="text-xs text-white/60">Training equipment</p>
+
+                        <h3 class="font-display text-lg">
+                            FITNESS
+                        </h3>
+
+                        <p class="text-xs text-white/60">
+                            Training equipment
+                        </p>
+
                     </div>
+
                 </div>
 
+
+                <!-- RUNNING -->
                 <div class="cat-card h-56" data-sport="Running">
-                    <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=600&q=80"
-                        class="absolute inset-0 w-full h-full object-cover" alt="Running">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=600&q=80"
+                        class="absolute inset-0 w-full h-full object-cover"
+                        alt="Running">
+
                     <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-                        <h3 class="font-display text-lg">RUNNING</h3>
-                        <p class="text-xs text-white/60">Shoes & accessories</p>
+
+                        <h3 class="font-display text-lg">
+                            RUNNING
+                        </h3>
+
+                        <p class="text-xs text-white/60">
+                            Shoes & accessories
+                        </p>
+
                     </div>
+
                 </div>
 
             </div>
@@ -297,18 +541,27 @@
     </section>
 
 
-    <!-- TRENDING -->
-    <section id="trendingSection" class="py-16 px-4 lg:px-6" style="background:var(--khz-bg-alt)">
+    <!-- =========================================================
+         TRENDING
+         ========================================================= -->
+
+    <section
+        id="trendingSection"
+        class="py-16 px-4 lg:px-6"
+        style="background:var(--khz-bg-alt)">
 
         <div class="max-w-7xl mx-auto">
 
-            <p class="section-eyebrow mb-2">Hand-picked</p>
+            <p class="section-eyebrow mb-2">
+                Hand-picked
+            </p>
 
             <h2 class="font-display text-3xl lg:text-4xl mb-8">
                 TRENDING GEAR
             </h2>
 
-            <div id="trendingGrid"
+            <div
+                id="trendingGrid"
                 class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
             </div>
 
@@ -317,39 +570,74 @@
     </section>
 
 
-    <!-- SHOP -->
+    <!-- =========================================================
+         SHOP
+         ========================================================= -->
+
     <section id="shopGrid" class="py-16 px-4 lg:px-6">
 
         <div class="max-w-7xl mx-auto">
 
             <div class="mb-8">
-                <p class="section-eyebrow mb-2">The Full Range</p>
-                <h2 class="shop-heading font-display">EXPLORE SPORTS GEAR</h2>
-                <p class="shop-subtext mt-2">Premium equipment selected for performance.</p>
+
+                <p class="section-eyebrow mb-2">
+                    The Full Range
+                </p>
+
+                <h2 class="shop-heading font-display">
+                    EXPLORE SPORTS GEAR
+                </h2>
+
+                <p class="shop-subtext mt-2">
+                    Premium equipment selected for performance.
+                </p>
+
             </div>
 
-            <div class="flex flex-wrap items-center justify-between gap-4 mb-8 pb-4 border-b"
+
+            <!-- SORT BAR -->
+
+            <div
+                class="flex flex-wrap items-center justify-between gap-4 mb-8 pb-4 border-b"
                 style="border-color:var(--khz-line)">
 
-                <p id="productCount" class="text-sm text-white/60">
+                <p
+                    id="productCount"
+                    class="text-sm text-white/60">
                     Loading products...
                 </p>
 
                 <div class="flex items-center gap-3">
 
-                    <button id="clearFiltersBtn"
+                    <button
+                        id="clearFiltersBtn"
                         class="text-xs underline text-white/50 hover:text-orange-500">
                         Clear All
                     </button>
 
-                    <select id="sortSelect"
+                    <select
+                        id="sortSelect"
                         class="bg-white/5 border border-white/10 rounded-full px-4 py-2 text-xs focus:outline-none">
 
-                        <option value="featured">Sort: Featured</option>
-                        <option value="newest">Sort: Newest</option>
-                        <option value="price-low">Price: Low to High</option>
-                        <option value="price-high">Price: High to Low</option>
-                        <option value="rating">Top Rated</option>
+                        <option value="featured">
+                            Sort: Featured
+                        </option>
+
+                        <option value="newest">
+                            Sort: Newest
+                        </option>
+
+                        <option value="price-low">
+                            Price: Low to High
+                        </option>
+
+                        <option value="price-high">
+                            Price: High to Low
+                        </option>
+
+                        <option value="rating">
+                            Top Rated
+                        </option>
 
                     </select>
 
@@ -358,21 +646,31 @@
             </div>
 
 
+            <!-- SHOP LAYOUT -->
+
             <div class="grid lg:grid-cols-[260px_1fr] gap-8">
 
+
                 <!-- FILTERS -->
+
                 <aside class="hidden lg:block space-y-6">
 
                     <div class="flex items-center justify-between">
 
-                        <h3 class="font-display text-lg">FILTERS</h3>
+                        <h3 class="font-display text-lg">
+                            FILTERS
+                        </h3>
 
                     </div>
 
 
+                    <!-- SPORT -->
+
                     <div>
 
-                        <h4 class="font-bold text-sm mb-3">Sport</h4>
+                        <h4 class="font-bold text-sm mb-3">
+                            Sport
+                        </h4>
 
                         <div class="space-y-2">
 
@@ -421,9 +719,15 @@
                     </div>
 
 
-                    <div class="border-t pt-5" style="border-color:var(--khz-line)">
+                    <!-- PRODUCT TYPE -->
 
-                        <h4 class="font-bold text-sm mb-3">Product Type</h4>
+                    <div
+                        class="border-t pt-5"
+                        style="border-color:var(--khz-line)">
+
+                        <h4 class="font-bold text-sm mb-3">
+                            Product Type
+                        </h4>
 
                         <div class="space-y-2">
 
@@ -457,11 +761,18 @@
                     </div>
 
 
-                    <div class="border-t pt-5" style="border-color:var(--khz-line)">
+                    <!-- PRICE -->
 
-                        <h4 class="font-bold text-sm mb-3">Price</h4>
+                    <div
+                        class="border-t pt-5"
+                        style="border-color:var(--khz-line)">
 
-                        <input id="priceRange"
+                        <h4 class="font-bold text-sm mb-3">
+                            Price
+                        </h4>
+
+                        <input
+                            id="priceRange"
                             type="range"
                             min="500"
                             max="100000"
@@ -471,7 +782,9 @@
 
                         <div class="flex justify-between text-xs mt-2 text-white/40">
 
-                            <span>Rs. 500</span>
+                            <span>
+                                Rs. 500
+                            </span>
 
                             <span id="priceRangeLabel">
                                 Rs. 100,000
@@ -485,13 +798,20 @@
 
 
                 <!-- PRODUCTS -->
+
                 <div>
 
-                    <div id="productGrid"
-                        class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 lg:gap-6">
+                    <div
+                        id="productGrid"
+                        class="product-grid grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 lg:gap-6">
                     </div>
 
-                    <div id="emptyState" class="hidden text-center py-20">
+
+                    <!-- EMPTY STATE -->
+
+                    <div
+                        id="emptyState"
+                        class="hidden text-center py-20">
 
                         <div class="empty-state__icon">
                             🏆
@@ -505,16 +825,21 @@
                             Try changing your search or filters.
                         </p>
 
-                        <button id="clearFiltersBtn2"
+                        <button
+                            id="clearFiltersBtn2"
                             class="cta-primary px-6 py-3 text-xs">
                             CLEAR ALL FILTERS
                         </button>
 
                     </div>
 
+
+                    <!-- LOAD MORE -->
+
                     <div class="text-center mt-8">
 
-                        <button id="loadMoreBtn"
+                        <button
+                            id="loadMoreBtn"
                             class="hidden cta-outline px-7 py-3 text-xs">
                             LOAD MORE
                         </button>
@@ -530,15 +855,21 @@
     </section>
 
 
-    <!-- OFFER -->
-    <section id="offerBanner"
+    <!-- =========================================================
+         OFFER
+         ========================================================= -->
+
+    <section
+        id="offerBanner"
         class="offer-banner speed-stripes relative py-16 px-4 lg:px-6 my-4">
 
         <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-8">
 
             <div>
 
-                <p class="section-eyebrow mb-2">Limited Time</p>
+                <p class="section-eyebrow mb-2">
+                    Limited Time
+                </p>
 
                 <h2 class="font-display text-3xl lg:text-5xl mb-2">
                     UP TO 40% OFF
@@ -550,7 +881,9 @@
 
             </div>
 
-            <a href="#shopGrid" class="cta-primary px-10 py-4 inline-block text-sm">
+            <a
+                href="#shopGrid"
+                class="cta-primary px-10 py-4 inline-block text-sm">
                 SHOP SALE
             </a>
 
@@ -559,22 +892,35 @@
     </section>
 
 
-    <!-- FOOTER -->
-    <footer id="footer"
+    <!-- =========================================================
+         FOOTER
+         ========================================================= -->
+
+    <footer
+        id="footer"
         class="pt-16 pb-8 px-4 lg:px-6 border-t"
         style="border-color:var(--khz-line)">
 
         <div class="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+
+
+            <!-- BRAND -->
 
             <div class="col-span-2 lg:col-span-1">
 
                 <div class="flex items-center gap-2 mb-4">
 
                     <span class="logo-mark w-7 h-7 flex items-center justify-center">
-                        <span class="font-display text-[#0A0A0A] text-base">K</span>
+
+                        <span class="font-display text-[#0A0A0A] text-base">
+                            K
+                        </span>
+
                     </span>
 
-                    <span class="font-display text-lg">KHELZONE</span>
+                    <span class="font-display text-lg">
+                        KHELZONE
+                    </span>
 
                 </div>
 
@@ -584,26 +930,37 @@
 
             </div>
 
+
+            <!-- KHELZONE -->
+
             <div>
 
-                <h4 class="font-bold text-sm mb-4">KHELZONE</h4>
+                <h4 class="font-bold text-sm mb-4">
+                    KHELZONE
+                </h4>
 
                 <ul class="space-y-2 text-xs text-white/40">
 
                     <li>
-                        <a href="about.html" class="hover:text-orange-500">
+                        <a
+                            href="about.html"
+                            class="hover:text-orange-500">
                             About KHELZONE
                         </a>
                     </li>
 
                     <li>
-                        <a href="#" class="hover:text-orange-500">
+                        <a
+                            href="#"
+                            class="hover:text-orange-500">
                             Contact Us
                         </a>
                     </li>
 
                     <li>
-                        <a href="seller.html" class="hover:text-orange-500">
+                        <a
+                            href="seller.html"
+                            class="hover:text-orange-500">
                             Become a Seller
                         </a>
                     </li>
@@ -612,32 +969,77 @@
 
             </div>
 
+
+            <!-- SHOP -->
+
             <div>
 
-                <h4 class="font-bold text-sm mb-4">SHOP</h4>
+                <h4 class="font-bold text-sm mb-4">
+                    SHOP
+                </h4>
 
                 <ul class="space-y-2 text-xs text-white/40">
 
-                    <li><button data-footer-category="Football">Football</button></li>
-                    <li><button data-footer-category="Cricket">Cricket</button></li>
-                    <li><button data-footer-category="Tennis">Tennis</button></li>
-                    <li><button data-footer-category="Basketball">Basketball</button></li>
-                    <li><button data-footer-category="Volleyball">Volleyball</button></li>
+                    <li>
+                        <button data-footer-category="Football">
+                            Football
+                        </button>
+                    </li>
+
+                    <li>
+                        <button data-footer-category="Cricket">
+                            Cricket
+                        </button>
+                    </li>
+
+                    <li>
+                        <button data-footer-category="Tennis">
+                            Tennis
+                        </button>
+                    </li>
+
+                    <li>
+                        <button data-footer-category="Basketball">
+                            Basketball
+                        </button>
+                    </li>
+
+                    <li>
+                        <button data-footer-category="Volleyball">
+                            Volleyball
+                        </button>
+                    </li>
 
                 </ul>
 
             </div>
 
+
+            <!-- HELP -->
+
             <div>
 
-                <h4 class="font-bold text-sm mb-4">HELP</h4>
+                <h4 class="font-bold text-sm mb-4">
+                    HELP
+                </h4>
 
                 <ul class="space-y-2 text-xs text-white/40">
 
-                    <li>Shipping</li>
-                    <li>Returns</li>
-                    <li>FAQs</li>
-                    <li>Track Order</li>
+                    <li>
+                        Shipping
+                    </li>
+
+                    <li>
+                        Returns
+                    </li>
+
+                    <li>
+                        FAQs
+                    </li>
+
+                    <li>
+                        Track Order
+                    </li>
 
                 </ul>
 
@@ -645,11 +1047,17 @@
 
         </div>
 
-        <div class="max-w-7xl mx-auto pt-6 border-t text-center"
+
+        <div
+            class="max-w-7xl mx-auto pt-6 border-t text-center"
             style="border-color:var(--khz-line)">
 
             <p class="text-xs text-white/40">
-                © <span id="yearNow"></span> KHELZONE. All Rights Reserved.
+
+                ©
+                <span id="yearNow"></span>
+                KHELZONE. All Rights Reserved.
+
             </p>
 
         </div>
@@ -657,50 +1065,95 @@
     </footer>
 
 
-    <!-- WISHLIST OVERLAY -->
-    <div id="wishlistOverlay" class="wishlist-overlay"></div>
+    <!-- =========================================================
+         WISHLIST OVERLAY
+         ========================================================= -->
+
+    <div
+        id="wishlistOverlay"
+        class="wishlist-overlay">
+    </div>
+
 
     <!-- WISHLIST DRAWER -->
-    <aside id="wishlistDrawer" class="wishlist-drawer">
+
+    <aside
+        id="wishlistDrawer"
+        class="wishlist-drawer">
 
         <div class="drawer-header">
 
             <div>
-                <p class="section-eyebrow">Saved Items</p>
-                <h2 class="font-display text-2xl">WISHLIST</h2>
+
+                <p class="section-eyebrow">
+                    Saved Items
+                </p>
+
+                <h2 class="font-display text-2xl">
+                    WISHLIST
+                </h2>
+
             </div>
 
-            <button id="closeWishlistBtn" class="text-2xl text-white/60 hover:text-white">
+            <button
+                id="closeWishlistBtn"
+                class="text-2xl text-white/60 hover:text-white">
                 ×
             </button>
 
         </div>
 
-        <div id="wishlistItems" class="drawer-body"></div>
+        <div
+            id="wishlistItems"
+            class="drawer-body">
+        </div>
 
     </aside>
 
 
-    <!-- CART OVERLAY -->
-    <div id="cartOverlay" class="cart-overlay"></div>
+    <!-- =========================================================
+         CART OVERLAY
+         ========================================================= -->
+
+    <div
+        id="cartOverlay"
+        class="cart-overlay">
+    </div>
+
 
     <!-- CART DRAWER -->
-    <aside id="cartDrawer" class="cart-drawer">
+
+    <aside
+        id="cartDrawer"
+        class="cart-drawer">
 
         <div class="drawer-header">
 
             <div>
-                <p class="section-eyebrow">Your Gear</p>
-                <h2 class="font-display text-2xl">CART</h2>
+
+                <p class="section-eyebrow">
+                    Your Gear
+                </p>
+
+                <h2 class="font-display text-2xl">
+                    CART
+                </h2>
+
             </div>
 
-            <button id="closeCartBtn" class="text-2xl text-white/60 hover:text-white">
+            <button
+                id="closeCartBtn"
+                class="text-2xl text-white/60 hover:text-white">
                 ×
             </button>
 
         </div>
 
-        <div id="cartDrawerItems" class="drawer-body"></div>
+        <div
+            id="cartDrawerItems"
+            class="drawer-body">
+        </div>
+
 
         <div class="drawer-footer">
 
@@ -710,13 +1163,16 @@
                     Total
                 </span>
 
-                <strong id="cartDrawerTotal" class="text-orange-500">
+                <strong
+                    id="cartDrawerTotal"
+                    class="text-orange-500">
                     Rs. 0
                 </strong>
 
             </div>
 
-            <button id="goToCartBtn"
+            <button
+                id="goToCartBtn"
                 class="cta-primary w-full py-3 text-xs">
                 VIEW FULL CART
             </button>
@@ -726,11 +1182,15 @@
     </aside>
 
 
-    <!-- SUPABASE -->
+    <!-- =========================================================
+         SUPABASE
+         ========================================================= -->
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <!-- SHOP JS -->
     <script src="shop.js"></script>
 
 </body>
+
 </html>

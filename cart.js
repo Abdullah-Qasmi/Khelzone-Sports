@@ -3268,16 +3268,6 @@ function wireCoupon() {
 
             const coupons = {
 
-                KHEL10: {
-
-                    code: "KHEL10",
-
-                    type: "percentage",
-
-                    value: 10
-
-                },
-
                 KHELZONE10: {
 
                     code: "KHELZONE10",

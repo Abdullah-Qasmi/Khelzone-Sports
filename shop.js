@@ -145,7 +145,7 @@ const state = {
   priceBuckets: new Set(),
 
   minRating: 0,
-  priceMax: 100000,
+  priceMax: 10000,
 
   sort: "featured",
   visibleCount: 12,
@@ -360,7 +360,9 @@ function stockStatus(product) {
 function getFilteredProducts() {
   let products = [...state.products];
 
-  /* SEARCH */
+  /* ================================================================
+     SEARCH
+     ================================================================ */
   if (state.search) {
     const query = state.search.toLowerCase();
 
@@ -380,20 +382,29 @@ function getFilteredProducts() {
     });
   }
 
-  /* SPORTS */
+
+  /* ================================================================
+     SPORTS
+     ================================================================ */
   if (state.sports.size) {
     products = products.filter(product => {
-      const sport = String(product.sport || product.category || "")
+      const sport = String(
+        product.sport || product.category || ""
+      )
         .trim()
         .toLowerCase();
 
       return [...state.sports].some(
-        selected => sport === String(selected).trim().toLowerCase()
+        selected =>
+          sport === String(selected).trim().toLowerCase()
       );
     });
   }
 
-  /* TYPES */
+
+  /* ================================================================
+     TYPES
+     ================================================================ */
   if (state.types.size) {
     products = products.filter(product =>
       [...state.types].some(
@@ -404,7 +415,10 @@ function getFilteredProducts() {
     );
   }
 
-  /* BRANDS */
+
+  /* ================================================================
+     BRANDS
+     ================================================================ */
   if (state.brands.size) {
     products = products.filter(product =>
       [...state.brands].some(
@@ -415,55 +429,128 @@ function getFilteredProducts() {
     );
   }
 
-  /* SIZES */
+
+  /* ================================================================
+     SIZES
+     ================================================================ */
   if (state.sizes.size) {
     products = products.filter(product =>
-      product.sizes.some(size => state.sizes.has(size))
+      product.sizes.some(size =>
+        state.sizes.has(size)
+      )
     );
   }
 
-  /* MAX PRICE */
-  if (state.priceMax) {
-    products = products.filter(
-      product => Number(product.price) <= Number(state.priceMax)
-    );
+
+  /* ================================================================
+     PRICE FILTER
+     Rs. 500 → Rs. 10,000
+     
+     Selected price is the MAXIMUM price.
+
+     Example:
+     Rs. 5,000 selected
+     → Rs. 500
+     → Rs. 1,000
+     → Rs. 3,500
+     → Rs. 5,000
+
+     Rs. 5,000 se upar products nahi ayenge.
+     ================================================================ */
+  if (
+    state.priceMax !== null &&
+    state.priceMax !== undefined
+  ) {
+    const maxPrice = Number(state.priceMax);
+
+    products = products.filter(product => {
+      const price = Number(product.price);
+
+      return (
+        Number.isFinite(price) &&
+        price >= 10 &&
+        price <= maxPrice
+      );
+    });
   }
 
-  /* MINIMUM RATING */
+
+  /* ================================================================
+     MINIMUM RATING
+     ================================================================ */
   if (state.minRating > 0) {
     products = products.filter(
-      product => Number(product.rating || 0) >= state.minRating
+      product =>
+        Number(product.rating || 0) >= state.minRating
     );
   }
 
-  /* PRICE BUCKETS */
+
+  /* ================================================================
+     PRICE BUCKETS
+     ================================================================ */
   if (state.priceBuckets.size) {
     products = products.filter(product => {
       const price = Number(product.price);
 
       return [...state.priceBuckets].some(bucket => {
-        if (bucket === "under5000") return price < 5000;
-        if (bucket === "5000to10000") return price >= 5000 && price <= 10000;
-        if (bucket === "10000to15000") return price >= 10000 && price <= 15000;
-        if (bucket === "above15000") return price > 15000;
+
+        if (bucket === "under5000") {
+          return price < 5000;
+        }
+
+        if (bucket === "5000to10000") {
+          return price >= 5000 && price <= 10000;
+        }
+
+        if (bucket === "10000to15000") {
+          return price >= 10000 && price <= 15000;
+        }
+
+        if (bucket === "above15000") {
+          return price > 15000;
+        }
+
         return true;
       });
     });
   }
 
-  /* SORTING */
+
+  /* ================================================================
+     SORTING
+     ================================================================ */
   if (state.sort === "price-low") {
-    products.sort((a, b) => Number(a.price) - Number(b.price));
+
+    products.sort((a, b) =>
+      Number(a.price || 0) -
+      Number(b.price || 0)
+    );
+
   } else if (state.sort === "price-high") {
-    products.sort((a, b) => Number(b.price) - Number(a.price));
+
+    products.sort((a, b) =>
+      Number(b.price || 0) -
+      Number(a.price || 0)
+    );
+
   } else if (state.sort === "rating") {
-    products.sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0));
+
+    products.sort((a, b) =>
+      Number(b.rating || 0) -
+      Number(a.rating || 0)
+    );
+
   } else if (state.sort === "newest") {
+
     products.reverse();
   }
 
+
   return products;
 }
+
+
 
 
 /* ==========================================================================
@@ -1764,15 +1851,32 @@ function wirePriceRange() {
     $("#priceValue") ||
     $("[data-price-value]");
 
+  // Price range: Rs. 500 - Rs. 10,000
+  const MIN_PRICE = 10;
+  const MAX_PRICE = 10000;
+
+  range.min = MIN_PRICE;
+  range.max = MAX_PRICE;
+  range.step = 10;
+
+  // Default = maximum price
+  range.value = MAX_PRICE;
+
   const updatePrice = () => {
-    state.priceMax = Number(range.value);
-    if (output) output.textContent = money(state.priceMax);
+    const selectedPrice = Number(range.value);
+
+    state.priceMax = selectedPrice;
+
+    if (output) {
+      output.textContent = money(selectedPrice);
+    }
 
     state.visibleCount = 12;
     renderProducts();
   };
 
   range.addEventListener("input", updatePrice);
+
   updatePrice();
 }
 
@@ -1996,7 +2100,7 @@ function clearAllFilters() {
   state.minRating = 0;
 
   const range = $("#priceRange") || $("[data-price-range]");
-  state.priceMax = Number(range?.max || 100000);
+  state.priceMax = Number(range?.max || 10000);
 
   state.sort = "featured";
   state.visibleCount = 12;
@@ -2016,14 +2120,14 @@ function clearAllFilters() {
   const searchClearBtn = $("#searchClearBtn");
   if (searchClearBtn) searchClearBtn.classList.add("hidden");
 
-  if (range) range.value = range.max || 100000;
+  if (range) range.value = range.max || 10000;
 
   const priceOutput =
     $("#priceRangeLabel") ||
     $("#priceRangeValue") ||
     $("#priceValue") ||
     $("[data-price-value]");
-  if (priceOutput) priceOutput.textContent = money(Number(range?.value || 100000));
+  if (priceOutput) priceOutput.textContent = money(Number(range?.value || 10000));
 
   const sortSelect = $("#sortSelect") || $("#sortProducts") || $("[data-sort]");
   if (sortSelect) sortSelect.value = "featured";

@@ -14,6 +14,8 @@
     --orange-dim:#ff5a1f33;
     --green:#7CFC5A;
     --green-dim:#7CFC5A33;
+    --red:#ef4444;
+    --red-dim:#ef444433;
     --text:#f2f2f0;
     --muted:#9a9a9f;
     --border:#2b2b2f;
@@ -36,6 +38,7 @@
     color:var(--text);
     font-family:'Segoe UI', Arial, sans-serif;
     line-height:1.5;
+    overflow-x:hidden;
   }
 
   a{
@@ -91,8 +94,6 @@
     border-radius:2px;
     transition:transform .25s ease, opacity .2s ease;
   }
-
-  /* Hamburger animation */
 
   .menu-button.active .line1{
     transform:translateY(8px) rotate(45deg);
@@ -357,6 +358,7 @@
     border:1px solid var(--border);
     border-radius:8px;
     padding:36px;
+    max-width:100%;
   }
 
   .field{
@@ -370,6 +372,13 @@
     letter-spacing:1px;
     color:var(--muted);
     margin-bottom:8px;
+  }
+
+  .optional-tag{
+    color:#66666c;
+    font-size:10px;
+    letter-spacing:1px;
+    margin-left:6px;
   }
 
   input,
@@ -414,10 +423,185 @@
     min-height:90px;
   }
 
-  .submit-btn{
+  /* INVALID STATE */
+
+  input.invalid,
+  select.invalid,
+  textarea.invalid{
+    border-color:var(--red) !important;
+    box-shadow:0 0 0 2px rgba(239,68,68,.12) !important;
+  }
+
+  .error-text{
+    display:none;
+    color:var(--red);
+    font-size:12px;
+    margin-top:7px;
+    font-family:var(--mono);
+    letter-spacing:.3px;
+  }
+
+  .error-text.show{
+    display:block;
+  }
+
+  /* FILE UPLOAD */
+
+  .file-upload{
+    position:relative;
+    border:1px dashed var(--border);
+    border-radius:5px;
+    padding:14px;
+    background:var(--bg-alt);
+    display:flex;
+    align-items:center;
+    gap:12px;
+    cursor:pointer;
+    transition:border-color .15s ease;
+  }
+
+  .file-upload:hover{
+    border-color:var(--orange);
+  }
+
+  .file-upload input[type="file"]{
+    position:absolute;
+    inset:0;
+    opacity:0;
+    cursor:pointer;
     width:100%;
+    height:100%;
+  }
+
+  .file-upload .file-icon{
+    font-size:20px;
+    color:var(--orange);
+    flex-shrink:0;
+  }
+
+  .file-upload .file-text{
+    font-size:13px;
+    color:var(--muted);
+    word-break:break-all;
+  }
+
+  .file-upload.has-file .file-text{
+    color:var(--text);
+  }
+
+  .file-upload.invalid{
+    border-color:var(--red);
+    border-style:solid;
+  }
+
+  .logo-preview{
+    width:64px;
+    height:64px;
+    border-radius:6px;
+    object-fit:cover;
+    border:1px solid var(--border);
+    display:none;
+    margin-top:12px;
+  }
+
+  .logo-preview.show{
+    display:block;
+  }
+
+  /* STEP INDICATOR */
+
+  .step-indicator{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    margin-bottom:32px;
+  }
+
+  .step-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    opacity:.5;
+    transition:opacity .2s ease;
+  }
+
+  .step-row.active{
+    opacity:1;
+  }
+
+  .step-row.completed{
+    opacity:.85;
+  }
+
+  .step-num{
+    font-family:var(--mono);
+    font-weight:700;
+    color:var(--muted);
+    border:2px solid var(--border);
+    border-radius:50%;
+    width:34px;
+    height:34px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:13px;
+    flex-shrink:0;
+    transition:all .2s ease;
+  }
+
+  .step-row.active .step-num{
+    color:var(--orange);
+    border-color:var(--orange);
+    background:rgba(255,90,31,.1);
+  }
+
+  .step-row.completed .step-num{
     background:var(--orange);
     color:#0b0b0d;
+    border-color:var(--orange);
+  }
+
+  .step-label{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:1.5px;
+    color:var(--muted);
+  }
+
+  .step-row.active .step-label{
+    color:var(--text);
+    font-weight:700;
+  }
+
+  .step-arrow{
+    color:var(--muted);
+    font-size:18px;
+    line-height:1;
+  }
+
+  /* STEP CONTENT */
+
+  .step-content{
+    display:none;
+  }
+
+  .step-content.active{
+    display:block;
+  }
+
+  .step-heading{
+    font-family:var(--mono);
+    font-size:13px;
+    letter-spacing:2px;
+    color:var(--orange);
+    margin-bottom:20px;
+    padding-bottom:12px;
+    border-bottom:1px solid var(--border);
+  }
+
+  .btn{
+    width:100%;
     border:none;
     padding:16px;
     font-family:var(--mono);
@@ -426,15 +610,61 @@
     font-size:14px;
     border-radius:5px;
     cursor:pointer;
-    margin-top:10px;
     transition:
       opacity .15s ease,
       transform .15s ease;
   }
 
-  .submit-btn:hover{
+  .btn:disabled{
+    opacity:.55;
+    cursor:not-allowed;
+    transform:none !important;
+  }
+
+  .submit-btn{
+    background:var(--orange);
+    color:#0b0b0d;
+    margin-top:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+  }
+
+  .submit-btn:hover:not(:disabled){
     opacity:.88;
     transform:translateY(-1px);
+  }
+
+  .btn-spinner{
+    display:none;
+    width:15px;
+    height:15px;
+    border:2px solid rgba(11,11,13,.35);
+    border-top-color:#0b0b0d;
+    border-radius:50%;
+    animation:spin .7s linear infinite;
+    flex-shrink:0;
+  }
+
+  .submit-btn.loading .btn-spinner{
+    display:inline-block;
+  }
+
+  @keyframes spin{
+    to{ transform:rotate(360deg); }
+  }
+
+  .back-btn{
+    background:transparent;
+    color:var(--muted);
+    border:1px solid var(--border);
+    margin-bottom:14px;
+  }
+
+  .back-btn:hover:not(:disabled){
+    color:var(--text);
+    border-color:var(--muted);
   }
 
   .fine-print{
@@ -447,6 +677,76 @@
   .fine-print a{
     color:var(--green);
     border-bottom:1px solid var(--green-dim);
+  }
+
+  /* =========================
+     STATUS BANNERS
+     (login / success / error)
+  ========================= */
+
+  .status-banner{
+    display:none;
+    border-radius:8px;
+    padding:18px 20px;
+    margin-bottom:24px;
+    align-items:flex-start;
+    gap:14px;
+  }
+
+  .status-banner.show{
+    display:flex;
+  }
+
+  .status-banner .status-icon{
+    font-size:20px;
+    line-height:1;
+    flex-shrink:0;
+    margin-top:1px;
+  }
+
+  .status-banner .status-body{
+    flex:1;
+    min-width:0;
+  }
+
+  .status-banner .status-title{
+    font-family:var(--display);
+    font-size:15px;
+    letter-spacing:.5px;
+    margin-bottom:5px;
+    line-height:1.3;
+  }
+
+  .status-banner .status-text{
+    font-family:'Segoe UI', Arial, sans-serif;
+    font-size:13.5px;
+    line-height:1.6;
+    color:inherit;
+    opacity:.92;
+  }
+
+  .status-banner .status-text strong{
+    font-weight:700;
+  }
+
+  .login-banner{
+    background:var(--red-dim);
+    border:1px solid var(--red);
+    color:#ffd6d6;
+  }
+
+  .success-banner{
+    background:var(--green-dim);
+    border:1px solid var(--green);
+    color:#dfffd0;
+  }
+
+  .submit-error-banner{
+    background:var(--red-dim);
+    border:1px solid var(--red);
+    color:#ffd6d6;
+    margin-top:16px;
+    margin-bottom:0;
   }
 
   /* =========================
@@ -592,6 +892,23 @@
     .row2{
       grid-template-columns:1fr;
       gap:0;
+    }
+
+    .step-label{
+      font-size:11px;
+    }
+
+    .status-banner{
+      padding:15px 16px;
+      gap:10px;
+    }
+
+    .status-banner .status-title{
+      font-size:14px;
+    }
+
+    .status-banner .status-text{
+      font-size:12.5px;
     }
 
     footer{
@@ -819,191 +1136,222 @@
       Apply to sell
     </h2>
 
-    <form id="sellerApplicationForm">
+    <div class="status-banner login-banner" id="loginBanner">
+      <span class="status-icon">⚠️</span>
+      <div class="status-body">
+        <div class="status-title">LOGIN REQUIRED</div>
+        <div class="status-text">Please log in first, then apply to become a seller.</div>
+      </div>
+    </div>
 
-      <div class="row2">
-
-        <div class="field">
-
-          <label for="bname">
-            BUSINESS NAME
-          </label>
-
-          <input
-            id="bname"
-            type="text"
-            placeholder="e.g. Champion Sports Co."
-            required
-          >
-
+    <div class="status-banner success-banner" id="successBanner">
+      <span class="status-icon">✓</span>
+      <div class="status-body">
+        <div class="status-title">APPLICATION SUBMITTED</div>
+        <div class="status-text">
+          Your seller application was received successfully. Your status is now
+          <strong>PENDING</strong> — our team will review it shortly and get back to you.
         </div>
+      </div>
+    </div>
 
+    <!-- STEP INDICATOR -->
 
-        <div class="field">
+    <div class="step-indicator">
 
-          <label for="oname">
-            OWNER NAME
-          </label>
-
-          <input
-            id="oname"
-            type="text"
-            placeholder="Full name"
-            required
-          >
-
-        </div>
-
+      <div class="step-row active" id="stepRow1">
+        <div class="step-num" id="stepNum1">01</div>
+        <div class="step-label">BUSINESS INFORMATION</div>
       </div>
 
+      <div class="step-arrow">↓</div>
 
-      <div class="row2">
-
-        <div class="field">
-
-          <label for="email">
-            EMAIL
-          </label>
-
-          <input
-            id="email"
-            type="email"
-            placeholder="you@business.com"
-            required
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label for="phone">
-            PHONE
-          </label>
-
-          <input
-            id="phone"
-            type="tel"
-            placeholder="03XX-XXXXXXX"
-            required
-          >
-
-        </div>
-
+      <div class="step-row" id="stepRow2">
+        <div class="step-num" id="stepNum2">02</div>
+        <div class="step-label">COMPLETE SETUP</div>
       </div>
 
+    </div>
 
-      <div class="row2">
 
-        <div class="field">
+    <form id="sellerApplicationForm" novalidate>
 
-          <label for="city">
-            CITY
-          </label>
+      <!-- ================= STEP 1 ================= -->
 
-          <input
-            id="city"
-            type="text"
-            placeholder="Karachi, Lahore, Islamabad..."
-            required
-          >
+      <div class="step-content active" id="step1Content">
+
+        <div class="step-heading">
+          BUSINESS INFORMATION
+        </div>
+
+        <div class="row2">
+
+          <div class="field">
+            <label for="bname">BUSINESS NAME</label>
+            <input id="bname" type="text" placeholder="e.g. Champion Sports Co.">
+            <span class="error-text" id="bname-error"></span>
+          </div>
+
+          <div class="field">
+            <label for="oname">OWNER NAME</label>
+            <input id="oname" type="text" placeholder="Full name">
+            <span class="error-text" id="oname-error"></span>
+          </div>
 
         </div>
 
+        <div class="row2">
+
+          <div class="field">
+            <label for="email">EMAIL</label>
+            <input id="email" type="email" placeholder="you@business.com">
+            <span class="error-text" id="email-error"></span>
+          </div>
+
+          <div class="field">
+            <label for="phone">PHONE</label>
+            <input id="phone" type="tel" placeholder="03XX-XXXXXXX">
+            <span class="error-text" id="phone-error"></span>
+          </div>
+
+        </div>
+
+        <div class="row2">
+
+          <div class="field">
+            <label for="city">CITY</label>
+            <input id="city" type="text" placeholder="Karachi, Lahore, Islamabad...">
+            <span class="error-text" id="city-error"></span>
+          </div>
+
+          <div class="field">
+            <label for="category">PRIMARY CATEGORY</label>
+            <select id="category">
+              <option value="">Select category</option>
+              <option>Cricket Gear</option>
+              <option>Football / Soccer</option>
+              <option>Gym & Fitness</option>
+              <option>Running & Athletics</option>
+              <option>Apparel & Footwear</option>
+              <option>Other</option>
+            </select>
+            <span class="error-text" id="category-error"></span>
+          </div>
+
+        </div>
 
         <div class="field">
-
-          <label for="category">
-            PRIMARY CATEGORY
-          </label>
-
-          <select id="category" required>
-
-            <option value="">
-              Select category
-            </option>
-
-            <option>
-              Cricket Gear
-            </option>
-
-            <option>
-              Football / Soccer
-            </option>
-
-            <option>
-              Gym & Fitness
-            </option>
-
-            <option>
-              Running & Athletics
-            </option>
-
-            <option>
-              Apparel & Footwear
-            </option>
-
-            <option>
-              Other
-            </option>
-
+          <label for="volume">MONTHLY SALES VOLUME (APPROX.)</label>
+          <select id="volume">
+            <option>Just starting out</option>
+            <option>Rs. 50,000 – 200,000</option>
+            <option>Rs. 200,000 – 1,000,000</option>
+            <option>Rs. 1,000,000+</option>
           </select>
+        </div>
 
+        <div class="field">
+          <label for="message">TELL US ABOUT YOUR PRODUCTS</label>
+          <textarea id="message" placeholder="Brands you carry, product range, current sales channels..."></textarea>
+          <span class="error-text" id="message-error"></span>
+        </div>
+
+        <div class="field">
+          <label for="instagram">INSTAGRAM PROFILE <span class="optional-tag">(OPTIONAL)</span></label>
+          <input id="instagram" type="text" placeholder="https://instagram.com/championsportsco or @championsportsco">
+          <span class="error-text" id="instagram-error"></span>
+        </div>
+
+        <div class="field">
+          <label for="facebook">FACEBOOK PAGE <span class="optional-tag">(OPTIONAL)</span></label>
+          <input id="facebook" type="text" placeholder="https://facebook.com/championsportsco or @championsportsco">
+          <span class="error-text" id="facebook-error"></span>
+        </div>
+
+        <div class="field">
+          <label for="youtube">YOUTUBE CHANNEL <span class="optional-tag">(OPTIONAL)</span></label>
+          <input id="youtube" type="text" placeholder="https://youtube.com/@championsportsco or @championsportsco">
+          <span class="error-text" id="youtube-error"></span>
+        </div>
+
+        <button type="button" class="btn submit-btn" id="continueBtn">
+          CONTINUE TO COMPLETE SETUP →
+        </button>
+
+      </div>
+
+
+      <!-- ================= STEP 2 ================= -->
+
+      <div class="step-content" id="step2Content">
+
+        <div class="step-heading">
+          COMPLETE SETUP
+        </div>
+
+        <div class="field">
+          <label for="shipping">SHIPPING INFORMATION</label>
+          <textarea id="shipping" placeholder="Shipping areas, methods, courier details, delivery timelines..."></textarea>
+          <span class="error-text" id="shipping-error"></span>
+        </div>
+
+        <div class="field">
+          <label for="returnPolicy">RETURN POLICY</label>
+          <textarea id="returnPolicy" placeholder="Describe your return/exchange policy..."></textarea>
+          <span class="error-text" id="returnPolicy-error"></span>
+        </div>
+
+        <div class="field">
+          <label for="warranty">WARRANTY INFORMATION</label>
+          <textarea id="warranty" placeholder="Describe warranty terms, or write 'No warranty' if none is offered..."></textarea>
+          <span class="error-text" id="warranty-error"></span>
+        </div>
+
+        <div class="field">
+          <label for="cnicNumber">CNIC NUMBER</label>
+          <input id="cnicNumber" type="text" placeholder="XXXXX-XXXXXXX-X" inputmode="numeric" maxlength="15">
+          <span class="error-text" id="cnicNumber-error"></span>
+        </div>
+
+        <div class="field">
+          <label for="cnicImage">CNIC PICTURE</label>
+          <div class="file-upload" id="cnicImageWrap">
+            <span class="file-icon">📄</span>
+            <span class="file-text" id="cnicImageText">Choose CNIC image (JPG or PNG, max 5MB)</span>
+            <input type="file" id="cnicImage" accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+          </div>
+          <span class="error-text" id="cnicImage-error"></span>
+        </div>
+
+        <div class="field">
+          <label for="shopLogo">SHOP LOGO</label>
+          <div class="file-upload" id="shopLogoWrap">
+            <span class="file-icon">🖼️</span>
+            <span class="file-text" id="shopLogoText">Choose shop logo (JPG or PNG, max 3MB)</span>
+            <input type="file" id="shopLogo" accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+          </div>
+          <img class="logo-preview" id="logoPreview" alt="Shop logo preview">
+          <span class="error-text" id="shopLogo-error"></span>
+        </div>
+
+        <button type="button" class="btn back-btn" id="backBtn">
+          ← BACK TO BUSINESS INFORMATION
+        </button>
+
+        <button type="submit" class="btn submit-btn" id="submitBtn">
+          <span class="btn-spinner" id="btnSpinner"></span>
+          <span id="submitBtnLabel">SUBMIT YOUR APPLICATION →</span>
+        </button>
+
+        <div class="status-banner submit-error-banner" id="submitErrorBanner">
+          <span class="status-icon">⚠️</span>
+          <div class="status-body">
+            <div class="status-title">APPLICATION FAILED</div>
+            <div class="status-text" id="submitErrorText"></div>
+          </div>
         </div>
 
       </div>
-
-
-      <div class="field">
-
-        <label for="volume">
-          MONTHLY SALES VOLUME (APPROX.)
-        </label>
-
-        <select id="volume">
-
-          <option>
-            Just starting out
-          </option>
-
-          <option>
-            Rs. 50,000 – 200,000
-          </option>
-
-          <option>
-            Rs. 200,000 – 1,000,000
-          </option>
-
-          <option>
-            Rs. 1,000,000+
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <div class="field">
-
-        <label for="message">
-          TELL US ABOUT YOUR PRODUCTS
-        </label>
-
-        <textarea
-          id="message"
-          placeholder="Brands you carry, product range, current sales channels..."
-        ></textarea>
-
-      </div>
-
-
-      <button
-        type="submit"
-        class="submit-btn"
-      >
-        SUBMIT APPLICATION →
-      </button>
-
 
       <p class="fine-print">
         By applying you agree to KHELZONE's
@@ -1030,7 +1378,7 @@
 
 
 <!-- =========================
-     JAVASCRIPT
+     JAVASCRIPT — NAVBAR
 ========================= -->
 
 <script>
@@ -1052,8 +1400,6 @@
   });
 
 
-  /* Close menu when a link is clicked */
-
   const menuLinks = mobileMenu.querySelectorAll("a");
 
   menuLinks.forEach(function(link){
@@ -1073,8 +1419,6 @@
 
   });
 
-
-  /* Close menu if user clicks outside */
 
   document.addEventListener("click", function(event){
 
@@ -1106,61 +1450,492 @@
 </script>
 
 
+<!-- =========================
+     JAVASCRIPT — SELLER APPLICATION
+========================= -->
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
+
   const SUPABASE_URL = "https://antqexjhlsaynunlmzqa.supabase.co";
   const SUPABASE_KEY = "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
   const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const CNIC_BUCKET = "seller-cnic-private";
+  const LOGO_BUCKET = "seller-logos";
+
   const form = document.getElementById("sellerApplicationForm");
   if (!form) return;
 
-  async function loadUser(){
-    const { data, error } = await client.auth.getUser();
-    if (error || !data.user) {
-      alert("Please log in first, then apply to become a seller.");
-      return null;
+  /* ---------- element refs ---------- */
+
+  const bname = document.getElementById("bname");
+  const oname = document.getElementById("oname");
+  const email = document.getElementById("email");
+  const phone = document.getElementById("phone");
+  const city = document.getElementById("city");
+  const category = document.getElementById("category");
+  const volume = document.getElementById("volume");
+  const message = document.getElementById("message");
+  const instagram = document.getElementById("instagram");
+  const facebook = document.getElementById("facebook");
+  const youtube = document.getElementById("youtube");
+
+  const shipping = document.getElementById("shipping");
+  const returnPolicy = document.getElementById("returnPolicy");
+  const warranty = document.getElementById("warranty");
+  const cnicNumber = document.getElementById("cnicNumber");
+  const cnicImage = document.getElementById("cnicImage");
+  const cnicImageWrap = document.getElementById("cnicImageWrap");
+  const cnicImageText = document.getElementById("cnicImageText");
+  const shopLogo = document.getElementById("shopLogo");
+  const shopLogoWrap = document.getElementById("shopLogoWrap");
+  const shopLogoText = document.getElementById("shopLogoText");
+  const logoPreview = document.getElementById("logoPreview");
+
+  const continueBtn = document.getElementById("continueBtn");
+  const backBtn = document.getElementById("backBtn");
+  const submitBtn = document.getElementById("submitBtn");
+  const btnSpinner = document.getElementById("btnSpinner");
+  const submitBtnLabel = document.getElementById("submitBtnLabel");
+
+  const step1Content = document.getElementById("step1Content");
+  const step2Content = document.getElementById("step2Content");
+  const stepRow1 = document.getElementById("stepRow1");
+  const stepRow2 = document.getElementById("stepRow2");
+
+  const loginBanner = document.getElementById("loginBanner");
+  const successBanner = document.getElementById("successBanner");
+  const submitErrorBanner = document.getElementById("submitErrorBanner");
+  const submitErrorText = document.getElementById("submitErrorText");
+
+  let currentUser = null;
+  let isSubmitting = false;
+
+  /* ---------- generic error helpers ---------- */
+
+  function setError(inputEl, errorId, msg, wrapperEl){
+    (wrapperEl || inputEl).classList.add("invalid");
+    const errEl = document.getElementById(errorId);
+    if(errEl){
+      errEl.textContent = msg;
+      errEl.classList.add("show");
     }
-    return data.user;
   }
+
+  function clearError(inputEl, errorId, wrapperEl){
+    (wrapperEl || inputEl).classList.remove("invalid");
+    const errEl = document.getElementById(errorId);
+    if(errEl){
+      errEl.textContent = "";
+      errEl.classList.remove("show");
+    }
+  }
+
+  function scrollAndFocus(el){
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(function(){ el.focus({ preventScroll: true }); }, 300);
+  }
+
+  /* Clear error state live as the user edits a field */
+  [bname, oname, email, phone, city, message, instagram, facebook, youtube,
+   shipping, returnPolicy, warranty].forEach(function(el){
+    el.addEventListener("input", function(){
+      clearError(el, el.id + "-error");
+    });
+  });
+
+  category.addEventListener("change", function(){
+    clearError(category, "category-error");
+  });
+
+  /* ---------- CNIC auto-format ---------- */
+
+  function formatCNIC(raw){
+    const digits = raw.replace(/\D/g, "").slice(0, 13);
+    if(digits.length > 12){
+      return digits.slice(0,5) + "-" + digits.slice(5,12) + "-" + digits.slice(12);
+    }
+    if(digits.length > 5){
+      return digits.slice(0,5) + "-" + digits.slice(5);
+    }
+    return digits;
+  }
+
+  cnicNumber.addEventListener("input", function(){
+    const cursorWasAtEnd = cnicNumber.selectionStart === cnicNumber.value.length;
+    cnicNumber.value = formatCNIC(cnicNumber.value);
+    if(cursorWasAtEnd){
+      cnicNumber.setSelectionRange(cnicNumber.value.length, cnicNumber.value.length);
+    }
+    clearError(cnicNumber, "cnicNumber-error");
+  });
+
+  /* ---------- file inputs ---------- */
+
+  function handleFileChange(inputEl, wrapperEl, textEl, defaultText, errorId){
+    const file = inputEl.files[0];
+    if(file){
+      textEl.textContent = file.name;
+      wrapperEl.classList.add("has-file");
+    } else {
+      textEl.textContent = defaultText;
+      wrapperEl.classList.remove("has-file");
+    }
+    clearError(wrapperEl, errorId, wrapperEl);
+  }
+
+  cnicImage.addEventListener("change", function(){
+    handleFileChange(
+      cnicImage, cnicImageWrap, cnicImageText,
+      "Choose CNIC image (JPG or PNG, max 5MB)", "cnicImage-error"
+    );
+  });
+
+  shopLogo.addEventListener("change", function(){
+    handleFileChange(
+      shopLogo, shopLogoWrap, shopLogoText,
+      "Choose shop logo (JPG or PNG, max 3MB)", "shopLogo-error"
+    );
+
+    const file = shopLogo.files[0];
+    if(file){
+      const reader = new FileReader();
+      reader.onload = function(e){
+        logoPreview.src = e.target.result;
+        logoPreview.classList.add("show");
+      };
+      reader.readAsDataURL(file);
+    } else {
+      logoPreview.classList.remove("show");
+      logoPreview.src = "";
+    }
+  });
+
+  const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png"];
+
+  function validateFileField(inputEl, wrapperEl, errorId, opts){
+    const file = inputEl.files[0];
+
+    if(!file){
+      setError(inputEl, errorId, opts.requiredMsg, wrapperEl);
+      return false;
+    }
+
+    if(!ALLOWED_IMAGE_TYPES.includes(file.type)){
+      setError(inputEl, errorId, "Only JPG and PNG files are allowed.", wrapperEl);
+      return false;
+    }
+
+    if(file.size > opts.maxSizeMB * 1024 * 1024){
+      setError(inputEl, errorId, "File is too large (max " + opts.maxSizeMB + "MB).", wrapperEl);
+      return false;
+    }
+
+    clearError(inputEl, errorId, wrapperEl);
+    return true;
+  }
+
+  /* ---------- step navigation ---------- */
+
+  function goToStep(step){
+    if(step === 1){
+      step1Content.classList.add("active");
+      step2Content.classList.remove("active");
+      stepRow1.classList.add("active");
+      stepRow1.classList.remove("completed");
+      stepRow2.classList.remove("active");
+    } else {
+      step1Content.classList.remove("active");
+      step2Content.classList.add("active");
+      stepRow1.classList.remove("active");
+      stepRow1.classList.add("completed");
+      stepRow2.classList.add("active");
+    }
+    window.scrollTo({ top: document.querySelector(".form-panel").offsetTop - 20, behavior: "smooth" });
+  }
+
+  /* ---------- validation: step 1 ---------- */
+
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const PHONE_RE = /^[0-9+\-\s]{7,15}$/;
+
+  /* Accepts EITHER a full profile/channel URL (with or without https://)
+     OR a plain @username / handle. This is used for Instagram, Facebook,
+     and YouTube fields so sellers can paste a full link if they prefer. */
+  function isValidSocialInput(value){
+    const trimmed = value.trim();
+    if(trimmed === "") return true; // optional field
+
+    // Try as a URL (allow pasting without the protocol too)
+    const candidate = /^https?:\/\//i.test(trimmed) ? trimmed : "https://" + trimmed;
+    try{
+      const url = new URL(candidate);
+      // Must have a real-looking hostname with a dot (e.g. instagram.com)
+      if(url.hostname.includes(".") && url.hostname.length > 3){
+        return true;
+      }
+    } catch(e){
+      // not a valid URL, fall through to username check
+    }
+
+    // Fallback: plain username/handle
+    return /^@?[A-Za-z0-9._-]{2,60}$/.test(trimmed);
+  }
+
+  function validateStep1(){
+    let firstInvalid = null;
+    let valid = true;
+
+    function check(condition, el, errorId, msg){
+      if(!condition){
+        setError(el, errorId, msg);
+        valid = false;
+        if(!firstInvalid) firstInvalid = el;
+      } else {
+        clearError(el, errorId);
+      }
+    }
+
+    check(bname.value.trim().length > 0, bname, "bname-error", "Please enter your business name.");
+    check(oname.value.trim().length > 0, oname, "oname-error", "Please enter the owner name.");
+    check(EMAIL_RE.test(email.value.trim()), email, "email-error", "Please enter a valid email address.");
+    check(PHONE_RE.test(phone.value.trim()), phone, "phone-error", "Please enter a valid phone number.");
+    check(city.value.trim().length > 0, city, "city-error", "Please enter your city.");
+    check(category.value !== "", category, "category-error", "Please select a category.");
+    check(message.value.trim().length > 0, message, "message-error", "Please tell us about your products.");
+
+    // optional social fields — validate only if filled in; full URL or plain username both accepted
+    check(
+      isValidSocialInput(instagram.value),
+      instagram, "instagram-error", "Please enter a valid Instagram URL or username."
+    );
+    check(
+      isValidSocialInput(facebook.value),
+      facebook, "facebook-error", "Please enter a valid Facebook URL or username."
+    );
+    check(
+      isValidSocialInput(youtube.value),
+      youtube, "youtube-error", "Please enter a valid YouTube URL or channel handle."
+    );
+
+    if(!valid && firstInvalid){
+      scrollAndFocus(firstInvalid);
+    }
+
+    return valid;
+  }
+
+  /* ---------- validation: step 2 ---------- */
+
+  const CNIC_RE = /^\d{5}-\d{7}-\d{1}$/;
+
+  function validateStep2(){
+    let firstInvalid = null;
+    let valid = true;
+
+    function check(condition, el, errorId, msg, wrapperEl){
+      if(!condition){
+        setError(el, errorId, msg, wrapperEl);
+        valid = false;
+        if(!firstInvalid) firstInvalid = wrapperEl || el;
+      } else {
+        clearError(el, errorId, wrapperEl);
+      }
+    }
+
+    check(shipping.value.trim().length > 0, shipping, "shipping-error", "Please provide your shipping information.");
+    check(returnPolicy.value.trim().length > 0, returnPolicy, "returnPolicy-error", "Please describe your return policy.");
+    check(warranty.value.trim().length > 0, warranty, "warranty-error", "Please describe your warranty policy, or write 'No warranty'.");
+    check(CNIC_RE.test(cnicNumber.value.trim()), cnicNumber, "cnicNumber-error", "Please enter a valid CNIC in the format XXXXX-XXXXXXX-X.");
+
+    const cnicValid = validateFileField(cnicImage, cnicImageWrap, "cnicImage-error", {
+      requiredMsg: "Please upload your CNIC picture.",
+      maxSizeMB: 5
+    });
+    if(!cnicValid && !firstInvalid) firstInvalid = cnicImageWrap;
+    if(!cnicValid) valid = false;
+
+    const logoValid = validateFileField(shopLogo, shopLogoWrap, "shopLogo-error", {
+      requiredMsg: "Please upload your shop logo.",
+      maxSizeMB: 3
+    });
+    if(!logoValid && !firstInvalid) firstInvalid = shopLogoWrap;
+    if(!logoValid) valid = false;
+
+    if(!valid && firstInvalid){
+      scrollAndFocus(firstInvalid);
+    }
+
+    return valid;
+  }
+
+  /* ---------- continue / back ---------- */
+
+  continueBtn.addEventListener("click", function(){
+    if(validateStep1()){
+      goToStep(2);
+    }
+  });
+
+  backBtn.addEventListener("click", function(){
+    goToStep(1);
+  });
+
+  /* ---------- auth check on load ---------- */
+
+  async function checkAuth(){
+    try{
+      const { data, error } = await client.auth.getUser();
+      if(error || !data.user){
+        currentUser = null;
+        loginBanner.classList.add("show");
+        continueBtn.disabled = true;
+        submitBtn.disabled = true;
+      } else {
+        currentUser = data.user;
+        loginBanner.classList.remove("show");
+        continueBtn.disabled = false;
+        submitBtn.disabled = false;
+      }
+    } catch(err){
+      currentUser = null;
+      loginBanner.classList.add("show");
+      continueBtn.disabled = true;
+      submitBtn.disabled = true;
+    }
+  }
+
+  checkAuth();
+
+  /* ---------- submission ---------- */
 
   form.addEventListener("submit", async function(e){
     e.preventDefault();
-    const button = form.querySelector("button[type=submit]");
-    const oldText = button.innerHTML;
-    button.disabled = true;
-    button.innerHTML = "SUBMITTING...";
 
-    try {
-      const user = await loadUser();
-      if (!user) throw new Error("You must be logged in to apply.");
+    if(isSubmitting) return;
 
+    submitErrorBanner.classList.remove("show");
+    submitErrorText.textContent = "";
+    successBanner.classList.remove("show");
+
+    const step1Valid = validateStep1();
+    if(!step1Valid){
+      goToStep(1);
+      return;
+    }
+
+    const step2Valid = validateStep2();
+    if(!step2Valid){
+      return;
+    }
+
+    if(!currentUser){
+      const { data, error } = await client.auth.getUser();
+      if(error || !data.user){
+        loginBanner.classList.add("show");
+        submitErrorText.textContent = "Please log in first, then apply to become a seller.";
+        submitErrorBanner.classList.add("show");
+        return;
+      }
+      currentUser = data.user;
+    }
+
+    isSubmitting = true;
+    submitBtn.disabled = true;
+    backBtn.disabled = true;
+    submitBtn.classList.add("loading");
+    submitBtnLabel.textContent = "SUBMITTING APPLICATION...";
+
+    try{
+      const user = currentUser;
+
+      /* upload CNIC image to PRIVATE bucket */
+      const cnicFile = cnicImage.files[0];
+      const cnicExt = (cnicFile.name.split(".").pop() || "jpg").toLowerCase();
+      const cnicPath = user.id + "/cnic-" + Date.now() + "." + cnicExt;
+
+      const { error: cnicUploadError } = await client
+        .storage
+        .from(CNIC_BUCKET)
+        .upload(cnicPath, cnicFile, { upsert: true, contentType: cnicFile.type });
+
+      if(cnicUploadError){
+        throw new Error("Failed to upload CNIC image: " + cnicUploadError.message);
+      }
+
+      /* upload shop logo to its own bucket */
+      const logoFile = shopLogo.files[0];
+      const logoExt = (logoFile.name.split(".").pop() || "jpg").toLowerCase();
+      const logoPath = user.id + "/logo-" + Date.now() + "." + logoExt;
+
+      const { error: logoUploadError } = await client
+        .storage
+        .from(LOGO_BUCKET)
+        .upload(logoPath, logoFile, { upsert: true, contentType: logoFile.type });
+
+      if(logoUploadError){
+        throw new Error("Failed to upload shop logo: " + logoUploadError.message);
+      }
+
+      /* build payload and save to sellers table */
       const payload = {
         id: user.id,
-        business_name: document.getElementById("bname").value.trim(),
-        owner_name: document.getElementById("oname").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        phone: document.getElementById("phone").value.trim(),
-        city: document.getElementById("city").value.trim(),
-        category: document.getElementById("category").value,
-        monthly_volume: document.getElementById("volume").value,
-        message: document.getElementById("message").value.trim(),
+        business_name: bname.value.trim(),
+        owner_name: oname.value.trim(),
+        email: email.value.trim(),
+        phone: phone.value.trim(),
+        city: city.value.trim(),
+        category: category.value,
+        monthly_volume: volume.value,
+        message: message.value.trim(),
+        instagram_id: instagram.value.trim() || null,
+        facebook_id: facebook.value.trim() || null,
+        youtube_id: youtube.value.trim() || null,
+        shipping_information: shipping.value.trim(),
+        return_policy: returnPolicy.value.trim(),
+        warranty_information: warranty.value.trim(),
+        cnic_number: cnicNumber.value.trim(),
+        cnic_image_path: cnicPath,
+        shop_logo_path: logoPath,
         status: "pending"
       };
 
-      const { error } = await client.from("sellers").upsert(payload, { onConflict: "id" });
-      if (error) throw error;
+      const { error: dbError } = await client
+        .from("sellers")
+        .upsert(payload, { onConflict: "id" });
 
-      alert("Application submitted successfully! Your seller status is now PENDING.");
+      if(dbError){
+        throw new Error("Failed to save application: " + dbError.message);
+      }
+
+      /* only now show success — everything actually succeeded */
+      successBanner.classList.add("show");
+      successBanner.scrollIntoView({ behavior: "smooth", block: "center" });
       form.reset();
-    } catch (err) {
+      logoPreview.classList.remove("show");
+      logoPreview.src = "";
+      cnicImageText.textContent = "Choose CNIC image (JPG or PNG, max 5MB)";
+      shopLogoText.textContent = "Choose shop logo (JPG or PNG, max 3MB)";
+      cnicImageWrap.classList.remove("has-file");
+      shopLogoWrap.classList.remove("has-file");
+      goToStep(1);
+
+    } catch(err){
       console.error(err);
-      alert("Application failed: " + (err.message || "Unknown error"));
-    } finally {
-      button.disabled = false;
-      button.innerHTML = oldText;
+      submitErrorText.textContent = err.message || "Unknown error. Please try again.";
+      submitErrorBanner.classList.add("show");
+      submitErrorBanner.scrollIntoView({ behavior: "smooth", block: "center" });
+    } finally{
+      isSubmitting = false;
+      submitBtn.disabled = false;
+      backBtn.disabled = false;
+      submitBtn.classList.remove("loading");
+      submitBtnLabel.textContent = "SUBMIT YOUR APPLICATION →";
     }
   });
+
 })();
 </script>
 

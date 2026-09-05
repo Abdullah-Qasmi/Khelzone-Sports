@@ -1,365 +1,307 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KHELZONE | Create Account</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KHELZONE | Create Account</title>
 
-<!-- Tailwind -->
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<!-- Google Font -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-<!-- Material Icons -->
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-
-<!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-* { box-sizing: border-box; }
-
-body {
-    margin: 0;
-    min-height: 100vh;
-    font-family: "Inter", sans-serif;
-    background:
-        radial-gradient(circle at top right, rgba(255, 90, 0, 0.18), transparent 35%),
-        radial-gradient(circle at bottom left, rgba(255, 90, 0, 0.08), transparent 30%),
-        #08090b;
-    color: white;
-}
-
-.signup-card {
-    background: rgba(18, 20, 24, 0.94);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.55), 0 0 40px rgba(255, 90, 0, 0.05);
-}
-
-.orange-gradient {
-    background: linear-gradient(135deg, #ff5a00 0%, #d63f00 100%);
-}
-
-.orange-gradient:hover {
-    background: linear-gradient(135deg, #ff6818 0%, #d63f00 100%);
-}
-
-.orange-gradient:disabled,
-button:disabled {
-    cursor: not-allowed;
-}
-
-.input-box {
-    background: rgba(255, 255, 255, 0.04) !important;
-    border: 1px solid rgba(255, 255, 255, 0.10) !important;
-    color: white !important;
-}
-
-.input-box:focus {
-    border-color: #ff5a00 !important;
-    box-shadow: 0 0 0 3px rgba(255, 90, 0, 0.12) !important;
-}
-
-.input-box::placeholder {
-    color: #6b7280;
-}
-
-.spinner {
-    width: 19px;
-    height: 19px;
-    border: 2px solid rgba(255,255,255,0.35);
-    border-top-color: white;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.otp-box {
-    text-align: center;
-    font-size: 1.5rem;
-    font-weight: 800;
-}
-
-.shake {
-    animation: shake 0.35s ease-in-out;
-}
-
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
-}
-</style>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Inter", sans-serif;
+            background:
+                radial-gradient(circle at top right, rgba(255,90,0,.18), transparent 35%),
+                radial-gradient(circle at bottom left, rgba(255,90,0,.08), transparent 30%),
+                #08090b;
+            color: white;
+        }
+        .signup-card {
+            background: rgba(18,20,24,.94);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255,255,255,.09);
+            box-shadow: 0 25px 70px rgba(0,0,0,.55), 0 0 40px rgba(255,90,0,.05);
+        }
+        .orange-gradient {
+            background: linear-gradient(135deg,#ff5a00 0%,#d63f00 100%);
+        }
+        .orange-gradient:hover {
+            background: linear-gradient(135deg,#ff6818 0%,#d63f00 100%);
+        }
+        .input-box {
+            background: rgba(255,255,255,.04) !important;
+            border: 1px solid rgba(255,255,255,.10) !important;
+            color: white !important;
+        }
+        .input-box:focus {
+            border-color: #ff5a00 !important;
+            box-shadow: 0 0 0 3px rgba(255,90,0,.12) !important;
+        }
+        .input-box::placeholder { color: #6b7280; }
+        .spinner {
+            width: 19px; height: 19px;
+            border: 2px solid rgba(255,255,255,.35);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+        }
+        .otp-box {
+            width: 46px;
+            height: 54px;
+            text-align: center;
+            font-size: 1.35rem;
+            font-weight: 800;
+            border-radius: .8rem;
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.12);
+            color: white;
+            outline: none;
+        }
+        .otp-box:focus {
+            border-color: #ff5a00;
+            box-shadow: 0 0 0 3px rgba(255,90,0,.12);
+        }
+        @media (max-width: 430px) {
+            .otp-box { width: 40px; height: 50px; }
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
 </head>
 
 <body class="flex items-center justify-center px-4 py-10">
-
 <main class="w-full max-w-md">
 
-<!-- LOGO -->
-<a href="homepage.html" class="block text-center mb-8">
-    <div class="text-4xl sm:text-5xl font-black tracking-tight text-orange-500">
-        KHELZONE
-    </div>
-    <div class="mt-2 text-[10px] sm:text-xs font-bold tracking-[0.28em] text-gray-500">
-        ENGINEERED FOR PERFORMANCE
-    </div>
-</a>
-
-<!-- SIGNUP CARD -->
-<section id="signupCard" class="signup-card rounded-3xl p-6 sm:p-8">
-
-<!-- SIGNUP SCREEN -->
-<div id="signupScreen">
-
-    <div class="text-center mb-7">
-        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-500/10 border border-orange-500/20">
-            <span class="material-symbols-outlined text-orange-500 text-3xl">person_add</span>
+    <!-- LOGO: intentionally NOT clickable -->
+    <div class="block text-center mb-8">
+        <div class="text-4xl sm:text-5xl font-black tracking-tight text-orange-500">
+            KHELZONE
         </div>
-        <h1 class="mt-5 text-3xl font-black uppercase">Create Account</h1>
-        <p class="mt-2 text-sm text-gray-500">Join KHELZONE today</p>
+        <div class="mt-2 text-[10px] sm:text-xs font-bold tracking-[0.28em] text-gray-500">
+            ENGINEERED FOR PERFORMANCE
+        </div>
     </div>
 
-    <form id="signupForm" class="space-y-5" novalidate>
+    <section class="signup-card rounded-3xl p-6 sm:p-8">
 
-        <!-- NAME -->
-        <div>
-            <label for="fullName" class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-400">Full Name</label>
-            <input id="fullName" type="text" required autocomplete="name" placeholder="e.g. Abdullah Qasmi"
-                class="input-box w-full rounded-xl px-4 py-3.5 outline-none transition">
-        </div>
+        <!-- SIGNUP VIEW -->
+        <div id="signupView">
+            <div class="text-center mb-7">
+                <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-500/10 border border-orange-500/20">
+                    <span class="material-symbols-outlined text-orange-500 text-3xl">person_add</span>
+                </div>
+                <h1 class="mt-5 text-3xl font-black uppercase">Create Account</h1>
+                <p class="mt-2 text-sm text-gray-500">Join KHELZONE today</p>
+            </div>
 
-        <!-- EMAIL -->
-        <div>
-            <label for="email" class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-400">Email</label>
-            <input id="email" type="email" required autocomplete="email" placeholder="Enter your email"
-                class="input-box w-full rounded-xl px-4 py-3.5 outline-none transition">
-            <p id="emailHint" class="mt-2 hidden text-[11px]"></p>
-        </div>
+            <form id="signupForm" class="space-y-5">
+                <div>
+                    <label for="fullName" class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-400">Full Name</label>
+                    <input id="fullName" type="text" required autocomplete="name"
+                        placeholder="Enter your full name"
+                        class="input-box w-full rounded-xl px-4 py-3.5 outline-none transition">
+                </div>
 
-        <!-- PASSWORD -->
-        <div>
-            <label for="password" class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-400">Password</label>
-            <div class="relative">
-                <input id="password" type="password" required minlength="8" autocomplete="new-password" placeholder="Minimum 8 characters"
-                    class="input-box w-full rounded-xl px-4 py-3.5 pr-12 outline-none transition">
-                <button type="button" id="togglePassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white">
-                    <span id="passwordIcon" class="material-symbols-outlined">visibility</span>
+                <div>
+                    <label for="email" class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-400">Email</label>
+                    <input id="email" type="email" required autocomplete="email"
+                        placeholder="Enter your email"
+                        class="input-box w-full rounded-xl px-4 py-3.5 outline-none transition">
+                </div>
+
+                <div>
+                    <label for="password" class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-400">Password</label>
+                    <div class="relative">
+                        <input id="password" type="password" required minlength="6" autocomplete="new-password"
+                            placeholder="Create a password"
+                            class="input-box w-full rounded-xl px-4 py-3.5 pr-12 outline-none transition">
+                        <button type="button" id="togglePassword"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white">
+                            <span id="passwordIcon" class="material-symbols-outlined">visibility</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="confirmPassword" class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-400">Confirm Password</label>
+                    <input id="confirmPassword" type="password" required minlength="6" autocomplete="new-password"
+                        placeholder="Confirm your password"
+                        class="input-box w-full rounded-xl px-4 py-3.5 outline-none transition">
+                </div>
+
+                <div id="signupMessage" class="hidden rounded-xl border px-4 py-3 text-sm font-semibold"></div>
+
+                <button id="signupBtn" type="submit"
+                    class="orange-gradient w-full rounded-xl py-4 font-black uppercase tracking-wide text-white flex items-center justify-center gap-2 transition hover:scale-[1.01] active:scale-[.99]">
+                    <span id="signupBtnText">Create Account</span>
+                    <span id="signupSpinner" class="spinner hidden"></span>
+                    <span id="signupIcon" class="material-symbols-outlined">arrow_forward</span>
                 </button>
+            </form>
+
+            <div class="mt-7 text-center">
+                <p class="text-sm text-gray-500">
+                    Already have an account?
+                    <a href="index.html" class="font-bold text-orange-400 hover:text-orange-300">Login</a>
+                </p>
             </div>
-            <p class="mt-2 text-[11px] text-gray-600">At least 8 characters with 1 letter and 1 number.</p>
-        </div>
 
-        <!-- CONFIRM PASSWORD -->
-        <div>
-            <label for="confirmPassword" class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-400">Confirm Password</label>
-            <input id="confirmPassword" type="password" required minlength="8" autocomplete="new-password" placeholder="Confirm your password"
-                class="input-box w-full rounded-xl px-4 py-3.5 outline-none transition">
-        </div>
-
-        <!-- MESSAGE -->
-        <div id="message" class="hidden rounded-xl border px-4 py-3 text-sm font-semibold"></div>
-
-        <!-- SIGNUP BUTTON -->
-        <button id="signupBtn" type="submit"
-            class="orange-gradient w-full rounded-xl py-4 font-black uppercase tracking-wide text-white flex items-center justify-center gap-2 transition hover:scale-[1.01] active:scale-[0.99]">
-            <span id="signupBtnText">Create Account</span>
-            <span id="signupSpinner" class="spinner hidden"></span>
-            <span id="signupIcon" class="material-symbols-outlined">arrow_forward</span>
-        </button>
-    </form>
-
-    <div class="mt-7 text-center">
-        <p class="text-sm text-gray-500">
-            Already have an account?
-            <a href="index.html" class="font-bold text-orange-400 hover:text-orange-300">Login</a>
-        </p>
-    </div>
-
-    <div class="mt-7 border-t border-white/10 pt-6">
-        <a href="index.html" class="flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-white">
-            <span class="material-symbols-outlined text-base">arrow_back</span>
-            Back to Login
-        </a>
-    </div>
-
-</div>
-
-<!-- OTP SCREEN -->
-<div id="otpScreen" class="hidden">
-
-    <div class="text-center mb-7">
-        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-500/10 border border-orange-500/20">
-            <span class="material-symbols-outlined text-orange-500 text-3xl">mark_email_read</span>
-        </div>
-        <h1 class="mt-5 text-3xl font-black uppercase">Verify Email</h1>
-        <p class="mt-2 text-sm text-gray-500 leading-6">
-            We sent a verification code to
-            <br>
-            <span id="otpEmail" class="text-orange-400 font-bold"></span>
-        </p>
-    </div>
-
-    <form id="otpForm" class="space-y-5" novalidate>
-
-        <div>
-            <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-400 text-center">Verification Code</label>
-
-            <div id="otpBoxesContainer" class="flex items-center justify-center gap-2 sm:gap-3">
-                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" data-index="0" aria-label="Digit 1"
-                    class="otp-box input-box w-12 h-14 sm:w-14 sm:h-16 rounded-xl outline-none transition">
-                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" data-index="1" aria-label="Digit 2"
-                    class="otp-box input-box w-12 h-14 sm:w-14 sm:h-16 rounded-xl outline-none transition">
-                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" data-index="2" aria-label="Digit 3"
-                    class="otp-box input-box w-12 h-14 sm:w-14 sm:h-16 rounded-xl outline-none transition">
-                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" data-index="3" aria-label="Digit 4"
-                    class="otp-box input-box w-12 h-14 sm:w-14 sm:h-16 rounded-xl outline-none transition">
-                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" data-index="4" aria-label="Digit 5"
-                    class="otp-box input-box w-12 h-14 sm:w-14 sm:h-16 rounded-xl outline-none transition">
-                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" data-index="5" aria-label="Digit 6"
-                    class="otp-box input-box w-12 h-14 sm:w-14 sm:h-16 rounded-xl outline-none transition">
+            <div class="mt-7 border-t border-white/10 pt-6">
+                <a href="homepage.html" class="flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-white">
+                    <span class="material-symbols-outlined text-base">arrow_back</span>
+                    Continue shopping
+                </a>
             </div>
         </div>
 
-        <div id="otpMessage" class="hidden rounded-xl border px-4 py-3 text-sm font-semibold"></div>
+        <!-- OTP VIEW -->
+        <div id="otpView" class="hidden">
+            <div class="text-center mb-7">
+                <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-500/10 border border-orange-500/20">
+                    <span class="material-symbols-outlined text-orange-500 text-3xl">mark_email_unread</span>
+                </div>
+                <h1 class="mt-5 text-3xl font-black uppercase">Verify Email</h1>
+                <p class="mt-2 text-sm text-gray-400">
+                    6-digit code enter karo jo tumhare actual email inbox mein aaya hai.
+                </p>
+                <p id="pendingEmailText" class="mt-2 text-sm font-bold text-orange-400 break-all"></p>
+            </div>
 
-        <button id="verifyBtn" type="submit"
-            class="orange-gradient w-full rounded-xl py-4 font-black uppercase tracking-wide text-white flex items-center justify-center gap-2 transition hover:scale-[1.01] active:scale-[0.99]">
-            <span id="verifyBtnText">Verify Email</span>
-            <span id="verifySpinner" class="spinner hidden"></span>
-            <span id="verifyIcon" class="material-symbols-outlined">verified</span>
-        </button>
-    </form>
+            <div id="otpMessage" class="hidden mb-5 rounded-xl border px-4 py-3 text-sm font-semibold"></div>
 
-    <div class="mt-6 text-center">
-        <p class="text-sm text-gray-500">Didn't receive the code?</p>
-        <button type="button" id="resendBtn" class="mt-2 font-bold text-orange-400 hover:text-orange-300">
-            Resend OTP
-        </button>
-    </div>
+            <div id="otpInputs" class="flex justify-center gap-2 mb-6" aria-label="Email verification code">
+                <input class="otp-box" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="Digit 1">
+                <input class="otp-box" inputmode="numeric" maxlength="1" aria-label="Digit 2">
+                <input class="otp-box" inputmode="numeric" maxlength="1" aria-label="Digit 3">
+                <input class="otp-box" inputmode="numeric" maxlength="1" aria-label="Digit 4">
+                <input class="otp-box" inputmode="numeric" maxlength="1" aria-label="Digit 5">
+                <input class="otp-box" inputmode="numeric" maxlength="1" aria-label="Digit 6">
+            </div>
 
-    <div class="mt-7 border-t border-white/10 pt-6">
-        <a href="index.html" class="flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-white">
-            <span class="material-symbols-outlined text-base">arrow_back</span>
-            Back to Login
-        </a>
-    </div>
+            <button id="verifyBtn" type="button"
+                class="orange-gradient w-full rounded-xl py-4 font-black uppercase tracking-wide text-white flex items-center justify-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                <span id="verifyBtnText">Verify Email</span>
+                <span id="verifySpinner" class="spinner hidden"></span>
+            </button>
 
-</div>
+            <button id="resendBtn" type="button"
+                class="mt-4 w-full rounded-xl border border-white/10 bg-white/5 py-3.5 font-bold text-gray-200 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed">
+                <span id="resendBtnText">Resend OTP</span>
+            </button>
 
-</section>
+            <p id="cooldownText" class="mt-3 text-center text-xs text-gray-500"></p>
 
-<p class="mt-6 text-center text-[10px] text-gray-600">
-    © 2026 KHELZONE. Engineered for Performance.
-</p>
+            <button id="backToSignupBtn" type="button"
+                class="mt-5 w-full text-sm text-gray-500 hover:text-white">
+                Use a different email
+            </button>
+        </div>
 
+    </section>
+
+    <p class="mt-6 text-center text-[10px] text-gray-600">
+        © 2026 KHELZONE. Engineered for Performance.
+    </p>
 </main>
 
 <script>
 "use strict";
 
 /* =========================================================
-   SUPABASE CONFIGURATION
+   SUPABASE
+   Publishable/anon key is safe for browser use.
+   NEVER put service_role, SMTP password, or API secret here.
 ========================================================= */
 const SUPABASE_URL = "https://antqexjhlsaynunlmzqa.supabase.co";
 const SUPABASE_KEY = "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
 
 /* =========================================================
-   SIGNUP ELEMENTS
+   ELEMENTS
 ========================================================= */
+const signupView = document.getElementById("signupView");
+const otpView = document.getElementById("otpView");
+
 const signupForm = document.getElementById("signupForm");
 const fullNameInput = document.getElementById("fullName");
 const emailInput = document.getElementById("email");
-const emailHint = document.getElementById("emailHint");
 const passwordInput = document.getElementById("password");
 const confirmPasswordInput = document.getElementById("confirmPassword");
+
 const togglePassword = document.getElementById("togglePassword");
 const passwordIcon = document.getElementById("passwordIcon");
+
 const signupBtn = document.getElementById("signupBtn");
 const signupBtnText = document.getElementById("signupBtnText");
 const signupSpinner = document.getElementById("signupSpinner");
 const signupIcon = document.getElementById("signupIcon");
-const message = document.getElementById("message");
+const signupMessage = document.getElementById("signupMessage");
 
-/* =========================================================
-   OTP ELEMENTS
-========================================================= */
-const signupScreen = document.getElementById("signupScreen");
-const otpScreen = document.getElementById("otpScreen");
-const otpEmail = document.getElementById("otpEmail");
-const otpForm = document.getElementById("otpForm");
-const otpBoxes = Array.from(document.querySelectorAll(".otp-box"));
+const pendingEmailText = document.getElementById("pendingEmailText");
 const otpMessage = document.getElementById("otpMessage");
+const otpBoxes = Array.from(document.querySelectorAll(".otp-box"));
+
 const verifyBtn = document.getElementById("verifyBtn");
 const verifyBtnText = document.getElementById("verifyBtnText");
 const verifySpinner = document.getElementById("verifySpinner");
-const verifyIcon = document.getElementById("verifyIcon");
+
 const resendBtn = document.getElementById("resendBtn");
+const resendBtnText = document.getElementById("resendBtnText");
+const cooldownText = document.getElementById("cooldownText");
+const backToSignupBtn = document.getElementById("backToSignupBtn");
 
 /* =========================================================
    STATE
 ========================================================= */
 let pendingEmail = "";
-let isSigningUp = false;
-let isVerifying = false;
-let otpAttempts = 0;
-const MAX_OTP_ATTEMPTS = 5;
-let resendCooldownTimer = null;
+let wrongAttempts = 0;
+const MAX_WRONG_ATTEMPTS = 5;
+
+let resendTimer = null;
+let resendAvailableAt = 0;
 
 /* =========================================================
    MESSAGE HELPERS
-   (message text is always built from static strings we
-   control, so innerHTML here never carries user input)
 ========================================================= */
-function showMessage(html, type = "error") {
-    message.innerHTML = html;
-    message.className = "rounded-xl border px-4 py-3 text-sm font-semibold";
-    message.classList.remove("hidden");
+function showMessage(element, text, type = "error") {
+    element.textContent = text;
+    element.className = "rounded-xl border px-4 py-3 text-sm font-semibold";
 
     if (type === "success") {
-        message.classList.add("bg-green-500/10", "border-green-500/20", "text-green-300");
+        element.classList.add(
+            "bg-green-500/10",
+            "border-green-500/20",
+            "text-green-300"
+        );
     } else {
-        message.classList.add("bg-red-500/10", "border-red-500/20", "text-red-300");
+        element.classList.add(
+            "bg-red-500/10",
+            "border-red-500/20",
+            "text-red-300"
+        );
     }
 }
 
-function showOtpMessage(text, type = "error") {
-    otpMessage.textContent = text;
-    otpMessage.className = "rounded-xl border px-4 py-3 text-sm font-semibold";
-    otpMessage.classList.remove("hidden");
-
-    if (type === "success") {
-        otpMessage.classList.add("bg-green-500/10", "border-green-500/20", "text-green-300");
-    } else {
-        otpMessage.classList.add("bg-red-500/10", "border-red-500/20", "text-red-300");
-    }
-}
-
-function hideMessage() {
-    message.textContent = "";
-    message.classList.add("hidden");
-}
-
-function hideOtpMessage() {
-    otpMessage.textContent = "";
-    otpMessage.classList.add("hidden");
+function hideMessage(element) {
+    element.classList.add("hidden");
 }
 
 /* =========================================================
-   LOADING STATES
+   LOADING
 ========================================================= */
-function setLoading(loading) {
-    isSigningUp = loading;
+function setSignupLoading(loading) {
     signupBtn.disabled = loading;
 
     if (loading) {
@@ -376,275 +318,201 @@ function setLoading(loading) {
 }
 
 function setVerifyLoading(loading) {
-    isVerifying = loading;
     verifyBtn.disabled = loading;
+    resendBtn.disabled = loading || Date.now() < resendAvailableAt;
 
     if (loading) {
         verifyBtnText.textContent = "Verifying...";
         verifySpinner.classList.remove("hidden");
-        verifyIcon.classList.add("hidden");
-        verifyBtn.classList.add("opacity-70", "cursor-not-allowed");
     } else {
         verifyBtnText.textContent = "Verify Email";
         verifySpinner.classList.add("hidden");
-        verifyIcon.classList.remove("hidden");
-        verifyBtn.classList.remove("opacity-70", "cursor-not-allowed");
+        updateResendButton();
     }
 }
 
 /* =========================================================
    PASSWORD SHOW / HIDE
 ========================================================= */
-togglePassword.addEventListener("click", function () {
-    if (passwordInput.type === "password") {
-        passwordInput.type = "text";
-        passwordIcon.textContent = "visibility_off";
-    } else {
-        passwordInput.type = "password";
-        passwordIcon.textContent = "visibility";
-    }
+togglePassword.addEventListener("click", () => {
+    const hidden = passwordInput.type === "password";
+    passwordInput.type = hidden ? "text" : "password";
+    passwordIcon.textContent = hidden ? "visibility_off" : "visibility";
 });
 
 /* =========================================================
-   FULL NAME VALIDATION
+   OTP HELPERS
 ========================================================= */
-function isValidFullName(name) {
-    const namePattern = /^[A-Za-z]+(?:[ '-][A-Za-z]+)+(?:\s+[A-Za-z]+(?:[ '-][A-Za-z]+)+)*$/;
-    return namePattern.test(name.trim());
+function getOtp() {
+    return otpBoxes.map(box => box.value).join("");
 }
 
-/* =========================================================
-   EMAIL VALIDATION
-========================================================= */
-function isValidEmail(email) {
-    if (!email) return false;
-    if (email.length > 254) return false;
-    if (/\s/.test(email)) return false;
-
-    const emailPattern = /^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$/;
-    if (!emailPattern.test(email)) return false;
-
-    const parts = email.split("@");
-    if (parts.length !== 2) return false;
-
-    const localPart = parts[0];
-    const domain = parts[1].toLowerCase();
-
-    if (!localPart || localPart.length > 64) return false;
-    if (domain.startsWith(".") || domain.endsWith(".") || domain.includes("..")) return false;
-
-    // domain must have at least one dot and a valid TLD length
-    const domainParts = domain.split(".");
-    const tld = domainParts[domainParts.length - 1];
-    if (domainParts.length < 2 || tld.length < 2) return false;
-
-    return true;
+function clearOtp() {
+    otpBoxes.forEach(box => box.value = "");
+    otpBoxes[0].focus();
 }
 
-/* =========================================================
-   DISPOSABLE / TEMPORARY EMAIL DOMAINS
-========================================================= */
-const blockedEmailDomains = [
-    "tempmail.com", "10minutemail.com", "guerrillamail.com", "mailinator.com",
-    "yopmail.com", "throwawaymail.com", "temp-mail.org", "fakeinbox.com",
-    "sharklasers.com", "trashmail.com", "dispostable.com", "mintemail.com",
-    "getnada.com", "maildrop.cc", "mohmal.com", "tempinbox.com",
-    "moakt.com", "emailondeck.com", "spamgourmet.com", "mailnesia.com"
-];
-
-function isBlockedEmailDomain(email) {
-    const domain = email.split("@")[1]?.toLowerCase();
-    return blockedEmailDomains.includes(domain);
-}
-
-/* =========================================================
-   PASSWORD VALIDATION
-========================================================= */
-function isValidPassword(password) {
-    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
-    return passwordPattern.test(password);
-}
-
-/* =========================================================
-   EMAIL LIVE CHECK (on blur)
-========================================================= */
-emailInput.addEventListener("blur", function () {
-    const email = emailInput.value.trim().toLowerCase();
-    emailHint.classList.add("hidden");
-
-    if (!email) return;
-
-    if (/\s/.test(email)) {
-        emailHint.textContent = "Email address cannot contain spaces.";
-        emailHint.className = "mt-2 text-[11px] text-red-400";
-        return;
-    }
-
-    if (!isValidEmail(email)) {
-        emailHint.textContent = "Please enter a valid email address.";
-        emailHint.className = "mt-2 text-[11px] text-red-400";
-        return;
-    }
-
-    if (isBlockedEmailDomain(email)) {
-        emailHint.textContent = "Temporary or disposable email addresses are not allowed.";
-        emailHint.className = "mt-2 text-[11px] text-red-400";
-        return;
-    }
-
-    emailHint.textContent = "Looks good. We'll send a code to verify you own this inbox.";
-    emailHint.className = "mt-2 text-[11px] text-green-400";
-});
-
-/* =========================================================
-   OTP SCREEN HELPERS
-========================================================= */
 function showOtpScreen(email) {
     pendingEmail = email;
-    otpEmail.textContent = email;
-
-    signupScreen.classList.add("hidden");
-    otpScreen.classList.remove("hidden");
-
-    otpAttempts = 0;
-    clearOtpBoxes();
-    setOtpBoxesEnabled(true);
-    hideOtpMessage();
-    startResendCooldown(30);
-
-    setTimeout(function () {
-        otpBoxes[0].focus();
-    }, 100);
+    pendingEmailText.textContent = email;
+    signupView.classList.add("hidden");
+    otpView.classList.remove("hidden");
+    hideMessage(otpMessage);
+    clearOtp();
+    otpBoxes[0].focus();
+    startResendCooldown(60);
 }
 
-function getOtpValue() {
-    return otpBoxes.map(function (box) { return box.value; }).join("");
+function returnToSignup() {
+    if (resendTimer) clearInterval(resendTimer);
+    signupView.classList.remove("hidden");
+    otpView.classList.add("hidden");
+    hideMessage(otpMessage);
+    hideMessage(signupMessage);
+    clearOtp();
+    emailInput.focus();
 }
 
-function clearOtpBoxes() {
-    otpBoxes.forEach(function (box) { box.value = ""; });
-}
+/* =========================================================
+   OTP INPUT
+   - digits only
+   - paste 6 digits
+   - next/previous
+   - arrows
+========================================================= */
+otpBoxes.forEach((box, index) => {
+    box.addEventListener("input", (event) => {
+        const digits = event.target.value.replace(/\D/g, "");
 
-function shakeOtpBoxes() {
-    otpBoxes.forEach(function (box) { box.classList.add("shake"); });
-    setTimeout(function () {
-        otpBoxes.forEach(function (box) { box.classList.remove("shake"); });
-    }, 400);
-}
-
-function setOtpBoxesEnabled(enabled) {
-    otpBoxes.forEach(function (box) { box.disabled = !enabled; });
-}
-
-/* OTP box navigation, digits-only, paste support */
-otpBoxes.forEach(function (box, idx) {
-    box.addEventListener("input", function () {
-        this.value = this.value.replace(/\D/g, "").slice(0, 1);
-        if (this.value && idx < otpBoxes.length - 1) {
-            otpBoxes[idx + 1].focus();
-        }
-    });
-
-    box.addEventListener("keydown", function (e) {
-        if (e.key === "Backspace") {
-            if (!this.value && idx > 0) {
-                otpBoxes[idx - 1].focus();
-                otpBoxes[idx - 1].value = "";
-                e.preventDefault();
+        if (digits.length > 1) {
+            const six = digits.slice(0, 6);
+            six.split("").forEach((digit, offset) => {
+                if (otpBoxes[index + offset]) {
+                    otpBoxes[index + offset].value = digit;
+                }
+            });
+            const next = Math.min(index + six.length, otpBoxes.length - 1);
+            otpBoxes[next].focus();
+        } else {
+            event.target.value = digits;
+            if (digits && index < otpBoxes.length - 1) {
+                otpBoxes[index + 1].focus();
             }
-        } else if (e.key === "ArrowLeft" && idx > 0) {
-            otpBoxes[idx - 1].focus();
-        } else if (e.key === "ArrowRight" && idx < otpBoxes.length - 1) {
-            otpBoxes[idx + 1].focus();
+        }
+
+        if (getOtp().length === 6) {
+            verifyBtn.focus();
         }
     });
 
-    box.addEventListener("paste", function (e) {
-        e.preventDefault();
-        const pasted = (e.clipboardData || window.clipboardData)
+    box.addEventListener("keydown", (event) => {
+        if (event.key === "Backspace" && !box.value && index > 0) {
+            otpBoxes[index - 1].focus();
+            otpBoxes[index - 1].value = "";
+        }
+
+        if (event.key === "ArrowLeft" && index > 0) {
+            event.preventDefault();
+            otpBoxes[index - 1].focus();
+        }
+
+        if (event.key === "ArrowRight" && index < otpBoxes.length - 1) {
+            event.preventDefault();
+            otpBoxes[index + 1].focus();
+        }
+    });
+
+    box.addEventListener("paste", (event) => {
+        event.preventDefault();
+        const pasted = (event.clipboardData || window.clipboardData)
             .getData("text")
             .replace(/\D/g, "")
-            .slice(0, otpBoxes.length);
+            .slice(0, 6);
 
         if (!pasted) return;
 
-        pasted.split("").forEach(function (digit, i) {
+        pasted.split("").forEach((digit, i) => {
             if (otpBoxes[i]) otpBoxes[i].value = digit;
         });
 
-        const nextIndex = Math.min(pasted.length, otpBoxes.length - 1);
-        otpBoxes[nextIndex].focus();
+        otpBoxes[Math.min(pasted.length, 6) - 1]?.focus();
     });
 });
 
 /* =========================================================
-   SIGNUP
+   RESEND COOLDOWN
 ========================================================= */
-signupForm.addEventListener("submit", async function (event) {
+function startResendCooldown(seconds) {
+    if (resendTimer) clearInterval(resendTimer);
+
+    resendAvailableAt = Date.now() + (seconds * 1000);
+    updateResendButton();
+
+    resendTimer = setInterval(() => {
+        updateResendButton();
+
+        if (Date.now() >= resendAvailableAt) {
+            clearInterval(resendTimer);
+            resendTimer = null;
+            updateResendButton();
+        }
+    }, 250);
+}
+
+function updateResendButton() {
+    const remaining = Math.max(
+        0,
+        Math.ceil((resendAvailableAt - Date.now()) / 1000)
+    );
+
+    if (remaining > 0) {
+        resendBtn.disabled = true;
+        resendBtnText.textContent = `Resend OTP (${remaining}s)`;
+        cooldownText.textContent = "Naya OTP request karne se pehle cooldown complete hone do.";
+    } else {
+        resendBtn.disabled = false;
+        resendBtnText.textContent = "Resend OTP";
+        cooldownText.textContent = "";
+    }
+}
+
+/* =========================================================
+   SIGNUP
+   Important:
+   signUp() returning data.user does NOT prove email delivery.
+   With Confirm Email enabled, session should normally be null.
+========================================================= */
+signupForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    if (isSigningUp) return;
+    hideMessage(signupMessage);
 
-    hideMessage();
-
-    const fullName = fullNameInput.value.trim().replace(/\s+/g, " ");
+    const fullName = fullNameInput.value.trim();
     const email = emailInput.value.trim().toLowerCase();
     const password = passwordInput.value;
     const confirmPassword = confirmPasswordInput.value;
 
-    /* FULL NAME */
     if (!fullName) {
-        showMessage("Enter your full name.");
-        fullNameInput.focus();
+        showMessage(signupMessage, "Apna full name enter karo.");
         return;
     }
 
-    if (!isValidFullName(fullName)) {
-        showMessage("Enter your full name correctly, e.g. Abdullah Qasmi.");
-        fullNameInput.focus();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showMessage(signupMessage, "Valid email address enter karo.");
         return;
     }
 
-    /* EMAIL */
-    if (!email) {
-        showMessage("Please enter your email address.");
-        emailInput.focus();
+    if (password.length < 6) {
+        showMessage(signupMessage, "Password kam az kam 6 characters ka hona chahiye.");
         return;
     }
 
-    if (/\s/.test(email)) {
-        showMessage("Email address cannot contain spaces.");
-        emailInput.focus();
-        return;
-    }
-
-    if (!isValidEmail(email)) {
-        showMessage("Please enter a valid email address.");
-        emailInput.focus();
-        return;
-    }
-
-    if (isBlockedEmailDomain(email)) {
-        showMessage("Temporary or disposable email addresses are not allowed.");
-        emailInput.focus();
-        return;
-    }
-
-    /* PASSWORD */
-    if (!isValidPassword(password)) {
-        showMessage("Password must be at least 8 characters and contain at least 1 letter and 1 number.");
-        passwordInput.focus();
-        return;
-    }
-
-    /* CONFIRM PASSWORD */
     if (password !== confirmPassword) {
-        showMessage("Passwords do not match.");
-        confirmPasswordInput.focus();
+        showMessage(signupMessage, "Passwords match nahi kar rahe.");
         return;
     }
 
-    setLoading(true);
+    setSignupLoading(true);
 
     try {
         const { data, error } = await supabaseClient.auth.signUp({
@@ -658,126 +526,164 @@ signupForm.addEventListener("submit", async function (event) {
             }
         });
 
-        if (error) throw error;
+        console.log("SUPABASE SIGNUP RESPONSE:", data);
+        console.log("SUPABASE SIGNUP ERROR:", error);
+
+        if (error) {
+            throw error;
+        }
 
         if (!data || !data.user) {
-            throw new Error("Account could not be created.");
+            throw new Error("Account create nahi hua.");
         }
 
-        setLoading(false);
+        /*
+         * Do NOT show "OTP sent" merely because data.user exists.
+         * Supabase's client response cannot prove inbox delivery.
+         *
+         * If Confirm Email is enabled, the correct next step is to
+         * show the OTP screen and let the user enter the code received
+         * in their real inbox.
+         */
+        wrongAttempts = 0;
         showOtpScreen(email);
 
-    } catch (error) {
-        console.error("KHELZONE SIGNUP ERROR:", error);
+        showMessage(
+            otpMessage,
+            "Account create ho gaya. Ab apne email inbox mein KHELZONE verification code check karo.",
+            "success"
+        );
 
-        let errorMessage = error?.message || "Account could not be created.";
-        const lower = errorMessage.toLowerCase();
-        const code = error?.code || "";
+    } catch (error) {
+        console.error("SIGNUP ERROR:", error);
+
+        const raw = String(error?.message || "").toLowerCase();
+        let userMessage = "Account create nahi ho saka. Dobara try karo.";
 
         if (
-            code === "user_already_exists" ||
-            lower.includes("user already registered") ||
-            lower.includes("already been registered") ||
-            lower.includes("already exists")
+            raw.includes("already registered") ||
+            raw.includes("user already registered")
         ) {
-            showMessage(
-                'This email already has an account. <a href="index.html" class="underline font-bold">Login instead</a>.'
-            );
-            setLoading(false);
-            return;
+            userMessage = "Ye email already registered hai. Please login karo.";
+        } else if (raw.includes("invalid email") || raw.includes("email address")) {
+            userMessage = "Valid email address enter karo.";
+        } else if (
+            raw.includes("rate") ||
+            raw.includes("too many") ||
+            raw.includes("429")
+        ) {
+            userMessage = "Bohat zyada attempts ho gaye hain. Thori dair baad dobara try karo.";
+        } else if (
+            raw.includes("not authorized") ||
+            raw.includes("email address not authorized")
+        ) {
+            userMessage = "Supabase ka default email service is address par email bhejne ki ijazat nahi de raha. Custom SMTP configure karo.";
+        } else if (
+            raw.includes("smtp") ||
+            raw.includes("email")
+        ) {
+            userMessage = "Account request hui, lekin email service mein problem aa rahi hai. Supabase SMTP/email configuration check karo.";
         }
 
-        if (lower.includes("invalid email") || lower.includes("invalid format")) {
-            errorMessage = "Please enter a valid email address.";
-        } else if (lower.includes("password")) {
-            errorMessage = "Password must be at least 8 characters and contain 1 letter and 1 number.";
-        } else if (lower.includes("rate") || lower.includes("too many")) {
-            errorMessage = "Too many attempts. Please wait a little and try again.";
-        } else if (lower.includes("network") || lower.includes("fetch")) {
-            errorMessage = "Network error. Please check your internet connection and try again.";
-        }
-
-        showMessage(errorMessage, "error");
-        setLoading(false);
+        showMessage(signupMessage, userMessage);
+    } finally {
+        setSignupLoading(false);
     }
 });
 
 /* =========================================================
    VERIFY OTP
+   Current Supabase JS docs use type: "email" for email OTP
+   verification. "signup" is not the recommended JS type.
 ========================================================= */
-otpForm.addEventListener("submit", async function (event) {
-    event.preventDefault();
-
-    if (isVerifying) return;
-
-    hideOtpMessage();
-
-    const token = getOtpValue();
-
-    if (!/^\d{6}$/.test(token)) {
-        showOtpMessage("Enter the 6-digit verification code.");
-        shakeOtpBoxes();
-        otpBoxes[0].focus();
+verifyBtn.addEventListener("click", async () => {
+    if (!pendingEmail) {
+        showMessage(otpMessage, "Email session missing hai. Signup dobara karo.");
         return;
     }
 
+    if (wrongAttempts >= MAX_WRONG_ATTEMPTS) {
+        showMessage(
+            otpMessage,
+            "5 wrong attempts ho chuke hain. Pehle new OTP resend karo."
+        );
+        return;
+    }
+
+    const token = getOtp();
+
+    if (!/^\d{6}$/.test(token)) {
+        showMessage(otpMessage, "Complete 6-digit OTP enter karo.");
+        return;
+    }
+
+    hideMessage(otpMessage);
     setVerifyLoading(true);
 
     try {
         const { data, error } = await supabaseClient.auth.verifyOtp({
             email: pendingEmail,
             token: token,
-            type: "signup"
+            type: "email"
         });
 
-        if (error) throw error;
+        console.log("VERIFY OTP RESPONSE:", data);
+        console.log("VERIFY OTP ERROR:", error);
 
-        if (!data || !data.user) {
-            throw new Error("Email verification failed.");
+        if (error) {
+            throw error;
         }
 
-        showOtpMessage("Email verified successfully! Redirecting to login...", "success");
-        setOtpBoxesEnabled(false);
-        setVerifyLoading(false);
+        /*
+         * Successful verifyOtp response is the server-side proof that
+         * the submitted OTP was accepted and the email was verified.
+         */
+        showMessage(
+            otpMessage,
+            "Email successfully verify ho gayi. Login page open ho raha hai...",
+            "success"
+        );
 
-        // Sign out so the user logs in fresh through the normal flow.
-        await supabaseClient.auth.signOut();
-
-        setTimeout(function () {
+        setTimeout(() => {
             window.location.href = "index.html";
         }, 1200);
 
     } catch (error) {
-        console.error("OTP VERIFICATION ERROR:", error);
+        console.error("VERIFY OTP ERROR:", error);
 
-        let errorMessage = error?.message || "OTP verification failed.";
-        const lower = errorMessage.toLowerCase();
-        const code = error?.code || "";
+        wrongAttempts++;
+        clearOtp();
 
-        if (code === "otp_expired" || lower.includes("expired")) {
-            errorMessage = "This code has expired. Tap \"Resend OTP\" to get a new one.";
-            clearOtpBoxes();
-            otpBoxes[0].focus();
-        } else if (lower.includes("rate") || lower.includes("too many")) {
-            errorMessage = "Too many attempts. Please wait before trying again.";
-        } else {
-            otpAttempts++;
+        const raw = String(error?.message || "").toLowerCase();
 
-            if (otpAttempts >= MAX_OTP_ATTEMPTS) {
-                errorMessage = "Too many incorrect attempts. Please resend a new code.";
-                setOtpBoxesEnabled(false);
+        if (
+            raw.includes("expired") ||
+            raw.includes("invalid") ||
+            raw.includes("token")
+        ) {
+            if (wrongAttempts >= MAX_WRONG_ATTEMPTS) {
+                showMessage(
+                    otpMessage,
+                    "OTP invalid/expired hai aur 5 attempts ho chuke hain. New OTP resend karo."
+                );
             } else {
-                errorMessage = "Incorrect code. Please check and try again.";
+                showMessage(
+                    otpMessage,
+                    `OTP invalid ya expired hai. Dobara check karo. Attempts left: ${MAX_WRONG_ATTEMPTS - wrongAttempts}.`
+                );
             }
-
-            shakeOtpBoxes();
-            clearOtpBoxes();
-            if (otpAttempts < MAX_OTP_ATTEMPTS) {
-                otpBoxes[0].focus();
-            }
+        } else if (raw.includes("rate") || raw.includes("too many") || raw.includes("429")) {
+            showMessage(
+                otpMessage,
+                "Verification requests zyada ho gayi hain. Thori dair baad dobara try karo."
+            );
+        } else {
+            showMessage(
+                otpMessage,
+                "OTP verify nahi ho saka. Code dobara check karo ya new OTP request karo."
+            );
         }
-
-        showOtpMessage(errorMessage, "error");
+    } finally {
         setVerifyLoading(false);
     }
 });
@@ -785,42 +691,19 @@ otpForm.addEventListener("submit", async function (event) {
 /* =========================================================
    RESEND OTP
 ========================================================= */
-function startResendCooldown(seconds) {
-    if (resendCooldownTimer) {
-        clearInterval(resendCooldownTimer);
+resendBtn.addEventListener("click", async () => {
+    if (!pendingEmail) {
+        showMessage(otpMessage, "Email session missing hai. Signup dobara karo.");
+        return;
     }
 
-    let remaining = seconds;
-    resendBtn.disabled = true;
-    resendBtn.textContent = "Resend OTP (" + remaining + "s)";
-
-    resendCooldownTimer = setInterval(function () {
-        remaining--;
-
-        if (remaining <= 0) {
-            clearInterval(resendCooldownTimer);
-            resendCooldownTimer = null;
-            resendBtn.disabled = false;
-            resendBtn.textContent = "Resend OTP";
-            return;
-        }
-
-        resendBtn.textContent = "Resend OTP (" + remaining + "s)";
-    }, 1000);
-}
-
-resendBtn.addEventListener("click", async function () {
-    if (resendBtn.disabled) return;
-
-    hideOtpMessage();
-
-    if (!pendingEmail) {
-        showOtpMessage("Email not found. Please start signup again.");
+    if (Date.now() < resendAvailableAt) {
+        updateResendButton();
         return;
     }
 
     resendBtn.disabled = true;
-    resendBtn.textContent = "Sending...";
+    resendBtnText.textContent = "Sending...";
 
     try {
         const { error } = await supabaseClient.auth.resend({
@@ -828,31 +711,61 @@ resendBtn.addEventListener("click", async function () {
             email: pendingEmail
         });
 
-        if (error) throw error;
+        console.log("RESEND ERROR:", error);
 
-        otpAttempts = 0;
-        clearOtpBoxes();
-        setOtpBoxesEnabled(true);
-        otpBoxes[0].focus();
+        if (error) {
+            throw error;
+        }
 
-        showOtpMessage("A new verification code has been sent to your email.", "success");
+        wrongAttempts = 0;
+        clearOtp();
+
+        showMessage(
+            otpMessage,
+            "Supabase ne resend request accept kar li hai. Apne inbox/spam folder mein naya code check karo.",
+            "success"
+        );
+
+        startResendCooldown(60);
 
     } catch (error) {
         console.error("RESEND OTP ERROR:", error);
 
-        let errorMessage = error?.message || "Could not resend OTP.";
-        const lower = errorMessage.toLowerCase();
+        const raw = String(error?.message || "").toLowerCase();
 
-        if (lower.includes("rate") || lower.includes("too many")) {
-            errorMessage = "Too many requests. Please wait a little before requesting another OTP.";
+        if (
+            raw.includes("rate") ||
+            raw.includes("too many") ||
+            raw.includes("429") ||
+            raw.includes("60")
+        ) {
+            showMessage(
+                otpMessage,
+                "Abhi resend rate limit active hai. 60 seconds wait karke dobara try karo."
+            );
+        } else if (raw.includes("not authorized")) {
+            showMessage(
+                otpMessage,
+                "Supabase default email service is address ko authorize nahi kar rahi. Custom SMTP configure karo."
+            );
+        } else {
+            showMessage(
+                otpMessage,
+                "OTP resend nahi ho saka. Supabase email/SMTP configuration check karo."
+            );
         }
 
-        showOtpMessage(errorMessage, "error");
+        updateResendButton();
     }
-
-    startResendCooldown(30);
 });
-</script>
 
+/* =========================================================
+   BACK
+========================================================= */
+backToSignupBtn.addEventListener("click", returnToSignup);
+
+/* Initial state */
+updateResendButton();
+</script>
 </body>
 </html>

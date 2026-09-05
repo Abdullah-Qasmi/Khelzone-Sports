@@ -1193,8 +1193,8 @@
           </div>
 
           <div class="field">
-            <label for="oname">OWNER NAME</label>
-            <input id="oname" type="text" placeholder="Full name">
+            <label for="oname">OWNER FULL NAME</label>
+            <input id="oname" type="text" placeholder="e.g. Ahmed Khan">
             <span class="error-text" id="oname-error"></span>
           </div>
 
@@ -1661,6 +1661,11 @@
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const PHONE_RE = /^[0-9+\-\s]{7,15}$/;
 
+  /* Owner full name must contain at least TWO name-parts separated by a space
+     e.g. "Ahmed Khan" is valid, "Ahmed" alone is NOT valid. Allows middle
+     names too ("Ahmed Ali Khan"), just requires 2+ words, letters only per word. */
+  const FULLNAME_RE = /^[A-Za-z]+(?:\s+[A-Za-z]+)+$/;
+
   /* Accepts EITHER a full profile/channel URL (with or without https://)
      OR a plain @username / handle. This is used for Instagram, Facebook,
      and YouTube fields so sellers can paste a full link if they prefer. */
@@ -1699,7 +1704,13 @@
     }
 
     check(bname.value.trim().length > 0, bname, "bname-error", "Please enter your business name.");
-    check(oname.value.trim().length > 0, oname, "oname-error", "Please enter the owner name.");
+
+    check(
+      FULLNAME_RE.test(oname.value.trim()),
+      oname, "oname-error",
+      "Please enter your full name (first and last name, separated by a space)."
+    );
+
     check(EMAIL_RE.test(email.value.trim()), email, "email-error", "Please enter a valid email address.");
     check(PHONE_RE.test(phone.value.trim()), phone, "phone-error", "Please enter a valid phone number.");
     check(city.value.trim().length > 0, city, "city-error", "Please enter your city.");

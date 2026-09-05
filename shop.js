@@ -959,44 +959,84 @@ async function fetchProductReviews(productId) {
   if (!supabaseClient) return [];
 
   try {
-    const { data, error } = await supabaseClient
+    /* ============================================================
+       1. REVIEWS LOAD
+       ============================================================ */
+
+    const { data: reviews, error: reviewError } = await supabaseClient
       .from("product_reviews")
-      .select(`
-        *,
-        profiles:user_id (
-          full_name
-        )
-      `)
+      .select("*")
       .eq("product_id", productId)
       .order("created_at", { ascending: false });
 
-    if (error) throw error;
+    if (reviewError) throw reviewError;
 
-    return data || [];
+    if (!reviews || !reviews.length) {
+      return [];
+    }
+
+    /* ============================================================
+       2. GET REVIEWER USER IDS
+       ============================================================ */
+
+    const userIds = [
+      ...new Set(
+        reviews
+          .map(review => review.user_id)
+          .filter(Boolean)
+      )
+    ];
+
+    /* ============================================================
+       3. LOAD PUBLIC PROFILE NAMES
+       ============================================================ */
+
+    let profiles = [];
+
+    if (userIds.length) {
+      const { data: profileData, error: profileError } =
+        await supabaseClient
+          .from("profiles")
+          .select("id, full_name")
+          .in("id", userIds);
+
+      if (profileError) {
+        console.warn(
+          "Could not load reviewer profiles:",
+          profileError.message || profileError
+        );
+      } else {
+        profiles = profileData || [];
+      }
+    }
+
+    /* ============================================================
+       4. ATTACH PROFILE TO EACH REVIEW
+       ============================================================ */
+
+    return reviews.map(review => {
+      const profile = profiles.find(
+        item => String(item.id) === String(review.user_id)
+      );
+
+      return {
+        ...review,
+
+        profiles: profile
+          ? {
+              full_name: profile.full_name || ""
+            }
+          : null
+      };
+    });
+
   } catch (error) {
-    console.warn("Could not load reviews:", error.message || error);
+    console.error(
+      "Could not load reviews:",
+      error.message || error
+    );
+
     return [];
-  }
-}
-
-async function fetchSellerShopProfile(sellerId) {
-  if (!supabaseClient || !sellerId) return null;
-
-  /* Uses the public "seller_shop_profiles" view (see Supabase SQL) so
-     that only safe, public seller fields are ever exposed to customers. */
-  try {
-    const { data, error } = await supabaseClient
-      .from("seller_shop_profiles")
-      .select("*")
-      .eq("seller_id", sellerId)
-      .maybeSingle();
-
-    if (error) throw error;
-
-    return data || null;
-  } catch (error) {
-    console.warn("Could not load seller shop profile:", error.message || error);
-    return null;
   }
 }
 
@@ -1470,8 +1510,10 @@ async function submitProductReview(productId, rating, reviewText) {
     renderProducts();
 
     if (state.quickView.productId === productId) {
-      openQuickView(productId);
-    }
+  await openQuickView(productId);
+}
+
+renderProducts();
   } catch (error) {
     console.error("Review submission failed:", error);
 

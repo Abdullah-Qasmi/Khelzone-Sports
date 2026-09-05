@@ -2176,458 +2176,445 @@
          DYNAMIC BEST SELLER SYSTEM
     ========================================================== -->
 
-    <script>
+    <!-- =========================================================
+     RANDOM BEST SELLERS FROM SUPABASE
+========================================================= -->
 
-    (() => {
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
 
-        const PRODUCT_KEY = "khz_products_v1";
+    const SUPABASE_URL =
+        "https://antqexjhlsaynunlmzqa.supabase.co";
 
-        const grid =
-            document.getElementById("productGrid");
+    const SUPABASE_KEY =
+        "YOUR_EXISTING_SUPABASE_PUBLISHABLE_KEY";
 
-        const noProducts =
-            document.getElementById("noProducts");
+    const grid = document.getElementById("productGrid");
+    const noProducts = document.getElementById("noProducts");
+
+    if (!grid) return;
 
 
-        if (!grid) {
+    /* =========================================================
+       ESCAPE HTML
+    ========================================================== */
+
+    function escapeHTML(value) {
+
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+
+    /* =========================================================
+       FORMAT PRICE
+    ========================================================== */
+
+    function formatPrice(price) {
+
+        return "Rs. " +
+            Number(price || 0).toLocaleString("en-PK");
+    }
+
+
+    /* =========================================================
+       SHUFFLE ARRAY
+    ========================================================== */
+
+    function shuffle(array) {
+
+        const copy = [...array];
+
+        for (
+            let i = copy.length - 1;
+            i > 0;
+            i--
+        ) {
+
+            const j =
+                Math.floor(Math.random() * (i + 1));
+
+            [copy[i], copy[j]] =
+                [copy[j], copy[i]];
+        }
+
+        return copy;
+    }
+
+
+    /* =========================================================
+       CREATE SUPABASE CLIENT
+    ========================================================== */
+
+    if (
+        typeof window.supabase === "undefined" ||
+        typeof window.supabase.createClient !== "function"
+    ) {
+
+        console.error(
+            "Supabase library is not loaded."
+        );
+
+        return;
+    }
+
+    const supabaseClient =
+        window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
+        );
+
+
+    /* =========================================================
+       LOAD PRODUCTS
+    ========================================================== */
+
+    async function loadRandomBestSellers() {
+
+        try {
+
+            grid.innerHTML = `
+                <div class="col-span-full flex justify-center py-12">
+                    <div class="flex items-center gap-3 text-gray-400">
+                        <span class="material-symbols-outlined animate-spin">
+                            progress_activity
+                        </span>
+                        <span>Loading products...</span>
+                    </div>
+                </div>
+            `;
+
+            const { data, error } =
+                await supabaseClient
+                    .from("products")
+                    .select("*")
+                    .eq("active", true);
+
+
+            if (error) {
+
+                console.error(
+                    "Supabase products error:",
+                    error
+                );
+
+                showNoProducts();
+
+                return;
+            }
+
+
+            if (!data || data.length === 0) {
+
+                showNoProducts();
+
+                return;
+            }
+
+
+            /* =================================================
+               ONLY PRODUCTS THAT ARE AVAILABLE
+            ================================================= */
+
+            const availableProducts =
+                data.filter(function (product) {
+
+                    const stock =
+                        Number(product.stock ?? 0);
+
+                    return stock > 0;
+                });
+
+
+            if (availableProducts.length === 0) {
+
+                showNoProducts();
+
+                return;
+            }
+
+
+            /* =================================================
+               RANDOM 4 PRODUCTS
+               If fewer than 4 exist, show whatever is available.
+            ================================================= */
+
+            const selectedProducts =
+                shuffle(availableProducts)
+                    .slice(0, 4);
+
+
+            renderProducts(selectedProducts);
+
+        } catch (error) {
+
+            console.error(
+                "Could not load best sellers:",
+                error
+            );
+
+            showNoProducts();
+        }
+    }
+
+
+    /* =========================================================
+       RENDER PRODUCTS
+    ========================================================== */
+
+    function renderProducts(products) {
+
+        if (!products.length) {
+
+            showNoProducts();
+
             return;
         }
 
 
-        function escapeHtml(value) {
+        if (noProducts) {
 
-            return String(value ?? "")
-                .replace(
-                    /[&<>"']/g,
-                    char => ({
-                        "&": "&amp;",
-                        "<": "&lt;",
-                        ">": "&gt;",
-                        '"': "&quot;",
-                        "'": "&#039;"
-                    }[char])
-                );
-
+            noProducts.classList.add("hidden");
         }
 
 
-        function escapeAttr(value) {
-            return escapeHtml(value);
-        }
-
-
-        function money(value) {
-
-            return "Rs. " +
-                Number(value || 0)
-                    .toLocaleString("en-PK");
-
-        }
-
-
-        function loadProducts() {
-
-            try {
-
-                const saved =
-                    localStorage.getItem(PRODUCT_KEY);
-
-
-                if (!saved) {
-                    return [];
-                }
-
-
-                const data =
-                    JSON.parse(saved);
-
-
-                return Array.isArray(data)
-                    ? data
-                    : [];
-
-            }
-
-            catch (error) {
-
-                console.error(
-                    "KHELZONE products loading error:",
-                    error
-                );
-
-                return [];
-
-            }
-
-        }
-
-
-        function getBestSellers() {
-
-            return loadProducts()
-
-                .filter(product => {
-
-                    return String(
-                        product.badge || ""
-                    )
-                    .trim()
-                    .toUpperCase() === "BEST SELLER";
-
-                })
-
-                .filter(product => {
-
-                    return Number(
-                        product.stock ?? 0
-                    ) > 0;
-
-                })
-
-                .slice(0, 8);
-
-        }
-
-
-        function createCard(product) {
-
-            const name =
-                product.name ||
-                "KHELZONE Product";
-
-
-            const image =
-                product.image || "";
-
-
-            const sport =
-                product.sport ||
-                "Sports";
-
-
-            const category =
-                product.category ||
-                "Sports Gear";
-
-
-            const brand =
-                product.brand ||
-                "KHELZONE";
-
-
-            const price =
-                Number(product.price || 0);
-
-
-            const oldPrice =
-                Number(product.oldPrice || 0);
-
-
-            const rating =
-                Math.max(
-                    0,
-                    Math.min(
-                        5,
-                        Math.round(
-                            Number(
-                                product.rating ?? 5
-                            )
-                        )
-                    )
-                );
-
-
-            const reviews =
-                Number(product.reviews || 0);
-
-
-            const stock =
-                Number(product.stock || 0);
-
-
-            const stars =
-                "★".repeat(rating) +
-                "☆".repeat(5 - rating);
-
-
-            const searchBlob =
-                [
-                    name,
-                    sport,
-                    category,
-                    brand
-                ]
-                .join(" ")
-                .toLowerCase();
-
-
-            return `
-
-                <article
-                    class="product-card card-hover bg-[#11151a] border border-white/10 rounded-2xl overflow-hidden"
-                    data-category="${escapeAttr(String(sport).toLowerCase())}"
-                    data-name="${escapeAttr(name)}"
-                    data-search="${escapeAttr(searchBlob)}"
-                    data-product-id="${escapeAttr(product.id)}">
-
-
-                    <div
-                        class="relative h-60 bg-[#181d23] flex items-center justify-center p-5">
-
-
-                        ${
-                            image
-                                ?
-                                `
-                                <img
-                                    src="${escapeAttr(image)}"
-                                    alt="${escapeAttr(name)}"
-                                    class="w-full h-full object-contain"
-                                    onerror="this.style.opacity='0.25';">
-                                `
-                                :
-                                `
-                                <div
-                                    class="flex flex-col items-center justify-center text-gray-600">
-
-                                    <span
-                                        class="material-symbols-outlined text-6xl">
-
-                                        image
-
-                                    </span>
-
-                                    <span class="text-xs mt-2">
-                                        No Image
-                                    </span>
-
-                                </div>
-                                `
-                        }
-
-
-                        <span
-                            class="absolute top-3 left-3 bg-orange-500 text-black text-[10px] font-black px-2 py-1 rounded-full">
-
-                            BEST SELLER
-
-                        </span>
-
-                    </div>
-
-
-                    <div class="p-5">
-
-
-                        <div
-                            class="text-[10px] text-orange-400 font-bold uppercase tracking-wider">
-
-                            ${escapeHtml(sport)}
-                            •
-                            ${escapeHtml(category)}
-
-                        </div>
-
-
-                        <h3
-                            class="mt-2 font-bold leading-snug min-h-12">
-
-                            ${escapeHtml(name)}
-
-                        </h3>
-
-
-                        <div
-                            class="text-[10px] text-gray-500 mt-1 uppercase tracking-wider">
-
-                            ${escapeHtml(brand)}
-
-                        </div>
-
-
-                        <div
-                            class="flex items-center gap-1 mt-3 text-amber-400 text-sm">
-
-                            <span>
-                                ${stars}
-                            </span>
-
-                            <span
-                                class="text-gray-500 text-xs">
-
-                                (${reviews})
-
-                            </span>
-
-                        </div>
-
-
-                        <div
-                            class="flex items-center justify-between mt-4 gap-3">
-
-
-                            <div>
-
+        grid.innerHTML =
+            products.map(function (product) {
+
+                const id =
+                    escapeHTML(product.id);
+
+                const name =
+                    escapeHTML(product.name);
+
+                const description =
+                    escapeHTML(
+                        product.description ||
+                        "Premium sports equipment."
+                    );
+
+                const image =
+                    escapeHTML(
+                        product.image ||
+                        "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=900&q=80"
+                    );
+
+                const price =
+                    Number(product.price || 0);
+
+                const oldPrice =
+                    Number(
+                        product.old_price ||
+                        product.oldPrice ||
+                        0
+                    );
+
+                const stock =
+                    Number(product.stock || 0);
+
+
+                return `
+                    <article
+                        class="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#111317] transition-all duration-300 hover:-translate-y-1 hover:border-orange-500/40 hover:shadow-xl"
+                    >
+
+                        <!-- PRODUCT IMAGE -->
+
+                        <div class="relative aspect-square overflow-hidden bg-[#0c0e11]">
+
+                            <img
+                                src="${image}"
+                                alt="${name}"
+                                loading="lazy"
+                                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                onerror="this.src='https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=900&q=80'"
+                            >
+
+
+                            <!-- WISHLIST -->
+
+                            <button
+                                type="button"
+                                class="khz-wishlist-btn absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md transition hover:bg-black/80"
+                                data-id="${id}"
+                                aria-label="Add to wishlist"
+                            >
                                 <span
-                                    class="text-xl font-black">
+                                    class="material-symbols-outlined text-[22px]"
+                                >
+                                    favorite
+                                </span>
+                            </button>
 
-                                    ${money(price)}
 
+                            <!-- BADGE -->
+
+                            <div class="absolute left-3 top-3">
+
+                                <span class="rounded-full bg-orange-500 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg">
+                                    Best Seller
                                 </span>
 
+                            </div>
+
+                        </div>
+
+
+                        <!-- PRODUCT INFO -->
+
+                        <div class="p-4">
+
+                            <div class="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-orange-500">
+                                ${escapeHTML(
+                                    product.sport ||
+                                    product.category ||
+                                    "Sports"
+                                )}
+                            </div>
+
+
+                            <h3
+                                class="line-clamp-2 min-h-[48px] text-base font-bold text-white"
+                            >
+                                ${name}
+                            </h3>
+
+
+                            <p
+                                class="mt-2 line-clamp-2 min-h-[40px] text-xs leading-5 text-gray-400"
+                            >
+                                ${description}
+                            </p>
+
+
+                            <!-- PRICE -->
+
+                            <div class="mt-4 flex items-center gap-2">
+
+                                <span class="text-lg font-black text-white">
+                                    ${formatPrice(price)}
+                                </span>
 
                                 ${
                                     oldPrice > price
-                                        ?
-                                        `
-                                        <span
-                                            class="block text-xs text-gray-500 line-through">
-
-                                            ${money(oldPrice)}
-
+                                    ? `
+                                        <span class="text-xs text-gray-500 line-through">
+                                            ${formatPrice(oldPrice)}
                                         </span>
-                                        `
-                                        :
-                                        ""
+                                      `
+                                    : ""
                                 }
 
                             </div>
 
 
+                            <!-- ADD TO CART -->
+
                             <button
                                 type="button"
-                                class="add-cart w-10 h-10 shrink-0 rounded-full bg-orange-500 text-black flex items-center justify-center hover:bg-orange-400 transition"
-                                data-product="${escapeAttr(name)}"
-                                data-price="${price}">
+                                class="khz-addcart-btn mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-bold text-white transition hover:bg-orange-600 active:scale-[0.98]"
+                                data-id="${id}"
+                                ${stock <= 0 ? "disabled" : ""}
+                            >
 
-                                <span
-                                    class="material-symbols-outlined">
-
-                                    add_shopping_cart
-
+                                <span class="material-symbols-outlined text-[19px]">
+                                    shopping_cart
                                 </span>
+
+                                ${
+                                    stock > 0
+                                    ? "Add to Cart"
+                                    : "Out of Stock"
+                                }
 
                             </button>
 
                         </div>
 
+                    </article>
+                `;
 
-                        ${
-                            stock > 0 && stock <= 5
-                                ?
-                                `
-                                <p
-                                    class="text-[10px] text-orange-400 mt-3 font-bold uppercase">
-
-                                    Only ${stock} left
-
-                                </p>
-                                `
-                                :
-                                ""
-                        }
-
-                    </div>
-
-                </article>
-
-            `;
-
-        }
+            }).join("");
 
 
-        function renderBestSellers() {
+        /* =====================================================
+           UPDATE WISHLIST VISUAL STATE
+        ====================================================== */
 
-            const bestSellers =
-                getBestSellers();
-
-
-            if (!bestSellers.length) {
-
-                grid.innerHTML = "";
-
-                if (noProducts) {
-                    noProducts.classList.remove("hidden");
-                }
-
-
-                document.dispatchEvent(
-                    new CustomEvent(
-                        "khelzoneProductsRendered"
-                    )
-                );
-
-                return;
-
-            }
-
-
-            if (noProducts) {
-                noProducts.classList.add("hidden");
-            }
-
-
-            grid.innerHTML =
-                bestSellers
-                    .map(createCard)
-                    .join("");
-
-
-            document.dispatchEvent(
-                new CustomEvent(
-                    "khelzoneProductsRendered"
-                )
-            );
-
-        }
-
-
-        renderBestSellers();
-
-
-        window.addEventListener(
-            "focus",
-            renderBestSellers
+        const wishlist = JSON.parse(
+            localStorage.getItem("khz_wishlist") || "[]"
         );
 
 
-        document.addEventListener(
-            "visibilitychange",
-            () => {
+        document
+            .querySelectorAll(".khz-wishlist-btn")
+            .forEach(function (button) {
 
-                if (!document.hidden) {
-
-                    renderBestSellers();
-
-                }
-
-            }
-        );
-
-
-        window.addEventListener(
-            "storage",
-            event => {
+                const id = button.dataset.id;
 
                 if (
-                    event.key === PRODUCT_KEY
+                    wishlist.some(
+                        item =>
+                            String(item) === String(id)
+                    )
                 ) {
 
-                    renderBestSellers();
+                    button.classList.add(
+                        "text-orange-500"
+                    );
 
+                    const icon =
+                        button.querySelector(
+                            ".material-symbols-outlined"
+                        );
+
+                    if (icon) {
+
+                        icon.style.fontVariationSettings =
+                            "'FILL' 1";
+                    }
                 }
+            });
 
+    }
+
+
+    /* =========================================================
+       NO PRODUCTS
+    ========================================================== */
+
+    function showNoProducts() {
+
+        grid.innerHTML = "";
+
+        if (noProducts) {
+
+            noProducts.classList.remove("hidden");
+
+            const message =
+                noProducts.querySelector("p");
+
+            if (message) {
+
+                message.textContent =
+                    "No products available right now.";
             }
-        );
+        }
+    }
 
 
-        window.refreshKhelzoneBestSellers =
-            renderBestSellers;
+    /* =========================================================
+       START
+    ========================================================== */
 
+    loadRandomBestSellers();
 
-    })();
-
-    </script>
+});
+</script>
 
 
     <!-- =========================================================

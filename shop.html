@@ -1,1155 +1,1379 @@
 <!DOCTYPE html>
+
 <html lang="en" class="dark">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>KHELZONE — Shop | Gear Up. Play Hard.</title>
+```
+<title>KHELZONE — Shop | Gear Up. Play Hard.</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
 
-    <!-- Tailwind Config -->
-    <script src="tailwind.config.js"></script>
+<!-- Tailwind Config -->
+<script src="tailwind.config.js"></script>
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Shop CSS -->
-    <link rel="stylesheet" href="shop.css">
+<!-- Shop CSS -->
+<link rel="stylesheet" href="shop.css">
+```
 
 </head>
 
 <body class="antialiased">
 
-    <!-- =========================================================
-         HEADER / NAVBAR
-         ========================================================= -->
+```
+<!-- =========================================================
+     HEADER / NAVBAR
+     ========================================================= -->
 
-    <header class="khz-header sticky top-0 z-40">
+<header class="khz-header sticky top-0 z-40">
 
-        <div class="max-w-7xl mx-auto px-4 lg:px-6">
+    <div class="max-w-7xl mx-auto px-4 lg:px-6">
 
-            <div class="flex items-center justify-between h-16 gap-4">
+        <div class="flex items-center justify-between h-16 gap-4">
 
-                <!-- LOGO + MOBILE MENU -->
-                <div class="flex items-center gap-3">
+            <!-- LOGO + MOBILE MENU -->
+            <div class="flex items-center gap-3">
 
-                    <button id="mobileMenuBtn"
-                        class="lg:hidden icon-btn p-1"
-                        aria-label="Open menu"
-                        aria-expanded="false">
-                        ☰
-                    </button>
+                <button id="mobileMenuBtn"
+                    class="lg:hidden icon-btn p-1"
+                    aria-label="Open menu"
+                    aria-expanded="false">
+                    ☰
+                </button>
 
-                    <!-- LOGO -->
-                    <a href="homepage.html" class="flex items-center gap-2">
+                <!-- LOGO -->
+                <a href="homepage.html" class="flex items-center gap-2">
 
-                        <span class="logo-mark w-8 h-8 flex items-center justify-center">
-                            <span class="font-display text-[#0A0A0A] text-lg leading-none">
-                                K
-                            </span>
+                    <span class="logo-mark w-8 h-8 flex items-center justify-center">
+                        <span class="font-display text-[#0A0A0A] text-lg leading-none">
+                            K
                         </span>
-
-                        <span class="font-display text-xl tracking-wide">
-                            KHELZONE
-                        </span>
-
-                    </a>
-
-                </div>
-
-
-                <!-- DESKTOP NAV -->
-                <nav class="hidden lg:flex items-center gap-8">
-
-                    <!-- HOME -->
-                    <a href="homepage.html" class="nav-link">
-                        Home
-                    </a>
-
-                    <!-- SHOP -->
-                    <a href="#shopGrid" class="nav-link active">
-                        Shop
-                    </a>
-
-                    <!-- CATEGORIES -->
-                    <a href="#categorySection" class="nav-link">
-                        Categories
-                    </a>
-
-                    <!-- TRENDING -->
-                    <a href="#trendingSection" class="nav-link">
-                        Trending
-                    </a>
-
-                    <!-- SALE -->
-                    <a href="#offerBanner" class="nav-link">
-                        Sale
-                    </a>
-
-                    <!-- ABOUT -->
-                    <a href="about.html" class="nav-link">
-                        About
-                    </a>
-
-                </nav>
-
-
-                <!-- SEARCH -->
-                <div class="hidden md:flex flex-1 max-w-md relative">
-
-                    <input
-                        id="searchInput"
-                        type="text"
-                        placeholder="Search football, cricket, jerseys, shoes..."
-                        class="w-full bg-white/5 border border-white/10 rounded-full pl-11 pr-9 py-2.5 text-sm placeholder:text-white/35 focus:outline-none focus:border-orange-500 transition">
-
-                    <span class="absolute left-4 top-1/2 -translate-y-1/2 opacity-50">
-                        🔎
                     </span>
 
-                    <button
-                        id="searchClearBtn"
-                        class="hidden absolute right-3 top-1/2 -translate-y-1/2 opacity-60 hover:opacity-100">
-                        ×
-                    </button>
+                    <span class="font-display text-xl tracking-wide">
+                        KHELZONE
+                    </span>
 
-                </div>
-
-
-                <!-- WISHLIST + CART -->
-                <div class="flex items-center gap-4">
-
-                    <button
-                        id="wishlistIconBtn"
-                        class="icon-btn"
-                        aria-label="Wishlist">
-
-                        <span class="text-xl">
-                            ♡
-                        </span>
-
-                        <span
-                            id="wishlistCount"
-                            class="badge-count hidden">
-                            0
-                        </span>
-
-                    </button>
-
-
-                    <button
-                        id="cartIconBtn"
-                        class="icon-btn"
-                        aria-label="Cart">
-
-                        🛒
-
-                        <span
-                            id="cartCount"
-                            class="badge-count hidden">
-                            0
-                        </span>
-
-                    </button>
-
-                </div>
+                </a>
 
             </div>
 
 
-            <!-- =====================================================
-                 MOBILE MENU
-                 ===================================================== -->
+            <!-- DESKTOP NAV -->
+            <nav class="hidden lg:flex items-center gap-8">
 
-            <div id="mobileMenu" class="mobile-menu lg:hidden">
-
-                <!-- HOME -->
-                <a href="homepage.html">
+                <a href="homepage.html" class="nav-link">
                     Home
                 </a>
 
-                <!-- SHOP -->
-                <a href="#shopGrid">
+                <a href="#shopGrid" class="nav-link active">
                     Shop
                 </a>
 
-                <!-- CATEGORIES -->
-                <a href="#categorySection">
+                <a href="#categorySection" class="nav-link">
                     Categories
                 </a>
 
-                <!-- TRENDING -->
-                <a href="#trendingSection">
+                <a href="#trendingSection" class="nav-link">
                     Trending
                 </a>
 
-                <!-- SALE -->
-                <a href="#offerBanner">
+                <a href="#offerBanner" class="nav-link">
                     Sale
                 </a>
 
-                <!-- ABOUT -->
-                <a href="about.html">
+                <a href="about.html" class="nav-link">
                     About
                 </a>
 
-            </div>
+            </nav>
 
 
-            <!-- =====================================================
-                 MOBILE SEARCH
-                 ===================================================== -->
-
-            <div class="md:hidden pb-3 relative">
+            <!-- SEARCH -->
+            <div class="hidden md:flex flex-1 max-w-md relative">
 
                 <input
-                    id="searchInputMobile"
+                    id="searchInput"
                     type="text"
-                    placeholder="Search KHELZONE..."
-                    class="w-full bg-white/5 border border-white/10 rounded-full pl-11 pr-4 py-2.5 text-sm placeholder:text-white/35 focus:outline-none focus:border-orange-500">
+                    placeholder="Search football, cricket, jerseys, shoes..."
+                    class="w-full bg-white/5 border border-white/10 rounded-full pl-11 pr-9 py-2.5 text-sm placeholder:text-white/35 focus:outline-none focus:border-orange-500 transition">
 
                 <span class="absolute left-4 top-1/2 -translate-y-1/2 opacity-50">
                     🔎
                 </span>
 
-            </div>
-
-        </div>
-
-        <div class="stripe-divider"></div>
-
-    </header>
-
-
-    <!-- =========================================================
-         HERO
-         ========================================================= -->
-
-    <section class="hero-section speed-stripes relative py-16 lg:py-24 px-4 lg:px-6">
-
-        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center relative">
-
-            <div>
-
-                <p class="section-eyebrow mb-4">
-                    KHELZONE Sports Marketplace
-                </p>
-
-                <h1 class="font-display hero-headline mb-6">
-                    GEAR UP
-                    <br>
-                    FOR THE
-                    <span class="accent">GAME</span>
-                </h1>
-
-                <p class="text-white/60 text-base lg:text-lg max-w-md mb-8">
-                    Premium sports equipment, apparel and accessories built for athletes who refuse to settle.
-                </p>
-
-                <div class="flex flex-wrap gap-4 mb-10">
-
-                    <a href="#shopGrid"
-                        class="cta-primary px-8 py-4 inline-block text-sm">
-                        SHOP NOW
-                    </a>
-
-                    <a href="#categorySection"
-                        class="cta-outline px-8 py-4 inline-block text-sm">
-                        BROWSE CATEGORIES
-                    </a>
-
-                </div>
-
-                <div class="flex gap-8">
-
-                    <div>
-                        <p class="font-display text-2xl text-orange-500">
-                            350+
-                        </p>
-
-                        <p class="text-xs text-white/50 uppercase">
-                            Premium Products
-                        </p>
-                    </div>
-
-                    <div>
-                        <p class="font-display text-2xl text-orange-500">
-                            11
-                        </p>
-
-                        <p class="text-xs text-white/50 uppercase">
-                            Sports Covered
-                        </p>
-                    </div>
-
-                    <div>
-                        <p class="font-display text-2xl text-orange-500">
-                            4.6★
-                        </p>
-
-                        <p class="text-xs text-white/50 uppercase">
-                            Avg. Rating
-                        </p>
-                    </div>
-
-                </div>
+                <button
+                    id="searchClearBtn"
+                    class="hidden absolute right-3 top-1/2 -translate-y-1/2 opacity-60 hover:opacity-100">
+                    ×
+                </button>
 
             </div>
 
 
-            <div class="hero-visual-frame">
+            <!-- WISHLIST + CART -->
+            <div class="flex items-center gap-4">
 
-                <img
-                    src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1000&q=80"
-                    alt="Sports equipment"
-                    class="w-full h-[320px] lg:h-[460px] object-cover">
+                <button
+                    id="wishlistIconBtn"
+                    class="icon-btn"
+                    aria-label="Wishlist">
 
-                <div class="hero-stat-chip absolute bottom-5 left-5 rounded-xl px-4 py-3">
+                    <span class="text-xl">
+                        ♡
+                    </span>
 
-                    <p class="text-xs text-white/50">
-                        Trending now
-                    </p>
+                    <span
+                        id="wishlistCount"
+                        class="badge-count hidden">
+                        0
+                    </span>
 
-                    <p class="font-bold text-sm">
-                        Cricket & Football Gear
-                    </p>
+                </button>
 
-                </div>
+
+                <button
+                    id="cartIconBtn"
+                    class="icon-btn"
+                    aria-label="Cart">
+
+                    🛒
+
+                    <span
+                        id="cartCount"
+                        class="badge-count hidden">
+                        0
+                    </span>
+
+                </button>
 
             </div>
 
         </div>
 
-    </section>
 
+        <!-- MOBILE MENU -->
 
-    <!-- =========================================================
-         CATEGORIES
-         ========================================================= -->
+        <div id="mobileMenu" class="mobile-menu lg:hidden">
 
-    <section id="categorySection" class="py-16 px-4 lg:px-6">
+            <a href="homepage.html">
+                Home
+            </a>
 
-        <div class="max-w-7xl mx-auto">
+            <a href="#shopGrid">
+                Shop
+            </a>
 
-            <div class="mb-8">
+            <a href="#categorySection">
+                Categories
+            </a>
 
-                <p class="section-eyebrow mb-2">
-                    Shop by Sport
-                </p>
+            <a href="#trendingSection">
+                Trending
+            </a>
 
-                <h2 class="font-display text-3xl lg:text-4xl">
-                    FIND YOUR GAME
-                </h2>
+            <a href="#offerBanner">
+                Sale
+            </a>
 
-            </div>
-
-
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
-
-
-                <!-- FOOTBALL -->
-                <div class="cat-card h-56" data-sport="Football">
-
-                    <img
-                        src="https://images.unsplash.com/photo-1614632537197-38a17061c2bd?w=600&q=80"
-                        class="absolute inset-0 w-full h-full object-cover"
-                        alt="Football">
-
-                    <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-
-                        <h3 class="font-display text-lg">
-                            FOOTBALL
-                        </h3>
-
-                        <p class="text-xs text-white/60">
-                            Boots, jerseys & balls
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <!-- CRICKET -->
-                <div class="cat-card h-56" data-sport="Cricket">
-
-                    <img
-                        src="https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=600&q=80"
-                        class="absolute inset-0 w-full h-full object-cover"
-                        alt="Cricket">
-
-                    <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-
-                        <h3 class="font-display text-lg">
-                            CRICKET
-                        </h3>
-
-                        <p class="text-xs text-white/60">
-                            Bats, pads & gloves
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <!-- TENNIS -->
-                <div class="cat-card h-56" data-sport="Tennis">
-
-                    <img
-                        src="https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=600&q=80"
-                        class="absolute inset-0 w-full h-full object-cover"
-                        alt="Tennis">
-
-                    <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-
-                        <h3 class="font-display text-lg">
-                            TENNIS
-                        </h3>
-
-                        <p class="text-xs text-white/60">
-                            Rackets & apparel
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <!-- BASKETBALL -->
-                <div class="cat-card h-56" data-sport="Basketball">
-
-                    <img
-                        src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&q=80"
-                        class="absolute inset-0 w-full h-full object-cover"
-                        alt="Basketball">
-
-                    <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-
-                        <h3 class="font-display text-lg">
-                            BASKETBALL
-                        </h3>
-
-                        <p class="text-xs text-white/60">
-                            Shoes & jerseys
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <!-- VOLLEYBALL -->
-                <div class="cat-card h-56" data-sport="Volleyball">
-
-                    <img
-                        src="https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=900&q=85"
-                        class="absolute inset-0 w-full h-full object-cover"
-                        alt="Volleyball">
-
-                    <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-
-                        <h3 class="font-display text-lg">
-                            VOLLEYBALL
-                        </h3>
-
-                        <p class="text-xs text-white/60">
-                            Balls, nets & gear
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <!-- BADMINTON -->
-                <div class="cat-card h-56" data-sport="Badminton">
-
-                    <img
-                        src="https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=600&q=80"
-                        class="absolute inset-0 w-full h-full object-cover"
-                        alt="Badminton">
-
-                    <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-
-                        <h3 class="font-display text-lg">
-                            BADMINTON
-                        </h3>
-
-                        <p class="text-xs text-white/60">
-                            Rackets & shuttles
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <!-- FITNESS -->
-                <div class="cat-card h-56" data-sport="Fitness">
-
-                    <img
-                        src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80"
-                        class="absolute inset-0 w-full h-full object-cover"
-                        alt="Fitness">
-
-                    <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-
-                        <h3 class="font-display text-lg">
-                            FITNESS
-                        </h3>
-
-                        <p class="text-xs text-white/60">
-                            Training equipment
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <!-- RUNNING -->
-                <div class="cat-card h-56" data-sport="Running">
-
-                    <img
-                        src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=600&q=80"
-                        class="absolute inset-0 w-full h-full object-cover"
-                        alt="Running">
-
-                    <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
-
-                        <h3 class="font-display text-lg">
-                            RUNNING
-                        </h3>
-
-                        <p class="text-xs text-white/60">
-                            Shoes & accessories
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================================================
-         TRENDING
-         ========================================================= -->
-
-    <section
-        id="trendingSection"
-        class="py-16 px-4 lg:px-6"
-        style="background:var(--khz-bg-alt)">
-
-        <div class="max-w-7xl mx-auto">
-
-            <p class="section-eyebrow mb-2">
-                Hand-picked
-            </p>
-
-            <h2 class="font-display text-3xl lg:text-4xl mb-8">
-                TRENDING GEAR
-            </h2>
-
-            <div
-                id="trendingGrid"
-                class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================================================
-         SHOP
-         ========================================================= -->
-
-    <section id="shopGrid" class="py-16 px-4 lg:px-6">
-
-        <div class="max-w-7xl mx-auto">
-
-            <div class="mb-8">
-
-                <p class="section-eyebrow mb-2">
-                    The Full Range
-                </p>
-
-                <h2 class="shop-heading font-display">
-                    EXPLORE SPORTS GEAR
-                </h2>
-
-                <p class="shop-subtext mt-2">
-                    Premium equipment selected for performance.
-                </p>
-
-            </div>
-
-
-            <!-- SORT BAR -->
-
-            <div
-                class="flex flex-wrap items-center justify-between gap-4 mb-8 pb-4 border-b"
-                style="border-color:var(--khz-line)">
-
-                <p
-                    id="productCount"
-                    class="text-sm text-white/60">
-                    Loading products...
-                </p>
-
-                <div class="flex items-center gap-3">
-
-                    <button
-                        id="clearFiltersBtn"
-                        class="text-xs underline text-white/50 hover:text-orange-500">
-                        Clear All
-                    </button>
-
-                    <select
-                        id="sortSelect"
-                        class="bg-white/5 border border-white/10 rounded-full px-4 py-2 text-xs focus:outline-none">
-
-                        <option value="featured">
-                            Sort: Featured
-                        </option>
-
-                        <option value="newest">
-                            Sort: Newest
-                        </option>
-
-                        <option value="price-low">
-                            Price: Low to High
-                        </option>
-
-                        <option value="price-high">
-                            Price: High to Low
-                        </option>
-
-                        <option value="rating">
-                            Top Rated
-                        </option>
-
-                    </select>
-
-                </div>
-
-            </div>
-
-
-            <!-- SHOP LAYOUT -->
-
-            <div class="grid lg:grid-cols-[260px_1fr] gap-8">
-
-
-                <!-- FILTERS -->
-
-                <aside class="hidden lg:block space-y-6">
-
-                    <div class="flex items-center justify-between">
-
-                        <h3 class="font-display text-lg">
-                            FILTERS
-                        </h3>
-
-                    </div>
-
-
-                    <!-- SPORT -->
-
-                    <div>
-
-                        <h4 class="font-bold text-sm mb-3">
-                            Sport
-                        </h4>
-
-                        <div class="space-y-2">
-
-                            <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
-                                <input type="checkbox" data-filter="sport" value="Football">
-                                Football
-                            </label>
-
-                            <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
-                                <input type="checkbox" data-filter="sport" value="Cricket">
-                                Cricket
-                            </label>
-
-                            <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
-                                <input type="checkbox" data-filter="sport" value="Tennis">
-                                Tennis
-                            </label>
-
-                            <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
-                                <input type="checkbox" data-filter="sport" value="Basketball">
-                                Basketball
-                            </label>
-
-                            <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
-                                <input type="checkbox" data-filter="sport" value="Volleyball">
-                                Volleyball
-                            </label>
-
-                            <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
-                                <input type="checkbox" data-filter="sport" value="Badminton">
-                                Badminton
-                            </label>
-
-                            <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
-                                <input type="checkbox" data-filter="sport" value="Fitness">
-                                Fitness
-                            </label>
-
-                            <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
-                                <input type="checkbox" data-filter="sport" value="Running">
-                                Running
-                            </label>
-
-                        </div>
-
-                    </div>
-
-
-
-
-                    <!-- PRICE -->
-
-                    <div
-                        class="border-t pt-5"
-                        style="border-color:var(--khz-line)">
-
-                        <h4 class="font-bold text-sm mb-3">
-                            Price
-                        </h4>
-
-                        <input
-                            id="priceRange"
-                            type="range"
-                            min="500"
-                            max="100000"
-                            step="500"
-                            value="100000"
-                            class="khz-range w-full">
-
-                        <div class="flex justify-between text-xs mt-2 text-white/40">
-
-                            <span>
-                                Rs. 500
-                            </span>
-
-                            <span id="priceRangeLabel">
-                                Rs. 100,000
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </aside>
-
-
-                <!-- PRODUCTS -->
-
-                <div>
-
-                    <div
-                        id="productGrid"
-                        class="product-grid grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 lg:gap-6">
-                    </div>
-
-
-                    <!-- EMPTY STATE -->
-
-                    <div
-                        id="emptyState"
-                        class="hidden text-center py-20">
-
-                        <div class="empty-state__icon">
-                            🏆
-                        </div>
-
-                        <p class="font-display text-2xl mb-2">
-                            NO PRODUCTS FOUND
-                        </p>
-
-                        <p class="text-sm mb-6 text-white/40">
-                            Try changing your search or filters.
-                        </p>
-
-                        <button
-                            id="clearFiltersBtn2"
-                            class="cta-primary px-6 py-3 text-xs">
-                            CLEAR ALL FILTERS
-                        </button>
-
-                    </div>
-
-
-                    <!-- LOAD MORE -->
-
-                    <div class="text-center mt-8">
-
-                        <button
-                            id="loadMoreBtn"
-                            class="hidden cta-outline px-7 py-3 text-xs">
-                            LOAD MORE
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================================================
-         OFFER
-         ========================================================= -->
-
-    <section
-        id="offerBanner"
-        class="offer-banner speed-stripes relative py-16 px-4 lg:px-6 my-4">
-
-        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-8">
-
-            <div>
-
-                <p class="section-eyebrow mb-2">
-                    Limited Time
-                </p>
-
-                <h2 class="font-display text-3xl lg:text-5xl mb-2">
-                    UP TO 40% OFF
-                </h2>
-
-                <p class="text-lg lg:text-xl text-white/70">
-                    LEVEL UP YOUR GAME
-                </p>
-
-            </div>
-
-            <a
-                href="#shopGrid"
-                class="cta-primary px-10 py-4 inline-block text-sm">
-                SHOP SALE
+            <a href="about.html">
+                About
             </a>
 
         </div>
 
-    </section>
+
+        <!-- MOBILE SEARCH -->
+
+        <div class="md:hidden pb-3 relative">
+
+            <input
+                id="searchInputMobile"
+                type="text"
+                placeholder="Search KHELZONE..."
+                class="w-full bg-white/5 border border-white/10 rounded-full pl-11 pr-4 py-2.5 text-sm placeholder:text-white/35 focus:outline-none focus:border-orange-500">
+
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 opacity-50">
+                🔎
+            </span>
+
+        </div>
+
+    </div>
+
+    <div class="stripe-divider"></div>
+
+</header>
 
 
-    <!-- =========================================================
-         FOOTER
-         ========================================================= -->
+<!-- =========================================================
+     HERO
+     ========================================================= -->
 
-    <footer
-        id="footer"
-        class="pt-16 pb-8 px-4 lg:px-6 border-t"
-        style="border-color:var(--khz-line)">
+<section class="hero-section speed-stripes relative py-16 lg:py-24 px-4 lg:px-6">
 
-        <div class="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center relative">
 
+        <div>
 
-            <!-- BRAND -->
+            <p class="section-eyebrow mb-4">
+                KHELZONE Sports Marketplace
+            </p>
 
-            <div class="col-span-2 lg:col-span-1">
+            <h1 class="font-display hero-headline mb-6">
+                GEAR UP
+                <br>
+                FOR THE
+                <span class="accent">GAME</span>
+            </h1>
 
-                <div class="flex items-center gap-2 mb-4">
+            <p class="text-white/60 text-base lg:text-lg max-w-md mb-8">
+                Premium sports equipment, apparel and accessories built for athletes who refuse to settle.
+            </p>
 
-                    <span class="logo-mark w-7 h-7 flex items-center justify-center">
+            <div class="flex flex-wrap gap-4 mb-10">
 
-                        <span class="font-display text-[#0A0A0A] text-base">
-                            K
-                        </span>
+                <a href="#shopGrid"
+                    class="cta-primary px-8 py-4 inline-block text-sm">
+                    SHOP NOW
+                </a>
 
-                    </span>
+                <a href="#categorySection"
+                    class="cta-outline px-8 py-4 inline-block text-sm">
+                    BROWSE CATEGORIES
+                </a>
 
-                    <span class="font-display text-lg">
-                        KHELZONE
-                    </span>
+            </div>
 
+            <div class="flex gap-8">
+
+                <div>
+                    <p class="font-display text-2xl text-orange-500">
+                        350+
+                    </p>
+
+                    <p class="text-xs text-white/50 uppercase">
+                        Premium Products
+                    </p>
                 </div>
 
-                <p class="text-xs text-white/40">
-                    Gear Up. Play Hard.
-                </p>
+                <div>
+                    <p class="font-display text-2xl text-orange-500">
+                        11
+                    </p>
 
-            </div>
+                    <p class="text-xs text-white/50 uppercase">
+                        Sports Covered
+                    </p>
+                </div>
 
+                <div>
+                    <p class="font-display text-2xl text-orange-500">
+                        4.6★
+                    </p>
 
-            <!-- KHELZONE -->
-
-            <div>
-
-                <h4 class="font-bold text-sm mb-4">
-                    KHELZONE
-                </h4>
-
-                <ul class="space-y-2 text-xs text-white/40">
-
-                    <li>
-                        <a
-                            href="about.html"
-                            class="hover:text-orange-500">
-                            About KHELZONE
-                        </a>
-                    </li>
-
-                    <li>
-                        <a
-                            href="#"
-                            class="hover:text-orange-500">
-                            Contact Us
-                        </a>
-                    </li>
-
-                    <li>
-                        <a
-                            href="seller.html"
-                            class="hover:text-orange-500">
-                            Become a Seller
-                        </a>
-                    </li>
-
-                </ul>
-
-            </div>
-
-
-            <!-- SHOP -->
-
-            <div>
-
-                <h4 class="font-bold text-sm mb-4">
-                    SHOP
-                </h4>
-
-                <ul class="space-y-2 text-xs text-white/40">
-
-                    <li>
-                        <button data-footer-category="Football">
-                            Football
-                        </button>
-                    </li>
-
-                    <li>
-                        <button data-footer-category="Cricket">
-                            Cricket
-                        </button>
-                    </li>
-
-                    <li>
-                        <button data-footer-category="Tennis">
-                            Tennis
-                        </button>
-                    </li>
-
-                    <li>
-                        <button data-footer-category="Basketball">
-                            Basketball
-                        </button>
-                    </li>
-
-                    <li>
-                        <button data-footer-category="Volleyball">
-                            Volleyball
-                        </button>
-                    </li>
-
-                </ul>
-
-            </div>
-
-
-            <!-- HELP -->
-
-            <div>
-
-                <h4 class="font-bold text-sm mb-4">
-                    HELP
-                </h4>
-
-                <ul class="space-y-2 text-xs text-white/40">
-
-                    <li>
-                        Shipping
-                    </li>
-
-                    <li>
-                        Returns
-                    </li>
-
-                    <li>
-                        FAQs
-                    </li>
-
-                    <li>
-                        Track Order
-                    </li>
-
-                </ul>
+                    <p class="text-xs text-white/50 uppercase">
+                        Avg. Rating
+                    </p>
+                </div>
 
             </div>
 
         </div>
 
 
+        <div class="hero-visual-frame">
+
+            <img
+                src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1000&q=80"
+                alt="Sports equipment"
+                class="w-full h-[320px] lg:h-[460px] object-cover">
+
+            <div class="hero-stat-chip absolute bottom-5 left-5 rounded-xl px-4 py-3">
+
+                <p class="text-xs text-white/50">
+                    Trending now
+                </p>
+
+                <p class="font-bold text-sm">
+                    Cricket & Football Gear
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     CATEGORIES
+     ========================================================= -->
+
+<section id="categorySection" class="py-16 px-4 lg:px-6">
+
+    <div class="max-w-7xl mx-auto">
+
+        <div class="mb-8">
+
+            <p class="section-eyebrow mb-2">
+                Shop by Sport
+            </p>
+
+            <h2 class="font-display text-3xl lg:text-4xl">
+                FIND YOUR GAME
+            </h2>
+
+        </div>
+
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
+
+
+            <!-- FOOTBALL -->
+            <div class="cat-card h-56" data-sport="Football">
+
+                <img
+                    src="https://images.unsplash.com/photo-1614632537197-38a17061c2bd?w=600&q=80"
+                    class="absolute inset-0 w-full h-full object-cover"
+                    alt="Football">
+
+                <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
+
+                    <h3 class="font-display text-lg">
+                        FOOTBALL
+                    </h3>
+
+                    <p class="text-xs text-white/60">
+                        Boots, jerseys & balls
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- CRICKET -->
+            <div class="cat-card h-56" data-sport="Cricket">
+
+                <img
+                    src="https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=600&q=80"
+                    class="absolute inset-0 w-full h-full object-cover"
+                    alt="Cricket">
+
+                <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
+
+                    <h3 class="font-display text-lg">
+                        CRICKET
+                    </h3>
+
+                    <p class="text-xs text-white/60">
+                        Bats, pads & gloves
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- TENNIS -->
+            <div class="cat-card h-56" data-sport="Tennis">
+
+                <img
+                    src="https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=600&q=80"
+                    class="absolute inset-0 w-full h-full object-cover"
+                    alt="Tennis">
+
+                <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
+
+                    <h3 class="font-display text-lg">
+                        TENNIS
+                    </h3>
+
+                    <p class="text-xs text-white/60">
+                        Rackets & apparel
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- BASKETBALL -->
+            <div class="cat-card h-56" data-sport="Basketball">
+
+                <img
+                    src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&q=80"
+                    class="absolute inset-0 w-full h-full object-cover"
+                    alt="Basketball">
+
+                <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
+
+                    <h3 class="font-display text-lg">
+                        BASKETBALL
+                    </h3>
+
+                    <p class="text-xs text-white/60">
+                        Shoes & jerseys
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- VOLLEYBALL -->
+            <div class="cat-card h-56" data-sport="Volleyball">
+
+                <img
+                    src="https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=900&q=85"
+                    class="absolute inset-0 w-full h-full object-cover"
+                    alt="Volleyball">
+
+                <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
+
+                    <h3 class="font-display text-lg">
+                        VOLLEYBALL
+                    </h3>
+
+                    <p class="text-xs text-white/60">
+                        Balls, nets & gear
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- BADMINTON -->
+            <div class="cat-card h-56" data-sport="Badminton">
+
+                <img
+                    src="https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=600&q=80"
+                    class="absolute inset-0 w-full h-full object-cover"
+                    alt="Badminton">
+
+                <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
+
+                    <h3 class="font-display text-lg">
+                        BADMINTON
+                    </h3>
+
+                    <p class="text-xs text-white/60">
+                        Rackets & shuttles
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- FITNESS -->
+            <div class="cat-card h-56" data-sport="Fitness">
+
+                <img
+                    src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80"
+                    class="absolute inset-0 w-full h-full object-cover"
+                    alt="Fitness">
+
+                <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
+
+                    <h3 class="font-display text-lg">
+                        FITNESS
+                    </h3>
+
+                    <p class="text-xs text-white/60">
+                        Training equipment
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- RUNNING -->
+            <div class="cat-card h-56" data-sport="Running">
+
+                <img
+                    src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=600&q=80"
+                    class="absolute inset-0 w-full h-full object-cover"
+                    alt="Running">
+
+                <div class="cat-overlay absolute inset-0 flex flex-col justify-end p-4">
+
+                    <h3 class="font-display text-lg">
+                        RUNNING
+                    </h3>
+
+                    <p class="text-xs text-white/60">
+                        Shoes & accessories
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     TRENDING SPORTS
+     ========================================================= -->
+
+<section
+    id="trendingSportsSection"
+    class="py-16 px-4 lg:px-6"
+    style="background:var(--khz-bg-alt)">
+
+    <div class="max-w-7xl mx-auto">
+
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+
+            <div>
+
+                <p class="section-eyebrow mb-2">
+                    What's Hot
+                </p>
+
+                <h2 class="font-display text-3xl lg:text-4xl">
+                    TRENDING SPORTS
+                </h2>
+
+                <p class="text-sm text-white/50 mt-2 max-w-xl">
+                    Explore the sports everyone's playing right now.
+                </p>
+
+            </div>
+
+            <span class="text-xs text-white/40 uppercase tracking-wider">
+                Tap a sport to shop
+            </span>
+
+        </div>
+
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+
+
+            <!-- TRENDING FOOTBALL -->
+            <button
+                type="button"
+                class="trending-sport-card group relative h-48 rounded-2xl overflow-hidden text-left"
+                data-trending-sport="Football">
+
+                <img
+                    src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=700&q=85"
+                    alt="Football"
+                    class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent"></div>
+
+                <div class="relative h-full flex flex-col justify-end p-4">
+
+                    <span class="text-orange-500 text-lg mb-1">
+                        ⚽
+                    </span>
+
+                    <h3 class="font-display text-xl">
+                        FOOTBALL
+                    </h3>
+
+                    <p class="text-[11px] text-white/60 mt-1">
+                        Shop gear →
+                    </p>
+
+                </div>
+
+            </button>
+
+
+            <!-- TRENDING CRICKET -->
+            <button
+                type="button"
+                class="trending-sport-card group relative h-48 rounded-2xl overflow-hidden text-left"
+                data-trending-sport="Cricket">
+
+                <img
+                    src="https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=700&q=85"
+                    alt="Cricket"
+                    class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent"></div>
+
+                <div class="relative h-full flex flex-col justify-end p-4">
+
+                    <span class="text-orange-500 text-lg mb-1">
+                        🏏
+                    </span>
+
+                    <h3 class="font-display text-xl">
+                        CRICKET
+                    </h3>
+
+                    <p class="text-[11px] text-white/60 mt-1">
+                        Shop gear →
+                    </p>
+
+                </div>
+
+            </button>
+
+
+            <!-- TRENDING BASKETBALL -->
+            <button
+                type="button"
+                class="trending-sport-card group relative h-48 rounded-2xl overflow-hidden text-left"
+                data-trending-sport="Basketball">
+
+                <img
+                    src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=700&q=85"
+                    alt="Basketball"
+                    class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent"></div>
+
+                <div class="relative h-full flex flex-col justify-end p-4">
+
+                    <span class="text-orange-500 text-lg mb-1">
+                        🏀
+                    </span>
+
+                    <h3 class="font-display text-xl">
+                        BASKETBALL
+                    </h3>
+
+                    <p class="text-[11px] text-white/60 mt-1">
+                        Shop gear →
+                    </p>
+
+                </div>
+
+            </button>
+
+
+            <!-- TRENDING TENNIS -->
+            <button
+                type="button"
+                class="trending-sport-card group relative h-48 rounded-2xl overflow-hidden text-left"
+                data-trending-sport="Tennis">
+
+                <img
+                    src="https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=700&q=85"
+                    alt="Tennis"
+                    class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent"></div>
+
+                <div class="relative h-full flex flex-col justify-end p-4">
+
+                    <span class="text-orange-500 text-lg mb-1">
+                        🎾
+                    </span>
+
+                    <h3 class="font-display text-xl">
+                        TENNIS
+                    </h3>
+
+                    <p class="text-[11px] text-white/60 mt-1">
+                        Shop gear →
+                    </p>
+
+                </div>
+
+            </button>
+
+
+            <!-- TRENDING VOLLEYBALL -->
+            <button
+                type="button"
+                class="trending-sport-card group relative h-48 rounded-2xl overflow-hidden text-left"
+                data-trending-sport="Volleyball">
+
+                <img
+                    src="https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=700&q=85"
+                    alt="Volleyball"
+                    class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent"></div>
+
+                <div class="relative h-full flex flex-col justify-end p-4">
+
+                    <span class="text-orange-500 text-lg mb-1">
+                        🏐
+                    </span>
+
+                    <h3 class="font-display text-xl">
+                        VOLLEYBALL
+                    </h3>
+
+                    <p class="text-[11px] text-white/60 mt-1">
+                        Shop gear →
+                    </p>
+
+                </div>
+
+            </button>
+
+
+            <!-- TRENDING BADMINTON -->
+            <button
+                type="button"
+                class="trending-sport-card group relative h-48 rounded-2xl overflow-hidden text-left"
+                data-trending-sport="Badminton">
+
+                <img
+                    src="https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=700&q=85"
+                    alt="Badminton"
+                    class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent"></div>
+
+                <div class="relative h-full flex flex-col justify-end p-4">
+
+                    <span class="text-orange-500 text-lg mb-1">
+                        🏸
+                    </span>
+
+                    <h3 class="font-display text-xl">
+                        BADMINTON
+                    </h3>
+
+                    <p class="text-[11px] text-white/60 mt-1">
+                        Shop gear →
+                    </p>
+
+                </div>
+
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     TRENDING GEAR
+     ========================================================= -->
+
+<section
+    id="trendingSection"
+    class="py-16 px-4 lg:px-6"
+    style="background:var(--khz-bg-alt)">
+
+    <div class="max-w-7xl mx-auto">
+
+        <p class="section-eyebrow mb-2">
+            Hand-picked
+        </p>
+
+        <h2 class="font-display text-3xl lg:text-4xl mb-8">
+            TRENDING GEAR
+        </h2>
+
         <div
-            class="max-w-7xl mx-auto pt-6 border-t text-center"
-            style="border-color:var(--khz-line)">
+            id="trendingGrid"
+            class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
+        </div>
 
-            <p class="text-xs text-white/40">
+    </div>
 
-                ©
-                <span id="yearNow"></span>
-                KHELZONE. All Rights Reserved.
+</section>
 
+
+<!-- =========================================================
+     SHOP
+     ========================================================= -->
+
+<section id="shopGrid" class="py-16 px-4 lg:px-6">
+
+    <div class="max-w-7xl mx-auto">
+
+        <div class="mb-8">
+
+            <p class="section-eyebrow mb-2">
+                The Full Range
+            </p>
+
+            <h2 class="shop-heading font-display">
+                EXPLORE SPORTS GEAR
+            </h2>
+
+            <p class="shop-subtext mt-2">
+                Premium equipment selected for performance.
             </p>
 
         </div>
 
-    </footer>
 
+        <!-- SORT BAR -->
 
-    <!-- =========================================================
-         WISHLIST OVERLAY
-         ========================================================= -->
+        <div
+            class="flex flex-wrap items-center justify-between gap-4 mb-8 pb-4 border-b"
+            style="border-color:var(--khz-line)">
 
-    <div
-        id="wishlistOverlay"
-        class="wishlist-overlay">
-    </div>
+            <p
+                id="productCount"
+                class="text-sm text-white/60">
+                Loading products...
+            </p>
 
+            <div class="flex items-center gap-3">
 
-    <!-- WISHLIST DRAWER -->
+                <button
+                    id="clearFiltersBtn"
+                    class="text-xs underline text-white/50 hover:text-orange-500">
+                    Clear All
+                </button>
 
-    <aside
-        id="wishlistDrawer"
-        class="wishlist-drawer">
+                <select
+                    id="sortSelect"
+                    class="bg-white/5 border border-white/10 rounded-full px-4 py-2 text-xs focus:outline-none">
 
-        <div class="drawer-header">
+                    <option value="featured">
+                        Sort: Featured
+                    </option>
 
-            <div>
+                    <option value="newest">
+                        Sort: Newest
+                    </option>
 
-                <p class="section-eyebrow">
-                    Saved Items
-                </p>
+                    <option value="price-low">
+                        Price: Low to High
+                    </option>
 
-                <h2 class="font-display text-2xl">
-                    WISHLIST
-                </h2>
+                    <option value="price-high">
+                        Price: High to Low
+                    </option>
+
+                    <option value="rating">
+                        Top Rated
+                    </option>
+
+                </select>
 
             </div>
 
-            <button
-                id="closeWishlistBtn"
-                class="text-2xl text-white/60 hover:text-white">
-                ×
-            </button>
-
         </div>
 
-        <div
-            id="wishlistItems"
-            class="drawer-body">
-        </div>
 
-    </aside>
+        <!-- SHOP LAYOUT -->
+
+        <div class="grid lg:grid-cols-[260px_1fr] gap-8">
 
 
-    <!-- =========================================================
-         CART OVERLAY
-         ========================================================= -->
+            <!-- FILTERS -->
 
-    <div
-        id="cartOverlay"
-        class="cart-overlay">
-    </div>
+            <aside class="hidden lg:block space-y-6">
+
+                <div class="flex items-center justify-between">
+
+                    <h3 class="font-display text-lg">
+                        FILTERS
+                    </h3>
+
+                </div>
 
 
-    <!-- CART DRAWER -->
+                <!-- SPORT -->
 
-    <aside
-        id="cartDrawer"
-        class="cart-drawer">
+                <div>
 
-        <div class="drawer-header">
+                    <h4 class="font-bold text-sm mb-3">
+                        Sport
+                    </h4>
+
+                    <div class="space-y-2">
+
+                        <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+                            <input type="checkbox" data-filter="sport" value="Football">
+                            Football
+                        </label>
+
+                        <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+                            <input type="checkbox" data-filter="sport" value="Cricket">
+                            Cricket
+                        </label>
+
+                        <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+                            <input type="checkbox" data-filter="sport" value="Tennis">
+                            Tennis
+                        </label>
+
+                        <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+                            <input type="checkbox" data-filter="sport" value="Basketball">
+                            Basketball
+                        </label>
+
+                        <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+                            <input type="checkbox" data-filter="sport" value="Volleyball">
+                            Volleyball
+                        </label>
+
+                        <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+                            <input type="checkbox" data-filter="sport" value="Badminton">
+                            Badminton
+                        </label>
+
+                        <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+                            <input type="checkbox" data-filter="sport" value="Fitness">
+                            Fitness
+                        </label>
+
+                        <label class="filter-chip block px-3 py-2 rounded-lg text-xs cursor-pointer">
+                            <input type="checkbox" data-filter="sport" value="Running">
+                            Running
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PRICE -->
+
+                <div
+                    class="border-t pt-5"
+                    style="border-color:var(--khz-line)">
+
+                    <h4 class="font-bold text-sm mb-3">
+                        Price
+                    </h4>
+
+                    <input
+                        id="priceRange"
+                        type="range"
+                        min="500"
+                        max="100000"
+                        step="500"
+                        value="100000"
+                        class="khz-range w-full">
+
+                    <div class="flex justify-between text-xs mt-2 text-white/40">
+
+                        <span>
+                            Rs. 500
+                        </span>
+
+                        <span id="priceRangeLabel">
+                            Rs. 100,000
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </aside>
+
+
+            <!-- PRODUCTS -->
 
             <div>
 
-                <p class="section-eyebrow">
-                    Your Gear
-                </p>
+                <div
+                    id="productGrid"
+                    class="product-grid grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 lg:gap-6">
+                </div>
 
-                <h2 class="font-display text-2xl">
-                    CART
-                </h2>
+
+                <!-- EMPTY STATE -->
+
+                <div
+                    id="emptyState"
+                    class="hidden text-center py-20">
+
+                    <div class="empty-state__icon">
+                        🏆
+                    </div>
+
+                    <p class="font-display text-2xl mb-2">
+                        NO PRODUCTS FOUND
+                    </p>
+
+                    <p class="text-sm mb-6 text-white/40">
+                        Try changing your search or filters.
+                    </p>
+
+                    <button
+                        id="clearFiltersBtn2"
+                        class="cta-primary px-6 py-3 text-xs">
+                        CLEAR ALL FILTERS
+                    </button>
+
+                </div>
+
+
+                <!-- LOAD MORE -->
+
+                <div class="text-center mt-8">
+
+                    <button
+                        id="loadMoreBtn"
+                        class="hidden cta-outline px-7 py-3 text-xs">
+                        LOAD MORE
+                    </button>
+
+                </div>
 
             </div>
 
-            <button
-                id="closeCartBtn"
-                class="text-2xl text-white/60 hover:text-white">
-                ×
-            </button>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     OFFER
+     ========================================================= -->
+
+<section
+    id="offerBanner"
+    class="offer-banner speed-stripes relative py-16 px-4 lg:px-6 my-4">
+
+    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-8">
+
+        <div>
+
+            <p class="section-eyebrow mb-2">
+                Limited Time
+            </p>
+
+            <h2 class="font-display text-3xl lg:text-5xl mb-2">
+                UP TO 40% OFF
+            </h2>
+
+            <p class="text-lg lg:text-xl text-white/70">
+                LEVEL UP YOUR GAME
+            </p>
 
         </div>
 
-        <div
-            id="cartDrawerItems"
-            class="drawer-body">
-        </div>
+        <a
+            href="#shopGrid"
+            class="cta-primary px-10 py-4 inline-block text-sm">
+            SHOP SALE
+        </a>
+
+    </div>
+
+</section>
 
 
-        <div class="drawer-footer">
+<!-- =========================================================
+     FOOTER
+     ========================================================= -->
 
-            <div class="flex justify-between mb-4">
+<footer
+    id="footer"
+    class="pt-16 pb-8 px-4 lg:px-6 border-t"
+    style="border-color:var(--khz-line)">
 
-                <span class="text-sm text-white/50">
-                    Total
+    <div class="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+
+
+        <!-- BRAND -->
+
+        <div class="col-span-2 lg:col-span-1">
+
+            <div class="flex items-center gap-2 mb-4">
+
+                <span class="logo-mark w-7 h-7 flex items-center justify-center">
+
+                    <span class="font-display text-[#0A0A0A] text-base">
+                        K
+                    </span>
+
                 </span>
 
-                <strong
-                    id="cartDrawerTotal"
-                    class="text-orange-500">
-                    Rs. 0
-                </strong>
+                <span class="font-display text-lg">
+                    KHELZONE
+                </span>
 
             </div>
 
-            <button
-                id="goToCartBtn"
-                class="cta-primary w-full py-3 text-xs">
-                VIEW FULL CART
-            </button>
+            <p class="text-xs text-white/40">
+                Gear Up. Play Hard.
+            </p>
 
         </div>
 
-    </aside>
+
+        <!-- KHELZONE -->
+
+        <div>
+
+            <h4 class="font-bold text-sm mb-4">
+                KHELZONE
+            </h4>
+
+            <ul class="space-y-2 text-xs text-white/40">
+
+                <li>
+                    <a
+                        href="about.html"
+                        class="hover:text-orange-500">
+                        About KHELZONE
+                    </a>
+                </li>
+
+                <li>
+                    <a
+                        href="#"
+                        class="hover:text-orange-500">
+                        Contact Us
+                    </a>
+                </li>
+
+                <li>
+                    <a
+                        href="seller.html"
+                        class="hover:text-orange-500">
+                        Become a Seller
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
 
 
-    <!-- =========================================================
-         SUPABASE
-         ========================================================= -->
+        <!-- SHOP -->
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <div>
 
-    <!-- SHOP JS -->
-    <script src="shop.js"></script>
+            <h4 class="font-bold text-sm mb-4">
+                SHOP
+            </h4>
+
+            <ul class="space-y-2 text-xs text-white/40">
+
+                <li>
+                    <button data-footer-category="Football">
+                        Football
+                    </button>
+                </li>
+
+                <li>
+                    <button data-footer-category="Cricket">
+                        Cricket
+                    </button>
+                </li>
+
+                <li>
+                    <button data-footer-category="Tennis">
+                        Tennis
+                    </button>
+                </li>
+
+                <li>
+                    <button data-footer-category="Basketball">
+                        Basketball
+                    </button>
+                </li>
+
+                <li>
+                    <button data-footer-category="Volleyball">
+                        Volleyball
+                    </button>
+                </li>
+
+            </ul>
+
+        </div>
+
+
+        <!-- HELP -->
+
+        <div>
+
+            <h4 class="font-bold text-sm mb-4">
+                HELP
+            </h4>
+
+            <ul class="space-y-2 text-xs text-white/40">
+
+                <li>
+                    Shipping
+                </li>
+
+                <li>
+                    Returns
+                </li>
+
+                <li>
+                    FAQs
+                </li>
+
+                <li>
+                    Track Order
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+
+    <div
+        class="max-w-7xl mx-auto pt-6 border-t text-center"
+        style="border-color:var(--khz-line)">
+
+        <p class="text-xs text-white/40">
+
+            ©
+            <span id="yearNow"></span>
+            KHELZONE. All Rights Reserved.
+
+        </p>
+
+    </div>
+
+</footer>
+
+
+<!-- =========================================================
+     WISHLIST OVERLAY
+     ========================================================= -->
+
+<div
+    id="wishlistOverlay"
+    class="wishlist-overlay">
+</div>
+
+
+<!-- WISHLIST DRAWER -->
+
+<aside
+    id="wishlistDrawer"
+    class="wishlist-drawer">
+
+    <div class="drawer-header">
+
+        <div>
+
+            <p class="section-eyebrow">
+                Saved Items
+            </p>
+
+            <h2 class="font-display text-2xl">
+                WISHLIST
+            </h2>
+
+        </div>
+
+        <button
+            id="closeWishlistBtn"
+            class="text-2xl text-white/60 hover:text-white">
+            ×
+        </button>
+
+    </div>
+
+    <div
+        id="wishlistItems"
+        class="drawer-body">
+    </div>
+
+</aside>
+
+
+<!-- =========================================================
+     CART OVERLAY
+     ========================================================= -->
+
+<div
+    id="cartOverlay"
+    class="cart-overlay">
+</div>
+
+
+<!-- CART DRAWER -->
+
+<aside
+    id="cartDrawer"
+    class="cart-drawer">
+
+    <div class="drawer-header">
+
+        <div>
+
+            <p class="section-eyebrow">
+                Your Gear
+            </p>
+
+            <h2 class="font-display text-2xl">
+                CART
+            </h2>
+
+        </div>
+
+        <button
+            id="closeCartBtn"
+            class="text-2xl text-white/60 hover:text-white">
+            ×
+        </button>
+
+    </div>
+
+    <div
+        id="cartDrawerItems"
+        class="drawer-body">
+    </div>
+
+
+    <div class="drawer-footer">
+
+        <div class="flex justify-between mb-4">
+
+            <span class="text-sm text-white/50">
+                Total
+            </span>
+
+            <strong
+                id="cartDrawerTotal"
+                class="text-orange-500">
+                Rs. 0
+            </strong>
+
+        </div>
+
+        <button
+            id="goToCartBtn"
+            class="cta-primary w-full py-3 text-xs">
+            VIEW FULL CART
+        </button>
+
+    </div>
+
+</aside>
+
+
+<!-- =========================================================
+     SUPABASE
+     ========================================================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- SHOP JS -->
+<script src="shop.js"></script>
+```
 
 </body>
 

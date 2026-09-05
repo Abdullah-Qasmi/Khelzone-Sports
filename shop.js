@@ -1222,50 +1222,151 @@ function wireSearch() {
 
   searchInputs.forEach(selector => {
     $$(selector).forEach(input => {
+
+      /* ================================================================
+         LIVE SEARCH
+         ================================================================ */
       input.addEventListener("input", () => {
         state.search = input.value.trim();
 
-        /* Keep both search boxes in sync */
+        /* Keep all search boxes in sync */
         searchInputs.forEach(other => {
           $$(other).forEach(el => {
-            if (el !== input) el.value = input.value;
+            if (el !== input) {
+              el.value = input.value;
+            }
           });
         });
 
+        /* Search clear button */
         const clearBtn = $("#searchClearBtn");
+
         if (clearBtn) {
-          clearBtn.classList.toggle("hidden", !input.value);
+          clearBtn.classList.toggle("hidden", !input.value.trim());
         }
 
         state.visibleCount = 12;
+
         renderProducts();
       });
 
+
+      /* ================================================================
+         ENTER → SEARCH + SCROLL TO PRODUCTS
+         ================================================================ */
       input.addEventListener("keydown", event => {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          state.search = input.value.trim();
-          renderProducts();
+
+        if (event.key !== "Enter") {
+          return;
         }
+
+        event.preventDefault();
+
+        /* Get the latest search text */
+        state.search = input.value.trim();
+
+        /* Keep all search boxes synchronized */
+        searchInputs.forEach(other => {
+          $$(other).forEach(el => {
+            el.value = input.value;
+          });
+        });
+
+        /* Update clear button */
+        const clearBtn = $("#searchClearBtn");
+
+        if (clearBtn) {
+          clearBtn.classList.toggle(
+            "hidden",
+            !input.value.trim()
+          );
+        }
+
+        /* Reset visible products */
+        state.visibleCount = 12;
+
+        /* Render filtered products first */
+        renderProducts();
+
+
+        /* ================================================================
+           SCROLL AFTER PRODUCTS HAVE BEEN RENDERED
+           ================================================================ */
+        setTimeout(() => {
+
+          /*
+           * Try the main shop/product section first.
+           * This supports different IDs in shop.html.
+           */
+          const productsSection =
+            $("#shopGrid") ||
+            $("#productGrid") ||
+            $("#productsGrid") ||
+            $(".product-grid");
+
+          /*
+           * If products section exists, smoothly scroll to it.
+           */
+          if (productsSection) {
+
+            productsSection.scrollIntoView({
+              behavior: "smooth",
+              block: "start"
+            });
+
+            return;
+          }
+
+          /*
+           * Fallback:
+           * If product grid itself wasn't found, try empty state.
+           */
+          const emptyState = $("#emptyState");
+
+          if (emptyState) {
+            emptyState.scrollIntoView({
+              behavior: "smooth",
+              block: "center"
+            });
+          }
+
+        }, 150);
       });
     });
   });
 
+
+  /* ================================================================
+     CLEAR SEARCH BUTTON
+     ================================================================ */
   const clearBtn = $("#searchClearBtn");
+
   if (clearBtn) {
+
     clearBtn.addEventListener("click", () => {
+
+      /* Clear every search box */
       searchInputs.forEach(selector => {
         $$(selector).forEach(input => {
           input.value = "";
         });
       });
 
+      /* Reset search */
       state.search = "";
+
+      /* Reset visible products */
+      state.visibleCount = 12;
+
+      /* Hide clear button */
       clearBtn.classList.add("hidden");
+
+      /* Render all products */
       renderProducts();
     });
   }
 }
+
 
 function wireCategoryCards() {
   ["[data-category]", "[data-sport]"].forEach(selector => {
@@ -1654,4 +1755,4 @@ window.KHELZONE_SHOP = {
   openWishlistDrawer,
   closeWishlistDrawer,
   refreshCartUI
-};
+}

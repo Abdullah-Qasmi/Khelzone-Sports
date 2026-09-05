@@ -2872,3 +2872,57 @@ footer button:hover {
         height: 70px;
     }
 }
+.qv-review-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.qv-review-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.qv-review-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ff5a00;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.qv-review-name {
+  margin: 0;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.qv-review-date {
+  margin: 3px 0 0;
+  color: rgba(255,255,255,.45);
+  font-size: 10px;
+}
+
+.qv-review-stars {
+  color: #ff5a00;
+  font-size: 14px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.qv-review-text {
+  margin: 10px 0 0;
+  color: rgba(255,255,255,.68);
+  font-size: 13px;
+  line-height: 1.6;
+}

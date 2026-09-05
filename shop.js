@@ -961,7 +961,12 @@ async function fetchProductReviews(productId) {
   try {
     const { data, error } = await supabaseClient
       .from("product_reviews")
-      .select("*")
+      .select(`
+        *,
+        profiles:user_id (
+          full_name
+        )
+      `)
       .eq("product_id", productId)
       .order("created_at", { ascending: false });
 
@@ -1115,22 +1120,51 @@ function renderReviewsHTML(product, reviews, currentUser, isOwner) {
 
   const reviewItems = reviews
     .slice(0, 20)
-    .map(
-      review => `
-        <div class="qv-review-item">
-          <div class="qv-review-stars">${starString(review.rating)}</div>
-          ${
-            review.review
-              ? `<p class="qv-review-text">${escapeHTML(review.review)}</p>`
-              : ""
-          }
-          <p class="qv-review-date">${
-            review.created_at
-              ? new Date(review.created_at).toLocaleDateString()
-              : ""
-          }</p>
-        </div>`
-    )
+.map(
+  review => {
+    const reviewerName =
+      review.profiles?.full_name ||
+      "KHELZONE Customer";
+
+    return `
+      <div class="qv-review-item">
+
+        <div class="qv-review-header">
+          <div class="qv-review-user">
+            <span class="qv-review-avatar">
+              ${escapeHTML(reviewerName.charAt(0).toUpperCase())}
+            </span>
+
+            <div>
+              <p class="qv-review-name">
+                ${escapeHTML(reviewerName)}
+              </p>
+
+              <p class="qv-review-date">
+                ${
+                  review.created_at
+                    ? new Date(review.created_at).toLocaleDateString()
+                    : ""
+                }
+              </p>
+            </div>
+          </div>
+
+          <div class="qv-review-stars">
+            ${starString(review.rating)}
+          </div>
+        </div>
+
+        ${
+          review.review
+            ? `<p class="qv-review-text">${escapeHTML(review.review)}</p>`
+            : ""
+        }
+
+      </div>
+    `;
+  }
+)
     .join("");
 
   return `

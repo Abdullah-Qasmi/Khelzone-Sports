@@ -1,16 +1,23 @@
 /* ==========================================================================
    KHELZONE SHOP — JAVASCRIPT
    Rebuilt from the original file:
-   - One single premium product-card renderer (used by the grid AND the
-     trending strip) instead of two competing renderers.
-   - Navbar Wishlist / Cart buttons now actually open the existing
-     #wishlistDrawer / #cartDrawer using the "open" class shop.css expects.
-   - Cart/Wishlist counters fixed (they were stuck behind a "hidden" class
-     that was never removed).
+   - One single premium product-card renderer (used by the grid) instead of
+     two competing renderers.
+   - Navbar Wishlist / Cart buttons open the existing #wishlistDrawer /
+     #cartDrawer using the "open" class shop.css expects.
+   - Cart/Wishlist counters fixed.
    - Mobile menu + mobile search wired to the IDs that actually exist in
      shop.html.
-   - Supabase config, filtering, sorting, search, quick view and the cart/
-     wishlist data model are unchanged.
+   - Supabase config, filtering, sorting, search and the cart/wishlist data
+     model are unchanged.
+
+   NEW IN THIS VERSION:
+   - "Trending Gear" grid/rendering removed (Trending Sports strip is
+     untouched — that's a different, separate section).
+   - Quick View rebuilt into a full product-details modal: specifications
+     table, return & warranty, ratings & reviews (with submission +
+     validation), and seller/shop information — all loaded dynamically
+     from Supabase, nothing hardcoded.
    ========================================================================== */
 
 "use strict";
@@ -100,6 +107,9 @@ const KHELZONE_FALLBACK_IMAGE =
 const VOLLEYBALL_FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=900&q=85";
 
+const KHELZONE_SHOP_FALLBACK_LOGO =
+  "https://placehold.co/120x120/1a1d23/ff5a00?text=KZ";
+
 function productImageFor(product) {
   const sport = String(product?.sport || product?.category || "")
     .trim()
@@ -138,7 +148,16 @@ const state = {
   priceMax: 100000,
 
   sort: "featured",
-  visibleCount: 12
+  visibleCount: 12,
+
+  /* Quick View runtime cache — cleared every time a new product opens */
+  quickView: {
+    productId: null,
+    specifications: [],
+    reviews: [],
+    seller: null,
+    currentUser: null
+  }
 };
 
 const CART_STORAGE_KEY = "khz_cart";
@@ -232,6 +251,12 @@ function normalizeProduct(product) {
     /* Optional manual override: if the row in Supabase has a "badge"
        column, honour it verbatim instead of the auto-derived badge. */
     badge: product.badge || "",
+
+    /* NEW: seller-provided policy text, shown verbatim in Quick View */
+    returnPolicy: product.return_policy || product.returnPolicy || "",
+    warranty: product.warranty || "",
+
+    sellerId: product.seller_id || product.sellerId || null,
 
     createdAt: product.created_at || product.createdAt || null
   };
@@ -584,22 +609,6 @@ function renderProducts() {
 
 
 /* ==========================================================================
-   RENDER TRENDING
-   ========================================================================== */
-
-function renderTrending() {
-  const container = $("#trendingGrid");
-  if (!container) return;
-
-  const trending = state.products
-    .filter(product => product.trending || product.featured)
-    .slice(0, 5);
-
-  container.innerHTML = trending.map(productCardHTML).join("");
-}
-
-
-/* ==========================================================================
    CART SYSTEM
    ========================================================================== */
 
@@ -818,7 +827,6 @@ function toggleWishlist(productId) {
   updateWishlistBadge();
   renderWishlistItems();
   renderProducts();
-  renderTrending();
 }
 
 /* Sync every wishlist button on the page (grid + drawer) with state */
@@ -924,10 +932,273 @@ function showToast(message) {
 
 
 /* ==========================================================================
-   QUICK VIEW MODAL
+   QUICK VIEW — DATA LOADERS (Supabase)
+   All of this is dynamic; nothing here is hardcoded per product.
    ========================================================================== */
 
-function openQuickView(productId) {
+async function fetchProductSpecifications(productId) {
+  if (!supabaseClient) return [];
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("product_specifications")
+      .select("*")
+      .eq("product_id", productId)
+      .order("sort_order", { ascending: true });
+
+    if (error) throw error;
+
+    return (data || []).filter(row => row.name && row.value);
+  } catch (error) {
+    console.warn("Could not load specifications:", error.message || error);
+    return [];
+  }
+}
+
+async function fetchProductReviews(productId) {
+  if (!supabaseClient) return [];
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("product_reviews")
+      .select("*")
+      .eq("product_id", productId)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    return data || [];
+  } catch (error) {
+    console.warn("Could not load reviews:", error.message || error);
+    return [];
+  }
+}
+
+async function fetchSellerShopProfile(sellerId) {
+  if (!supabaseClient || !sellerId) return null;
+
+  /* Uses the public "seller_shop_profiles" view (see Supabase SQL) so
+     that only safe, public seller fields are ever exposed to customers. */
+  try {
+    const { data, error } = await supabaseClient
+      .from("seller_shop_profiles")
+      .select("*")
+      .eq("seller_id", sellerId)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    return data || null;
+  } catch (error) {
+    console.warn("Could not load seller shop profile:", error.message || error);
+    return null;
+  }
+}
+
+async function fetchCurrentUser() {
+  if (!supabaseClient) return null;
+
+  try {
+    const { data: { user } = {} } = await supabaseClient.auth.getUser();
+    return user || null;
+  } catch (error) {
+    return null;
+  }
+}
+
+
+/* ==========================================================================
+   QUICK VIEW — RENDER PIECES
+   ========================================================================== */
+
+function renderSpecificationsHTML(specifications) {
+  if (!specifications.length) return "";
+
+  const rows = specifications
+    .map(
+      spec => `
+        <tr>
+          <td>${escapeHTML(spec.name)}</td>
+          <td>${escapeHTML(spec.value)}</td>
+        </tr>`
+    )
+    .join("");
+
+  return `
+    <div class="qv-section">
+      <h4 class="qv-section-title">Specifications</h4>
+      <table class="qv-specs-table">
+        <thead>
+          <tr><th>Specification</th><th>Details</th></tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+function renderReturnWarrantyHTML(product) {
+  if (!product.returnPolicy && !product.warranty) return "";
+
+  return `
+    <div class="qv-section">
+      <h4 class="qv-section-title">Return &amp; Warranty</h4>
+      <div class="qv-return-warranty">
+        ${
+          product.returnPolicy
+            ? `<div class="qv-rw-item">
+                 <span class="qv-rw-label">Return</span>
+                 <span class="qv-rw-value">${escapeHTML(product.returnPolicy)}</span>
+               </div>`
+            : ""
+        }
+        ${
+          product.warranty
+            ? `<div class="qv-rw-item">
+                 <span class="qv-rw-label">Warranty</span>
+                 <span class="qv-rw-value">${escapeHTML(product.warranty)}</span>
+               </div>`
+            : ""
+        }
+      </div>
+    </div>`;
+}
+
+function starPickerHTML(name) {
+  return `
+    <div class="qv-star-picker" data-star-picker="${name}">
+      ${[1, 2, 3, 4, 5]
+        .map(
+          value =>
+            `<button type="button" class="qv-star-btn" data-star-value="${value}" aria-label="${value} star">☆</button>`
+        )
+        .join("")}
+    </div>`;
+}
+
+function renderReviewsHTML(product, reviews, currentUser, isOwner) {
+  const rating = Number(product.rating || 0);
+  const reviewCount = Number(product.reviews) || reviews.length || 0;
+
+  const alreadyReviewed =
+    currentUser &&
+    reviews.some(review => String(review.user_id) === String(currentUser.id));
+
+  let formHTML = "";
+
+  if (!currentUser) {
+    formHTML = `
+      <div class="qv-review-login">
+        <p>Login to rate this product.</p>
+        <button type="button" class="cta-outline px-5 py-2 text-xs" data-quick-login>LOGIN</button>
+      </div>`;
+  } else if (isOwner) {
+    formHTML = `<p class="qv-review-note">You can't review your own product.</p>`;
+  } else if (alreadyReviewed) {
+    formHTML = `<p class="qv-review-note">You've already reviewed this product. Thanks!</p>`;
+  } else {
+    formHTML = `
+      <form class="qv-review-form" data-review-form data-product-id="${escapeHTML(product.id)}">
+        <label class="qv-rw-label">Your Rating</label>
+        ${starPickerHTML("newReview")}
+        <textarea
+          class="qv-review-textarea"
+          data-review-text
+          rows="3"
+          maxlength="600"
+          placeholder="Share your experience with this product (optional)"
+        ></textarea>
+        <button type="submit" class="cta-primary px-6 py-3 text-xs" data-review-submit>
+          SUBMIT REVIEW
+        </button>
+      </form>`;
+  }
+
+  const reviewItems = reviews
+    .slice(0, 20)
+    .map(
+      review => `
+        <div class="qv-review-item">
+          <div class="qv-review-stars">${starString(review.rating)}</div>
+          ${
+            review.review
+              ? `<p class="qv-review-text">${escapeHTML(review.review)}</p>`
+              : ""
+          }
+          <p class="qv-review-date">${
+            review.created_at
+              ? new Date(review.created_at).toLocaleDateString()
+              : ""
+          }</p>
+        </div>`
+    )
+    .join("");
+
+  return `
+    <div class="qv-section">
+      <h4 class="qv-section-title">Ratings &amp; Reviews</h4>
+
+      <div class="qv-rating-summary">
+        <span class="qv-rating-stars">${starString(rating)}</span>
+        <span class="qv-rating-value">${rating.toFixed(1)}</span>
+        <span class="qv-rating-count">(${reviewCount} Review${reviewCount === 1 ? "" : "s"})</span>
+      </div>
+
+      <div class="qv-review-status" data-review-status></div>
+
+      ${formHTML}
+
+      ${
+        reviewItems
+          ? `<div class="qv-review-list">${reviewItems}</div>`
+          : `<p class="qv-review-note">No reviews yet. Be the first to review this product.</p>`
+      }
+    </div>`;
+}
+
+function renderSellerHTML(seller) {
+  if (!seller) return "";
+
+  const logo = seller.shop_logo || KHELZONE_SHOP_FALLBACK_LOGO;
+  const banner = seller.shop_banner || "";
+
+  return `
+    <div class="qv-section qv-seller-card">
+      <h4 class="qv-section-title">Sold By</h4>
+
+      ${
+        banner
+          ? `<div class="qv-seller-banner" style="background-image:url('${escapeHTML(banner)}')"></div>`
+          : ""
+      }
+
+      <div class="qv-seller-row">
+        <img
+          class="qv-seller-logo"
+          src="${escapeHTML(logo)}"
+          alt="${escapeHTML(seller.shop_name || "KHELZONE Seller")}"
+          onerror="this.onerror=null;this.src='${KHELZONE_SHOP_FALLBACK_LOGO}';"
+        >
+
+        <div class="qv-seller-info">
+          <p class="qv-seller-name">${escapeHTML(seller.shop_name || "KHELZONE Seller")}</p>
+          ${
+            seller.contact_number
+              ? `<a class="qv-seller-contact" href="tel:${escapeHTML(seller.contact_number)}">
+                   ☎ Contact Seller — ${escapeHTML(seller.contact_number)}
+                 </a>`
+              : ""
+          }
+        </div>
+      </div>
+    </div>`;
+}
+
+
+/* ==========================================================================
+   QUICK VIEW MODAL — MAIN
+   ========================================================================== */
+
+async function openQuickView(productId) {
   const product = findProduct(productId);
   if (!product) return;
 
@@ -940,18 +1211,9 @@ function openQuickView(productId) {
     document.body.appendChild(modal);
   }
 
+  /* Show a lightweight loading state immediately so the modal feels
+     instant, then fill in the dynamic sections once data arrives. */
   const image = productImageFor(product);
-
-  const sizeOptions = product.sizes
-    .map(
-      (size, index) => `
-        <button
-          type="button"
-          class="size-option ${index === 0 ? "active" : ""}"
-          data-quick-size="${escapeHTML(size)}"
-        >${escapeHTML(size)}</button>`
-    )
-    .join("");
 
   modal.innerHTML = `
     <div class="quick-view-box" role="dialog" aria-modal="true">
@@ -966,7 +1228,7 @@ function openQuickView(productId) {
         >
       </div>
 
-      <div class="quick-view-content">
+      <div class="quick-view-content" data-quick-content>
 
         <p class="section-eyebrow">${escapeHTML(product.sport || product.category || "Sports")}</p>
 
@@ -977,22 +1239,49 @@ function openQuickView(productId) {
           <span class="text-white/40">(${Number(product.reviews) || 0} reviews)</span>
         </div>
 
-        <h3 class="font-display text-2xl mt-4 text-orange-500">${money(product.price)}</h3>
+        <div class="qv-price-row mt-4">
+          <h3 class="font-display text-2xl text-orange-500">${money(product.price)}</h3>
+          ${
+            product.oldPrice > product.price
+              ? `<span class="qv-old-price">${money(product.oldPrice)}</span>`
+              : ""
+          }
+        </div>
 
-        <p class="mt-4 text-sm text-white/60 leading-relaxed">
-          ${escapeHTML(product.description || "Premium sports equipment from KHELZONE.")}
-        </p>
+        <p class="qv-stock ${stockStatus(product).className}">${stockStatus(product).label}</p>
+
+        ${
+          product.description
+            ? `<p class="mt-4 text-sm text-white/60 leading-relaxed">${escapeHTML(product.description)}</p>`
+            : ""
+        }
 
         <div class="mt-6">
           <span class="text-xs font-bold uppercase tracking-widest text-white/50">Select Size</span>
-          <div class="flex flex-wrap gap-2 mt-3">${sizeOptions}</div>
+          <div class="flex flex-wrap gap-2 mt-3">
+            ${product.sizes
+              .map(
+                (size, index) => `
+                  <button
+                    type="button"
+                    class="size-option ${index === 0 ? "active" : ""}"
+                    data-quick-size="${escapeHTML(size)}"
+                  >${escapeHTML(size)}</button>`
+              )
+              .join("")}
+          </div>
         </div>
 
         <button
           type="button"
           class="cta-primary w-full py-4 text-sm mt-8"
           data-quick-add="${escapeHTML(product.id)}"
-        >ADD TO CART</button>
+          ${Number(product.stock) <= 0 ? "disabled" : ""}
+        >${Number(product.stock) <= 0 ? "OUT OF STOCK" : "ADD TO CART"}</button>
+
+        <div class="qv-dynamic-sections" data-quick-dynamic>
+          <p class="qv-loading">Loading product details…</p>
+        </div>
 
       </div>
 
@@ -1001,6 +1290,43 @@ function openQuickView(productId) {
 
   document.body.classList.add("modal-open");
   requestAnimationFrame(() => modal.classList.add("show"));
+
+  /* Reset per-open cache */
+  state.quickView.productId = product.id;
+
+  /* Fetch specifications, reviews, seller profile and current user in
+     parallel, then render once everything is back. */
+  const [specifications, reviews, currentUser] = await Promise.all([
+    fetchProductSpecifications(product.id),
+    fetchProductReviews(product.id),
+    fetchCurrentUser()
+  ]);
+
+  const seller = product.sellerId
+    ? await fetchSellerShopProfile(product.sellerId)
+    : null;
+
+  /* The modal might have been closed / switched to another product while
+     we were awaiting — bail out if so. */
+  if (state.quickView.productId !== product.id) return;
+
+  state.quickView.specifications = specifications;
+  state.quickView.reviews = reviews;
+  state.quickView.seller = seller;
+  state.quickView.currentUser = currentUser;
+
+  const isOwner =
+    currentUser && String(currentUser.id) === String(product.sellerId);
+
+  const dynamicContainer = $("[data-quick-dynamic]", modal);
+  if (dynamicContainer) {
+    dynamicContainer.innerHTML = [
+      renderSpecificationsHTML(specifications),
+      renderReturnWarrantyHTML(product),
+      renderReviewsHTML(product, reviews, currentUser, isOwner),
+      renderSellerHTML(seller)
+    ].join("");
+  }
 }
 
 function closeQuickView() {
@@ -1010,10 +1336,123 @@ function closeQuickView() {
   modal.classList.remove("show");
   document.body.classList.remove("modal-open");
 
+  state.quickView.productId = null;
+
   setTimeout(() => {
     if (modal.parentNode) modal.remove();
   }, 250);
 }
+
+
+/* ==========================================================================
+   RATING SUBMISSION (with validation)
+   ========================================================================== */
+
+function getSelectedStarValue(pickerEl) {
+  const active = $(".qv-star-btn.active", pickerEl);
+  return active ? Number(active.dataset.starValue) : 0;
+}
+
+function setReviewStatus(message, type = "info") {
+  const statusEl = $("[data-review-status]");
+  if (!statusEl) return;
+
+  statusEl.textContent = message;
+  statusEl.className = `qv-review-status qv-review-status--${type}`;
+}
+
+async function submitProductReview(productId, rating, reviewText) {
+  if (!supabaseClient) {
+    setReviewStatus("Reviews are unavailable right now.", "error");
+    return;
+  }
+
+  /* --- VALIDATION ------------------------------------------------- */
+
+  const numericRating = Number(rating);
+
+  if (!Number.isInteger(numericRating) || numericRating < 1 || numericRating > 5) {
+    setReviewStatus("Please select a rating between 1 and 5 stars.", "error");
+    return;
+  }
+
+  const { data: { user } = {} } = await supabaseClient.auth.getUser();
+
+  if (!user) {
+    setReviewStatus("Please login to submit a rating.", "error");
+    return;
+  }
+
+  const product = findProduct(productId);
+
+  if (product && String(product.sellerId) === String(user.id)) {
+    setReviewStatus("Sellers can't review their own products.", "error");
+    return;
+  }
+
+  const alreadyReviewed = state.quickView.reviews.some(
+    review => String(review.user_id) === String(user.id)
+  );
+
+  if (alreadyReviewed) {
+    setReviewStatus("You've already reviewed this product.", "error");
+    return;
+  }
+
+  /* --- SUBMIT ------------------------------------------------------- */
+
+  setReviewStatus("Submitting your review…", "info");
+
+  try {
+    const { error } = await supabaseClient.from("product_reviews").insert([
+      {
+        product_id: productId,
+        user_id: user.id,
+        rating: numericRating,
+        review: reviewText ? reviewText.trim().slice(0, 600) : null
+      }
+    ]);
+
+    if (error) throw error;
+
+    setReviewStatus("Thanks! Your review has been submitted.", "success");
+
+    /* Refresh the product's live rating/review-count from Supabase
+       (updated server-side by a trigger), then re-render Quick View. */
+    const { data: freshProduct } = await supabaseClient
+      .from("products")
+      .select("*")
+      .eq("id", productId)
+      .maybeSingle();
+
+    if (freshProduct) {
+      const normalized = normalizeProduct(freshProduct);
+      const index = state.products.findIndex(
+        p => String(p.id) === String(productId)
+      );
+      if (index >= 0) state.products[index] = normalized;
+    }
+
+    renderProducts();
+
+    if (state.quickView.productId === productId) {
+      openQuickView(productId);
+    }
+  } catch (error) {
+    console.error("Review submission failed:", error);
+
+    if (String(error.message || "").toLowerCase().includes("duplicate")) {
+      setReviewStatus("You've already reviewed this product.", "error");
+    } else {
+      setReviewStatus("Could not submit your review. Please try again.", "error");
+    }
+  }
+}
+
+
+/* ==========================================================================
+   QUICK VIEW EVENTS
+   ========================================================================== */
 
 function wireQuickViewEvents() {
   document.addEventListener("click", event => {
@@ -1042,7 +1481,7 @@ function wireQuickViewEvents() {
     }
 
     const quickAddButton = event.target.closest("[data-quick-add]");
-    if (quickAddButton) {
+    if (quickAddButton && !quickAddButton.disabled) {
       event.preventDefault();
 
       const productId = quickAddButton.dataset.quickAdd;
@@ -1059,7 +1498,56 @@ function wireQuickViewEvents() {
 
       addToCart(productId, selectedSize);
       closeQuickView();
+      return;
     }
+
+    /* Star picker (used for submitting a new review) */
+    const starButton = event.target.closest(".qv-star-btn");
+    if (starButton) {
+      event.preventDefault();
+
+      const picker = starButton.closest("[data-star-picker]");
+      if (!picker) return;
+
+      const value = Number(starButton.dataset.starValue);
+
+      $$(".qv-star-btn", picker).forEach(btn => {
+        const btnValue = Number(btn.dataset.starValue);
+        btn.classList.toggle("active", btnValue <= value);
+        btn.textContent = btnValue <= value ? "★" : "☆";
+      });
+
+      picker.dataset.selectedValue = value;
+      return;
+    }
+
+    /* "Login to review" shortcut — sends the shopper to the account page.
+       Falls back gracefully if the site doesn't have a dedicated page. */
+    if (event.target.closest("[data-quick-login]")) {
+      event.preventDefault();
+      window.location.href = "login.html";
+      return;
+    }
+  });
+
+  document.addEventListener("submit", event => {
+    const form = event.target.closest("[data-review-form]");
+    if (!form) return;
+
+    event.preventDefault();
+
+    const productId = form.dataset.productId;
+    const picker = $("[data-star-picker]", form);
+    const rating = picker ? Number(picker.dataset.selectedValue || 0) : 0;
+    const textArea = $("[data-review-text]", form);
+    const reviewText = textArea ? textArea.value : "";
+
+    if (!rating) {
+      setReviewStatus("Please select a star rating first.", "error");
+      return;
+    }
+
+    submitProductReview(productId, rating, reviewText);
   });
 
   document.addEventListener("keydown", event => {
@@ -1701,7 +2189,6 @@ async function initializeShop() {
   applyCategoryFromURL();
 
   renderProducts();
-  renderTrending();
   renderWishlistUI();
   refreshCartUI();
   updateWishlistBadge();
@@ -1755,4 +2242,4 @@ window.KHELZONE_SHOP = {
   openWishlistDrawer,
   closeWishlistDrawer,
   refreshCartUI
-}
+};

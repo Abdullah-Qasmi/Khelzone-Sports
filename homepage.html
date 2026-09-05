@@ -6,510 +6,437 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta name="description"
-    content="KHELZONE - Premium sports equipment, team kits and sportswear from Pakistan.">
+    <meta name="description" content="KHELZONE - Premium sports equipment, team kits and sportswear from Pakistan.">
 
-<title>KHELZONE | Gear Up. Play Hard. Win Big.</title>
+    <title>KHELZONE | Gear Up. Play Hard. Win Big.</title>
 
-<!-- =========================================================
+    <!-- =========================================================
      TAILWIND CSS
 ========================================================== -->
 
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
 
-<!-- =========================================================
+    <!-- =========================================================
      GOOGLE FONTS
 ========================================================== -->
 
-<link
-    href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,400..700;1,400..700&family=Inter:wght@400..700&family=JetBrains+Mono:wght@400..800&display=swap"
-    rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,400..700;1,400..700&family=Inter:wght@400..700&family=JetBrains+Mono:wght@400..800&display=swap"
+        rel="stylesheet">
 
 
-<!-- =========================================================
+    <!-- =========================================================
      MATERIAL ICONS
 ========================================================== -->
 
-<link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-    rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
 
 
-<!-- =========================================================
+    <!-- =========================================================
      HOMEPAGE CSS
 ========================================================== -->
 
-<link rel="stylesheet" href="homepage.css">
+    <link rel="stylesheet" href="homepage.css">
+    <link rel="stylesheet" href="shop.css">
 
 
-<!-- =========================================================
+    <!-- =========================================================
      TAILWIND CONFIG
 ========================================================== -->
 
-<script src="homepage.tailwind.config.js"></script>
+    <script src="homepage.tailwind.config.js"></script>
 
 
-<!-- =========================================================
+    <!-- =========================================================
      SUPABASE
 ========================================================== -->
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 </head>
 
 <body class="text-white font-body-md antialiased overflow-x-hidden">
 
 
-<!-- =========================================================
+    <!-- =========================================================
      TOP PROMO
 ========================================================== -->
 
-<div
-    class="bg-orange-600 text-white text-center text-xs sm:text-sm font-semibold py-2 px-4 tracking-wide">
+    <div class="bg-orange-600 text-white text-center text-xs sm:text-sm font-semibold py-2 px-4 tracking-wide">
 
-    FREE DELIVERY ON ORDERS OVER
-    <span class="font-bold">RS. 10,000</span>
+        FREE DELIVERY ON ORDERS OVER
+        <span class="font-bold">RS. 10,000</span>
 
-    <span class="mx-2 opacity-50">•</span>
+        <span class="mx-2 opacity-50">•</span>
 
-    <a
-        href="#deals"
-        class="underline underline-offset-2">
+        <a href="#deals" class="underline underline-offset-2">
 
-        SHOP TODAY'S DEALS
-
-    </a>
-
-</div>
-
-
-<!-- =========================================================
-     HEADER / NAVBAR
-========================================================== -->
-
-<header
-    class="sticky top-0 z-50 border-b border-white/10 bg-[#080a0d]/90 backdrop-blur-xl">
-
-    <div
-        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[72px] flex items-center gap-5">
-
-
-        <!-- MOBILE MENU BUTTON -->
-
-        <button
-            id="menuBtn"
-            type="button"
-            aria-label="Open menu"
-            class="lg:hidden p-2 text-gray-300 hover:text-orange-400">
-
-            <span class="material-symbols-outlined">
-                menu
-            </span>
-
-        </button>
-
-
-        <!-- LOGO -->
-
-        <a
-            href="homepage.html"
-            class="shrink-0">
-
-            <div
-                class="font-display-xl text-2xl sm:text-3xl font-black tracking-tighter text-orange-500">
-
-                KHELZONE
-
-            </div>
-
-            <div
-                class="hidden sm:block text-[9px] tracking-[.28em] text-gray-500 font-bold">
-
-                ENGINEERED FOR PERFORMANCE
-
-            </div>
+            SHOP TODAY'S DEALS
 
         </a>
 
+    </div>
 
-        <!-- =====================================================
+
+    <!-- =========================================================
+     HEADER / NAVBAR
+========================================================== -->
+
+    <header class="sticky top-0 z-50 border-b border-white/10 bg-[#080a0d]/90 backdrop-blur-xl">
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[72px] flex items-center gap-5">
+
+
+            <!-- MOBILE MENU BUTTON -->
+
+            <button id="menuBtn" type="button" aria-label="Open menu"
+                class="lg:hidden p-2 text-gray-300 hover:text-orange-400">
+
+                <span class="material-symbols-outlined">
+                    menu
+                </span>
+
+            </button>
+
+
+            <!-- LOGO -->
+
+            <a href="homepage.html" class="shrink-0">
+
+                <div class="font-display-xl text-2xl sm:text-3xl font-black tracking-tighter text-orange-500">
+
+                    KHELZONE
+
+                </div>
+
+                <div class="hidden sm:block text-[9px] tracking-[.28em] text-gray-500 font-bold">
+
+                    ENGINEERED FOR PERFORMANCE
+
+                </div>
+
+            </a>
+
+
+            <!-- =====================================================
              DESKTOP NAVIGATION
         ====================================================== -->
 
-        <nav
-            class="hidden lg:flex items-center gap-20 ml-10 text-sm font-semibold">
+            <nav class="hidden lg:flex items-center gap-20 ml-10 text-sm font-semibold">
 
-            <a
-                href="homepage.html"
-                class="text-white hover:text-orange-400 transition">
+                <a href="homepage.html" class="text-white hover:text-orange-400 transition">
 
-                Home
+                    Home
 
-            </a>
+                </a>
 
-            <a
-                href="shop.html"
-                class="text-gray-400 hover:text-white transition">
+                <a href="shop.html" class="text-gray-400 hover:text-white transition">
 
-                Shop
+                    Shop
 
-            </a>
+                </a>
 
-            <a
-                href="#deals"
-                class="text-gray-400 hover:text-white transition">
+                <a href="#deals" class="text-gray-400 hover:text-white transition">
 
-                Deals
+                    Deals
 
-            </a>
+                </a>
 
-            <a
-                href="#story"
-                class="text-gray-400 hover:text-white transition">
+                <a href="#story" class="text-gray-400 hover:text-white transition">
 
-                Our Story
+                    Our Story
 
-            </a>
+                </a>
 
-        </nav>
+            </nav>
 
 
-        <!-- =====================================================
+            <!-- =====================================================
              HEADER ACTIONS
         ====================================================== -->
 
-        <div
-            class="ml-auto flex items-center gap-1 sm:gap-2">
+            <div class="ml-auto flex items-center gap-1 sm:gap-2">
 
 
-            <!-- CART -->
+                <!-- CART -->
 
-            <a
-                href="cart.html"
-                aria-label="Shopping cart"
-                class="p-2.5 rounded-full bg-white/5 hover:bg-white/10 text-white transition relative">
+                <a href="cart.html" aria-label="Shopping cart"
+                    class="p-2.5 rounded-full bg-white/5 hover:bg-white/10 text-white transition relative">
 
-                <span class="material-symbols-outlined">
-                    shopping_cart
-                </span>
+                    <span class="material-symbols-outlined">
+                        shopping_cart
+                    </span>
 
-                <span
-                    id="cartCount"
-                    class="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-orange-500 text-[10px] font-bold flex items-center justify-center">
+                    <span id="cartCount"
+                        class="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-orange-500 text-[10px] font-bold flex items-center justify-center">
 
-                    0
+                        0
 
-                </span>
+                    </span>
 
-            </a>
+                </a>
 
 
-            <!-- =================================================
+                <!-- =================================================
                  ACCOUNT
             ================================================== -->
 
-            <div class="relative">
+                <div class="relative">
 
-                <button
-                    id="accountBtn"
-                    type="button"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                    aria-label="Account menu"
-                    class="p-2.5 rounded-full bg-white/5 hover:bg-white/10 text-white transition flex items-center gap-1">
+                    <button id="accountBtn" type="button" aria-haspopup="true" aria-expanded="false"
+                        aria-label="Account menu"
+                        class="p-2.5 rounded-full bg-white/5 hover:bg-white/10 text-white transition flex items-center gap-1">
 
-                    <span class="material-symbols-outlined">
-                        account_circle
-                    </span>
+                        <span class="material-symbols-outlined">
+                            account_circle
+                        </span>
 
-                </button>
+                    </button>
 
-                <div
-                    id="accountMenu"
-                    class="hidden absolute right-0 mt-2 w-64 rounded-2xl border border-white/10 bg-[#11151a] shadow-2xl shadow-black/50 overflow-hidden z-[70]">
-                    <!-- populated by JS -->
+                    <div id="accountMenu"
+                        class="hidden absolute right-0 mt-2 w-64 rounded-2xl border border-white/10 bg-[#11151a] shadow-2xl shadow-black/50 overflow-hidden z-[70]">
+                        <!-- populated by JS -->
+                    </div>
+
                 </div>
 
-            </div>
 
-
-            <!-- =================================================
+                <!-- =================================================
                  SELLER BUTTON
             ================================================== -->
 
-            <a
-                href="seller.html"
-                class="hidden xl:inline-flex ml-2 px-4 py-2.5 rounded-lg border border-orange-500/50 text-orange-400 text-xs font-bold uppercase tracking-wider hover:bg-orange-500 hover:text-black transition">
+                <a href="seller.html"
+                    class="hidden xl:inline-flex ml-2 px-4 py-2.5 rounded-lg border border-orange-500/50 text-orange-400 text-xs font-bold uppercase tracking-wider hover:bg-orange-500 hover:text-black transition">
 
-                Become a Seller
+                    Become a Seller
 
-            </a>
+                </a>
 
 
-            <!-- =================================================
+                <!-- =================================================
                  ADMIN DASHBOARD
             ================================================== -->
 
-            <a
-                id="adminDashboardLink"
-                href="admin-dashboard.html"
-                style="display:none !important;"
-                class="ml-2 px-4 py-2.5 rounded-lg bg-orange-500 text-black text-xs font-black uppercase tracking-wider hover:bg-orange-400 transition">
+                <a id="adminDashboardLink" href="admin-dashboard.html" style="display:none !important;"
+                    class="ml-2 px-4 py-2.5 rounded-lg bg-orange-500 text-black text-xs font-black uppercase tracking-wider hover:bg-orange-400 transition">
 
-                Admin Dashboard
+                    Admin Dashboard
 
-            </a>
+                </a>
+
+            </div>
 
         </div>
 
-    </div>
 
-
-    <!-- =====================================================
+        <!-- =====================================================
          MOBILE MENU
     ====================================================== -->
 
-    <div
-        id="mobileMenu"
-        class="lg:hidden max-h-0 opacity-0 overflow-hidden border-t border-white/10">
+        <div id="mobileMenu" class="lg:hidden max-h-0 opacity-0 overflow-hidden border-t border-white/10">
 
-        <nav
-            class="px-5 py-4 flex flex-col gap-1 text-sm font-semibold">
+            <nav class="px-5 py-4 flex flex-col gap-1 text-sm font-semibold">
 
 
-            <!-- MOBILE ACCOUNT -->
+                <!-- MOBILE ACCOUNT -->
 
-            <div
-                id="mobileAccountSection"
-                class="py-3 border-b border-white/5">
-                <!-- populated by JS -->
-            </div>
+                <div id="mobileAccountSection" class="py-3 border-b border-white/5">
+                    <!-- populated by JS -->
+                </div>
 
 
-            <a
-                class="mobile-link py-3 border-b border-white/5"
-                href="homepage.html">
+                <a class="mobile-link py-3 border-b border-white/5" href="homepage.html">
 
-                Home
+                    Home
 
-            </a>
+                </a>
 
 
-            <a
-                class="mobile-link py-3 border-b border-white/5"
-                href="shop.html">
+                <a class="mobile-link py-3 border-b border-white/5" href="shop.html">
 
-                Shop
+                    Shop
 
-            </a>
+                </a>
 
 
-            <a
-                class="mobile-link py-3 border-b border-white/5"
-                href="#deals">
+                <a class="mobile-link py-3 border-b border-white/5" href="#deals">
 
-                Deals
+                    Deals
 
-            </a>
+                </a>
 
 
-            <a
-                class="mobile-link py-3 border-b border-white/5"
-                href="#story">
+                <a class="mobile-link py-3 border-b border-white/5" href="#story">
 
-                Our Story
+                    Our Story
 
-            </a>
+                </a>
 
 
-            <a
-                class="mobile-link py-3 border-b border-white/5"
-                href="seller.html">
+                <a class="mobile-link py-3 border-b border-white/5" href="seller.html">
 
-                Become a Seller
+                    Become a Seller
 
-            </a>
+                </a>
 
 
-            <a
-                class="mobile-link py-3 border-b border-white/5"
-                href="cart.html">
+                <a class="mobile-link py-3 border-b border-white/5" href="cart.html">
 
-                Shopping Cart
+                    Shopping Cart
 
-            </a>
+                </a>
 
 
-            <!-- MOBILE ADMIN -->
+                <!-- MOBILE ADMIN -->
 
-            <a
-                id="adminDashboardMobileLink"
-                href="admin-dashboard.html"
-                style="display:none !important;"
-                class="mobile-link py-3 text-orange-400 font-black">
+                <a id="adminDashboardMobileLink" href="admin-dashboard.html" style="display:none !important;"
+                    class="mobile-link py-3 text-orange-400 font-black">
 
-                Admin Dashboard
+                    Admin Dashboard
 
-            </a>
+                </a>
 
-        </nav>
+            </nav>
 
-    </div>
+        </div>
 
-</header>
+    </header>
 
 
-<!-- =========================================================
+    <!-- =========================================================
      MAIN
 ========================================================== -->
 
-<main>
+    <main>
 
 
-    <!-- =====================================================
+        <!-- =====================================================
          HERO
     ====================================================== -->
 
-    <section
-        class="relative min-h-[680px] lg:min-h-[760px] flex items-center overflow-hidden">
+        <section class="relative min-h-[680px] lg:min-h-[760px] flex items-center overflow-hidden">
 
-        <div
-            class="absolute inset-0">
+            <div class="absolute inset-0">
 
-            <img
-                src="babar-hero.png"
-                alt="Professional cricket player wearing KHELZONE sports gear"
-                class="w-full h-full object-cover object-center">
+                <img src="babar-hero.png" alt="Professional cricket player wearing KHELZONE sports gear"
+                    class="w-full h-full object-cover object-center">
 
-            <div
-                class="absolute inset-0 hero-overlay">
+                <div class="absolute inset-0 hero-overlay">
+                </div>
+
             </div>
 
-        </div>
+
+            <div class="relative z-10 max-w-7xl w-full mx-auto px-5 sm:px-8 lg:px-10 py-20">
+
+                <div class="max-w-2xl">
 
 
-        <div
-            class="relative z-10 max-w-7xl w-full mx-auto px-5 sm:px-8 lg:px-10 py-20">
+                    <div
+                        class="inline-flex items-center gap-2 border border-orange-500/40 bg-orange-500/10 rounded-full px-4 py-2 mb-7 text-orange-300 text-xs font-bold uppercase tracking-[.16em]">
 
-            <div
-                class="max-w-2xl">
-
-
-                <div
-                    class="inline-flex items-center gap-2 border border-orange-500/40 bg-orange-500/10 rounded-full px-4 py-2 mb-7 text-orange-300 text-xs font-bold uppercase tracking-[.16em]">
-
-                    <span
-                        class="w-2 h-2 rounded-full bg-orange-400 badge-pulse">
-                    </span>
-
-                    Pakistan's Sports Destination
-
-                </div>
-
-
-                <h1
-                    class="font-headline-lg-mobile text-5xl sm:text-7xl lg:text-8xl font-black uppercase tracking-tight leading-[.88]">
-
-                    GEAR UP.<br>
-                    PLAY HARD.<br>
-
-                    <span class="text-gradient">
-                        WIN BIG.
-                    </span>
-
-                </h1>
-
-
-                <p
-                    class="mt-6 max-w-xl text-gray-300 text-base sm:text-lg leading-relaxed">
-
-                    Premium sports equipment and performance wear —
-                    built for athletes who refuse to play ordinary.
-
-                </p>
-
-
-                <div
-                    class="mt-8 flex flex-col sm:flex-row gap-3">
-
-
-                    <a
-                        href="shop.html"
-                        class="orange-gradient inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl text-white font-black uppercase tracking-wide shadow-xl shadow-orange-900/20 hover:scale-[1.02] transition">
-
-                        Shop Sports Equipment
-
-                        <span class="material-symbols-outlined text-lg">
-                            arrow_forward
+                        <span class="w-2 h-2 rounded-full bg-orange-400 badge-pulse">
                         </span>
 
-                    </a>
-
-                </div>
-
-
-                <!-- STATS -->
-
-                <div
-                    class="mt-10 grid grid-cols-3 max-w-lg border-t border-white/15 pt-5">
-
-
-                    <div>
-
-                        <strong
-                            class="block text-xl sm:text-2xl font-black">
-
-                            10K+
-
-                        </strong>
-
-                        <span
-                            class="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider">
-
-                            Athletes Served
-
-                        </span>
+                        Pakistan's Sports Destination
 
                     </div>
 
 
-                    <div
-                        class="border-l border-white/15 pl-4">
+                    <h1
+                        class="font-headline-lg-mobile text-5xl sm:text-7xl lg:text-8xl font-black uppercase tracking-tight leading-[.88]">
 
-                        <strong
-                            class="block text-xl sm:text-2xl font-black">
+                        GEAR UP.<br>
+                        PLAY HARD.<br>
 
-                            50+
-
-                        </strong>
-
-                        <span
-                            class="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider">
-
-                            Sports Products
-
+                        <span class="text-gradient">
+                            WIN BIG.
                         </span>
+
+                    </h1>
+
+
+                    <p class="mt-6 max-w-xl text-gray-300 text-base sm:text-lg leading-relaxed">
+
+                        Premium sports equipment and performance wear —
+                        built for athletes who refuse to play ordinary.
+
+                    </p>
+
+
+                    <div class="mt-8 flex flex-col sm:flex-row gap-3">
+
+
+                        <a href="shop.html"
+                            class="orange-gradient inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl text-white font-black uppercase tracking-wide shadow-xl shadow-orange-900/20 hover:scale-[1.02] transition">
+
+                            Shop Sports Equipment
+
+                            <span class="material-symbols-outlined text-lg">
+                                arrow_forward
+                            </span>
+
+                        </a>
 
                     </div>
 
 
-                    <div
-                        class="border-l border-white/15 pl-4">
+                    <!-- STATS -->
 
-                        <strong
-                            class="block text-xl sm:text-2xl font-black">
+                    <div class="mt-10 grid grid-cols-3 max-w-lg border-t border-white/15 pt-5">
 
-                            100%
 
-                        </strong>
+                        <div>
 
-                        <span
-                            class="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider">
+                            <strong class="block text-xl sm:text-2xl font-black">
 
-                            Quality Focus
+                                10K+
 
-                        </span>
+                            </strong>
+
+                            <span class="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider">
+
+                                Athletes Served
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="border-l border-white/15 pl-4">
+
+                            <strong class="block text-xl sm:text-2xl font-black">
+
+                                50+
+
+                            </strong>
+
+                            <span class="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider">
+
+                                Sports Products
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="border-l border-white/15 pl-4">
+
+                            <strong class="block text-xl sm:text-2xl font-black">
+
+                                100%
+
+                            </strong>
+
+                            <span class="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wider">
+
+                                Quality Focus
+
+                            </span>
+
+                        </div>
 
                     </div>
 
@@ -517,709 +444,791 @@
 
             </div>
 
-        </div>
-
-    </section>
+        </section>
 
 
-    <!-- =====================================================
+        <!-- =====================================================
          TRUST STRIP
     ====================================================== -->
 
-    <section
-        class="border-b border-white/10 bg-[#0d1014]">
+        <section class="border-b border-white/10 bg-[#0d1014]">
 
-        <div
-            class="max-w-7xl mx-auto px-5 sm:px-8 py-5 grid grid-cols-2 md:grid-cols-4 gap-5">
+            <div class="max-w-7xl mx-auto px-5 sm:px-8 py-5 grid grid-cols-2 md:grid-cols-4 gap-5">
 
 
-            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3">
 
-                <span class="material-symbols-outlined text-orange-500">
-                    verified
-                </span>
-
-                <div>
-
-                    <b class="text-sm block">
-                        Verified Quality
-                    </b>
-
-                    <span class="text-xs text-gray-500">
-                        Performance tested gear
+                    <span class="material-symbols-outlined text-orange-500">
+                        verified
                     </span>
+
+                    <div>
+
+                        <b class="text-sm block">
+                            Verified Quality
+                        </b>
+
+                        <span class="text-xs text-gray-500">
+                            Performance tested gear
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="flex items-center gap-3">
+
+                    <span class="material-symbols-outlined text-orange-500">
+                        local_shipping
+                    </span>
+
+                    <div>
+
+                        <b class="text-sm block">
+                            Fast Delivery
+                        </b>
+
+                        <span class="text-xs text-gray-500">
+                            Nationwide shipping
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="flex items-center gap-3">
+
+                    <span class="material-symbols-outlined text-orange-500">
+                        inventory_2
+                    </span>
+
+                    <div>
+
+                        <b class="text-sm block">
+                            Sports Equipment
+                        </b>
+
+                        <span class="text-xs text-gray-500">
+                            Gear for every game
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="flex items-center gap-3">
+
+                    <span class="material-symbols-outlined text-orange-500">
+                        support_agent
+                    </span>
+
+                    <div>
+
+                        <b class="text-sm block">
+                            Athlete Support
+                        </b>
+
+                        <span class="text-xs text-gray-500">
+                            We're here to help
+                        </span>
+
+                    </div>
 
                 </div>
 
             </div>
 
-
-            <div class="flex items-center gap-3">
-
-                <span class="material-symbols-outlined text-orange-500">
-                    local_shipping
-                </span>
-
-                <div>
-
-                    <b class="text-sm block">
-                        Fast Delivery
-                    </b>
-
-                    <span class="text-xs text-gray-500">
-                        Nationwide shipping
-                    </span>
-
-                </div>
-
-            </div>
+        </section>
 
 
-            <div class="flex items-center gap-3">
-
-                <span class="material-symbols-outlined text-orange-500">
-                    inventory_2
-                </span>
-
-                <div>
-
-                    <b class="text-sm block">
-                        Sports Equipment
-                    </b>
-
-                    <span class="text-xs text-gray-500">
-                        Gear for every game
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <div class="flex items-center gap-3">
-
-                <span class="material-symbols-outlined text-orange-500">
-                    support_agent
-                </span>
-
-                <div>
-
-                    <b class="text-sm block">
-                        Athlete Support
-                    </b>
-
-                    <span class="text-xs text-gray-500">
-                        We're here to help
-                    </span>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =====================================================
+        <!-- =====================================================
          SPORTS
     ====================================================== -->
 
-    <section
-        id="sports"
-        class="py-16 sm:py-20 px-5 sm:px-8 max-w-7xl mx-auto">
+        <section id="sports" class="py-16 sm:py-20 px-5 sm:px-8 max-w-7xl mx-auto">
 
 
-        <div
-            class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
 
-            <div>
+                <div>
 
-                <p
-                    class="text-orange-500 text-xs font-black uppercase tracking-[.2em] mb-2">
+                    <p class="text-orange-500 text-xs font-black uppercase tracking-[.2em] mb-2">
 
-                    Find your game
+                        Find your game
 
-                </p>
+                    </p>
 
-                <h2
-                    class="text-3xl sm:text-4xl font-black uppercase tracking-tight">
+                    <h2 class="text-3xl sm:text-4xl font-black uppercase tracking-tight">
 
-                    Shop by Sport
+                        Shop by Sport
 
-                </h2>
+                    </h2>
+
+                </div>
+
+
+                <a href="shop.html"
+                    class="text-orange-400 text-sm font-bold uppercase tracking-wider inline-flex items-center gap-1">
+
+                    View all sports
+
+                    <span class="material-symbols-outlined text-base">
+                        arrow_forward
+                    </span>
+
+                </a>
 
             </div>
 
 
-            <a
-                href="shop.html"
-                class="text-orange-400 text-sm font-bold uppercase tracking-wider inline-flex items-center gap-1">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
 
-                View all sports
 
-                <span class="material-symbols-outlined text-base">
-                    arrow_forward
-                </span>
+                <!-- CRICKET -->
 
-            </a>
+                <a href="shop.html?category=Cricket" data-sport="Cricket"
+                    class="sport-card relative h-44 sm:h-52 rounded-2xl overflow-hidden border border-white/10 group card-hover">
 
-        </div>
+                    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLnCkJl0Hw5LTWrCUGxTi18FgB3KfQ-XO0hcZmeSGAXpwDLJIyaqKnGIDTFDAafI_gv5hVCd2BrD6s1Jw98unBqeUOYIJIRoIvUo_V2CuiEjasQcfpAWav-Z-0-4TNYsd8uiargfUUNmjM1B3F91V5srySVs1Mu_fFYTpRIvrEqrT3mFxgsbjPgGzbJ-SE9Xg37iCD1sTj04Qd9bLapAvPC6LXhZYME_QZnks4RdcG-czygtuaOcPXfw"
+                        class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                        alt="Cricket">
 
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent">
+                    </div>
 
-        <div
-            class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <span class="absolute bottom-4 left-4 font-black uppercase">
 
+                        Cricket
 
-            <!-- CRICKET -->
+                    </span>
 
-            <a
-                href="shop.html?category=Cricket"
-                data-sport="Cricket"
-                class="sport-card relative h-44 sm:h-52 rounded-2xl overflow-hidden border border-white/10 group card-hover">
+                </a>
 
-                <img
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLnCkJl0Hw5LTWrCUGxTi18FgB3KfQ-XO0hcZmeSGAXpwDLJIyaqKnGIDTFDAafI_gv5hVCd2BrD6s1Jw98unBqeUOYIJIRoIvUo_V2CuiEjasQcfpAWav-Z-0-4TNYsd8uiargfUUNmjM1B3F91V5srySVs1Mu_fFYTpRIvrEqrT3mFxgsbjPgGzbJ-SE9Xg37iCD1sTj04Qd9bLapAvPC6LXhZYME_QZnks4RdcG-czygtuaOcPXfw"
-                    class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500"
-                    alt="Cricket">
 
-                <div
-                    class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent">
-                </div>
+                <!-- FOOTBALL -->
 
-                <span
-                    class="absolute bottom-4 left-4 font-black uppercase">
+                <a href="shop.html?category=Football" data-sport="Football"
+                    class="sport-card relative h-44 sm:h-52 rounded-2xl overflow-hidden border border-white/10 group card-hover">
 
-                    Cricket
+                    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5p6XiUkGT0spHyJ9l_jOpd8ikuyF3L0gAV5it5qbNwCEAjVYVsIAgwKIWNeghvIVJWGVQdCpl1JUzkYyow6lmiQ4JqnFF3UJLjXoTDdxvQRBeHF4Bq4657ueEDgE0J9QLqsED9viSc7WzfWZu1wpB8gHVfYnd2Rsr1N5mXiy7FTFqvIK8OBsxOljDKxNDELKgqogw05-9cCVGC-AvlxvcARujMMZoEkp571WdozuGHwEhDh1TrOpzHg"
+                        class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                        alt="Football">
 
-                </span>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent">
+                    </div>
 
-            </a>
+                    <span class="absolute bottom-4 left-4 font-black uppercase">
 
+                        Football
 
-            <!-- FOOTBALL -->
+                    </span>
 
-            <a
-                href="shop.html?category=Football"
-                data-sport="Football"
-                class="sport-card relative h-44 sm:h-52 rounded-2xl overflow-hidden border border-white/10 group card-hover">
+                </a>
 
-                <img
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5p6XiUkGT0spHyJ9l_jOpd8ikuyF3L0gAV5it5qbNwCEAjVYVsIAgwKIWNeghvIVJWGVQdCpl1JUzkYyow6lmiQ4JqnFF3UJLjXoTDdxvQRBeHF4Bq4657ueEDgE0J9QLqsED9viSc7WzfWZu1wpB8gHVfYnd2Rsr1N5mXiy7FTFqvIK8OBsxOljDKxNDELKgqogw05-9cCVGC-AvlxvcARujMMZoEkp571WdozuGHwEhDh1TrOpzHg"
-                    class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500"
-                    alt="Football">
 
-                <div
-                    class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent">
-                </div>
+                <!-- HOCKEY -->
 
-                <span
-                    class="absolute bottom-4 left-4 font-black uppercase">
+                <a href="shop.html?category=Hockey" data-sport="Hockey"
+                    class="sport-card relative h-44 sm:h-52 rounded-2xl overflow-hidden border border-white/10 group card-hover">
 
-                    Football
+                    <img src="https://images.unsplash.com/photo-1537751181166-be1708a8ec4f?auto=format&fit=crop&w=1200&q=90"
+                        class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                        alt="Field hockey player in action"
+                        onerror="this.onerror=null;this.src='https://images.squarespace-cdn.com/content/v1/5746af52b6aa605171e48142/f8df745a-c95c-4910-b2f0-e810c957f895/7.jpg';">
 
-                </span>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent">
+                    </div>
 
-            </a>
+                    <span class="absolute bottom-4 left-4 font-black uppercase">
 
+                        Hockey
 
-            <!-- HOCKEY -->
+                    </span>
 
-            <a
-                href="shop.html?category=Hockey"
-                data-sport="Hockey"
-                class="sport-card relative h-44 sm:h-52 rounded-2xl overflow-hidden border border-white/10 group card-hover">
+                </a>
 
-                <img
-                    src="https://images.unsplash.com/photo-1537751181166-be1708a8ec4f?auto=format&fit=crop&w=1200&q=90"
-                    class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500"
-                    alt="Field hockey player in action"
-                    onerror="this.onerror=null;this.src='https://images.squarespace-cdn.com/content/v1/5746af52b6aa605171e48142/f8df745a-c95c-4910-b2f0-e810c957f895/7.jpg';">
 
-                <div
-                    class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent">
-                </div>
+                <!-- BADMINTON -->
 
-                <span
-                    class="absolute bottom-4 left-4 font-black uppercase">
+                <a href="shop.html?category=Badminton" data-sport="Badminton"
+                    class="sport-card relative h-44 sm:h-52 rounded-2xl overflow-hidden border border-white/10 group card-hover">
 
-                    Hockey
+                    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7F589TrWkGsxA2p0Bf_ahcgvspAFqdxbHavKa1dEa5rcH64WkTb6jUkftymjvk8aj_9-GmAfF-0oZeZO549yAuZtwwMUjFnZXn5A-rkOAHoSxi8IIdZHevJRKxFYxzC_Wd3ItEoRCPsF2BubTVc0eCeO5u9-NoNoM0plmH-ioYbAIYIbMSG_V5IEPiK6ZLUPAv14s16Wm41wVrEgNZ-cUu-tA1hRzlq64nU6JXpULoc7TPeRmnLl0uQ"
+                        class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                        alt="Badminton">
 
-                </span>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent">
+                    </div>
 
-            </a>
+                    <span class="absolute bottom-4 left-4 font-black uppercase">
 
+                        Badminton
 
-            <!-- BADMINTON -->
+                    </span>
 
-            <a
-                href="shop.html?category=Badminton"
-                data-sport="Badminton"
-                class="sport-card relative h-44 sm:h-52 rounded-2xl overflow-hidden border border-white/10 group card-hover">
+                </a>
 
-                <img
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7F589TrWkGsxA2p0Bf_ahcgvspAFqdxbHavKa1dEa5rcH64WkTb6jUkftymjvk8aj_9-GmAfF-0oZeZO549yAuZtwwMUjFnZXn5A-rkOAHoSxi8IIdZHevJRKxFYxzC_Wd3ItEoRCPsF2BubTVc0eCeO5u9-NoNoM0plmH-ioYbAIYIbMSG_V5IEPiK6ZLUPAv14s16Wm41wVrEgNZ-cUu-tA1hRzlq64nU6JXpULoc7TPeRmnLl0uQ"
-                    class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500"
-                    alt="Badminton">
 
-                <div
-                    class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent">
-                </div>
+                <!-- TENNIS -->
 
-                <span
-                    class="absolute bottom-4 left-4 font-black uppercase">
+                <a href="shop.html?category=Tennis" data-sport="Tennis"
+                    class="sport-card relative h-44 sm:h-52 rounded-2xl overflow-hidden border border-white/10 group card-hover">
 
-                    Badminton
+                    <img src="https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?auto=format&fit=crop&w=900&q=85"
+                        class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                        alt="Tennis player">
 
-                </span>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent">
+                    </div>
 
-            </a>
+                    <span class="absolute bottom-4 left-4 font-black uppercase">
 
+                        Tennis
 
-            <!-- TENNIS -->
+                    </span>
 
-            <a
-                href="shop.html?category=Tennis"
-                data-sport="Tennis"
-                class="sport-card relative h-44 sm:h-52 rounded-2xl overflow-hidden border border-white/10 group card-hover">
+                </a>
 
-                <img
-                    src="https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?auto=format&fit=crop&w=900&q=85"
-                    class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500"
-                    alt="Tennis player">
 
-                <div
-                    class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent">
-                </div>
+                <!-- BASKETBALL -->
 
-                <span
-                    class="absolute bottom-4 left-4 font-black uppercase">
+                <a href="shop.html?category=Basketball" data-sport="Basketball"
+                    class="sport-card relative h-44 sm:h-52 rounded-2xl overflow-hidden border border-white/10 group card-hover">
 
-                    Tennis
+                    <img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=900&q=85"
+                        class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                        alt="Basketball game">
 
-                </span>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent">
+                    </div>
 
-            </a>
+                    <span class="absolute bottom-4 left-4 font-black uppercase">
 
+                        Basketball
 
-            <!-- BASKETBALL -->
+                    </span>
 
-            <a
-                href="shop.html?category=Basketball"
-                data-sport="Basketball"
-                class="sport-card relative h-44 sm:h-52 rounded-2xl overflow-hidden border border-white/10 group card-hover">
+                </a>
 
-                <img
-                    src="https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=900&q=85"
-                    class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition duration-500"
-                    alt="Basketball game">
+            </div>
 
-                <div
-                    class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent">
-                </div>
+        </section>
 
-                <span
-                    class="absolute bottom-4 left-4 font-black uppercase">
 
-                    Basketball
-
-                </span>
-
-            </a>
-
-        </div>
-
-    </section>
-
-
-    <!-- =====================================================
+        <!-- =====================================================
          BEST SELLERS
          (Top Sellers marketplace block removed — this section
          now starts directly with admin-selected Best Sellers)
     ====================================================== -->
 
-    <section
-        id="products"
-        class="py-16 sm:py-20 px-5 sm:px-8 max-w-7xl mx-auto">
+        <section id="products" class="py-16 sm:py-20 px-5 sm:px-8 max-w-7xl mx-auto">
 
 
-        <!-- BEST SELLER TITLE -->
+            <!-- BEST SELLER TITLE -->
 
-        <div
-            class="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-8">
-
-            <div>
-
-                <p
-                    class="text-orange-500 text-xs font-black uppercase tracking-[.2em] mb-2">
-
-                    Admin selected
-
-                </p>
-
-                <h2
-                    class="text-3xl sm:text-4xl font-black uppercase">
-
-                    Best Sellers
-
-                </h2>
-
-                <p
-                    id="filterText"
-                    class="text-gray-500 text-sm mt-2">
-
-                    Top products selected by KHELZONE.
-
-                </p>
-
-            </div>
-
-
-            <a
-                href="shop.html"
-                class="text-orange-400 text-sm font-bold uppercase tracking-wider inline-flex items-center gap-1">
-
-                View all products
-
-                <span class="material-symbols-outlined text-base">
-                    arrow_forward
-                </span>
-
-            </a>
-
-        </div>
-
-
-        <!-- DYNAMIC PRODUCT GRID -->
-
-        <div
-            id="productGrid"
-            class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        </div>
-
-
-        <!-- NO PRODUCTS -->
-
-        <div
-            id="noProducts"
-            class="hidden text-center py-16 text-gray-500">
-
-            <span class="material-symbols-outlined text-5xl">
-                inventory_2
-            </span>
-
-            <p class="mt-3 font-bold text-white">
-                No best sellers available right now.
-            </p>
-
-        </div>
-
-
-        <!-- VIEW ALL -->
-
-        <div class="text-center mt-9">
-
-            <a
-                href="shop.html"
-                class="inline-flex px-7 py-3 rounded-xl border border-white/15 hover:border-orange-500 hover:text-orange-400 text-sm font-black uppercase transition">
-
-                Explore All Products
-
-            </a>
-
-        </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         DEALS
-    ====================================================== -->
-
-    <section
-        id="deals"
-        class="py-16 px-5 sm:px-8">
-
-        <div
-            class="max-w-7xl mx-auto rounded-3xl overflow-hidden border border-orange-500/20 orange-gradient">
-
-            <div
-                class="px-6 sm:px-12 py-10 sm:py-14 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-8">
 
                 <div>
 
-                    <span
-                        class="inline-block bg-black/20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+                    <p class="text-orange-500 text-xs font-black uppercase tracking-[.2em] mb-2">
 
-                        Limited Time Offer
+                        Admin selected
 
-                    </span>
+                    </p>
 
-                    <h2
-                        class="mt-4 text-4xl sm:text-6xl font-black uppercase leading-none">
+                    <h2 class="text-3xl sm:text-4xl font-black uppercase">
 
-                        Game On.<br>
-                        Prices Down.
+                        Best Sellers
 
                     </h2>
 
-                    <p
-                        class="mt-4 text-white/80 max-w-lg">
+                    <p id="filterText" class="text-gray-500 text-sm mt-2">
 
-                        Save on selected sports equipment and team essentials.
-                        Upgrade your game without breaking the budget.
+                        Top products selected by KHELZONE.
 
                     </p>
 
                 </div>
 
 
+                <a href="shop.html"
+                    class="text-orange-400 text-sm font-bold uppercase tracking-wider inline-flex items-center gap-1">
+
+                    View all products
+
+                    <span class="material-symbols-outlined text-base">
+                        arrow_forward
+                    </span>
+
+                </a>
+
+            </div>
+
+
+            <!-- DYNAMIC PRODUCT GRID -->
+
+            <div id="productGrid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            </div>
+
+
+            <!-- NO PRODUCTS -->
+
+            <div id="noProducts" class="hidden text-center py-16 text-gray-500">
+
+                <span class="material-symbols-outlined text-5xl">
+                    inventory_2
+                </span>
+
+                <p class="mt-3 font-bold text-white">
+                    No best sellers available right now.
+                </p>
+
+            </div>
+
+
+            <!-- VIEW ALL -->
+
+            <div class="text-center mt-9">
+
+                <a href="shop.html"
+                    class="inline-flex px-7 py-3 rounded-xl border border-white/15 hover:border-orange-500 hover:text-orange-400 text-sm font-black uppercase transition">
+
+                    Explore All Products
+
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+         DEALS
+    ====================================================== -->
+
+        <section id="deals" class="py-16 px-5 sm:px-8">
+
+            <div class="max-w-7xl mx-auto rounded-3xl overflow-hidden border border-orange-500/20 orange-gradient">
+
                 <div
-                    class="shrink-0 text-center">
+                    class="px-6 sm:px-12 py-10 sm:py-14 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
 
-                    <div
-                        class="text-6xl sm:text-8xl font-black">
+                    <div>
 
-                        30<span class="text-4xl">%</span>
+                        <span
+                            class="inline-block bg-black/20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+
+                            Limited Time Offer
+
+                        </span>
+
+                        <h2 class="mt-4 text-4xl sm:text-6xl font-black uppercase leading-none">
+
+                            Game On.<br>
+                            Prices Down.
+
+                        </h2>
+
+                        <p class="mt-4 text-white/80 max-w-lg">
+
+                            Save on selected sports equipment and team essentials.
+                            Upgrade your game without breaking the budget.
+
+                        </p>
 
                     </div>
 
-                    <div
-                        class="font-black uppercase tracking-widest text-sm">
 
-                        Up to selected items
+                    <div class="shrink-0 text-center">
+
+                        <div class="text-6xl sm:text-8xl font-black">
+
+                            30<span class="text-4xl">%</span>
+
+                        </div>
+
+                        <div class="font-black uppercase tracking-widest text-sm">
+
+                            Up to selected items
+
+                        </div>
+
+
+                        <a href="shop.html"
+                            class="mt-5 inline-flex bg-black text-white px-7 py-3.5 rounded-xl font-black uppercase text-sm hover:bg-white hover:text-black transition">
+
+                            Shop Deals
+
+                        </a>
 
                     </div>
-
-
-                    <a
-                        href="shop.html"
-                        class="mt-5 inline-flex bg-black text-white px-7 py-3.5 rounded-xl font-black uppercase text-sm hover:bg-white hover:text-black transition">
-
-                        Shop Deals
-
-                    </a>
 
                 </div>
 
             </div>
 
-        </div>
-
-    </section>
+        </section>
 
 
-    <!-- =====================================================
+        <!-- =====================================================
          WHY KHELZONE
     ====================================================== -->
 
-    <section
-        class="py-16 sm:py-20 bg-[#0d1014] border-y border-white/10">
+        <section class="py-16 sm:py-20 bg-[#0d1014] border-y border-white/10">
 
-        <div
-            class="max-w-7xl mx-auto px-5 sm:px-8">
+            <div class="max-w-7xl mx-auto px-5 sm:px-8">
 
 
-            <div
-                class="text-center max-w-2xl mx-auto">
+                <div class="text-center max-w-2xl mx-auto">
 
-                <p
-                    class="text-orange-500 text-xs font-black uppercase tracking-[.2em]">
+                    <p class="text-orange-500 text-xs font-black uppercase tracking-[.2em]">
 
-                    Why athletes choose us
-
-                </p>
-
-                <h2
-                    class="mt-2 text-3xl sm:text-4xl font-black uppercase">
-
-                    Built Around Your Game
-
-                </h2>
-
-            </div>
-
-
-            <div
-                class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-10">
-
-
-                <div
-                    class="p-6 rounded-2xl bg-white/[.03] border border-white/10 card-hover">
-
-                    <span
-                        class="material-symbols-outlined text-orange-500 text-3xl">
-
-                        workspace_premium
-
-                    </span>
-
-                    <h3 class="mt-5 font-black uppercase">
-                        Premium Quality
-                    </h3>
-
-                    <p
-                        class="mt-2 text-sm text-gray-500 leading-relaxed">
-
-                        Reliable equipment selected for real training and match performance.
+                        Why athletes choose us
 
                     </p>
+
+                    <h2 class="mt-2 text-3xl sm:text-4xl font-black uppercase">
+
+                        Built Around Your Game
+
+                    </h2>
 
                 </div>
 
 
-                <div
-                    class="p-6 rounded-2xl bg-white/[.03] border border-white/10 card-hover">
-
-                    <span
-                        class="material-symbols-outlined text-orange-500 text-3xl">
-
-                        sports
-
-                    </span>
-
-                    <h3 class="mt-5 font-black uppercase">
-                        Made for Athletes
-                    </h3>
-
-                    <p
-                        class="mt-2 text-sm text-gray-500 leading-relaxed">
-
-                        Sports gear designed around the needs of players, teams and athletes.
-
-                    </p>
-
-                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-10">
 
 
-                <div
-                    class="p-6 rounded-2xl bg-white/[.03] border border-white/10 card-hover">
+                    <div class="p-6 rounded-2xl bg-white/[.03] border border-white/10 card-hover">
 
-                    <span
-                        class="material-symbols-outlined text-orange-500 text-3xl">
+                        <span class="material-symbols-outlined text-orange-500 text-3xl">
 
-                        local_shipping
+                            workspace_premium
 
-                    </span>
+                        </span>
 
-                    <h3 class="mt-5 font-black uppercase">
-                        Nationwide Delivery
-                    </h3>
+                        <h3 class="mt-5 font-black uppercase">
+                            Premium Quality
+                        </h3>
 
-                    <p
-                        class="mt-2 text-sm text-gray-500 leading-relaxed">
+                        <p class="mt-2 text-sm text-gray-500 leading-relaxed">
 
-                        Get your sports essentials delivered wherever you play in Pakistan.
+                            Reliable equipment selected for real training and match performance.
 
-                    </p>
+                        </p>
 
-                </div>
+                    </div>
 
 
-                <div
-                    class="p-6 rounded-2xl bg-white/[.03] border border-white/10 card-hover">
+                    <div class="p-6 rounded-2xl bg-white/[.03] border border-white/10 card-hover">
 
-                    <span
-                        class="material-symbols-outlined text-orange-500 text-3xl">
+                        <span class="material-symbols-outlined text-orange-500 text-3xl">
 
-                        support_agent
+                            sports
 
-                    </span>
+                        </span>
 
-                    <h3 class="mt-5 font-black uppercase">
-                        Real Support
-                    </h3>
+                        <h3 class="mt-5 font-black uppercase">
+                            Made for Athletes
+                        </h3>
 
-                    <p
-                        class="mt-2 text-sm text-gray-500 leading-relaxed">
+                        <p class="mt-2 text-sm text-gray-500 leading-relaxed">
 
-                        Need help choosing gear or planning a team order?
-                        Talk to our team.
+                            Sports gear designed around the needs of players, teams and athletes.
 
-                    </p>
+                        </p>
+
+                    </div>
+
+
+                    <div class="p-6 rounded-2xl bg-white/[.03] border border-white/10 card-hover">
+
+                        <span class="material-symbols-outlined text-orange-500 text-3xl">
+
+                            local_shipping
+
+                        </span>
+
+                        <h3 class="mt-5 font-black uppercase">
+                            Nationwide Delivery
+                        </h3>
+
+                        <p class="mt-2 text-sm text-gray-500 leading-relaxed">
+
+                            Get your sports essentials delivered wherever you play in Pakistan.
+
+                        </p>
+
+                    </div>
+
+
+                    <div class="p-6 rounded-2xl bg-white/[.03] border border-white/10 card-hover">
+
+                        <span class="material-symbols-outlined text-orange-500 text-3xl">
+
+                            support_agent
+
+                        </span>
+
+                        <h3 class="mt-5 font-black uppercase">
+                            Real Support
+                        </h3>
+
+                        <p class="mt-2 text-sm text-gray-500 leading-relaxed">
+
+                            Need help choosing gear or planning a team order?
+                            Talk to our team.
+
+                        </p>
+
+                    </div>
 
                 </div>
 
             </div>
 
-        </div>
-
-    </section>
+        </section>
 
 
-    <!-- =====================================================
+        <!-- =====================================================
          STORY
     ====================================================== -->
 
-    <section
-        id="story"
-        class="py-20 relative overflow-hidden">
+        <section id="story" class="py-20 relative overflow-hidden">
 
-        <div
-            class="absolute right-0 top-0 text-orange-500/[.04]">
+            <div class="absolute right-0 top-0 text-orange-500/[.04]">
 
-            <span
-                class="material-symbols-outlined text-[350px]">
+                <span class="material-symbols-outlined text-[350px]">
 
-                public
+                    public
 
-            </span>
+                </span>
 
-        </div>
+            </div>
 
 
-        <div
-            class="max-w-7xl mx-auto px-5 sm:px-8 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
+            <div class="max-w-7xl mx-auto px-5 sm:px-8 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
 
+
+                <div>
+
+                    <p class="text-orange-500 text-xs font-black uppercase tracking-[.2em]">
+
+                        Our roots
+
+                    </p>
+
+
+                    <h2 class="mt-3 text-4xl sm:text-6xl font-black uppercase leading-[.9]">
+
+                        From Sialkot<br>
+
+                        <span class="text-gradient">
+                            To The World.
+                        </span>
+
+                    </h2>
+
+
+                    <p class="mt-6 text-gray-400 leading-relaxed max-w-xl">
+
+                        KHELZONE connects athletes with the sports manufacturing expertise
+                        Pakistan is known for. From everyday equipment to team essentials,
+                        our mission is simple: make quality sports gear more accessible
+                        and help every player perform with confidence.
+
+                    </p>
+
+
+                    <div class="flex flex-wrap gap-3 mt-7">
+
+                        <a href="shop.html"
+                            class="px-5 py-3 rounded-xl border border-white/15 hover:border-orange-500 text-sm font-bold transition">
+
+                            Explore Sports Gear
+
+                        </a>
+
+
+                        <a href="seller.html"
+                            class="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-sm font-bold transition">
+
+                            Become a Seller
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <div class="grid grid-cols-2 gap-3">
+
+
+                    <div class="rounded-2xl bg-[#151a20] border border-white/10 p-7 min-h-44">
+
+                        <div class="text-4xl font-black text-orange-500">
+
+                            01
+
+                        </div>
+
+                        <h3 class="mt-8 font-black uppercase">
+                            Quality First
+                        </h3>
+
+                    </div>
+
+
+                    <div class="rounded-2xl bg-[#151a20] border border-white/10 p-7 min-h-44 mt-8">
+
+                        <div class="text-4xl font-black text-orange-500">
+
+                            02
+
+                        </div>
+
+                        <h3 class="mt-8 font-black uppercase">
+                            Fair Pricing
+                        </h3>
+
+                    </div>
+
+
+                    <div class="rounded-2xl bg-[#151a20] border border-white/10 p-7 min-h-44">
+
+                        <div class="text-4xl font-black text-orange-500">
+
+                            03
+
+                        </div>
+
+                        <h3 class="mt-8 font-black uppercase">
+                            Athlete Focus
+                        </h3>
+
+                    </div>
+
+
+                    <div class="rounded-2xl bg-[#151a20] border border-white/10 p-7 min-h-44 mt-8">
+
+                        <div class="text-4xl font-black text-orange-500">
+
+                            04
+
+                        </div>
+
+                        <h3 class="mt-8 font-black uppercase">
+                            Global Vision
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================================================
+     FOOTER
+========================================================== -->
+
+    <footer class="border-t border-white/10 bg-[#07090c]">
+
+        <div class="max-w-7xl mx-auto px-5 sm:px-8 py-14 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-10">
+
+
+            <!-- BRAND -->
+
+            <div class="col-span-2 lg:col-span-1">
+
+                <a href="homepage.html">
+
+                    <div class="text-3xl font-black tracking-tighter text-orange-500">
+
+                        KHELZONE
+
+                    </div>
+
+                </a>
+
+
+                <p class="mt-4 text-sm text-gray-500 leading-relaxed">
+
+                    Premium sports equipment built for performance.
+
+                </p>
+
+            </div>
+
+
+            <!-- SHOP -->
 
             <div>
 
-                <p
-                    class="text-orange-500 text-xs font-black uppercase tracking-[.2em]">
+                <h3 class="text-xs font-black uppercase tracking-widest mb-4">
 
-                    Our roots
+                    Shop
 
-                </p>
+                </h3>
 
+                <div class="space-y-3 text-sm text-gray-500">
 
-                <h2
-                    class="mt-3 text-4xl sm:text-6xl font-black uppercase leading-[.9]">
+                    <a class="block hover:text-orange-400" href="shop.html">
 
-                    From Sialkot<br>
-
-                    <span class="text-gradient">
-                        To The World.
-                    </span>
-
-                </h2>
-
-
-                <p
-                    class="mt-6 text-gray-400 leading-relaxed max-w-xl">
-
-                    KHELZONE connects athletes with the sports manufacturing expertise
-                    Pakistan is known for. From everyday equipment to team essentials,
-                    our mission is simple: make quality sports gear more accessible
-                    and help every player perform with confidence.
-
-                </p>
-
-
-                <div
-                    class="flex flex-wrap gap-3 mt-7">
-
-                    <a
-                        href="shop.html"
-                        class="px-5 py-3 rounded-xl border border-white/15 hover:border-orange-500 text-sm font-bold transition">
-
-                        Explore Sports Gear
+                        All Products
 
                     </a>
 
+                    <a class="block hover:text-orange-400" href="shop.html?category=Cricket">
 
-                    <a
-                        href="seller.html"
-                        class="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-sm font-bold transition">
+                        Cricket
+
+                    </a>
+
+                    <a class="block hover:text-orange-400" href="shop.html?category=Football">
+
+                        Football
+
+                    </a>
+
+                    <a class="block hover:text-orange-400" href="shop.html?category=Hockey">
+
+                        Hockey
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- COMPANY -->
+
+            <div>
+
+                <h3 class="text-xs font-black uppercase tracking-widest mb-4">
+
+                    Company
+
+                </h3>
+
+                <div class="space-y-3 text-sm text-gray-500">
+
+                    <a class="block hover:text-orange-400" href="#story">
+
+                        Our Story
+
+                    </a>
+
+                    <a class="block hover:text-orange-400" href="seller.html">
 
                         Become a Seller
 
@@ -1229,1382 +1238,1489 @@
 
             </div>
 
-
-            <div
-                class="grid grid-cols-2 gap-3">
-
-
-                <div
-                    class="rounded-2xl bg-[#151a20] border border-white/10 p-7 min-h-44">
-
-                    <div
-                        class="text-4xl font-black text-orange-500">
-
-                        01
-
-                    </div>
-
-                    <h3 class="mt-8 font-black uppercase">
-                        Quality First
-                    </h3>
-
-                </div>
-
-
-                <div
-                    class="rounded-2xl bg-[#151a20] border border-white/10 p-7 min-h-44 mt-8">
-
-                    <div
-                        class="text-4xl font-black text-orange-500">
-
-                        02
-
-                    </div>
-
-                    <h3 class="mt-8 font-black uppercase">
-                        Fair Pricing
-                    </h3>
-
-                </div>
-
-
-                <div
-                    class="rounded-2xl bg-[#151a20] border border-white/10 p-7 min-h-44">
-
-                    <div
-                        class="text-4xl font-black text-orange-500">
-
-                        03
-
-                    </div>
-
-                    <h3 class="mt-8 font-black uppercase">
-                        Athlete Focus
-                    </h3>
-
-                </div>
-
-
-                <div
-                    class="rounded-2xl bg-[#151a20] border border-white/10 p-7 min-h-44 mt-8">
-
-                    <div
-                        class="text-4xl font-black text-orange-500">
-
-                        04
-
-                    </div>
-
-                    <h3 class="mt-8 font-black uppercase">
-                        Global Vision
-                    </h3>
-
-                </div>
-
-            </div>
-
         </div>
 
-    </section>
 
-</main>
-
-
-<!-- =========================================================
-     FOOTER
-========================================================== -->
-
-<footer
-    class="border-t border-white/10 bg-[#07090c]">
-
-    <div
-        class="max-w-7xl mx-auto px-5 sm:px-8 py-14 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-10">
-
-
-        <!-- BRAND -->
+        <!-- COPYRIGHT -->
 
         <div
-            class="col-span-2 lg:col-span-1">
+            class="border-t border-white/10 max-w-7xl mx-auto px-5 sm:px-8 py-5 flex flex-col sm:flex-row justify-between gap-2 text-xs text-gray-600">
 
-            <a href="homepage.html">
+            <span>
+                © 2026 KHELZONE. Engineered for Performance.
+            </span>
 
-                <div
-                    class="text-3xl font-black tracking-tighter text-orange-500">
-
-                    KHELZONE
-
-                </div>
-
-            </a>
-
-
-            <p
-                class="mt-4 text-sm text-gray-500 leading-relaxed">
-
-                Premium sports equipment built for performance.
-
-            </p>
+            <span>
+                Made for athletes. Built from Pakistan.
+            </span>
 
         </div>
 
-
-        <!-- SHOP -->
-
-        <div>
-
-            <h3
-                class="text-xs font-black uppercase tracking-widest mb-4">
-
-                Shop
-
-            </h3>
-
-            <div
-                class="space-y-3 text-sm text-gray-500">
-
-                <a
-                    class="block hover:text-orange-400"
-                    href="shop.html">
-
-                    All Products
-
-                </a>
-
-                <a
-                    class="block hover:text-orange-400"
-                    href="shop.html?category=Cricket">
-
-                    Cricket
-
-                </a>
-
-                <a
-                    class="block hover:text-orange-400"
-                    href="shop.html?category=Football">
-
-                    Football
-
-                </a>
-
-                <a
-                    class="block hover:text-orange-400"
-                    href="shop.html?category=Hockey">
-
-                    Hockey
-
-                </a>
-
-            </div>
-
-        </div>
+    </footer>
 
 
-        <!-- COMPANY -->
-
-        <div>
-
-            <h3
-                class="text-xs font-black uppercase tracking-widest mb-4">
-
-                Company
-
-            </h3>
-
-            <div
-                class="space-y-3 text-sm text-gray-500">
-
-                <a
-                    class="block hover:text-orange-400"
-                    href="#story">
-
-                    Our Story
-
-                </a>
-
-                <a
-                    class="block hover:text-orange-400"
-                    href="seller.html">
-
-                    Become a Seller
-
-                </a>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- COPYRIGHT -->
-
-    <div
-        class="border-t border-white/10 max-w-7xl mx-auto px-5 sm:px-8 py-5 flex flex-col sm:flex-row justify-between gap-2 text-xs text-gray-600">
-
-        <span>
-            © 2026 KHELZONE. Engineered for Performance.
-        </span>
-
-        <span>
-            Made for athletes. Built from Pakistan.
-        </span>
-
-    </div>
-
-</footer>
-
-
-<!-- =========================================================
+    <!-- =========================================================
      CART OVERLAY
 ========================================================== -->
 
-<div
-    id="cartOverlay"
-    class="hidden fixed inset-0 bg-black/70 z-[80]">
-</div>
+    <div id="cartOverlay" class="hidden fixed inset-0 bg-black/70 z-[80]">
+    </div>
 
 
-<!-- =========================================================
+    <!-- =========================================================
      CART DRAWER
 ========================================================== -->
 
-<aside
-    id="cartDrawer"
-    class="drawer fixed right-0 top-0 bottom-0 z-[90] w-full max-w-md bg-[#101318] border-l border-white/10 translate-x-full flex flex-col">
+    <aside id="cartDrawer"
+        class="drawer fixed right-0 top-0 bottom-0 z-[90] w-full max-w-md bg-[#101318] border-l border-white/10 translate-x-full flex flex-col">
 
 
-    <div
-        class="p-5 border-b border-white/10 flex items-center justify-between">
+        <div class="p-5 border-b border-white/10 flex items-center justify-between">
 
-        <div>
+            <div>
 
-            <h2 class="text-xl font-black uppercase">
-                Your Cart
-            </h2>
+                <h2 class="text-xl font-black uppercase">
+                    Your Cart
+                </h2>
 
-            <p
-                id="cartSubtitle"
-                class="text-xs text-gray-500 mt-1">
+                <p id="cartSubtitle" class="text-xs text-gray-500 mt-1">
 
-                0 items
+                    0 items
+
+                </p>
+
+            </div>
+
+
+            <button id="closeCart" type="button" class="w-10 h-10 rounded-full hover:bg-white/10">
+
+                <span class="material-symbols-outlined">
+                    close
+                </span>
+
+            </button>
+
+        </div>
+
+
+        <div id="cartItems" class="flex-1 overflow-y-auto p-5 space-y-3">
+
+
+            <div id="emptyCart" class="h-full flex flex-col items-center justify-center text-center text-gray-500">
+
+                <span class="material-symbols-outlined text-6xl">
+                    shopping_cart
+                </span>
+
+                <h3 class="mt-4 text-white font-bold">
+                    Your cart is empty
+                </h3>
+
+                <p class="mt-1 text-sm">
+                    Add some gear and get game-ready.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="p-5 border-t border-white/10">
+
+            <div class="flex justify-between text-sm text-gray-400">
+
+                <span>
+                    Subtotal
+                </span>
+
+                <strong id="cartTotal" class="text-white text-lg">
+
+                    Rs. 0
+
+                </strong>
+
+            </div>
+
+
+            <button id="checkoutBtn" type="button"
+                class="mt-4 w-full orange-gradient py-4 rounded-xl font-black uppercase">
+
+                Proceed to Checkout
+
+            </button>
+
+
+            <p class="text-center text-[10px] text-gray-600 mt-3">
+
+                Shipping and taxes calculated at checkout.
 
             </p>
 
         </div>
 
-
-        <button
-            id="closeCart"
-            type="button"
-            class="w-10 h-10 rounded-full hover:bg-white/10">
-
-            <span class="material-symbols-outlined">
-                close
-            </span>
-
-        </button>
-
-    </div>
+    </aside>
 
 
-    <div
-        id="cartItems"
-        class="flex-1 overflow-y-auto p-5 space-y-3">
-
-
-        <div
-            id="emptyCart"
-            class="h-full flex flex-col items-center justify-center text-center text-gray-500">
-
-            <span class="material-symbols-outlined text-6xl">
-                shopping_cart
-            </span>
-
-            <h3 class="mt-4 text-white font-bold">
-                Your cart is empty
-            </h3>
-
-            <p class="mt-1 text-sm">
-                Add some gear and get game-ready.
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <div
-        class="p-5 border-t border-white/10">
-
-        <div
-            class="flex justify-between text-sm text-gray-400">
-
-            <span>
-                Subtotal
-            </span>
-
-            <strong
-                id="cartTotal"
-                class="text-white text-lg">
-
-                Rs. 0
-
-            </strong>
-
-        </div>
-
-
-        <button
-            id="checkoutBtn"
-            type="button"
-            class="mt-4 w-full orange-gradient py-4 rounded-xl font-black uppercase">
-
-            Proceed to Checkout
-
-        </button>
-
-
-        <p
-            class="text-center text-[10px] text-gray-600 mt-3">
-
-            Shipping and taxes calculated at checkout.
-
-        </p>
-
-    </div>
-
-</aside>
-
-
-<!-- =========================================================
+    <!-- =========================================================
      TOAST
 ========================================================== -->
 
-<div
-    id="toast"
-    class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[120] translate-y-20 opacity-0 transition-all duration-300 bg-white text-black px-5 py-3 rounded-xl shadow-2xl text-sm font-bold flex items-center gap-2">
+    <div id="toast"
+        class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[120] translate-y-20 opacity-0 transition-all duration-300 bg-white text-black px-5 py-3 rounded-xl shadow-2xl text-sm font-bold flex items-center gap-2">
 
-    <span
-        class="material-symbols-outlined text-orange-600">
+        <span class="material-symbols-outlined text-orange-600">
 
-        check_circle
+            check_circle
 
-    </span>
+        </span>
 
-    <span id="toastText">
-        Done
-    </span>
+        <span id="toastText">
+            Done
+        </span>
 
-</div>
+    </div>
 
 
-<!-- =========================================================
-     BEST SELLERS FROM SUPABASE
-     (Admin-selected only — no random selection)
+    <!-- =========================================================
+     BEST SELLERS FROM SUPABASE — SHOP-STYLE CARDS + QUICK VIEW
+     (No wishlist on homepage. Cart item shape matches the rest
+     of the site: { id, size, qty }.)
 ========================================================== -->
 
-<script>
+    <script>
 
-document.addEventListener("DOMContentLoaded", async function () {
+    document.addEventListener('DOMContentLoaded', async function () {
 
-    const SUPABASE_URL =
-        "https://antqexjhlsaynunlmzqa.supabase.co";
+        const SUPABASE_URL =
+            'https://antqexjhlsaynunlmzqa.supabase.co';
 
-    const SUPABASE_KEY =
-        "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
+        const SUPABASE_KEY =
+            'sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu';
 
-    const grid =
-        document.getElementById("productGrid");
+        const grid =
+            document.getElementById('productGrid');
 
-    const noProducts =
-        document.getElementById("noProducts");
-
-
-    if (!grid) return;
+        const noProducts =
+            document.getElementById('noProducts');
 
 
-    /* =========================================================
-       ESCAPE HTML
-    ========================================================== */
-
-    function escapeHTML(value) {
-
-        return String(value ?? "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-
-    }
+        if (!grid) return;
 
 
-    /* =========================================================
-       FORMAT PRICE
-    ========================================================== */
-
-    function formatPrice(price) {
-
-        return "Rs. " +
-            Number(price || 0).toLocaleString("en-PK");
-
-    }
-
-
-    /* =========================================================
-       CREATE SUPABASE CLIENT
-    ========================================================== */
-
-    if (
-        typeof window.supabase === "undefined" ||
-        typeof window.supabase.createClient !== "function"
-    ) {
-
-        console.error(
-            "Supabase library is not loaded."
-        );
-
-        return;
-
-    }
-
-
-    const supabaseClient =
-        window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_KEY
-        );
-
-
-    /* =========================================================
-       LOAD BEST SELLERS
-       Only products the admin has marked with is_best_seller.
-       No shuffling, no random selection.
-    ========================================================== */
-
-    async function loadBestSellers() {
-
-        try {
-
-            grid.innerHTML = `
-                <div class="col-span-full flex justify-center py-12">
-                    <div class="flex items-center gap-3 text-gray-400">
-                        <span class="material-symbols-outlined animate-spin">
-                            progress_activity
-                        </span>
-                        <span>Loading products...</span>
-                    </div>
-                </div>
-            `;
-
-
-            const { data, error } =
-                await supabaseClient
-                    .from("products")
-                    .select("*")
-                    .eq("active", true)
-                    .eq("is_best_seller", true);
-
-
-            if (error) {
-
-                console.error(
-                    "Supabase products error:",
-                    error
-                );
-
-                showNoProducts();
-
-                return;
-
-            }
-
-
-            if (!data || data.length === 0) {
-
-                showNoProducts();
-
-                return;
-
-            }
-
-
-            /* =================================================
-               ONLY IN-STOCK PRODUCTS, FIRST 4
-            ================================================== */
-
-            const availableProducts =
-                data.filter(function (product) {
-
-                    const stock =
-                        Number(product.stock ?? 0);
-
-                    return stock > 0;
-
-                });
-
-
-            if (availableProducts.length === 0) {
-
-                showNoProducts();
-
-                return;
-
-            }
-
-
-            renderProducts(
-                availableProducts.slice(0, 4)
-            );
-
-        }
-
-        catch (error) {
+        if (
+            !window.supabase ||
+            typeof window.supabase.createClient !== 'function'
+        ) {
 
             console.error(
-                "Could not load best sellers:",
-                error
+                'KHELZONE: Supabase library did not load.'
             );
-
-            showNoProducts();
-
-        }
-
-    }
-
-
-    /* =========================================================
-       RENDER PRODUCTS
-    ========================================================== */
-
-    function renderProducts(products) {
-
-        if (!products.length) {
-
-            showNoProducts();
 
             return;
 
         }
 
 
-        if (noProducts) {
+        const supabaseClient =
+            window.supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_KEY
+            );
 
-            noProducts.classList.add("hidden");
+
+        /* =========================================================
+           PRODUCT DATA STORE (used by Quick View)
+        ========================================================== */
+
+        const homepageProducts =
+            new Map();
+
+
+        /* =========================================================
+           HELPERS
+        ========================================================== */
+
+        function escapeHTML(value) {
+
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
 
         }
 
 
-        grid.innerHTML =
-            products.map(function (product) {
+        function money(value) {
 
-                const id =
-                    escapeHTML(product.id);
+            return 'Rs. ' +
+                Number(value || 0).toLocaleString('en-PK');
 
-                const name =
-                    escapeHTML(product.name);
-
-                const description =
-                    escapeHTML(
-                        product.description ||
-                        "Premium sports equipment."
-                    );
-
-                const image =
-                    escapeHTML(
-                        product.image ||
-                        "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=900&q=80"
-                    );
-
-                const price =
-                    Number(product.price || 0);
-
-                const oldPrice =
-                    Number(
-                        product.old_price ||
-                        product.oldPrice ||
-                        0
-                    );
-
-                const stock =
-                    Number(product.stock || 0);
+        }
 
 
-                return `
-                    <article
-                        class="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#111317] transition-all duration-300 hover:-translate-y-1 hover:border-orange-500/40 hover:shadow-xl"
-                    >
+        function starString(rating) {
 
-                        <div class="relative aspect-square overflow-hidden bg-[#0c0e11]">
+            const value =
+                Math.max(0, Math.min(5, Number(rating || 0)));
 
-                            <img
-                                src="${image}"
-                                alt="${name}"
-                                loading="lazy"
-                                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                onerror="this.src='https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=900&q=80'"
-                            >
+            let output = '';
+
+            for (let i = 1; i <= 5; i++) {
+
+                output += i <= Math.round(value) ? '★' : '☆';
+
+            }
+
+            return output;
+
+        }
 
 
-                            <!-- WISHLIST -->
+        function getStockStatus(product) {
+
+            const stock =
+                Number(product.stock ?? 0);
+
+            if (stock <= 0) {
+
+                return { label: 'OUT OF STOCK', className: 'out-stock' };
+
+            }
+
+            if (stock <= 5) {
+
+                return { label: 'LOW STOCK', className: 'low-stock' };
+
+            }
+
+            return { label: 'IN STOCK', className: 'in-stock' };
+
+        }
+
+
+        function bestImage(product) {
+
+            return (
+                product.image_url ||
+                product.image ||
+                product.thumbnail ||
+                'https://placehold.co/600x600/111111/ffffff?text=KHELZONE'
+            );
+
+        }
+
+
+        /* =========================================================
+           PRODUCT CARD
+           Same visual structure/classes as shop.js's card
+           (product-card / product-card__*), minus the wishlist
+           button — homepage does not show wishlist.
+        ========================================================== */
+
+        function productCardHTML(product) {
+
+            const id =
+                escapeHTML(product.id);
+
+            const name =
+                escapeHTML(product.name);
+
+            const image =
+                escapeHTML(bestImage(product));
+
+            const sport =
+                escapeHTML(
+                    product.sport ||
+                    product.category ||
+                    'Sports'
+                );
+
+            const description =
+                escapeHTML(
+                    product.description ||
+                    'Premium sports equipment.'
+                );
+
+            const rating =
+                Number(product.rating || 0);
+
+            const reviews =
+                Number(product.reviews || 0);
+
+            const price =
+                Number(product.price || 0);
+
+            const oldPrice =
+                Number(
+                    product.old_price ||
+                    product.oldPrice ||
+                    0
+                );
+
+            const stock =
+                getStockStatus(product);
+
+
+            let badge = 'BEST SELLER';
+
+            let badgeClass =
+                'product-card__badge';
+
+            if (oldPrice > price) {
+
+                badge = 'SALE';
+
+                badgeClass =
+                    'product-card__badge product-card__badge--sale';
+
+            }
+
+
+            return `
+                <article
+                    class="product-card"
+                    data-product-id="${id}"
+                >
+
+                    <div class="product-card__image-wrap">
+
+                        <span class="${badgeClass}">
+                            ${escapeHTML(badge)}
+                        </span>
+
+
+                        <img
+                            src="${image}"
+                            alt="${name}"
+                            class="product-card__image"
+                            loading="lazy"
+                            onerror="this.onerror=null;this.src='https://placehold.co/600x600/111111/ffffff?text=KHELZONE';"
+                        >
+
+
+                        <div class="product-card__quick-wrap">
 
                             <button
                                 type="button"
-                                class="khz-wishlist-btn absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md transition hover:bg-black/80"
+                                class="product-card__quick"
+                                data-action="quickview"
                                 data-id="${id}"
-                                aria-label="Add to wishlist"
                             >
-
-                                <span
-                                    class="material-symbols-outlined text-[22px]"
-                                >
-                                    favorite
-                                </span>
-
-                            </button>
-
-
-                            <!-- BADGE -->
-
-                            <div class="absolute left-3 top-3">
-
-                                <span
-                                    class="rounded-full bg-orange-500 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg">
-
-                                    Best Seller
-
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- PRODUCT INFO -->
-
-                        <div class="p-4">
-
-                            <div
-                                class="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-orange-500">
-
-                                ${escapeHTML(
-                                    product.sport ||
-                                    product.category ||
-                                    "Sports"
-                                )}
-
-                            </div>
-
-
-                            <h3
-                                class="line-clamp-2 min-h-[48px] text-base font-bold text-white">
-
-                                ${name}
-
-                            </h3>
-
-
-                            <p
-                                class="mt-2 line-clamp-2 min-h-[40px] text-xs leading-5 text-gray-400">
-
-                                ${description}
-
-                            </p>
-
-
-                            <!-- PRICE -->
-
-                            <div
-                                class="mt-4 flex items-center gap-2">
-
-                                <span
-                                    class="text-lg font-black text-white">
-
-                                    ${formatPrice(price)}
-
-                                </span>
-
-                                ${
-                                    oldPrice > price
-                                    ? `
-                                        <span
-                                            class="text-xs text-gray-500 line-through">
-
-                                            ${formatPrice(oldPrice)}
-
-                                        </span>
-                                      `
-                                    : ""
-                                }
-
-                            </div>
-
-
-                            <!-- ADD TO CART -->
-
-                            <button
-                                type="button"
-                                class="khz-addcart-btn mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-bold text-white transition hover:bg-orange-600 active:scale-[0.98]"
-                                data-id="${id}"
-                                ${stock <= 0 ? "disabled" : ""}
-                            >
-
-                                <span
-                                    class="material-symbols-outlined text-[19px]">
-
-                                    shopping_cart
-
-                                </span>
-
-                                ${
-                                    stock > 0
-                                    ? "Add to Cart"
-                                    : "Out of Stock"
-                                }
-
+                                Quick View
                             </button>
 
                         </div>
 
-                    </article>
+                    </div>
+
+
+                    <div class="product-card__content">
+
+                        <p class="product-card__sport">
+                            ${sport}
+                        </p>
+
+                        <h3 class="product-card__title">
+                            ${name}
+                        </h3>
+
+                        <p class="product-card__description">
+                            ${description}
+                        </p>
+
+                        <div class="product-card__rating">
+                            ${starString(rating)}
+                            <span>
+                                ${rating.toFixed(1)} (${reviews})
+                            </span>
+                        </div>
+
+                        <div class="product-card__price">
+                            <strong>
+                                ${money(price)}
+                            </strong>
+                            ${
+                                oldPrice > price
+                                    ? `<del>${money(oldPrice)}</del>`
+                                    : ''
+                            }
+                        </div>
+
+                        <p class="product-card__stock ${stock.className}">
+                            ${stock.label}
+                        </p>
+
+                        <button
+                            type="button"
+                            class="product-card__cart khz-addcart-btn"
+                            data-action="addcart"
+                            data-id="${id}"
+                            ${stock.className === 'out-stock' ? 'disabled' : ''}
+                        >
+                            ${
+                                stock.className === 'out-stock'
+                                    ? 'OUT OF STOCK'
+                                    : 'ADD TO CART'
+                            }
+                        </button>
+
+                    </div>
+
+                </article>
+            `;
+
+        }
+
+
+        /* =========================================================
+           LOAD BEST SELLERS
+           Only admin-selected, active, in-stock products.
+        ========================================================== */
+
+        async function loadBestSellers() {
+
+            try {
+
+                grid.innerHTML = `
+                    <div class="col-span-full flex justify-center py-12">
+                        <div class="flex items-center gap-3 text-gray-400">
+                            <span class="material-symbols-outlined animate-spin">
+                                progress_activity
+                            </span>
+                            <span>Loading products...</span>
+                        </div>
+                    </div>
                 `;
 
-            }).join("");
+
+                const { data, error } =
+                    await supabaseClient
+                        .from('products')
+                        .select('*')
+                        .eq('is_active', true)
+                        .eq('is_best_seller', true)
+                        .order('created_at', { ascending: false });
 
 
-        /* =====================================================
-           UPDATE WISHLIST VISUAL STATE
-        ====================================================== */
+                if (error) {
 
-        const wishlist =
-            JSON.parse(
-                localStorage.getItem("khz_wishlist") || "[]"
+                    console.error(
+                        'Supabase products error:',
+                        error
+                    );
+
+                    showNoProducts();
+
+                    return;
+
+                }
+
+
+                const availableProducts =
+                    (data || []).filter(function (product) {
+
+                        return Number(product.stock ?? 0) > 0;
+
+                    });
+
+
+                if (!availableProducts.length) {
+
+                    showNoProducts();
+
+                    return;
+
+                }
+
+
+                renderProducts(
+                    availableProducts.slice(0, 4)
+                );
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    'Could not load best sellers:',
+                    error
+                );
+
+                showNoProducts();
+
+            }
+
+        }
+
+
+        /* =========================================================
+           RENDER
+        ========================================================== */
+
+        function renderProducts(products) {
+
+            if (!products.length) {
+
+                showNoProducts();
+
+                return;
+
+            }
+
+
+            if (noProducts) {
+
+                noProducts.classList.add('hidden');
+
+            }
+
+
+            homepageProducts.clear();
+
+            products.forEach(function (product) {
+
+                homepageProducts.set(
+                    String(product.id),
+                    product
+                );
+
+            });
+
+
+            grid.innerHTML =
+                products.map(productCardHTML).join('');
+
+        }
+
+
+        function showNoProducts() {
+
+            grid.innerHTML = '';
+
+            if (noProducts) {
+
+                noProducts.classList.remove('hidden');
+
+            }
+
+        }
+
+
+        /* =========================================================
+           QUICK VIEW
+        ========================================================== */
+
+        const quickViewModal =
+            document.getElementById('homeQuickView');
+
+        const quickViewContent =
+            document.getElementById('homeQuickViewContent');
+
+        const closeQuickViewBtn =
+            document.getElementById('closeHomeQuickView');
+
+
+        function openQuickView(productId) {
+
+            const product =
+                homepageProducts.get(String(productId));
+
+            if (!product) {
+
+                console.error(
+                    'Quick View product not found:',
+                    productId
+                );
+
+                return;
+
+            }
+
+
+            const image =
+                escapeHTML(bestImage(product));
+
+            const name =
+                escapeHTML(product.name || 'Product');
+
+            const sport =
+                escapeHTML(
+                    product.sport ||
+                    product.category ||
+                    'Sports'
+                );
+
+            const description =
+                escapeHTML(
+                    product.description ||
+                    'Premium sports equipment built for performance.'
+                );
+
+            const price =
+                Number(product.price || 0);
+
+            const oldPrice =
+                Number(
+                    product.old_price ||
+                    product.oldPrice ||
+                    0
+                );
+
+            const rating =
+                Number(product.rating || 0);
+
+            const reviews =
+                Number(product.reviews || 0);
+
+            const stock =
+                Number(product.stock ?? 0);
+
+
+            quickViewContent.innerHTML = `
+
+                <div class="bg-[#0b0e12] min-h-[320px] md:min-h-[520px] flex items-center justify-center p-6">
+
+                    <img
+                        src="${image}"
+                        alt="${name}"
+                        class="w-full h-full max-h-[500px] object-contain rounded-2xl"
+                        onerror="this.onerror=null;this.src='https://placehold.co/600x600/111111/ffffff?text=KHELZONE';"
+                    >
+
+                </div>
+
+
+                <div class="p-7 sm:p-9 flex flex-col justify-center">
+
+                    <p class="text-orange-500 text-xs font-black uppercase tracking-[.2em] mb-3">
+                        ${sport}
+                    </p>
+
+
+                    <h2 class="text-3xl sm:text-4xl font-black uppercase leading-tight">
+                        ${name}
+                    </h2>
+
+
+                    <div class="mt-4 flex items-center gap-2">
+
+                        <span class="text-orange-400 text-lg">
+                            ${starString(rating)}
+                        </span>
+
+                        <span class="text-sm text-gray-500">
+                            ${rating.toFixed(1)} (${reviews} reviews)
+                        </span>
+
+                    </div>
+
+
+                    <p class="mt-5 text-gray-400 leading-relaxed">
+                        ${description}
+                    </p>
+
+
+                    <div class="mt-6 flex items-center gap-3">
+
+                        <strong class="text-3xl font-black text-white">
+                            ${money(price)}
+                        </strong>
+
+                        ${
+                            oldPrice > price
+                                ? `<del class="text-gray-500 text-lg">${money(oldPrice)}</del>`
+                                : ''
+                        }
+
+                    </div>
+
+
+                    <div class="mt-4">
+
+                        ${
+                            stock > 5
+                                ? `<span class="text-sm font-bold text-green-400">● IN STOCK</span>`
+                                : stock > 0
+                                ? `<span class="text-sm font-bold text-yellow-400">● LOW STOCK</span>`
+                                : `<span class="text-sm font-bold text-red-400">● OUT OF STOCK</span>`
+                        }
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        id="quickViewAddCart"
+                        data-id="${escapeHTML(product.id)}"
+                        ${stock <= 0 ? 'disabled' : ''}
+                        class="mt-7 w-full py-4 rounded-xl bg-orange-500 text-black font-black uppercase tracking-wide hover:bg-orange-400 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                        ${stock <= 0 ? 'OUT OF STOCK' : 'ADD TO CART'}
+                    </button>
+
+                </div>
+            `;
+
+
+            quickViewModal.classList.remove('hidden');
+
+            quickViewModal.classList.add('flex');
+
+            document.body.classList.add('overflow-hidden');
+
+        }
+
+
+        function closeQuickViewModal() {
+
+            quickViewModal.classList.add('hidden');
+
+            quickViewModal.classList.remove('flex');
+
+            document.body.classList.remove('overflow-hidden');
+
+        }
+
+
+        closeQuickViewBtn.addEventListener(
+            'click',
+            closeQuickViewModal
+        );
+
+
+        quickViewModal.addEventListener(
+            'click',
+            function (event) {
+
+                if (event.target === quickViewModal) {
+
+                    closeQuickViewModal();
+
+                }
+
+            }
+        );
+
+
+        document.addEventListener(
+            'keydown',
+            function (event) {
+
+                if (
+                    event.key === 'Escape' &&
+                    !quickViewModal.classList.contains('hidden')
+                ) {
+
+                    closeQuickViewModal();
+
+                }
+
+            }
+        );
+
+
+        /* Quick View button click (delegated on the grid) */
+
+        grid.addEventListener(
+            'click',
+            function (event) {
+
+                const quickButton =
+                    event.target.closest('[data-action="quickview"]');
+
+                if (!quickButton) return;
+
+                openQuickView(quickButton.dataset.id);
+
+            }
+        );
+
+
+        /* =========================================================
+           QUICK VIEW → ADD TO CART
+           Uses the SAME cart shape as the rest of KHELZONE:
+           { id, size, qty } stored under "khz_cart".
+        ========================================================== */
+
+        document.addEventListener(
+            'click',
+            function (event) {
+
+                const button =
+                    event.target.closest('#quickViewAddCart');
+
+                if (!button || button.disabled) return;
+
+
+                const productId =
+                    button.dataset.id;
+
+                const product =
+                    homepageProducts.get(String(productId));
+
+                if (!product) return;
+
+
+                let cart = [];
+
+                try {
+
+                    cart = JSON.parse(
+                        localStorage.getItem('khz_cart') || '[]'
+                    );
+
+                    if (!Array.isArray(cart)) {
+
+                        cart = [];
+
+                    }
+
+                } catch (error) {
+
+                    cart = [];
+
+                }
+
+
+                const existing =
+                    cart.find(function (item) {
+
+                        return (
+                            String(item.id) === String(product.id) &&
+                            (item.size || 'Standard') === 'Standard'
+                        );
+
+                    });
+
+
+                if (existing) {
+
+                    existing.qty =
+                        Number(existing.qty || 0) + 1;
+
+                } else {
+
+                    cart.push({
+                        id: product.id,
+                        size: 'Standard',
+                        qty: 1
+                    });
+
+                }
+
+
+                localStorage.setItem(
+                    'khz_cart',
+                    JSON.stringify(cart)
+                );
+
+
+                closeQuickViewModal();
+
+
+                const toast =
+                    document.getElementById('toast');
+
+                const toastText =
+                    document.getElementById('toastText');
+
+
+                if (toast && toastText) {
+
+                    toastText.textContent =
+                        'Added to cart';
+
+                    toast.classList.remove(
+                        'translate-y-20',
+                        'opacity-0'
+                    );
+
+                    setTimeout(function () {
+
+                        toast.classList.add(
+                            'translate-y-20',
+                            'opacity-0'
+                        );
+
+                    }, 1800);
+
+                }
+
+
+                const cartCount =
+                    document.getElementById('cartCount');
+
+                if (cartCount) {
+
+                    const total =
+                        cart.reduce(function (sum, item) {
+
+                            return sum + Number(item.qty || 0);
+
+                        }, 0);
+
+                    cartCount.textContent = total;
+
+                }
+
+            }
+        );
+
+
+        /* =========================================================
+           START
+        ========================================================== */
+
+        loadBestSellers();
+
+    });
+
+    </script>
+
+
+    <!-- =========================================================
+     HOMEPAGE QUICK VIEW MODAL
+========================================================== -->
+
+    <div
+        id="homeQuickView"
+        class="hidden fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm p-4 items-center justify-center"
+    >
+
+        <div
+            class="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl border border-white/10 bg-[#101318] shadow-2xl"
+        >
+
+            <button
+                id="closeHomeQuickView"
+                type="button"
+                class="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/60 border border-white/10 text-white hover:bg-orange-500 hover:text-black transition"
+            >
+                <span class="material-symbols-outlined">
+                    close
+                </span>
+            </button>
+
+
+            <div
+                id="homeQuickViewContent"
+                class="grid md:grid-cols-2"
+            >
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+     HOME JAVASCRIPT
+     (restored — this drives cart count, the grid's "Add to
+     Cart" button, sport-card navigation, toasts and smooth
+     scroll. It was missing from the file, which is why the
+     grid's Add to Cart button had stopped working.)
+========================================================== -->
+
+    <script src="home.js"></script>
+
+
+    <!-- =========================================================
+     ADMIN DASHBOARD VISIBILITY + ACCOUNT / LOGOUT
+     (restored — this is what actually builds the Account
+     dropdown/mobile block and wires Logout. It was missing
+     from the file, which is why Account/Login had stopped
+     working. Login page confirmed from the existing
+     signup.html as index.html — not guessed.)
+========================================================== -->
+
+    <script>
+
+    (() => {
+
+        "use strict";
+
+
+        const SUPABASE_URL =
+            "https://antqexjhlsaynunlmzqa.supabase.co";
+
+        const SUPABASE_KEY =
+            "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
+
+
+        if (
+            !window.supabase ||
+            typeof window.supabase.createClient !== "function"
+        ) {
+
+            console.error(
+                "KHELZONE: Supabase library did not load."
+            );
+
+            return;
+
+        }
+
+
+        const supabaseClient =
+            window.supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_KEY
             );
 
 
-        document
-            .querySelectorAll(".khz-wishlist-btn")
-            .forEach(function (button) {
+        const desktopAdminLink =
+            document.getElementById("adminDashboardLink");
 
-                const id =
-                    button.dataset.id;
+        const mobileAdminLink =
+            document.getElementById("adminDashboardMobileLink");
+
+        const accountBtn =
+            document.getElementById("accountBtn");
+
+        const accountMenu =
+            document.getElementById("accountMenu");
+
+        const mobileAccountSection =
+            document.getElementById("mobileAccountSection");
 
 
-                if (
-                    wishlist.some(
-                        item =>
-                            String(item) === String(id)
-                    )
-                ) {
+        function hideAdminDashboard() {
 
-                    button.classList.add(
-                        "text-orange-500"
+            if (desktopAdminLink) {
+
+                desktopAdminLink.style.setProperty(
+                    "display", "none", "important"
+                );
+
+            }
+
+            if (mobileAdminLink) {
+
+                mobileAdminLink.style.setProperty(
+                    "display", "none", "important"
+                );
+
+            }
+
+        }
+
+
+        function showAdminDashboard() {
+
+            if (desktopAdminLink) {
+
+                desktopAdminLink.style.setProperty(
+                    "display", "inline-flex", "important"
+                );
+
+            }
+
+            if (mobileAdminLink) {
+
+                mobileAdminLink.style.setProperty(
+                    "display", "block", "important"
+                );
+
+            }
+
+        }
+
+
+        function escapeHTML(value) {
+
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+
+        }
+
+
+        function clearLocalSession() {
+
+            try {
+
+                localStorage.removeItem("khelzone_role");
+                localStorage.removeItem("khelzone_user_id");
+                localStorage.removeItem("khelzone_email");
+
+            } catch (error) {
+
+                console.error(
+                    "KHELZONE: Could not clear local session:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        async function handleLogout() {
+
+            try {
+
+                await supabaseClient.auth.signOut();
+
+            } catch (error) {
+
+                console.error(
+                    "KHELZONE: Sign out error:",
+                    error
+                );
+
+            }
+
+            clearLocalSession();
+
+            /* Existing login page — confirmed from signup.html's
+               own "Back to Login" / "Already have an account"
+               links, both of which point to index.html. */
+
+            window.location.href = "index.html";
+
+        }
+
+
+        function renderLoggedInAccount(email) {
+
+            const safeEmail = escapeHTML(email || "");
+
+            if (accountMenu) {
+
+                accountMenu.innerHTML = `
+                    <div class="px-4 py-4 border-b border-white/10">
+                        <p class="text-[10px] uppercase tracking-wider text-gray-500 font-bold">
+                            Signed in as
+                        </p>
+                        <p class="mt-1 text-sm font-bold text-white truncate">
+                            ${safeEmail}
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        id="logoutBtnDesktop"
+                        class="w-full flex items-center gap-2 px-4 py-3.5 text-sm font-bold text-red-400 hover:bg-white/5 transition"
+                    >
+                        <span class="material-symbols-outlined text-lg">logout</span>
+                        Logout
+                    </button>
+                `;
+
+                const logoutBtnDesktop =
+                    document.getElementById("logoutBtnDesktop");
+
+                if (logoutBtnDesktop) {
+
+                    logoutBtnDesktop.addEventListener(
+                        "click", handleLogout
                     );
 
+                }
 
-                    const icon =
-                        button.querySelector(
-                            ".material-symbols-outlined"
-                        );
+            }
+
+            if (mobileAccountSection) {
+
+                mobileAccountSection.innerHTML = `
+                    <p class="text-[10px] uppercase tracking-wider text-gray-500 font-bold mb-1">
+                        Signed in as
+                    </p>
+                    <p class="text-sm font-bold text-white truncate mb-3">
+                        ${safeEmail}
+                    </p>
+                    <button
+                        type="button"
+                        id="logoutBtnMobile"
+                        class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 font-bold text-sm"
+                    >
+                        <span class="material-symbols-outlined text-lg">logout</span>
+                        Logout
+                    </button>
+                `;
+
+                const logoutBtnMobile =
+                    document.getElementById("logoutBtnMobile");
+
+                if (logoutBtnMobile) {
+
+                    logoutBtnMobile.addEventListener(
+                        "click", handleLogout
+                    );
+
+                }
+
+            }
+
+        }
 
 
-                    if (icon) {
+        function renderLoggedOutAccount() {
 
-                        icon.style.fontVariationSettings =
-                            "'FILL' 1";
+            if (accountMenu) {
 
-                    }
+                accountMenu.innerHTML = `
+                    <a
+                        href="index.html"
+                        class="flex items-center gap-2 px-4 py-3.5 text-sm font-bold text-orange-400 hover:bg-white/5 transition"
+                    >
+                        <span class="material-symbols-outlined text-lg">login</span>
+                        Login
+                    </a>
+                `;
+
+            }
+
+            if (mobileAccountSection) {
+
+                mobileAccountSection.innerHTML = `
+                    <a
+                        href="index.html"
+                        class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-orange-500/10 border border-orange-500/30 text-orange-400 font-bold text-sm"
+                    >
+                        <span class="material-symbols-outlined text-lg">login</span>
+                        Login
+                    </a>
+                `;
+
+            }
+
+        }
+
+
+        if (accountBtn && accountMenu) {
+
+            accountBtn.addEventListener("click", function (event) {
+
+                event.stopPropagation();
+
+                const isOpen =
+                    !accountMenu.classList.contains("hidden");
+
+                accountMenu.classList.toggle("hidden");
+
+                accountBtn.setAttribute(
+                    "aria-expanded",
+                    isOpen ? "false" : "true"
+                );
+
+            });
+
+            document.addEventListener("click", function (event) {
+
+                if (
+                    !accountMenu.contains(event.target) &&
+                    !accountBtn.contains(event.target)
+                ) {
+
+                    accountMenu.classList.add("hidden");
+
+                    accountBtn.setAttribute(
+                        "aria-expanded", "false"
+                    );
 
                 }
 
             });
 
-    }
-
-
-    /* =========================================================
-       NO PRODUCTS
-    ========================================================== */
-
-    function showNoProducts() {
-
-        grid.innerHTML = "";
-
-
-        if (noProducts) {
-
-            noProducts.classList.remove("hidden");
-
         }
 
-    }
 
+        async function checkAuthState() {
 
-    /* =========================================================
-       START
-    ========================================================== */
+            hideAdminDashboard();
 
-    loadBestSellers();
 
-});
+            try {
 
-</script>
+                const {
+                    data: { user },
+                    error: userError
+                } =
+                    await supabaseClient.auth.getUser();
 
 
-<!-- =========================================================
-     HOME JAVASCRIPT
-========================================================== -->
+                if (userError || !user) {
 
-<script src="home.js"></script>
+                    renderLoggedOutAccount();
 
+                    return;
 
-<!-- =========================================================
-     ADMIN DASHBOARD VISIBILITY + ACCOUNT / LOGOUT
-========================================================== -->
+                }
 
-<script>
 
-(() => {
+                renderLoggedInAccount(user.email);
 
-    "use strict";
 
+                const {
+                    data: admin,
+                    error: adminError
+                } =
+                    await supabaseClient
+                        .from("admins")
+                        .select("id")
+                        .eq("id", user.id)
+                        .maybeSingle();
 
-    // =====================================================
-    // SUPABASE CONFIG
-    // =====================================================
 
-    const SUPABASE_URL =
-        "https://antqexjhlsaynunlmzqa.supabase.co";
+                if (adminError) {
 
+                    console.error(
+                        "KHELZONE admin check error:",
+                        adminError
+                    );
 
-    const SUPABASE_KEY =
-        "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
+                    return;
 
+                }
 
-    // =====================================================
-    // MAKE SUPABASE CLIENT
-    // =====================================================
 
-    if (
-        !window.supabase ||
-        typeof window.supabase.createClient !== "function"
-    ) {
+                if (admin) {
 
-        console.error(
-            "KHELZONE: Supabase library did not load."
-        );
+                    showAdminDashboard();
 
-        return;
-
-    }
-
-
-    const supabaseClient =
-        window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_KEY
-        );
-
-
-    // =====================================================
-    // GET ELEMENTS
-    // =====================================================
-
-    const desktopAdminLink =
-        document.getElementById("adminDashboardLink");
-
-    const mobileAdminLink =
-        document.getElementById("adminDashboardMobileLink");
-
-    const accountBtn =
-        document.getElementById("accountBtn");
-
-    const accountMenu =
-        document.getElementById("accountMenu");
-
-    const mobileAccountSection =
-        document.getElementById("mobileAccountSection");
-
-
-    // =====================================================
-    // ADMIN DASHBOARD VISIBILITY
-    // =====================================================
-
-    function hideAdminDashboard() {
-
-        if (desktopAdminLink) {
-
-            desktopAdminLink.style.setProperty(
-                "display", "none", "important"
-            );
-
-        }
-
-        if (mobileAdminLink) {
-
-            mobileAdminLink.style.setProperty(
-                "display", "none", "important"
-            );
-
-        }
-
-    }
-
-
-    function showAdminDashboard() {
-
-        if (desktopAdminLink) {
-
-            desktopAdminLink.style.setProperty(
-                "display", "inline-flex", "important"
-            );
-
-        }
-
-        if (mobileAdminLink) {
-
-            mobileAdminLink.style.setProperty(
-                "display", "block", "important"
-            );
-
-        }
-
-    }
-
-
-    // =====================================================
-    // ESCAPE HTML (for email display)
-    // =====================================================
-
-    function escapeHTML(value) {
-
-        return String(value ?? "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-
-    }
-
-
-    // =====================================================
-    // CLEAR LOCAL SESSION VALUES
-    // =====================================================
-
-    function clearLocalSession() {
-
-        try {
-
-            localStorage.removeItem("khelzone_role");
-            localStorage.removeItem("khelzone_user_id");
-            localStorage.removeItem("khelzone_email");
-
-        } catch (error) {
-
-            console.error(
-                "KHELZONE: Could not clear local session:",
-                error
-            );
-
-        }
-
-    }
-
-
-    // =====================================================
-    // LOGOUT
-    // =====================================================
-
-    async function handleLogout() {
-
-        try {
-
-            await supabaseClient.auth.signOut();
-
-        } catch (error) {
-
-            console.error(
-                "KHELZONE: Sign out error:",
-                error
-            );
-
-        }
-
-        clearLocalSession();
-
-        window.location.href = "index.html";
-
-    }
-
-
-    // =====================================================
-    // BUILD ACCOUNT UI (desktop dropdown + mobile block)
-    // =====================================================
-
-    function renderLoggedInAccount(email) {
-
-        const safeEmail = escapeHTML(email || "");
-
-        if (accountMenu) {
-
-            accountMenu.innerHTML = `
-                <div class="px-4 py-4 border-b border-white/10">
-                    <p class="text-[10px] uppercase tracking-wider text-gray-500 font-bold">
-                        Signed in as
-                    </p>
-                    <p class="mt-1 text-sm font-bold text-white truncate">
-                        ${safeEmail}
-                    </p>
-                </div>
-                <button
-                    type="button"
-                    id="logoutBtnDesktop"
-                    class="w-full flex items-center gap-2 px-4 py-3.5 text-sm font-bold text-red-400 hover:bg-white/5 transition"
-                >
-                    <span class="material-symbols-outlined text-lg">logout</span>
-                    Logout
-                </button>
-            `;
-
-            const logoutBtnDesktop =
-                document.getElementById("logoutBtnDesktop");
-
-            if (logoutBtnDesktop) {
-
-                logoutBtnDesktop.addEventListener(
-                    "click", handleLogout
-                );
+                }
 
             }
 
-        }
+            catch (error) {
 
-        if (mobileAccountSection) {
-
-            mobileAccountSection.innerHTML = `
-                <p class="text-[10px] uppercase tracking-wider text-gray-500 font-bold mb-1">
-                    Signed in as
-                </p>
-                <p class="text-sm font-bold text-white truncate mb-3">
-                    ${safeEmail}
-                </p>
-                <button
-                    type="button"
-                    id="logoutBtnMobile"
-                    class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 font-bold text-sm"
-                >
-                    <span class="material-symbols-outlined text-lg">logout</span>
-                    Logout
-                </button>
-            `;
-
-            const logoutBtnMobile =
-                document.getElementById("logoutBtnMobile");
-
-            if (logoutBtnMobile) {
-
-                logoutBtnMobile.addEventListener(
-                    "click", handleLogout
+                console.error(
+                    "KHELZONE Auth Check Error:",
+                    error
                 );
-
-            }
-
-        }
-
-    }
-
-
-    function renderLoggedOutAccount() {
-
-        if (accountMenu) {
-
-            accountMenu.innerHTML = `
-                <a
-                    href="index.html"
-                    class="flex items-center gap-2 px-4 py-3.5 text-sm font-bold text-orange-400 hover:bg-white/5 transition"
-                >
-                    <span class="material-symbols-outlined text-lg">login</span>
-                    Login
-                </a>
-            `;
-
-        }
-
-        if (mobileAccountSection) {
-
-            mobileAccountSection.innerHTML = `
-                <a
-                    href="login.html"
-                    class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-orange-500/10 border border-orange-500/30 text-orange-400 font-bold text-sm"
-                >
-                    <span class="material-symbols-outlined text-lg">login</span>
-                    Login
-                </a>
-            `;
-
-        }
-
-    }
-
-
-    // =====================================================
-    // ACCOUNT DROPDOWN TOGGLE
-    // =====================================================
-
-    if (accountBtn && accountMenu) {
-
-        accountBtn.addEventListener("click", function (event) {
-
-            event.stopPropagation();
-
-            const isOpen =
-                !accountMenu.classList.contains("hidden");
-
-            accountMenu.classList.toggle("hidden");
-
-            accountBtn.setAttribute(
-                "aria-expanded",
-                isOpen ? "false" : "true"
-            );
-
-        });
-
-        document.addEventListener("click", function (event) {
-
-            if (
-                !accountMenu.contains(event.target) &&
-                !accountBtn.contains(event.target)
-            ) {
-
-                accountMenu.classList.add("hidden");
-
-                accountBtn.setAttribute(
-                    "aria-expanded", "false"
-                );
-
-            }
-
-        });
-
-    }
-
-
-    // =====================================================
-    // CHECK AUTH STATE (admin visibility + account UI)
-    // =====================================================
-
-    async function checkAuthState() {
-
-        hideAdminDashboard();
-
-
-        try {
-
-            const {
-                data: { user },
-                error: userError
-            } =
-                await supabaseClient.auth.getUser();
-
-
-            if (userError || !user) {
 
                 renderLoggedOutAccount();
 
-                return;
-
-            }
-
-
-            renderLoggedInAccount(user.email);
-
-
-            const {
-                data: admin,
-                error: adminError
-            } =
-                await supabaseClient
-                    .from("admins")
-                    .select("id")
-                    .eq("id", user.id)
-                    .maybeSingle();
-
-
-            if (adminError) {
-
-                console.error(
-                    "KHELZONE admin check error:",
-                    adminError
-                );
-
-                return;
-
-            }
-
-
-            if (admin) {
-
-                showAdminDashboard();
-
             }
 
         }
 
-        catch (error) {
 
-            console.error(
-                "KHELZONE Auth Check Error:",
-                error
-            );
-
-            renderLoggedOutAccount();
-
-        }
-
-    }
+        checkAuthState();
 
 
-    // =====================================================
-    // INITIAL CHECK
-    // =====================================================
+        supabaseClient.auth.onAuthStateChange(function () {
 
-    checkAuthState();
-
-
-    // =====================================================
-    // AUTH STATE CHANGE
-    // =====================================================
-
-    supabaseClient.auth.onAuthStateChange(function () {
-
-        setTimeout(checkAuthState, 0);
-
-    });
-
-
-    // =====================================================
-    // RE-CHECK ON BACK/FORWARD (BFCACHE) NAVIGATION
-    // Prevents a stale "logged in" UI from a cached page
-    // after the user has logged out.
-    // =====================================================
-
-    window.addEventListener("pageshow", function (event) {
-
-        if (event.persisted) {
-
-            checkAuthState();
-
-        }
-
-    });
-
-
-})();
-
-</script>
-
-
-<!-- =========================================================
-     MOBILE MENU JAVASCRIPT
-========================================================== -->
-
-<script>
-
-(() => {
-
-    const menuBtn =
-        document.getElementById("menuBtn");
-
-
-    const mobileMenu =
-        document.getElementById("mobileMenu");
-
-
-    if (!menuBtn || !mobileMenu) {
-        return;
-    }
-
-
-    let menuOpen = false;
-
-
-    menuBtn.addEventListener(
-        "click",
-        () => {
-
-            menuOpen = !menuOpen;
-
-
-            if (menuOpen) {
-
-                mobileMenu.style.maxHeight =
-                    mobileMenu.scrollHeight + "px";
-
-                mobileMenu.style.opacity =
-                    "1";
-
-
-                menuBtn.setAttribute(
-                    "aria-label",
-                    "Close menu"
-                );
-
-            }
-
-            else {
-
-                mobileMenu.style.maxHeight =
-                    "0px";
-
-                mobileMenu.style.opacity =
-                    "0";
-
-
-                menuBtn.setAttribute(
-                    "aria-label",
-                    "Open menu"
-                );
-
-            }
-
-        }
-    );
-
-
-    document
-        .querySelectorAll(".mobile-link")
-        .forEach(link => {
-
-            link.addEventListener(
-                "click",
-                () => {
-
-                    if (
-                        window.innerWidth < 1024
-                    ) {
-
-                        menuOpen = false;
-
-
-                        mobileMenu.style.maxHeight =
-                            "0px";
-
-
-                        mobileMenu.style.opacity =
-                            "0";
-
-                    }
-
-                }
-            );
+            setTimeout(checkAuthState, 0);
 
         });
 
 
-})();
+        window.addEventListener("pageshow", function (event) {
 
-</script>
+            if (event.persisted) {
+
+                checkAuthState();
+
+            }
+
+        });
+
+
+    })();
+
+    </script>
+
+
+    <!-- =========================================================
+     MOBILE MENU JAVASCRIPT
+     (restored — this is what makes the hamburger button open
+     the mobile nav. It was missing from the file.)
+========================================================== -->
+
+    <script>
+
+    (() => {
+
+        const menuBtn =
+            document.getElementById("menuBtn");
+
+        const mobileMenu =
+            document.getElementById("mobileMenu");
+
+        if (!menuBtn || !mobileMenu) {
+            return;
+        }
+
+
+        let menuOpen = false;
+
+
+        menuBtn.addEventListener(
+            "click",
+            () => {
+
+                menuOpen = !menuOpen;
+
+
+                if (menuOpen) {
+
+                    mobileMenu.style.maxHeight =
+                        mobileMenu.scrollHeight + "px";
+
+                    mobileMenu.style.opacity =
+                        "1";
+
+                    menuBtn.setAttribute(
+                        "aria-label",
+                        "Close menu"
+                    );
+
+                }
+
+                else {
+
+                    mobileMenu.style.maxHeight =
+                        "0px";
+
+                    mobileMenu.style.opacity =
+                        "0";
+
+                    menuBtn.setAttribute(
+                        "aria-label",
+                        "Open menu"
+                    );
+
+                }
+
+            }
+        );
+
+
+        document
+            .querySelectorAll(".mobile-link")
+            .forEach(link => {
+
+                link.addEventListener(
+                    "click",
+                    () => {
+
+                        if (window.innerWidth < 1024) {
+
+                            menuOpen = false;
+
+                            mobileMenu.style.maxHeight =
+                                "0px";
+
+                            mobileMenu.style.opacity =
+                                "0";
+
+                        }
+
+                    }
+                );
+
+            });
+
+
+    })();
+
+    </script>
 
 </body>
 

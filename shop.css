@@ -2515,3 +2515,360 @@ footer button:hover {
         gap: 12px !important;
     }
 }
+
+/* ==========================================================================
+   KHELZONE — ADVANCED QUICK VIEW ADDITIONS
+   (Specifications, Return & Warranty, Ratings & Reviews, Sold By)
+   Appended — does not touch any existing rule above.
+   ========================================================================== */
+
+.quick-view-box {
+    max-height: 92vh;
+    overflow: hidden;
+}
+
+.quick-view-content {
+    overflow-y: auto;
+    max-height: 92vh;
+}
+
+.qv-price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.qv-old-price {
+    color: #646974;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: line-through;
+}
+
+.qv-stock {
+    margin-top: 6px;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.qv-dynamic-sections {
+    margin-top: 10px;
+}
+
+.qv-loading {
+    padding: 20px 0;
+    color: #7d838d;
+    font-size: 12px;
+    text-align: center;
+}
+
+.qv-section {
+    margin-top: 30px;
+    padding-top: 24px;
+    border-top: 1px solid var(--khz-line);
+}
+
+.qv-section-title {
+    font-family: "Anton", sans-serif;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    font-size: 15px;
+    color: #ffffff;
+    margin-bottom: 14px;
+}
+
+/* ---------------------------------------------------------
+   SPECIFICATIONS TABLE
+   --------------------------------------------------------- */
+
+.qv-specs-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid var(--khz-line);
+}
+
+.qv-specs-table thead th {
+    background: rgba(255, 90, 0, 0.08);
+    color: var(--khz-orange);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 10px;
+    font-weight: 900;
+    text-align: left;
+    padding: 10px 14px;
+}
+
+.qv-specs-table tbody td {
+    padding: 10px 14px;
+    border-top: 1px solid var(--khz-line);
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.qv-specs-table tbody td:first-child {
+    font-weight: 700;
+    color: #ffffff;
+    width: 40%;
+}
+
+/* ---------------------------------------------------------
+   RETURN & WARRANTY
+   --------------------------------------------------------- */
+
+.qv-return-warranty {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.qv-rw-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--khz-line);
+}
+
+.qv-rw-label {
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--khz-orange);
+}
+
+.qv-rw-value {
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+/* ---------------------------------------------------------
+   RATINGS & REVIEWS
+   --------------------------------------------------------- */
+
+.qv-rating-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.qv-rating-stars {
+    color: var(--khz-yellow);
+    font-size: 16px;
+    letter-spacing: 2px;
+}
+
+.qv-rating-value {
+    font-weight: 900;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.qv-rating-count {
+    color: #7d838d;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.qv-review-status {
+    font-size: 11px;
+    margin-bottom: 10px;
+    min-height: 14px;
+}
+
+.qv-review-status--error { color: var(--khz-red); }
+.qv-review-status--success { color: var(--khz-green); }
+.qv-review-status--info { color: #7d838d; }
+
+.qv-review-login,
+.qv-review-note {
+    padding: 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px dashed var(--khz-line-light);
+    font-size: 12px;
+    color: #9aa0aa;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.qv-review-form {
+    margin-bottom: 20px;
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--khz-line);
+}
+
+.qv-star-picker {
+    display: flex;
+    gap: 6px;
+    margin: 8px 0 14px;
+}
+
+.qv-star-btn {
+    background: none;
+    border: 0;
+    font-size: 24px;
+    line-height: 1;
+    color: #4b4f57;
+    transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.qv-star-btn:hover {
+    transform: scale(1.12);
+}
+
+.qv-star-btn.active {
+    color: var(--khz-yellow);
+}
+
+.qv-review-textarea {
+    width: 100%;
+    resize: vertical;
+    min-height: 70px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--khz-line-light);
+    color: #ffffff;
+    font-size: 12px;
+    margin-bottom: 14px;
+}
+
+.qv-review-textarea:focus {
+    outline: none;
+    border-color: var(--khz-orange);
+}
+
+.qv-review-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-height: 260px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.qv-review-item {
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid var(--khz-line);
+}
+
+.qv-review-stars {
+    color: var(--khz-yellow);
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
+.qv-review-text {
+    margin-top: 6px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.75);
+    line-height: 1.6;
+}
+
+.qv-review-date {
+    margin-top: 6px;
+    font-size: 10px;
+    color: #626773;
+}
+
+/* ---------------------------------------------------------
+   SOLD BY / SELLER CARD
+   --------------------------------------------------------- */
+
+.qv-seller-card {
+    padding-bottom: 4px;
+}
+
+.qv-seller-banner {
+    width: 100%;
+    height: 90px;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+    background-color: #14161b;
+    margin-bottom: -30px;
+    border: 1px solid var(--khz-line);
+}
+
+.qv-seller-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--khz-line);
+    position: relative;
+}
+
+.qv-seller-logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #14161b;
+    border: 2px solid var(--khz-bg-alt);
+    flex-shrink: 0;
+}
+
+.qv-seller-info {
+    min-width: 0;
+}
+
+.qv-seller-name {
+    font-weight: 800;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.qv-seller-contact {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    color: var(--khz-orange);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.qv-seller-contact:hover {
+    text-decoration: underline;
+}
+
+/* ---------------------------------------------------------
+   MOBILE
+   --------------------------------------------------------- */
+
+@media (max-width: 800px) {
+
+    .qv-return-warranty {
+        grid-template-columns: 1fr;
+    }
+
+    .qv-review-login,
+    .qv-review-note {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .qv-seller-banner {
+        height: 70px;
+    }
+}

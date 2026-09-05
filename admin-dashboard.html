@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang='en' class='dark'>
 
 <head>
 
-    <meta charset="UTF-8">
+    <meta charset='UTF-8'>
 
     <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
+        name='viewport'
+        content='width=device-width, initial-scale=1.0'
     >
 
     <title>KHELZONE | Admin Dashboard</title>
@@ -17,34 +17,33 @@
          TAILWIND
     ====================================================== -->
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src='https://cdn.tailwindcss.com'></script>
 
 
     <!-- =====================================================
          SUPABASE
     ====================================================== -->
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'></script>
 
 
     <!-- =====================================================
          SUPABASE CONFIG
-         MUST LOAD BEFORE admin-dashboard.js
     ====================================================== -->
 
     <script>
 
         const SUPABASE_URL =
-            "https://antqexjhlsaynunlmzqa.supabase.co";
+            'https://antqexjhlsaynunlmzqa.supabase.co';
 
         const SUPABASE_PUBLISHABLE_KEY =
-            "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
+            'sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu';
 
 
         if (!window.supabase) {
 
             console.error(
-                "Supabase library failed to load."
+                'Supabase library failed to load.'
             );
 
         } else {
@@ -56,7 +55,7 @@
                 );
 
             console.log(
-                "KHELZONE Supabase client initialized."
+                'KHELZONE Supabase client initialized.'
             );
 
         }
@@ -72,7 +71,7 @@
 
         tailwind.config = {
 
-            darkMode: "class",
+            darkMode: 'class',
 
             theme: {
 
@@ -80,15 +79,15 @@
 
                     colors: {
 
-                        kzOrange: "#ff5a00",
+                        kzOrange: '#ff5a00',
 
-                        kzOrangeDark: "#d63f00",
+                        kzOrangeDark: '#d63f00',
 
-                        kzBlack: "#090909",
+                        kzBlack: '#090909',
 
-                        kzCard: "#151515",
+                        kzCard: '#151515',
 
-                        kzBorder: "#292929"
+                        kzBorder: '#292929'
 
                     }
 
@@ -758,7 +757,7 @@
             border-collapse:
                 collapse;
 
-            min-width: 700px;
+            min-width: 800px;
 
         }
 
@@ -866,6 +865,162 @@
 
         }
 
+
+        /* =================================================
+           BEST SELLER BUTTON
+        ================================================= */
+
+        .best-seller-btn {
+
+            min-width: 105px;
+
+            padding:
+                8px 13px;
+
+            border-radius: 8px;
+
+            border:
+                1px solid #444;
+
+            background: #202020;
+
+            color: #aaa;
+
+            cursor: pointer;
+
+            font-size: 12px;
+
+            font-weight: 800;
+
+            transition: .2s;
+
+        }
+
+
+        .best-seller-btn:hover {
+
+            border-color:
+                #ff5a00;
+
+            color: white;
+
+        }
+
+
+        .best-seller-btn.active {
+
+            background:
+                rgba(255,90,0,.15);
+
+            border-color:
+                #ff5a00;
+
+            color:
+                #ff5a00;
+
+        }
+
+
+        .best-seller-status {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 6px;
+
+            font-size: 12px;
+
+            font-weight: 800;
+
+            margin-top: 6px;
+
+        }
+
+
+        .best-seller-status.active {
+
+            color: #ff5a00;
+
+        }
+
+
+        .best-seller-status.inactive {
+
+            color: #666;
+
+        }
+
+
+        /* =================================================
+           TOAST
+        ================================================= */
+
+        #adminToast {
+
+            position: fixed;
+
+            right: 20px;
+
+            bottom: 20px;
+
+            z-index: 999999;
+
+            background: #181818;
+
+            border:
+                1px solid #333;
+
+            border-radius: 10px;
+
+            padding:
+                14px 18px;
+
+            color: white;
+
+            font-weight: 700;
+
+            box-shadow:
+                0 15px 40px
+                rgba(0,0,0,.4);
+
+            transform:
+                translateY(20px);
+
+            opacity: 0;
+
+            pointer-events: none;
+
+            transition: .25s;
+
+        }
+
+
+        #adminToast.show {
+
+            transform:
+                translateY(0);
+
+            opacity: 1;
+
+        }
+
+
+        #adminToast.success {
+
+            border-color:
+                #ff5a00;
+
+        }
+
+
+        #adminToast.error {
+
+            border-color:
+                #ef4444;
+
+        }
+
     </style>
 
 </head>
@@ -878,15 +1033,15 @@
      SECURITY CHECKING SCREEN
 ========================================================= -->
 
-<div id="checkingScreen">
+<div id='checkingScreen'>
 
-    <div class="checking-logo">
+    <div class='checking-logo'>
         KHELZONE
     </div>
 
-    <div class="loader"></div>
+    <div class='loader'></div>
 
-    <div style="color:#888;">
+    <div style='color:#888;'>
         Checking admin access...
     </div>
 
@@ -897,26 +1052,26 @@
      ACCESS DENIED
 ========================================================= -->
 
-<div id="accessDenied">
+<div id='accessDenied'>
 
-    <div class="access-box">
+    <div class='access-box'>
 
-        <div class="access-icon">
+        <div class='access-icon'>
             🔒
         </div>
 
-        <div class="access-title">
+        <div class='access-title'>
             ACCESS DENIED
         </div>
 
-        <div class="access-text">
+        <div class='access-text'>
             You do not have permission to access
             the KHELZONE Admin Dashboard.
         </div>
 
         <a
-            href="homepage.html"
-            class="home-btn"
+            href='homepage.html'
+            class='home-btn'
         >
             BACK TO HOMEPAGE
         </a>
@@ -931,29 +1086,31 @@
 ========================================================= -->
 
 <div
-    id="dashboard"
-    class="hidden"
+    id='dashboard'
+    class='hidden'
 >
 
 
-    <!-- SIDEBAR -->
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
 
     <aside
-        id="sidebar"
-        class="sidebar"
+        id='sidebar'
+        class='sidebar'
     >
 
-        <div class="sidebar-logo">
+        <div class='sidebar-logo'>
             KHELZONE
         </div>
 
 
-        <nav class="sidebar-nav">
+        <nav class='sidebar-nav'>
 
             <button
-                type="button"
-                class="sidebar-link active"
-                data-section="dashboardSection"
+                type='button'
+                class='sidebar-link active'
+                data-section='dashboardSection'
             >
                 📊
                 <span>Dashboard</span>
@@ -961,9 +1118,9 @@
 
 
             <button
-                type="button"
-                class="sidebar-link"
-                data-section="productsSection"
+                type='button'
+                class='sidebar-link'
+                data-section='productsSection'
             >
                 🛒
                 <span>Products</span>
@@ -971,9 +1128,9 @@
 
 
             <button
-                type="button"
-                class="sidebar-link"
-                data-section="sellersSection"
+                type='button'
+                class='sidebar-link'
+                data-section='sellersSection'
             >
                 🏪
                 <span>Sellers</span>
@@ -981,9 +1138,9 @@
 
 
             <button
-                type="button"
-                class="sidebar-link"
-                data-section="customersSection"
+                type='button'
+                class='sidebar-link'
+                data-section='customersSection'
             >
                 👥
                 <span>Customers</span>
@@ -991,9 +1148,9 @@
 
 
             <button
-                type="button"
-                class="sidebar-link"
-                data-section="ordersSection"
+                type='button'
+                class='sidebar-link'
+                data-section='ordersSection'
             >
                 📦
                 <span>Orders</span>
@@ -1002,12 +1159,12 @@
         </nav>
 
 
-        <div class="sidebar-bottom">
+        <div class='sidebar-bottom'>
 
             <button
-                id="logoutBtn"
-                type="button"
-                class="logout-btn"
+                id='logoutBtn'
+                type='button'
+                class='logout-btn'
             >
                 Logout
             </button>
@@ -1017,26 +1174,28 @@
     </aside>
 
 
-    <!-- MOBILE HEADER -->
+    <!-- =====================================================
+         MOBILE HEADER
+    ====================================================== -->
 
-    <div class="mobile-header">
+    <div class='mobile-header'>
 
         <div
-            style="
+            style='
                 font-weight:900;
                 color:#ff5a00;
                 font-size:23px;
-            "
+            '
         >
             KHELZONE
         </div>
 
 
         <button
-            id="mobileMenuBtn"
-            type="button"
-            class="mobile-menu-btn"
-            aria-label="Open menu"
+            id='mobileMenuBtn'
+            type='button'
+            class='mobile-menu-btn'
+            aria-label='Open menu'
         >
             ☰
         </button>
@@ -1044,20 +1203,24 @@
     </div>
 
 
-    <!-- MAIN -->
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
 
-    <main class="main">
+    <main class='main'>
 
 
-        <!-- TOPBAR -->
+        <!-- =================================================
+             TOPBAR
+        ================================================== -->
 
-        <div class="topbar">
+        <div class='topbar'>
 
             <div>
 
                 <div
-                    id="pageTitle"
-                    class="page-title"
+                    id='pageTitle'
+                    class='page-title'
                 >
                     Dashboard
                 </div>
@@ -1065,19 +1228,19 @@
             </div>
 
 
-            <div class="admin-info">
+            <div class='admin-info'>
 
                 <div
-                    id="adminName"
-                    class="admin-name"
+                    id='adminName'
+                    class='admin-name'
                 >
                     Admin
                 </div>
 
 
                 <div
-                    id="adminEmail"
-                    class="admin-email"
+                    id='adminEmail'
+                    class='admin-email'
                 >
                     -
                 </div>
@@ -1087,25 +1250,29 @@
         </div>
 
 
-        <!-- CONTENT -->
+        <!-- =================================================
+             CONTENT
+        ================================================== -->
 
-        <div class="content">
+        <div class='content'>
 
 
-            <!-- DASHBOARD -->
+            <!-- =================================================
+                 DASHBOARD
+            ================================================== -->
 
             <section
-                id="dashboardSection"
-                class="section active"
+                id='dashboardSection'
+                class='section active'
             >
 
-                <div class="mb-6">
+                <div class='mb-6'>
 
-                    <h1 class="text-3xl font-black">
+                    <h1 class='text-3xl font-black'>
                         Dashboard
                     </h1>
 
-                    <p class="text-gray-500 mt-2">
+                    <p class='text-gray-500 mt-2'>
                         KHELZONE administration overview
                     </p>
 
@@ -1113,24 +1280,24 @@
 
 
                 <div
-                    class="
+                    class='
                         grid
                         grid-cols-1
                         md:grid-cols-2
                         xl:grid-cols-4
                         gap-5
-                    "
+                    '
                 >
 
-                    <div class="dashboard-card">
+                    <div class='dashboard-card'>
 
-                        <div class="stat-label">
+                        <div class='stat-label'>
                             Products
                         </div>
 
                         <div
-                            id="productCount"
-                            class="stat-value"
+                            id='productCount'
+                            class='stat-value'
                         >
                             0
                         </div>
@@ -1138,15 +1305,15 @@
                     </div>
 
 
-                    <div class="dashboard-card">
+                    <div class='dashboard-card'>
 
-                        <div class="stat-label">
+                        <div class='stat-label'>
                             Sellers
                         </div>
 
                         <div
-                            id="sellerCount"
-                            class="stat-value"
+                            id='sellerCount'
+                            class='stat-value'
                         >
                             0
                         </div>
@@ -1154,15 +1321,15 @@
                     </div>
 
 
-                    <div class="dashboard-card">
+                    <div class='dashboard-card'>
 
-                        <div class="stat-label">
+                        <div class='stat-label'>
                             Customers
                         </div>
 
                         <div
-                            id="customerCount"
-                            class="stat-value"
+                            id='customerCount'
+                            class='stat-value'
                         >
                             0
                         </div>
@@ -1170,15 +1337,15 @@
                     </div>
 
 
-                    <div class="dashboard-card">
+                    <div class='dashboard-card'>
 
-                        <div class="stat-label">
+                        <div class='stat-label'>
                             Orders
                         </div>
 
                         <div
-                            id="orderCount"
-                            class="stat-value"
+                            id='orderCount'
+                            class='stat-value'
                         >
                             0
                         </div>
@@ -1190,15 +1357,17 @@
             </section>
 
 
-            <!-- PRODUCTS -->
+            <!-- =================================================
+                 PRODUCTS
+            ================================================== -->
 
             <section
-                id="productsSection"
-                class="section"
+                id='productsSection'
+                class='section'
             >
 
                 <div
-                    class="
+                    class='
                         flex
                         flex-col
                         md:flex-row
@@ -1206,34 +1375,78 @@
                         md:justify-between
                         gap-4
                         mb-6
-                    "
+                    '
                 >
 
                     <div>
 
-                        <h1 class="text-3xl font-black">
+                        <h1 class='text-3xl font-black'>
                             Products
                         </h1>
 
-                        <p class="text-gray-500 mt-2">
-                            Manage KHELZONE products
+                        <p class='text-gray-500 mt-2'>
+                            Manage KHELZONE products and Best Sellers
                         </p>
 
                     </div>
 
 
                     <input
-                        id="productSearch"
-                        class="search-input"
-                        type="text"
-                        autocomplete="off"
-                        placeholder="Search products..."
+                        id='productSearch'
+                        class='search-input'
+                        type='text'
+                        autocomplete='off'
+                        placeholder='Search products...'
                     >
 
                 </div>
 
 
-                <div class="table-wrapper">
+                <div class='dashboard-card mb-5'>
+
+                    <div class='flex items-start gap-3'>
+
+                        <div
+                            style='
+                                font-size:24px;
+                                color:#ff5a00;
+                            '
+                        >
+                            ⭐
+                        </div>
+
+                        <div>
+
+                            <div
+                                style='
+                                    font-size:16px;
+                                    font-weight:900;
+                                    margin-bottom:5px;
+                                '
+                            >
+                                Best Sellers
+                            </div>
+
+                            <div
+                                style='
+                                    color:#888;
+                                    font-size:13px;
+                                    line-height:1.6;
+                                '
+                            >
+                                Turn ON Best Seller for the products
+                                you want to display on the homepage
+                                Best Sellers section.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class='table-wrapper'>
 
                     <table>
 
@@ -1251,6 +1464,8 @@
 
                                 <th>Status</th>
 
+                                <th>Best Seller</th>
+
                                 <th>Action</th>
 
                             </tr>
@@ -1258,16 +1473,16 @@
                         </thead>
 
 
-                        <tbody id="productsTableBody">
+                        <tbody id='productsTableBody'>
 
                             <tr>
 
                                 <td
-                                    colspan="6"
-                                    style="
+                                    colspan='7'
+                                    style='
                                         text-align:center;
                                         color:#888;
-                                    "
+                                    '
                                 >
                                     Loading...
                                 </td>
@@ -1283,15 +1498,17 @@
             </section>
 
 
-            <!-- SELLERS -->
+            <!-- =================================================
+                 SELLERS
+            ================================================== -->
 
             <section
-                id="sellersSection"
-                class="section"
+                id='sellersSection'
+                class='section'
             >
 
                 <div
-                    class="
+                    class='
                         flex
                         flex-col
                         md:flex-row
@@ -1299,16 +1516,16 @@
                         md:justify-between
                         gap-4
                         mb-6
-                    "
+                    '
                 >
 
                     <div>
 
-                        <h1 class="text-3xl font-black">
+                        <h1 class='text-3xl font-black'>
                             Sellers
                         </h1>
 
-                        <p class="text-gray-500 mt-2">
+                        <p class='text-gray-500 mt-2'>
                             Manage sellers
                         </p>
 
@@ -1316,17 +1533,17 @@
 
 
                     <input
-                        id="sellerSearch"
-                        class="search-input"
-                        type="text"
-                        autocomplete="off"
-                        placeholder="Search sellers..."
+                        id='sellerSearch'
+                        class='search-input'
+                        type='text'
+                        autocomplete='off'
+                        placeholder='Search sellers...'
                     >
 
                 </div>
 
 
-                <div class="table-wrapper">
+                <div class='table-wrapper'>
 
                     <table>
 
@@ -1351,16 +1568,16 @@
                         </thead>
 
 
-                        <tbody id="sellersTableBody">
+                        <tbody id='sellersTableBody'>
 
                             <tr>
 
                                 <td
-                                    colspan="6"
-                                    style="
+                                    colspan='6'
+                                    style='
                                         text-align:center;
                                         color:#888;
-                                    "
+                                    '
                                 >
                                     Loading...
                                 </td>
@@ -1376,15 +1593,17 @@
             </section>
 
 
-            <!-- CUSTOMERS -->
+            <!-- =================================================
+                 CUSTOMERS
+            ================================================== -->
 
             <section
-                id="customersSection"
-                class="section"
+                id='customersSection'
+                class='section'
             >
 
                 <div
-                    class="
+                    class='
                         flex
                         flex-col
                         md:flex-row
@@ -1392,16 +1611,16 @@
                         md:justify-between
                         gap-4
                         mb-6
-                    "
+                    '
                 >
 
                     <div>
 
-                        <h1 class="text-3xl font-black">
+                        <h1 class='text-3xl font-black'>
                             Customers
                         </h1>
 
-                        <p class="text-gray-500 mt-2">
+                        <p class='text-gray-500 mt-2'>
                             Manage customers
                         </p>
 
@@ -1409,17 +1628,17 @@
 
 
                     <input
-                        id="customerSearch"
-                        class="search-input"
-                        type="text"
-                        autocomplete="off"
-                        placeholder="Search customers..."
+                        id='customerSearch'
+                        class='search-input'
+                        type='text'
+                        autocomplete='off'
+                        placeholder='Search customers...'
                     >
 
                 </div>
 
 
-                <div class="table-wrapper">
+                <div class='table-wrapper'>
 
                     <table>
 
@@ -1444,16 +1663,16 @@
                         </thead>
 
 
-                        <tbody id="customersTableBody">
+                        <tbody id='customersTableBody'>
 
                             <tr>
 
                                 <td
-                                    colspan="6"
-                                    style="
+                                    colspan='6'
+                                    style='
                                         text-align:center;
                                         color:#888;
-                                    "
+                                    '
                                 >
                                     Loading...
                                 </td>
@@ -1469,15 +1688,17 @@
             </section>
 
 
-            <!-- ORDERS -->
+            <!-- =================================================
+                 ORDERS
+            ================================================== -->
 
             <section
-                id="ordersSection"
-                class="section"
+                id='ordersSection'
+                class='section'
             >
 
                 <div
-                    class="
+                    class='
                         flex
                         flex-col
                         md:flex-row
@@ -1485,16 +1706,16 @@
                         md:justify-between
                         gap-4
                         mb-6
-                    "
+                    '
                 >
 
                     <div>
 
-                        <h1 class="text-3xl font-black">
+                        <h1 class='text-3xl font-black'>
                             Orders
                         </h1>
 
-                        <p class="text-gray-500 mt-2">
+                        <p class='text-gray-500 mt-2'>
                             Manage customer orders
                         </p>
 
@@ -1502,17 +1723,17 @@
 
 
                     <input
-                        id="orderSearch"
-                        class="search-input"
-                        type="text"
-                        autocomplete="off"
-                        placeholder="Search orders..."
+                        id='orderSearch'
+                        class='search-input'
+                        type='text'
+                        autocomplete='off'
+                        placeholder='Search orders...'
                     >
 
                 </div>
 
 
-                <div class="table-wrapper">
+                <div class='table-wrapper'>
 
                     <table>
 
@@ -1537,16 +1758,16 @@
                         </thead>
 
 
-                        <tbody id="ordersTableBody">
+                        <tbody id='ordersTableBody'>
 
                             <tr>
 
                                 <td
-                                    colspan="6"
-                                    style="
+                                    colspan='6'
+                                    style='
                                         text-align:center;
                                         color:#888;
-                                    "
+                                    '
                                 >
                                     Loading...
                                 </td>
@@ -1570,11 +1791,22 @@
 
 
 <!-- =========================================================
-     ADMIN DASHBOARD JS
+     TOAST
 ========================================================= -->
 
-<script src="admin-dashboard.js"></script>
+<div id='adminToast'></div>
+
+
+<!-- =========================================================
+     EXISTING ADMIN DASHBOARD JS
+========================================================= -->
+
+<script src='admin-dashboard.js'></script>
+
+
+
 
 
 </body>
+
 </html>

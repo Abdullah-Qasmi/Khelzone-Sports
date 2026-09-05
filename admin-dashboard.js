@@ -1,28 +1,10 @@
 /* ============================================================
    KHELZONE ADMIN DASHBOARD
-   FULL VERSION
+   FULL FIXED VERSION
    ADMIN ONLY
-
-   FEATURES:
-   - Admin access protection
-   - Dashboard counts
-   - Products
-   - Product enable/disable
-   - Product delete
-   - Sellers
-   - Seller status update
-   - Seller delete
-   - Customers from profiles WHERE role = customer
-   - Customer delete
-   - Orders
-   - Order status update
-   - Order delete
-   - Search
-   - Mobile sidebar
-   - Logout
 ============================================================ */
 
-"use strict";
+'use strict';
 
 
 /* ============================================================
@@ -33,7 +15,7 @@ const supabaseClient = window.supabaseClient;
 
 if (!supabaseClient) {
     console.error(
-        "KHELZONE ERROR: Supabase client not found."
+        'KHELZONE ERROR: Supabase client not found.'
     );
 }
 
@@ -57,15 +39,15 @@ function escapeHTML(value) {
         value === null ||
         value === undefined
     ) {
-        return "";
+        return '';
     }
 
     return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
 
 
@@ -80,12 +62,12 @@ function formatMoney(value) {
     );
 
     if (!Number.isFinite(number)) {
-        return "Rs. 0";
+        return 'Rs. 0';
     }
 
     return (
-        "Rs. " +
-        number.toLocaleString("en-PK")
+        'Rs. ' +
+        number.toLocaleString('en-PK')
     );
 }
 
@@ -97,21 +79,21 @@ function formatMoney(value) {
 function formatDate(value) {
 
     if (!value) {
-        return "-";
+        return '-';
     }
 
     const date = new Date(value);
 
     if (Number.isNaN(date.getTime())) {
-        return "-";
+        return '-';
     }
 
     return date.toLocaleDateString(
-        "en-PK",
+        'en-PK',
         {
-            year: "numeric",
-            month: "short",
-            day: "numeric"
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
         }
     );
 }
@@ -124,7 +106,7 @@ function formatDate(value) {
 function initials(name) {
 
     if (!name) {
-        return "U";
+        return 'U';
     }
 
     const words = String(name)
@@ -141,8 +123,8 @@ function initials(name) {
                         .charAt(0)
                         .toUpperCase()
             )
-            .join("")
-        || "U"
+            .join('')
+        || 'U'
     );
 }
 
@@ -166,13 +148,13 @@ function showTableMessage(
     tbody.innerHTML = `
         <tr>
             <td
-                colspan="${colspan}"
-                style="
+                colspan='${colspan}'
+                style='
                     text-align:center;
                     padding:35px 20px;
                     color:#999;
                     font-weight:600;
-                "
+                '
             >
                 ${escapeHTML(message)}
             </td>
@@ -187,31 +169,31 @@ function showTableMessage(
 
 function showToast(message) {
 
-    let toast = $("kzToast");
+    let toast = $('adminToast');
 
     if (!toast) {
 
         toast =
-            document.createElement("div");
+            document.createElement('div');
 
-        toast.id = "kzToast";
+        toast.id = 'adminToast';
 
         Object.assign(
             toast.style,
             {
-                position: "fixed",
-                right: "20px",
-                bottom: "20px",
-                zIndex: "999999",
-                padding: "14px 20px",
-                borderRadius: "10px",
-                background: "#ff5a00",
-                color: "#fff",
-                fontWeight: "800",
+                position: 'fixed',
+                right: '20px',
+                bottom: '20px',
+                zIndex: '999999',
+                padding: '14px 20px',
+                borderRadius: '10px',
+                background: '#ff5a00',
+                color: '#fff',
+                fontWeight: '800',
                 boxShadow:
-                    "0 10px 30px rgba(0,0,0,.4)",
-                maxWidth: "90%",
-                transition: "opacity .2s ease"
+                    '0 10px 30px rgba(0,0,0,.4)',
+                maxWidth: '90%',
+                transition: 'opacity .2s ease'
             }
         );
 
@@ -219,8 +201,8 @@ function showToast(message) {
     }
 
     toast.textContent = message;
-    toast.style.opacity = "1";
-    toast.style.display = "block";
+    toast.style.opacity = '1';
+    toast.style.display = 'block';
 
     clearTimeout(
         window.kzToastTimer
@@ -230,12 +212,12 @@ function showToast(message) {
         setTimeout(
             () => {
 
-                toast.style.opacity = "0";
+                toast.style.opacity = '0';
 
                 setTimeout(
                     () => {
                         toast.style.display =
-                            "none";
+                            'none';
                     },
                     200
                 );
@@ -253,200 +235,218 @@ function showToast(message) {
 async function checkAdminAccess() {
 
     const checkingScreen =
-        $("checkingScreen");
+        $('checkingScreen');
 
     const dashboard =
-        $("dashboard");
+        $('dashboard');
 
     const accessDenied =
-        $("accessDenied");
+        $('accessDenied');
 
 
     if (dashboard) {
-        dashboard.classList.add("hidden");
+        dashboard.classList.add('hidden');
     }
 
     if (accessDenied) {
-        accessDenied.style.display =
-            "none";
+        accessDenied.style.display = 'none';
     }
 
     if (checkingScreen) {
-        checkingScreen.style.display =
-            "flex";
+        checkingScreen.style.display = 'flex';
     }
 
 
     try {
 
         if (!supabaseClient) {
-
             throw new Error(
-                "Supabase client is not initialized."
+                'Supabase client is not initialized.'
             );
         }
 
 
-        /* ----------------------------------------------------
-           GET CURRENT USER
-        ---------------------------------------------------- */
-
         const {
-            data,
-            error: userError
+            data: sessionData,
+            error: sessionError
         } =
-            await supabaseClient.auth.getUser();
+            await supabaseClient.auth.getSession();
 
-        if (userError) {
-            throw userError;
+
+        if (sessionError) {
+            throw sessionError;
         }
 
-        const user =
-            data?.user;
+
+        const session =
+            sessionData?.session;
 
 
-        /* ----------------------------------------------------
-           USER NOT LOGGED IN
-        ---------------------------------------------------- */
+        if (!session?.user) {
 
-        if (!user) {
+            console.warn(
+                'KHELZONE: No logged-in user.'
+            );
 
             window.location.replace(
-                "admin.html"
+                'admin.html'
             );
 
             return false;
         }
 
 
-        /* ----------------------------------------------------
-           CHECK ADMIN TABLE
-        ---------------------------------------------------- */
+        const user =
+            session.user;
+
+
+        console.log(
+            'KHELZONE LOGGED USER:',
+            user.email
+        );
+
 
         const {
-            data: admin,
-            error: adminError
+            data: profile,
+            error: profileError
         } =
             await supabaseClient
-                .from("admins")
-                .select("id")
-                .eq("id", user.id)
+                .from('profiles')
+                .select(
+                    'id, email, full_name, role'
+                )
+                .eq(
+                    'id',
+                    user.id
+                )
                 .maybeSingle();
 
-        if (adminError) {
-            throw adminError;
+
+        if (profileError) {
+            throw profileError;
         }
 
 
-        /* ----------------------------------------------------
-           NOT ADMIN
-        ---------------------------------------------------- */
+        console.log(
+            'KHELZONE ADMIN PROFILE:',
+            profile
+        );
 
-        if (!admin) {
+
+        if (
+            !profile ||
+            profile.role !== 'admin'
+        ) {
 
             console.warn(
-                "KHELZONE: User is not admin."
+                'KHELZONE: User is not admin.'
             );
 
             if (checkingScreen) {
                 checkingScreen.style.display =
-                    "none";
+                    'none';
             }
 
             if (dashboard) {
                 dashboard.classList.add(
-                    "hidden"
+                    'hidden'
                 );
             }
 
             if (accessDenied) {
                 accessDenied.style.display =
-                    "flex";
+                    'flex';
             }
 
             return false;
         }
 
 
-        /* ----------------------------------------------------
-           ADMIN VERIFIED
-        ---------------------------------------------------- */
-
         console.log(
-            "KHELZONE ADMIN VERIFIED:",
-            user.id
-        );
-
-        localStorage.setItem(
-            "khelzone_role",
-            "admin"
-        );
-
-        localStorage.setItem(
-            "khelzone_user_id",
+            'KHELZONE ADMIN VERIFIED:',
             user.id
         );
 
 
-        /* ----------------------------------------------------
-           ADMIN NAME
-        ---------------------------------------------------- */
+        localStorage.setItem(
+            'khelzone_role',
+            'admin'
+        );
+
+        localStorage.setItem(
+            'khelzone_user_id',
+            user.id
+        );
+
 
         const adminName =
+            profile.full_name ||
             user.user_metadata?.full_name ||
             user.user_metadata?.name ||
-            user.email?.split("@")[0] ||
-            "Admin";
+            user.email?.split('@')[0] ||
+            'Admin';
+
 
         const adminEmail =
             user.email ||
-            "-";
+            profile.email ||
+            '-';
 
 
-        if ($("adminName")) {
-            $("adminName").textContent =
+        if ($('adminName')) {
+            $('adminName').textContent =
                 adminName;
         }
 
-        if ($("adminEmail")) {
-            $("adminEmail").textContent =
+
+        if ($('adminEmail')) {
+            $('adminEmail').textContent =
                 adminEmail;
         }
 
 
-        /* ----------------------------------------------------
-           SHOW DASHBOARD
-        ---------------------------------------------------- */
-
         if (checkingScreen) {
             checkingScreen.style.display =
-                "none";
+                'none';
         }
+
 
         if (dashboard) {
             dashboard.classList.remove(
-                "hidden"
+                'hidden'
             );
         }
 
+
         return true;
+
 
     } catch (error) {
 
         console.error(
-            "KHELZONE ADMIN ACCESS ERROR:",
+            'KHELZONE ADMIN ACCESS ERROR:',
             error
         );
 
+
         if (checkingScreen) {
             checkingScreen.style.display =
-                "none";
+                'none';
         }
+
+
+        if (dashboard) {
+            dashboard.classList.add(
+                'hidden'
+            );
+        }
+
 
         if (accessDenied) {
             accessDenied.style.display =
-                "flex";
+                'flex';
         }
+
 
         return false;
     }
@@ -454,44 +454,28 @@ async function checkAdminAccess() {
 
 
 /* ============================================================
-   PAGE TITLES
-============================================================ */
-
-const sectionTitles = {
-
-    dashboardSection:
-        "Dashboard",
-
-    productsSection:
-        "Products",
-
-    sellersSection:
-        "Sellers",
-
-    customersSection:
-        "Customers",
-
-    ordersSection:
-        "Orders"
-
-};
-
-
-/* ============================================================
-   SECTION NAVIGATION
+   SHOW SECTION
+   IMPORTANT:
+   HTML USES .section + .section.active
 ============================================================ */
 
 function showSection(sectionId) {
 
+    if (!sectionId) {
+        return;
+    }
+
+
     const sections =
         document.querySelectorAll(
-            ".section"
+            '.section'
         );
+
 
     sections.forEach(
         section => {
             section.classList.remove(
-                "active"
+                'active'
             );
         }
     );
@@ -500,29 +484,29 @@ function showSection(sectionId) {
     const target =
         $(sectionId);
 
+
     if (target) {
+
         target.classList.add(
-            "active"
+            'active'
         );
     }
 
 
-    /* --------------------------------------------------------
-       NAV ACTIVE
-    -------------------------------------------------------- */
-
-    const navLinks =
+    const links =
         document.querySelectorAll(
-            "[data-section]"
+            '[data-section]'
         );
 
-    navLinks.forEach(
+
+    links.forEach(
         link => {
 
             const linkSection =
                 link.getAttribute(
-                    "data-section"
+                    'data-section'
                 );
+
 
             if (
                 linkSection ===
@@ -530,33 +514,47 @@ function showSection(sectionId) {
             ) {
 
                 link.classList.add(
-                    "active"
+                    'active'
                 );
 
             } else {
 
                 link.classList.remove(
-                    "active"
+                    'active'
                 );
             }
         }
     );
 
 
-    /* --------------------------------------------------------
-       PAGE TITLE
-    -------------------------------------------------------- */
-
     const pageTitle =
-        $("pageTitle");
+        $('pageTitle');
+
 
     if (pageTitle) {
 
+        const titles = {
+
+            dashboardSection:
+                'Dashboard',
+
+            productsSection:
+                'Products',
+
+            sellersSection:
+                'Sellers',
+
+            customersSection:
+                'Customers',
+
+            ordersSection:
+                'Orders'
+        };
+
+
         pageTitle.textContent =
-            sectionTitles[
-                sectionId
-            ] ||
-            "Dashboard";
+            titles[sectionId] ||
+            'Dashboard';
     }
 
 
@@ -565,31 +563,34 @@ function showSection(sectionId) {
 
 
 /* ============================================================
-   NAVIGATION INIT
+   NAVIGATION
 ============================================================ */
 
 function initNavigation() {
 
     const links =
         document.querySelectorAll(
-            "[data-section]"
+            '[data-section]'
         );
+
 
     links.forEach(
         link => {
 
             link.addEventListener(
-                "click",
+                'click',
                 event => {
 
                     event.preventDefault();
 
                     const sectionId =
                         link.getAttribute(
-                            "data-section"
+                            'data-section'
                         );
 
+
                     if (sectionId) {
+
                         showSection(
                             sectionId
                         );
@@ -614,32 +615,38 @@ function createMobileOverlay() {
         return mobileOverlay;
     }
 
+
     mobileOverlay =
-        document.createElement("div");
+        document.createElement('div');
+
 
     mobileOverlay.id =
-        "kzMobileOverlay";
+        'kzMobileOverlay';
+
 
     Object.assign(
         mobileOverlay.style,
         {
-            position: "fixed",
-            inset: "0",
+            position: 'fixed',
+            inset: '0',
             background:
-                "rgba(0,0,0,.65)",
-            zIndex: "99",
-            display: "none"
+                'rgba(0,0,0,.65)',
+            zIndex: '99',
+            display: 'none'
         }
     );
 
+
     mobileOverlay.addEventListener(
-        "click",
+        'click',
         closeMobileMenu
     );
+
 
     document.body.appendChild(
         mobileOverlay
     );
+
 
     return mobileOverlay;
 }
@@ -648,22 +655,24 @@ function createMobileOverlay() {
 function openMobileMenu() {
 
     const sidebar =
-        $("sidebar");
+        $('sidebar');
 
     const overlay =
         createMobileOverlay();
 
+
     if (sidebar) {
 
         sidebar.classList.add(
-            "mobile-open"
+            'mobile-open'
         );
     }
+
 
     if (overlay) {
 
         overlay.style.display =
-            "block";
+            'block';
     }
 }
 
@@ -671,19 +680,21 @@ function openMobileMenu() {
 function closeMobileMenu() {
 
     const sidebar =
-        $("sidebar");
+        $('sidebar');
+
 
     if (sidebar) {
 
         sidebar.classList.remove(
-            "mobile-open"
+            'mobile-open'
         );
     }
+
 
     if (mobileOverlay) {
 
         mobileOverlay.style.display =
-            "none";
+            'none';
     }
 }
 
@@ -691,23 +702,26 @@ function closeMobileMenu() {
 function initMobileMenu() {
 
     const button =
-        $("mobileMenuBtn");
+        $('mobileMenuBtn');
+
 
     if (!button) {
         return;
     }
 
+
     button.addEventListener(
-        "click",
+        'click',
         () => {
 
             const sidebar =
-                $("sidebar");
+                $('sidebar');
+
 
             if (
                 sidebar &&
                 sidebar.classList.contains(
-                    "mobile-open"
+                    'mobile-open'
                 )
             ) {
 
@@ -734,6 +748,7 @@ async function safeCount(table) {
             return 0;
         }
 
+
         const {
             count,
             error
@@ -741,12 +756,13 @@ async function safeCount(table) {
             await supabaseClient
                 .from(table)
                 .select(
-                    "*",
+                    '*',
                     {
-                        count: "exact",
+                        count: 'exact',
                         head: true
                     }
                 );
+
 
         if (error) {
 
@@ -758,7 +774,9 @@ async function safeCount(table) {
             return 0;
         }
 
+
         return count || 0;
+
 
     } catch (error) {
 
@@ -774,7 +792,6 @@ async function safeCount(table) {
 
 /* ============================================================
    CUSTOMER COUNT
-   CUSTOMERS ARE IN profiles
 ============================================================ */
 
 async function safeCustomerCount() {
@@ -785,40 +802,44 @@ async function safeCustomerCount() {
             return 0;
         }
 
+
         const {
             count,
             error
         } =
             await supabaseClient
-                .from("profiles")
+                .from('profiles')
                 .select(
-                    "*",
+                    '*',
                     {
-                        count: "exact",
+                        count: 'exact',
                         head: true
                     }
                 )
                 .eq(
-                    "role",
-                    "customer"
+                    'role',
+                    'customer'
                 );
+
 
         if (error) {
 
             console.error(
-                "Customer count error:",
+                'Customer count error:',
                 error
             );
 
             return 0;
         }
 
+
         return count || 0;
+
 
     } catch (error) {
 
         console.error(
-            "Customer count exception:",
+            'Customer count exception:',
             error
         );
 
@@ -835,48 +856,36 @@ async function loadDashboardData() {
 
     const results =
         await Promise.all([
-            safeCount("products"),
-            safeCount("sellers"),
+            safeCount('products'),
+            safeCount('sellers'),
             safeCustomerCount(),
-            safeCount("orders")
+            safeCount('orders')
         ]);
 
 
-    const products =
-        results[0];
-
-    const sellers =
-        results[1];
-
-    const customers =
-        results[2];
-
-    const orders =
-        results[3];
-
-
-    if ($("productCount")) {
-        $("productCount").textContent =
-            products;
+    if ($('productCount')) {
+        $('productCount').textContent =
+            results[0];
     }
 
-    if ($("sellerCount")) {
-        $("sellerCount").textContent =
-            sellers;
+
+    if ($('sellerCount')) {
+        $('sellerCount').textContent =
+            results[1];
     }
 
-    if ($("customerCount")) {
-        $("customerCount").textContent =
-            customers;
+
+    if ($('customerCount')) {
+        $('customerCount').textContent =
+            results[2];
     }
 
-    if ($("orderCount")) {
-        $("orderCount").textContent =
-            orders;
+
+    if ($('orderCount')) {
+        $('orderCount').textContent =
+            results[3];
     }
 }
-
-
 /* ============================================================
    PRODUCTS
 ============================================================ */
@@ -891,18 +900,17 @@ let allProducts = [];
 async function loadProducts() {
 
     const tbody =
-        $("productsTableBody");
+        $('productsTableBody');
 
     if (!tbody) {
         return;
     }
 
     showTableMessage(
-        "productsTableBody",
-        "Loading products...",
-        6
+        'productsTableBody',
+        'Loading products...',
+        7
     );
-
 
     try {
 
@@ -911,10 +919,10 @@ async function loadProducts() {
             error
         } =
             await supabaseClient
-                .from("products")
-                .select("*")
+                .from('products')
+                .select('*')
                 .order(
-                    "created_at",
+                    'created_at',
                     {
                         ascending: false
                     }
@@ -936,15 +944,15 @@ async function loadProducts() {
     } catch (error) {
 
         console.error(
-            "Products error:",
+            'Products error:',
             error
         );
 
         showTableMessage(
-            "productsTableBody",
+            'productsTableBody',
             error?.message ||
-            "Unable to load products.",
-            6
+            'Unable to load products.',
+            7
         );
     }
 }
@@ -957,7 +965,7 @@ async function loadProducts() {
 function renderProducts(products) {
 
     const tbody =
-        $("productsTableBody");
+        $('productsTableBody');
 
     if (!tbody) {
         return;
@@ -970,9 +978,9 @@ function renderProducts(products) {
     ) {
 
         showTableMessage(
-            "productsTableBody",
-            "No products found.",
-            6
+            'productsTableBody',
+            'No products found.',
+            7
         );
 
         return;
@@ -984,12 +992,12 @@ function renderProducts(products) {
             product => {
 
                 const id =
-                    product.id || "";
+                    product.id || '';
 
                 const name =
                     product.name ||
                     product.title ||
-                    "Unnamed Product";
+                    'Unnamed Product';
 
                 const price =
                     product.sale_price ??
@@ -998,16 +1006,19 @@ function renderProducts(products) {
 
                 const category =
                     product.category ||
-                    "-";
+                    '-';
 
                 const seller =
                     product.seller_name ||
                     product.seller_email ||
                     product.seller_id ||
-                    "-";
+                    '-';
 
                 const active =
                     product.is_active !== false;
+
+                const bestSeller =
+                    product.is_best_seller === true;
 
 
                 return `
@@ -1032,39 +1043,66 @@ function renderProducts(products) {
                         </td>
 
                         <td>
+
                             <span
-                                style="
+                                style='
                                     color:${active
-                                        ? "#42d392"
-                                        : "#ff5a00"};
+                                        ? '#42d392'
+                                        : '#ff5a00'};
                                     font-weight:800;
-                                "
+                                '
                             >
                                 ${active
-                                    ? "Active"
-                                    : "Inactive"}
+                                    ? 'Active'
+                                    : 'Inactive'}
                             </span>
+
+                        </td>
+
+                        <td>
+
+                            <button
+                                type='button'
+                                onclick='toggleBestSeller(${JSON.stringify(String(id))})'
+                                style='
+                                    min-width:100px;
+                                    padding:8px 13px;
+                                    border-radius:8px;
+                                    border:1px solid ${bestSeller
+                                        ? '#ff5a00'
+                                        : '#444'};
+                                    background:${bestSeller
+                                        ? 'rgba(255,90,0,.15)'
+                                        : '#202020'};
+                                    color:${bestSeller
+                                        ? '#ff5a00'
+                                        : '#aaa'};
+                                    cursor:pointer;
+                                    font-size:12px;
+                                    font-weight:800;
+                                '
+                            >
+                                ${bestSeller
+                                    ? '★ ON'
+                                    : '☆ OFF'}
+                            </button>
+
                         </td>
 
                         <td>
 
                             <div
-                                style="
+                                style='
                                     display:flex;
                                     gap:6px;
                                     flex-wrap:wrap;
-                                "
+                                '
                             >
 
                                 <button
-                                    type="button"
-                                    onclick="toggleProduct(
-                                        '${escapeHTML(
-                                            String(id)
-                                        )}',
-                                        ${active}
-                                    )"
-                                    style="
+                                    type='button'
+                                    onclick='toggleProduct(${JSON.stringify(String(id))}, ${active})'
+                                    style='
                                         padding:8px 12px;
                                         border-radius:7px;
                                         border:1px solid #333;
@@ -1072,22 +1110,18 @@ function renderProducts(products) {
                                         color:#fff;
                                         cursor:pointer;
                                         font-weight:700;
-                                    "
+                                    '
                                 >
                                     ${active
-                                        ? "Disable"
-                                        : "Enable"}
+                                        ? 'Disable'
+                                        : 'Enable'}
                                 </button>
 
 
                                 <button
-                                    type="button"
-                                    onclick="deleteProduct(
-                                        '${escapeHTML(
-                                            String(id)
-                                        )}'
-                                    )"
-                                    style="
+                                    type='button'
+                                    onclick='deleteProduct(${JSON.stringify(String(id))})'
+                                    style='
                                         padding:8px 12px;
                                         border-radius:7px;
                                         border:1px solid #6b1f1f;
@@ -1095,7 +1129,7 @@ function renderProducts(products) {
                                         color:#ff7777;
                                         cursor:pointer;
                                         font-weight:800;
-                                    "
+                                    '
                                 >
                                     Delete
                                 </button>
@@ -1107,85 +1141,98 @@ function renderProducts(products) {
                     </tr>
                 `;
             }
-        ).join("");
+        ).join('');
 }
 
 
 /* ============================================================
-   PRODUCT SEARCH
+   TOGGLE BEST SELLER
 ============================================================ */
 
-function initProductSearch() {
+async function toggleBestSeller(productId) {
 
-    const input =
-        $("productSearch");
-
-    if (!input) {
+    if (!productId) {
         return;
     }
 
-    input.addEventListener(
-        "input",
-        () => {
 
-            const query =
-                input.value
-                    .trim()
-                    .toLowerCase();
-
-
-            if (!query) {
-
-                renderProducts(
-                    allProducts
-                );
-
-                return;
-            }
+    const product =
+        allProducts.find(
+            item =>
+                String(item.id) ===
+                String(productId)
+        );
 
 
-            const filtered =
-                allProducts.filter(
-                    product => {
+    if (!product) {
 
-                        return [
+        alert(
+            'Product not found.'
+        );
 
-                            product.name,
+        return;
+    }
 
-                            product.title,
 
-                            product.category,
+    const newValue =
+        product.is_best_seller !== true;
 
-                            product.seller_name,
 
-                            product.seller_email,
+    try {
 
-                            product.seller_id
-
-                        ]
-                            .filter(Boolean)
-                            .some(
-                                value =>
-                                    String(value)
-                                        .toLowerCase()
-                                        .includes(
-                                            query
-                                        )
-                            );
-                    }
+        const {
+            error
+        } =
+            await supabaseClient
+                .from('products')
+                .update({
+                    is_best_seller: newValue
+                })
+                .eq(
+                    'id',
+                    productId
                 );
 
 
-            renderProducts(
-                filtered
-            );
+        if (error) {
+            throw error;
         }
-    );
+
+
+        product.is_best_seller =
+            newValue;
+
+
+        showToast(
+            newValue
+                ? 'Product added to Best Sellers.'
+                : 'Product removed from Best Sellers.'
+        );
+
+
+        renderProductSearchResults();
+
+    } catch (error) {
+
+        console.error(
+            'Best Seller update error:',
+            error
+        );
+
+
+        alert(
+            'Could not update Best Seller status.\n\n' +
+            (
+                error?.message ||
+                'Unknown error'
+            )
+        );
+    }
 }
 
 
 /* ============================================================
-   TOGGLE PRODUCT
+   TOGGLE PRODUCT STATUS
 ============================================================ */
 
 async function toggleProduct(
@@ -1198,52 +1245,68 @@ async function toggleProduct(
     }
 
 
+    const newStatus =
+        !currentStatus;
+
+
     try {
 
         const {
             error
         } =
             await supabaseClient
-                .from("products")
+                .from('products')
                 .update({
-                    is_active:
-                        !Boolean(
-                            currentStatus
-                        )
+                    is_active: newStatus
                 })
                 .eq(
-                    "id",
+                    'id',
                     productId
                 );
+
 
         if (error) {
             throw error;
         }
 
 
+        const product =
+            allProducts.find(
+                item =>
+                    String(item.id) ===
+                    String(productId)
+            );
+
+
+        if (product) {
+
+            product.is_active =
+                newStatus;
+        }
+
+
         showToast(
-            currentStatus
-                ? "Product disabled."
-                : "Product enabled."
+            newStatus
+                ? 'Product enabled.'
+                : 'Product disabled.'
         );
 
 
-        await loadProducts();
-
-        await loadDashboardData();
+        renderProductSearchResults();
 
     } catch (error) {
 
         console.error(
-            "Product update error:",
+            'Product status error:',
             error
         );
 
+
         alert(
-            "Could not update product.\n\n" +
+            'Could not update product status.\n\n' +
             (
                 error?.message ||
-                "Unknown error"
+                'Unknown error'
             )
         );
     }
@@ -1265,7 +1328,7 @@ async function deleteProduct(
 
     const confirmed =
         window.confirm(
-            "Are you sure you want to delete this product?\n\nThis action cannot be undone."
+            'Are you sure you want to delete this product?\n\nThis action cannot be undone.'
         );
 
 
@@ -1280,39 +1343,51 @@ async function deleteProduct(
             error
         } =
             await supabaseClient
-                .from("products")
+                .from('products')
                 .delete()
                 .eq(
-                    "id",
+                    'id',
                     productId
                 );
+
 
         if (error) {
             throw error;
         }
 
 
+        allProducts =
+            allProducts.filter(
+                product =>
+                    String(product.id) !==
+                    String(productId)
+            );
+
+
         showToast(
-            "Product deleted successfully."
+            'Product deleted successfully.'
         );
 
 
-        await loadProducts();
+        renderProductSearchResults();
+
 
         await loadDashboardData();
+
 
     } catch (error) {
 
         console.error(
-            "Product delete error:",
+            'Product delete error:',
             error
         );
 
+
         alert(
-            "Could not delete product.\n\n" +
+            'Could not delete product.\n\n' +
             (
                 error?.message ||
-                "Unknown error"
+                'Unknown error'
             )
         );
     }
@@ -1320,1933 +1395,1438 @@ async function deleteProduct(
 
 
 /* ============================================================
-   SELLERS
+   PRODUCT SEARCH RESULTS
 ============================================================ */
+
+function renderProductSearchResults() {
+
+    const input =
+        $('productSearch');
+
+
+    if (!input) {
+
+        renderProducts(
+            allProducts
+        );
+
+        return;
+    }
+
+
+    const query =
+        input.value
+            .trim()
+            .toLowerCase();
+
+
+    if (!query) {
+
+        renderProducts(
+            allProducts
+        );
+
+        return;
+    }
+
+
+    const filtered =
+        allProducts.filter(
+            product => {
+
+                return [
+
+                    product.name,
+                    product.title,
+                    product.category,
+                    product.seller_name,
+                    product.seller_email,
+                    product.seller_id
+
+                ]
+                    .filter(Boolean)
+                    .some(
+                        value =>
+                            String(value)
+                                .toLowerCase()
+                                .includes(query)
+                    );
+            }
+        );
+
+
+    renderProducts(
+        filtered
+    );
+}
+
+
+/* ============================================================
+   PRODUCT SEARCH
+============================================================ */
+
+function initProductSearch() {
+
+    const input =
+        $('productSearch');
+
+
+    if (!input) {
+        return;
+    }
+
+
+    input.addEventListener(
+        'input',
+        renderProductSearchResults
+    );
+}
+/* ==========================================================================
+   SELLERS
+   ========================================================================== */
 
 let allSellers = [];
 
 
-/* ============================================================
-   LOAD SELLERS
-============================================================ */
-
-async function loadSellers() {
-
-    const tbody =
-        $("sellersTableBody");
-
-    if (!tbody) {
-        return;
-    }
-
-    showTableMessage(
-        "sellersTableBody",
-        "Loading sellers...",
-        6
-    );
-
-
-    try {
-
-        const {
-            data,
-            error
-        } =
-            await supabaseClient
-                .from("sellers")
-                .select("*")
-                .order(
-                    "created_at",
-                    {
-                        ascending: false
-                    }
-                );
-
-        if (error) {
-            throw error;
-        }
-
-        allSellers =
-            Array.isArray(data)
-                ? data
-                : [];
-
-
-        renderSellers(
-            allSellers
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Sellers error:",
-            error
-        );
-
-        showTableMessage(
-            "sellersTableBody",
-            error?.message ||
-            "Unable to load sellers.",
-            6
-        );
-    }
-}
-
-
-/* ============================================================
+/* --------------------------------------------------------------------------
    SELLER HELPERS
-============================================================ */
+   -------------------------------------------------------------------------- */
 
 function sellerName(seller) {
-
     return (
-        seller.name ||
         seller.full_name ||
+        seller.name ||
         seller.seller_name ||
         seller.username ||
-        "Unknown Seller"
+        seller.display_name ||
+        'Seller'
     );
 }
-
 
 function sellerEmail(seller) {
-
-    return (
-        seller.email ||
-        seller.seller_email ||
-        "-"
-    );
+    return seller.email || seller.seller_email || '-';
 }
 
-
 function sellerPhone(seller) {
-
     return (
         seller.phone ||
         seller.phone_number ||
         seller.seller_phone ||
-        "-"
+        '-'
     );
 }
 
-
 function sellerStatus(seller) {
-
     return String(
-        seller.status ||
-        "pending"
+        seller.status || 'pending'
     ).toLowerCase();
 }
 
 
-/* ============================================================
-   RENDER SELLERS
-============================================================ */
-
-function renderSellers(sellers) {
-
-    const tbody =
-        $("sellersTableBody");
-
-    if (!tbody) {
-        return;
-    }
-
-
-    if (
-        !Array.isArray(sellers) ||
-        sellers.length === 0
-    ) {
-
-        showTableMessage(
-            "sellersTableBody",
-            "No sellers found.",
-            6
-        );
-
-        return;
-    }
-
-
-    tbody.innerHTML =
-        sellers.map(
-            seller => {
-
-                const id =
-                    seller.id || "";
-
-                const name =
-                    sellerName(seller);
-
-                const email =
-                    sellerEmail(seller);
-
-                const phone =
-                    sellerPhone(seller);
-
-                const status =
-                    sellerStatus(seller);
-
-                const date =
-                    formatDate(
-                        seller.created_at ||
-                        seller.createdAt
-                    );
-
-
-                return `
-                    <tr>
-
-                        <td>
-
-                            <div
-                                style="
-                                    display:flex;
-                                    align-items:center;
-                                    gap:10px;
-                                "
-                            >
-
-                                <div
-                                    style="
-                                        width:38px;
-                                        height:38px;
-                                        min-width:38px;
-                                        border-radius:50%;
-                                        background:#ff5a00;
-                                        color:#fff;
-                                        display:flex;
-                                        align-items:center;
-                                        justify-content:center;
-                                        font-weight:900;
-                                    "
-                                >
-                                    ${escapeHTML(
-                                        initials(name)
-                                    )}
-                                </div>
-
-                                <strong>
-                                    ${escapeHTML(name)}
-                                </strong>
-
-                            </div>
-
-                        </td>
-
-
-                        <td>
-                            ${escapeHTML(email)}
-                        </td>
-
-
-                        <td>
-                            ${escapeHTML(phone)}
-                        </td>
-
-
-                        <td>
-
-                            <select
-                                onchange="updateSellerStatus(
-                                    '${escapeHTML(
-                                        String(id)
-                                    )}',
-                                    this.value
-                                )"
-                                style="
-                                    padding:7px 10px;
-                                    border-radius:7px;
-                                    border:1px solid #444;
-                                    background:#191919;
-                                    color:#fff;
-                                    cursor:pointer;
-                                    max-width:130px;
-                                "
-                            >
-
-                                <option
-                                    value="pending"
-                                    ${status === "pending"
-                                        ? "selected"
-                                        : ""}
-                                >
-                                    Pending
-                                </option>
-
-                                <option
-                                    value="approved"
-                                    ${status === "approved"
-                                        ? "selected"
-                                        : ""}
-                                >
-                                    Approved
-                                </option>
-
-                                <option
-                                    value="active"
-                                    ${status === "active"
-                                        ? "selected"
-                                        : ""}
-                                >
-                                    Active
-                                </option>
-
-                                <option
-                                    value="rejected"
-                                    ${status === "rejected"
-                                        ? "selected"
-                                        : ""}
-                                >
-                                    Rejected
-                                </option>
-
-                                <option
-                                    value="blocked"
-                                    ${status === "blocked"
-                                        ? "selected"
-                                        : ""}
-                                >
-                                    Blocked
-                                </option>
-
-                            </select>
-
-                        </td>
-
-
-                        <td>
-                            ${escapeHTML(date)}
-                        </td>
-
-
-                        <td>
-
-                            <div
-                                style="
-                                    display:flex;
-                                    gap:6px;
-                                    flex-wrap:wrap;
-                                "
-                            >
-
-                                <button
-                                    type="button"
-                                    onclick="viewSeller(
-                                        '${escapeHTML(
-                                            String(id)
-                                        )}'
-                                    )"
-                                    style="
-                                        padding:8px 12px;
-                                        border-radius:7px;
-                                        border:1px solid #333;
-                                        background:#191919;
-                                        color:#fff;
-                                        cursor:pointer;
-                                        font-weight:700;
-                                    "
-                                >
-                                    View
-                                </button>
-
-
-                                <button
-                                    type="button"
-                                    onclick="deleteSeller(
-                                        '${escapeHTML(
-                                            String(id)
-                                        )}'
-                                    )"
-                                    style="
-                                        padding:8px 12px;
-                                        border-radius:7px;
-                                        border:1px solid #6b1f1f;
-                                        background:#3a1515;
-                                        color:#ff7777;
-                                        cursor:pointer;
-                                        font-weight:800;
-                                    "
-                                >
-                                    Delete
-                                </button>
-
-                            </div>
-
-                        </td>
-
-                    </tr>
-                `;
-            }
-        ).join("");
-}
-
-
-/* ============================================================
-   SELLER SEARCH
-============================================================ */
-
-function initSellerSearch() {
-
-    const input =
-        $("sellerSearch");
-
-    if (!input) {
-        return;
-    }
-
-    input.addEventListener(
-        "input",
-        () => {
-
-            const query =
-                input.value
-                    .trim()
-                    .toLowerCase();
-
-
-            if (!query) {
-
-                renderSellers(
-                    allSellers
-                );
-
-                return;
-            }
-
-
-            const filtered =
-                allSellers.filter(
-                    seller => {
-
-                        return [
-
-                            seller.name,
-
-                            seller.full_name,
-
-                            seller.seller_name,
-
-                            seller.username,
-
-                            seller.email,
-
-                            seller.seller_email,
-
-                            seller.phone,
-
-                            seller.phone_number,
-
-                            seller.seller_phone,
-
-                            seller.status
-
-                        ]
-                            .filter(Boolean)
-                            .some(
-                                value =>
-                                    String(value)
-                                        .toLowerCase()
-                                        .includes(
-                                            query
-                                        )
-                            );
-                    }
-                );
-
-
-            renderSellers(
-                filtered
-            );
-        }
+/* --------------------------------------------------------------------------
+   LOAD SELLERS
+   -------------------------------------------------------------------------- */
+
+async function loadSellers() {
+    const tbody = $('sellersTableBody');
+
+    if (!tbody) return;
+
+    showTableMessage(
+        tbody,
+        6,
+        'Loading sellers...'
     );
-}
-
-
-/* ============================================================
-   VIEW SELLER
-============================================================ */
-
-function viewSeller(id) {
-
-    const seller =
-        allSellers.find(
-            item =>
-                String(item.id) ===
-                String(id)
-        );
-
-
-    if (!seller) {
-
-        alert(
-            "Seller not found."
-        );
-
-        return;
-    }
-
-
-    alert(
-
-        "SELLER DETAILS\n\n" +
-
-        "Name: " +
-        sellerName(seller) +
-
-        "\nEmail: " +
-        sellerEmail(seller) +
-
-        "\nPhone: " +
-        sellerPhone(seller) +
-
-        "\nStatus: " +
-        (
-            seller.status ||
-            "-"
-        ) +
-
-        "\nDate: " +
-        formatDate(
-            seller.created_at ||
-            seller.createdAt
-        )
-
-    );
-}
-
-
-/* ============================================================
-   UPDATE SELLER STATUS
-============================================================ */
-
-async function updateSellerStatus(
-    id,
-    status
-) {
-
-    if (!id || !status) {
-        return;
-    }
-
 
     try {
-
-        const {
-            error
-        } =
-            await supabaseClient
-                .from("sellers")
-                .update({
-                    status: status
-                })
-                .eq(
-                    "id",
-                    id
-                );
+        const { data, error } = await supabaseClient
+            .from('sellers')
+            .select('*')
+            .order('created_at', { ascending: false });
 
         if (error) {
-            throw error;
+            console.error('Load sellers error:', error);
+
+            allSellers = [];
+
+            showTableMessage(
+                tbody,
+                6,
+                'Unable to load sellers.'
+            );
+
+            return;
         }
 
+        allSellers = data || [];
 
-        showToast(
-            "Seller status updated."
+        renderSellers(allSellers);
+
+    } catch (error) {
+        console.error('Unexpected sellers error:', error);
+
+        allSellers = [];
+
+        showTableMessage(
+            tbody,
+            6,
+            'Unable to load sellers.'
+        );
+    }
+}
+
+
+/* --------------------------------------------------------------------------
+   RENDER SELLERS
+   -------------------------------------------------------------------------- */
+
+function renderSellers(sellers = allSellers) {
+    const tbody = $('sellersTableBody');
+
+    if (!tbody) return;
+
+    if (!sellers || sellers.length === 0) {
+        showTableMessage(
+            tbody,
+            6,
+            'No sellers found.'
         );
 
+        return;
+    }
+
+    tbody.innerHTML = sellers.map(seller => {
+        const name = sellerName(seller);
+        const email = sellerEmail(seller);
+        const phone = sellerPhone(seller);
+        const status = sellerStatus(seller);
+
+        const sellerId = seller.id || '';
+
+        let statusClass = 'status-pending';
+
+        if (status === 'approved' || status === 'active') {
+            statusClass = 'status-active';
+        } else if (
+            status === 'rejected' ||
+            status === 'inactive' ||
+            status === 'blocked'
+        ) {
+            statusClass = 'status-inactive';
+        }
+
+        return `
+            <tr class='border-b border-white/5 hover:bg-white/[0.02]'>
+                <td class='px-4 py-4'>
+                    <div class='flex items-center gap-3'>
+                        <div class='w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-400 font-bold'>
+                            ${escapeHTML(initials(name))}
+                        </div>
+
+                        <div>
+                            <div class='font-semibold text-white'>
+                                ${escapeHTML(name)}
+                            </div>
+
+                            <div class='text-xs text-gray-500'>
+                                ID: ${escapeHTML(String(sellerId))}
+                            </div>
+                        </div>
+                    </div>
+                </td>
+
+                <td class='px-4 py-4 text-gray-300'>
+                    ${escapeHTML(email)}
+                </td>
+
+                <td class='px-4 py-4 text-gray-300'>
+                    ${escapeHTML(phone)}
+                </td>
+
+                <td class='px-4 py-4'>
+                    <span class='status-badge ${statusClass}'>
+                        ${escapeHTML(status)}
+                    </span>
+                </td>
+
+                <td class='px-4 py-4 text-gray-400'>
+                    ${formatDate(seller.created_at)}
+                </td>
+
+                <td class='px-4 py-4'>
+                    <div class='flex items-center gap-2'>
+
+                        <button
+                            type='button'
+                            onclick='viewSeller("${sellerId}")'
+                            class='action-btn'
+                            title='View seller'
+                        >
+                            <span class='material-symbols-outlined'>
+                                visibility
+                            </span>
+                        </button>
+
+                        <button
+                            type='button'
+                            onclick='updateSellerStatus("${sellerId}")'
+                            class='action-btn'
+                            title='Update status'
+                        >
+                            <span class='material-symbols-outlined'>
+                                edit
+                            </span>
+                        </button>
+
+                        <button
+                            type='button'
+                            onclick='deleteSeller("${sellerId}")'
+                            class='action-btn danger'
+                            title='Delete seller'
+                        >
+                            <span class='material-symbols-outlined'>
+                                delete
+                            </span>
+                        </button>
+
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+
+/* --------------------------------------------------------------------------
+   SELLER SEARCH
+   -------------------------------------------------------------------------- */
+
+function initSellerSearch() {
+    const searchInput = $('sellerSearch');
+
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value
+            .trim()
+            .toLowerCase();
+
+        if (!query) {
+            renderSellers(allSellers);
+            return;
+        }
+
+        const filtered = allSellers.filter(seller => {
+            const name = sellerName(seller).toLowerCase();
+            const email = sellerEmail(seller).toLowerCase();
+            const phone = sellerPhone(seller).toLowerCase();
+            const status = sellerStatus(seller).toLowerCase();
+
+            return (
+                name.includes(query) ||
+                email.includes(query) ||
+                phone.includes(query) ||
+                status.includes(query)
+            );
+        });
+
+        renderSellers(filtered);
+    });
+}
+
+
+/* --------------------------------------------------------------------------
+   VIEW SELLER
+   -------------------------------------------------------------------------- */
+
+function viewSeller(sellerId) {
+    const seller = allSellers.find(
+        item => String(item.id) === String(sellerId)
+    );
+
+    if (!seller) {
+        showToast(
+            'Seller not found.',
+            'error'
+        );
+
+        return;
+    }
+
+    const name = sellerName(seller);
+    const email = sellerEmail(seller);
+    const phone = sellerPhone(seller);
+    const status = sellerStatus(seller);
+
+    alert(
+        'Seller Details\n\n' +
+        'Name: ' + name + '\n' +
+        'Email: ' + email + '\n' +
+        'Phone: ' + phone + '\n' +
+        'Status: ' + status + '\n' +
+        'Created: ' + formatDate(seller.created_at)
+    );
+}
+
+
+/* --------------------------------------------------------------------------
+   UPDATE SELLER STATUS
+   -------------------------------------------------------------------------- */
+
+async function updateSellerStatus(sellerId) {
+    const seller = allSellers.find(
+        item => String(item.id) === String(sellerId)
+    );
+
+    if (!seller) {
+        showToast(
+            'Seller not found.',
+            'error'
+        );
+
+        return;
+    }
+
+    const currentStatus = sellerStatus(seller);
+
+    let newStatus = 'approved';
+
+    if (currentStatus === 'approved' || currentStatus === 'active') {
+        newStatus = 'inactive';
+    } else if (currentStatus === 'inactive') {
+        newStatus = 'approved';
+    }
+
+    const confirmed = confirm(
+        'Change seller status to ' +
+        newStatus +
+        '?'
+    );
+
+    if (!confirmed) return;
+
+    try {
+        const { error } = await supabaseClient
+            .from('sellers')
+            .update({
+                status: newStatus
+            })
+            .eq('id', sellerId);
+
+        if (error) {
+            console.error(
+                'Update seller status error:',
+                error
+            );
+
+            showToast(
+                'Failed to update seller status.',
+                'error'
+            );
+
+            return;
+        }
+
+        showToast(
+            'Seller status updated successfully.',
+            'success'
+        );
 
         await loadSellers();
 
     } catch (error) {
-
         console.error(
-            "Seller status error:",
+            'Unexpected seller status error:',
             error
         );
 
-        alert(
-            "Could not update seller status.\n\n" +
-            (
-                error?.message ||
-                "Unknown error"
-            )
+        showToast(
+            'Something went wrong.',
+            'error'
         );
     }
 }
 
 
-/* ============================================================
+/* --------------------------------------------------------------------------
    DELETE SELLER
-============================================================ */
+   -------------------------------------------------------------------------- */
 
-async function deleteSeller(
-    sellerId
-) {
+async function deleteSeller(sellerId) {
+    const seller = allSellers.find(
+        item => String(item.id) === String(sellerId)
+    );
 
-    if (!sellerId) {
-        return;
-    }
-
-
-    const confirmed =
-        window.confirm(
-            "Are you sure you want to delete this seller?\n\nThis action cannot be undone."
+    if (!seller) {
+        showToast(
+            'Seller not found.',
+            'error'
         );
 
-
-    if (!confirmed) {
         return;
     }
 
+    const name = sellerName(seller);
+
+    const confirmed = confirm(
+        'Are you sure you want to delete seller "' +
+        name +
+        '"?'
+    );
+
+    if (!confirmed) return;
 
     try {
-
-        const {
-            error
-        } =
-            await supabaseClient
-                .from("sellers")
-                .delete()
-                .eq(
-                    "id",
-                    sellerId
-                );
+        const { error } = await supabaseClient
+            .from('sellers')
+            .delete()
+            .eq('id', sellerId);
 
         if (error) {
-            throw error;
+            console.error(
+                'Delete seller error:',
+                error
+            );
+
+            showToast(
+                'Failed to delete seller.',
+                'error'
+            );
+
+            return;
         }
 
-
         showToast(
-            "Seller deleted successfully."
+            'Seller deleted successfully.',
+            'success'
         );
 
-
         await loadSellers();
-
         await loadDashboardData();
 
     } catch (error) {
-
         console.error(
-            "Seller delete error:",
+            'Unexpected delete seller error:',
             error
         );
 
-        alert(
-            "Could not delete seller.\n\n" +
-            (
-                error?.message ||
-                "Unknown error"
-            )
+        showToast(
+            'Something went wrong.',
+            'error'
         );
     }
 }
-
-
-/* ============================================================
+/* ==========================================================================
    CUSTOMERS
-   CUSTOMERS ARE STORED IN profiles
-============================================================ */
+   ========================================================================== */
 
 let allCustomers = [];
 
 
-/* ============================================================
-   CUSTOMER NAME
-============================================================ */
+/* --------------------------------------------------------------------------
+   CUSTOMER HELPERS
+   -------------------------------------------------------------------------- */
 
 function customerName(customer) {
-
     return (
         customer.full_name ||
         customer.name ||
-        customer.customer_name ||
         customer.username ||
         customer.display_name ||
-        "Customer"
+        'Customer'
     );
 }
-
-
-/* ============================================================
-   CUSTOMER EMAIL
-============================================================ */
 
 function customerEmail(customer) {
-
-    return (
-        customer.email ||
-        customer.customer_email ||
-        "-"
-    );
+    return customer.email || '-';
 }
 
-
-/* ============================================================
-   CUSTOMER PHONE
-============================================================ */
-
 function customerPhone(customer) {
-
     return (
         customer.phone ||
         customer.phone_number ||
-        customer.customer_phone ||
-        "-"
+        '-'
     );
 }
-
-
-/* ============================================================
-   CUSTOMER CITY
-============================================================ */
 
 function customerCity(customer) {
-
     return (
         customer.city ||
-        customer.customer_city ||
-        customer.location ||
-        "-"
+        customer.address_city ||
+        '-'
     );
 }
 
 
-/* ============================================================
-   CUSTOMER DATE
-============================================================ */
-
-function customerDate(customer) {
-
-    return formatDate(
-        customer.created_at ||
-        customer.createdAt ||
-        customer.date
-    );
-}
-
-
-/* ============================================================
+/* --------------------------------------------------------------------------
    LOAD CUSTOMERS
-   FROM profiles WHERE role = customer
-============================================================ */
+   -------------------------------------------------------------------------- */
 
 async function loadCustomers() {
+    const tbody = $('customersTableBody');
 
-    const tbody =
-        $("customersTableBody");
-
-    if (!tbody) {
-        return;
-    }
-
+    if (!tbody) return;
 
     showTableMessage(
-        "customersTableBody",
-        "Loading customers...",
-        6
+        tbody,
+        6,
+        'Loading customers...'
     );
 
-
     try {
-
-        console.log(
-            "KHELZONE: Loading customers from profiles..."
-        );
-
-
-        const {
-            data,
-            error
-        } =
-            await supabaseClient
-                .from("profiles")
-                .select("*")
-                .eq(
-                    "role",
-                    "customer"
-                );
-
+        const { data, error } = await supabaseClient
+            .from('profiles')
+            .select('*')
+            .eq('role', 'customer')
+            .order('created_at', { ascending: false });
 
         if (error) {
-            throw error;
+            console.error(
+                'Load customers error:',
+                error
+            );
+
+            allCustomers = [];
+
+            showTableMessage(
+                tbody,
+                6,
+                'Unable to load customers.'
+            );
+
+            return;
         }
 
+        allCustomers = data || [];
 
-        allCustomers =
-            Array.isArray(data)
-                ? data
-                : [];
-
-
-        /* ----------------------------------------------------
-           SORT NEWEST FIRST
-        ---------------------------------------------------- */
-
-        allCustomers.sort(
-            (a, b) => {
-
-                const dateA =
-                    new Date(
-                        a.created_at ||
-                        a.createdAt ||
-                        0
-                    ).getTime();
-
-                const dateB =
-                    new Date(
-                        b.created_at ||
-                        b.createdAt ||
-                        0
-                    ).getTime();
-
-                return dateB - dateA;
-            }
-        );
-
-
-        console.log(
-            "KHELZONE CUSTOMERS:",
-            allCustomers
-        );
-
-
-        renderCustomers(
-            allCustomers
-        );
+        renderCustomers(allCustomers);
 
     } catch (error) {
-
         console.error(
-            "Customers error:",
+            'Unexpected customers error:',
             error
         );
 
+        allCustomers = [];
+
         showTableMessage(
-            "customersTableBody",
-            error?.message ||
-            "Unable to load customers.",
-            6
+            tbody,
+            6,
+            'Unable to load customers.'
         );
     }
 }
 
 
-/* ============================================================
+/* --------------------------------------------------------------------------
    RENDER CUSTOMERS
-============================================================ */
+   -------------------------------------------------------------------------- */
 
-function renderCustomers(customers) {
+function renderCustomers(customers = allCustomers) {
+    const tbody = $('customersTableBody');
 
-    const tbody =
-        $("customersTableBody");
+    if (!tbody) return;
 
-    if (!tbody) {
-        return;
-    }
-
-
-    if (
-        !Array.isArray(customers) ||
-        customers.length === 0
-    ) {
-
+    if (!customers || customers.length === 0) {
         showTableMessage(
-            "customersTableBody",
-            "No customers found.",
-            6
+            tbody,
+            6,
+            'No customers found.'
         );
 
         return;
     }
 
+    tbody.innerHTML = customers.map(customer => {
+        const name = customerName(customer);
+        const email = customerEmail(customer);
+        const phone = customerPhone(customer);
+        const city = customerCity(customer);
 
-    tbody.innerHTML =
-        customers.map(
-            customer => {
+        const customerId = customer.id || '';
 
-                const id =
-                    customer.id || "";
+        return `
+            <tr class='border-b border-white/5 hover:bg-white/[0.02]'>
 
-                const name =
-                    customerName(
-                        customer
-                    );
+                <td class='px-4 py-4'>
+                    <div class='flex items-center gap-3'>
 
-                const email =
-                    customerEmail(
-                        customer
-                    );
+                        <div class='w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-400 font-bold'>
+                            ${escapeHTML(initials(name))}
+                        </div>
 
-                const phone =
-                    customerPhone(
-                        customer
-                    );
-
-                const city =
-                    customerCity(
-                        customer
-                    );
-
-                const date =
-                    customerDate(
-                        customer
-                    );
-
-
-                return `
-                    <tr>
-
-                        <td>
-
-                            <div
-                                style="
-                                    display:flex;
-                                    align-items:center;
-                                    gap:10px;
-                                "
-                            >
-
-                                <div
-                                    style="
-                                        width:36px;
-                                        height:36px;
-                                        min-width:36px;
-                                        border-radius:50%;
-                                        background:#ff5a00;
-                                        color:#fff;
-                                        display:flex;
-                                        align-items:center;
-                                        justify-content:center;
-                                        font-weight:900;
-                                        font-size:13px;
-                                    "
-                                >
-                                    ${escapeHTML(
-                                        initials(name)
-                                    )}
-                                </div>
-
-                                <span
-                                    style="
-                                        font-weight:700;
-                                        color:#fff;
-                                    "
-                                >
-                                    ${escapeHTML(name)}
-                                </span>
-
+                        <div>
+                            <div class='font-semibold text-white'>
+                                ${escapeHTML(name)}
                             </div>
 
-                        </td>
-
-
-                        <td>
-                            ${escapeHTML(email)}
-                        </td>
-
-
-                        <td>
-                            ${escapeHTML(phone)}
-                        </td>
-
-
-                        <td>
-                            ${escapeHTML(city)}
-                        </td>
-
-
-                        <td>
-                            ${escapeHTML(date)}
-                        </td>
-
-
-                        <td>
-
-                            <div
-                                style="
-                                    display:flex;
-                                    gap:6px;
-                                    flex-wrap:wrap;
-                                "
-                            >
-
-                                <button
-                                    type="button"
-                                    onclick="viewCustomer(
-                                        '${escapeHTML(
-                                            String(id)
-                                        )}'
-                                    )"
-                                    style="
-                                        padding:8px 12px;
-                                        border-radius:7px;
-                                        border:1px solid #333;
-                                        background:#191919;
-                                        color:#fff;
-                                        cursor:pointer;
-                                        font-weight:700;
-                                    "
-                                >
-                                    View
-                                </button>
-
-
-                                <button
-                                    type="button"
-                                    onclick="deleteCustomer(
-                                        '${escapeHTML(
-                                            String(id)
-                                        )}'
-                                    )"
-                                    style="
-                                        padding:8px 12px;
-                                        border-radius:7px;
-                                        border:1px solid #6b1f1f;
-                                        background:#3a1515;
-                                        color:#ff7777;
-                                        cursor:pointer;
-                                        font-weight:800;
-                                    "
-                                >
-                                    Delete
-                                </button>
-
+                            <div class='text-xs text-gray-500'>
+                                ID: ${escapeHTML(String(customerId))}
                             </div>
+                        </div>
 
-                        </td>
+                    </div>
+                </td>
 
-                    </tr>
-                `;
-            }
-        ).join("");
+                <td class='px-4 py-4 text-gray-300'>
+                    ${escapeHTML(email)}
+                </td>
+
+                <td class='px-4 py-4 text-gray-300'>
+                    ${escapeHTML(phone)}
+                </td>
+
+                <td class='px-4 py-4 text-gray-300'>
+                    ${escapeHTML(city)}
+                </td>
+
+                <td class='px-4 py-4 text-gray-400'>
+                    ${formatDate(customer.created_at)}
+                </td>
+
+                <td class='px-4 py-4'>
+
+                    <div class='flex items-center gap-2'>
+
+                        <button
+                            type='button'
+                            onclick='viewCustomer("${customerId}")'
+                            class='action-btn'
+                            title='View customer'
+                        >
+                            <span class='material-symbols-outlined'>
+                                visibility
+                            </span>
+                        </button>
+
+                        <button
+                            type='button'
+                            onclick='deleteCustomer("${customerId}")'
+                            class='action-btn danger'
+                            title='Delete customer'
+                        >
+                            <span class='material-symbols-outlined'>
+                                delete
+                            </span>
+                        </button>
+
+                    </div>
+
+                </td>
+
+            </tr>
+        `;
+    }).join('');
 }
 
 
-/* ============================================================
+/* --------------------------------------------------------------------------
    CUSTOMER SEARCH
-============================================================ */
+   -------------------------------------------------------------------------- */
 
 function initCustomerSearch() {
+    const searchInput = $('customerSearch');
 
-    const input =
-        $("customerSearch");
+    if (!searchInput) return;
 
-    if (!input) {
-        return;
-    }
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value
+            .trim()
+            .toLowerCase();
 
-    input.addEventListener(
-        "input",
-        () => {
-
-            const query =
-                input.value
-                    .trim()
-                    .toLowerCase();
-
-
-            if (!query) {
-
-                renderCustomers(
-                    allCustomers
-                );
-
-                return;
-            }
-
-
-            const filtered =
-                allCustomers.filter(
-                    customer => {
-
-                        return [
-
-                            customer.full_name,
-
-                            customer.name,
-
-                            customer.customer_name,
-
-                            customer.username,
-
-                            customer.display_name,
-
-                            customer.email,
-
-                            customer.customer_email,
-
-                            customer.phone,
-
-                            customer.phone_number,
-
-                            customer.customer_phone,
-
-                            customer.city,
-
-                            customer.customer_city,
-
-                            customer.location
-
-                        ]
-                            .filter(Boolean)
-                            .some(
-                                value =>
-                                    String(value)
-                                        .toLowerCase()
-                                        .includes(
-                                            query
-                                        )
-                            );
-                    }
-                );
-
-
-            renderCustomers(
-                filtered
-            );
+        if (!query) {
+            renderCustomers(allCustomers);
+            return;
         }
-    );
+
+        const filtered = allCustomers.filter(customer => {
+            const name = customerName(customer)
+                .toLowerCase();
+
+            const email = customerEmail(customer)
+                .toLowerCase();
+
+            const phone = customerPhone(customer)
+                .toLowerCase();
+
+            const city = customerCity(customer)
+                .toLowerCase();
+
+            return (
+                name.includes(query) ||
+                email.includes(query) ||
+                phone.includes(query) ||
+                city.includes(query)
+            );
+        });
+
+        renderCustomers(filtered);
+    });
 }
 
 
-/* ============================================================
+/* --------------------------------------------------------------------------
    VIEW CUSTOMER
-============================================================ */
+   -------------------------------------------------------------------------- */
 
-function viewCustomer(id) {
-
-    const customer =
-        allCustomers.find(
-            item =>
-                String(item.id) ===
-                String(id)
-        );
-
+function viewCustomer(customerId) {
+    const customer = allCustomers.find(
+        item =>
+            String(item.id) === String(customerId)
+    );
 
     if (!customer) {
-
-        alert(
-            "Customer not found."
+        showToast(
+            'Customer not found.',
+            'error'
         );
 
         return;
     }
 
+    const name = customerName(customer);
+    const email = customerEmail(customer);
+    const phone = customerPhone(customer);
+    const city = customerCity(customer);
 
     alert(
-
-        "CUSTOMER DETAILS\n\n" +
-
-        "Name: " +
-        customerName(customer) +
-
-        "\nEmail: " +
-        customerEmail(customer) +
-
-        "\nPhone: " +
-        customerPhone(customer) +
-
-        "\nCity: " +
-        customerCity(customer) +
-
-        "\nRole: " +
-        (
-            customer.role ||
-            "customer"
-        ) +
-
-        "\nDate: " +
-        customerDate(customer)
-
+        'Customer Details\n\n' +
+        'Name: ' + name + '\n' +
+        'Email: ' + email + '\n' +
+        'Phone: ' + phone + '\n' +
+        'City: ' + city + '\n' +
+        'Joined: ' +
+        formatDate(customer.created_at)
     );
 }
 
 
-/* ============================================================
+/* --------------------------------------------------------------------------
    DELETE CUSTOMER
-   DELETE FROM profiles
-============================================================ */
+   -------------------------------------------------------------------------- */
 
-async function deleteCustomer(
-    customerId
-) {
+async function deleteCustomer(customerId) {
+    const customer = allCustomers.find(
+        item =>
+            String(item.id) === String(customerId)
+    );
 
-    if (!customerId) {
-        return;
-    }
-
-
-    const confirmed =
-        window.confirm(
-            "Are you sure you want to delete this customer?\n\nThe customer profile will be permanently removed."
+    if (!customer) {
+        showToast(
+            'Customer not found.',
+            'error'
         );
 
-
-    if (!confirmed) {
         return;
     }
 
+    const name = customerName(customer);
+
+    const confirmed = confirm(
+        'Are you sure you want to delete customer "' +
+        name +
+        '"?'
+    );
+
+    if (!confirmed) return;
 
     try {
-
-        const {
-            error
-        } =
-            await supabaseClient
-                .from("profiles")
-                .delete()
-                .eq(
-                    "id",
-                    customerId
-                )
-                .eq(
-                    "role",
-                    "customer"
-                );
+        const { error } = await supabaseClient
+            .from('profiles')
+            .delete()
+            .eq('id', customerId)
+            .eq('role', 'customer');
 
         if (error) {
-            throw error;
+            console.error(
+                'Delete customer error:',
+                error
+            );
+
+            showToast(
+                'Failed to delete customer.',
+                'error'
+            );
+
+            return;
         }
 
-
         showToast(
-            "Customer deleted successfully."
+            'Customer deleted successfully.',
+            'success'
         );
 
-
         await loadCustomers();
-
         await loadDashboardData();
 
     } catch (error) {
-
         console.error(
-            "Customer delete error:",
+            'Unexpected delete customer error:',
             error
         );
 
-        alert(
-            "Could not delete customer.\n\n" +
-            (
-                error?.message ||
-                "Unknown error"
-            )
+        showToast(
+            'Something went wrong.',
+            'error'
         );
     }
 }
-
-
-/* ============================================================
+/* ==========================================================================
    ORDERS
-============================================================ */
+   ========================================================================== */
 
 let allOrders = [];
 
 
-/* ============================================================
+/* --------------------------------------------------------------------------
    ORDER HELPERS
-============================================================ */
+   -------------------------------------------------------------------------- */
 
 function orderNumber(order) {
-
     return (
         order.order_number ||
+        order.order_no ||
         order.order_id ||
         order.id ||
-        "-"
+        '-'
     );
 }
-
 
 function orderCustomer(order) {
-
     return (
-        order.shipping_name ||
         order.customer_name ||
+        order.full_name ||
         order.customer_email ||
-        order.user_email ||
-        order.user_id ||
-        "-"
+        order.email ||
+        'Customer'
     );
 }
-
 
 function orderTotal(order) {
-
-    return (
-        order.total ??
+    const total =
         order.total_amount ??
+        order.total ??
         order.amount ??
-        order.grand_total ??
-        0
-    );
+        0;
+
+    return formatMoney(total);
+}
+
+function orderStatus(order) {
+    return String(
+        order.status || 'pending'
+    ).toLowerCase();
 }
 
 
-function orderDate(order) {
-
-    return formatDate(
-        order.created_at ||
-        order.createdAt ||
-        order.date
-    );
-}
-
-
-/* ============================================================
+/* --------------------------------------------------------------------------
    LOAD ORDERS
-============================================================ */
+   -------------------------------------------------------------------------- */
 
 async function loadOrders() {
+    const tbody = $('ordersTableBody');
 
-    const tbody =
-        $("ordersTableBody");
-
-    if (!tbody) {
-        return;
-    }
-
+    if (!tbody) return;
 
     showTableMessage(
-        "ordersTableBody",
-        "Loading orders...",
-        6
+        tbody,
+        6,
+        'Loading orders...'
     );
 
-
     try {
-
-        const {
-            data,
-            error
-        } =
-            await supabaseClient
-                .from("orders")
-                .select("*")
-                .order(
-                    "created_at",
-                    {
-                        ascending: false
-                    }
-                );
-
+        const { data, error } = await supabaseClient
+            .from('orders')
+            .select('*')
+            .order('created_at', { ascending: false });
 
         if (error) {
-            throw error;
+            console.error(
+                'Load orders error:',
+                error
+            );
+
+            allOrders = [];
+
+            showTableMessage(
+                tbody,
+                6,
+                'Unable to load orders.'
+            );
+
+            return;
         }
 
+        allOrders = data || [];
 
-        allOrders =
-            Array.isArray(data)
-                ? data
-                : [];
-
-
-        renderOrders(
-            allOrders
-        );
+        renderOrders(allOrders);
 
     } catch (error) {
-
         console.error(
-            "Orders error:",
+            'Unexpected orders error:',
             error
         );
 
+        allOrders = [];
+
         showTableMessage(
-            "ordersTableBody",
-            error?.message ||
-            "Unable to load orders.",
-            6
+            tbody,
+            6,
+            'Unable to load orders.'
         );
     }
 }
 
 
-/* ============================================================
+/* --------------------------------------------------------------------------
    RENDER ORDERS
-============================================================ */
+   -------------------------------------------------------------------------- */
 
-function renderOrders(orders) {
+function renderOrders(orders = allOrders) {
+    const tbody = $('ordersTableBody');
 
-    const tbody =
-        $("ordersTableBody");
+    if (!tbody) return;
 
-    if (!tbody) {
-        return;
-    }
-
-
-    if (
-        !Array.isArray(orders) ||
-        orders.length === 0
-    ) {
-
+    if (!orders || orders.length === 0) {
         showTableMessage(
-            "ordersTableBody",
-            "No orders found.",
-            6
+            tbody,
+            6,
+            'No orders found.'
         );
 
         return;
     }
 
+    tbody.innerHTML = orders.map(order => {
+        const id = order.id || '';
+        const number = orderNumber(order);
+        const customer = orderCustomer(order);
+        const total = orderTotal(order);
+        const status = orderStatus(order);
 
-    tbody.innerHTML =
-        orders.map(
-            order => {
+        let statusClass = 'status-pending';
 
-                const id =
-                    order.id || "";
+        if (
+            status === 'completed' ||
+            status === 'delivered' ||
+            status === 'approved'
+        ) {
+            statusClass = 'status-active';
+        } else if (
+            status === 'cancelled' ||
+            status === 'canceled' ||
+            status === 'rejected'
+        ) {
+            statusClass = 'status-inactive';
+        }
 
-                const status =
-                    String(
-                        order.status ||
-                        "pending"
-                    ).toLowerCase();
+        return `
+            <tr class='border-b border-white/5 hover:bg-white/[0.02]'>
 
+                <td class='px-4 py-4'>
+                    <div class='font-semibold text-white'>
+                        #${escapeHTML(String(number))}
+                    </div>
 
-                return `
-                    <tr>
+                    <div class='text-xs text-gray-500'>
+                        ID: ${escapeHTML(String(id))}
+                    </div>
+                </td>
 
-                        <td>
-                            ${escapeHTML(
-                                orderNumber(order)
-                            )}
-                        </td>
+                <td class='px-4 py-4 text-gray-300'>
+                    ${escapeHTML(String(customer))}
+                </td>
 
+                <td class='px-4 py-4 font-semibold text-white'>
+                    ${escapeHTML(String(total))}
+                </td>
 
-                        <td>
-                            ${escapeHTML(
-                                orderCustomer(order)
-                            )}
-                        </td>
+                <td class='px-4 py-4'>
+                    <span class='status-badge ${statusClass}'>
+                        ${escapeHTML(status)}
+                    </span>
+                </td>
 
+                <td class='px-4 py-4 text-gray-400'>
+                    ${formatDate(order.created_at)}
+                </td>
 
-                        <td>
-                            ${formatMoney(
-                                orderTotal(order)
-                            )}
-                        </td>
+                <td class='px-4 py-4'>
 
+                    <div class='flex items-center gap-2'>
 
-                        <td>
+                        <button
+                            type='button'
+                            onclick='viewOrder("${id}")'
+                            class='action-btn'
+                            title='View order'
+                        >
+                            <span class='material-symbols-outlined'>
+                                visibility
+                            </span>
+                        </button>
 
-                            <select
-                                onchange="updateOrderStatus(
-                                    '${escapeHTML(
-                                        String(id)
-                                    )}',
-                                    this.value
-                                )"
-                                style="
-                                    padding:7px 10px;
-                                    border-radius:7px;
-                                    border:1px solid #444;
-                                    background:#191919;
-                                    color:#fff;
-                                    cursor:pointer;
-                                    max-width:140px;
-                                "
-                            >
+                        <button
+                            type='button'
+                            onclick='updateOrderStatus("${id}")'
+                            class='action-btn'
+                            title='Update status'
+                        >
+                            <span class='material-symbols-outlined'>
+                                edit
+                            </span>
+                        </button>
 
-                                <option
-                                    value="pending"
-                                    ${status === "pending"
-                                        ? "selected"
-                                        : ""}
-                                >
-                                    Pending
-                                </option>
+                        <button
+                            type='button'
+                            onclick='deleteOrder("${id}")'
+                            class='action-btn danger'
+                            title='Delete order'
+                        >
+                            <span class='material-symbols-outlined'>
+                                delete
+                            </span>
+                        </button>
 
-                                <option
-                                    value="confirmed"
-                                    ${status === "confirmed"
-                                        ? "selected"
-                                        : ""}
-                                >
-                                    Confirmed
-                                </option>
+                    </div>
 
-                                <option
-                                    value="processing"
-                                    ${status === "processing"
-                                        ? "selected"
-                                        : ""}
-                                >
-                                    Processing
-                                </option>
+                </td>
 
-                                <option
-                                    value="shipped"
-                                    ${status === "shipped"
-                                        ? "selected"
-                                        : ""}
-                                >
-                                    Shipped
-                                </option>
-
-                                <option
-                                    value="delivered"
-                                    ${status === "delivered"
-                                        ? "selected"
-                                        : ""}
-                                >
-                                    Delivered
-                                </option>
-
-                                <option
-                                    value="cancelled"
-                                    ${status === "cancelled"
-                                        ? "selected"
-                                        : ""}
-                                >
-                                    Cancelled
-                                </option>
-
-                            </select>
-
-                        </td>
-
-
-                        <td>
-                            ${escapeHTML(
-                                orderDate(order)
-                            )}
-                        </td>
-
-
-                        <td>
-
-                            <div
-                                style="
-                                    display:flex;
-                                    gap:6px;
-                                    flex-wrap:wrap;
-                                "
-                            >
-
-                                <button
-                                    type="button"
-                                    onclick="viewOrder(
-                                        '${escapeHTML(
-                                            String(id)
-                                        )}'
-                                    )"
-                                    style="
-                                        padding:8px 12px;
-                                        border-radius:7px;
-                                        border:1px solid #333;
-                                        background:#191919;
-                                        color:#fff;
-                                        cursor:pointer;
-                                        font-weight:700;
-                                    "
-                                >
-                                    View
-                                </button>
-
-
-                                <button
-                                    type="button"
-                                    onclick="deleteOrder(
-                                        '${escapeHTML(
-                                            String(id)
-                                        )}'
-                                    )"
-                                    style="
-                                        padding:8px 12px;
-                                        border-radius:7px;
-                                        border:1px solid #6b1f1f;
-                                        background:#3a1515;
-                                        color:#ff7777;
-                                        cursor:pointer;
-                                        font-weight:800;
-                                    "
-                                >
-                                    Delete
-                                </button>
-
-                            </div>
-
-                        </td>
-
-                    </tr>
-                `;
-            }
-        ).join("");
+            </tr>
+        `;
+    }).join('');
 }
 
 
-/* ============================================================
+/* --------------------------------------------------------------------------
    ORDER SEARCH
-============================================================ */
+   -------------------------------------------------------------------------- */
 
 function initOrderSearch() {
+    const searchInput = $('orderSearch');
 
-    const input =
-        $("orderSearch");
+    if (!searchInput) return;
 
-    if (!input) {
-        return;
-    }
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value
+            .trim()
+            .toLowerCase();
 
-
-    input.addEventListener(
-        "input",
-        () => {
-
-            const query =
-                input.value
-                    .trim()
-                    .toLowerCase();
-
-
-            if (!query) {
-
-                renderOrders(
-                    allOrders
-                );
-
-                return;
-            }
-
-
-            const filtered =
-                allOrders.filter(
-                    order => {
-
-                        return [
-
-                            order.order_number,
-
-                            order.order_id,
-
-                            order.id,
-
-                            order.shipping_name,
-
-                            order.customer_name,
-
-                            order.customer_email,
-
-                            order.user_email,
-
-                            order.user_id,
-
-                            order.status
-
-                        ]
-                            .filter(Boolean)
-                            .some(
-                                value =>
-                                    String(value)
-                                        .toLowerCase()
-                                        .includes(
-                                            query
-                                        )
-                            );
-                    }
-                );
-
-
-            renderOrders(
-                filtered
-            );
+        if (!query) {
+            renderOrders(allOrders);
+            return;
         }
-    );
+
+        const filtered = allOrders.filter(order => {
+            const number = String(
+                orderNumber(order)
+            ).toLowerCase();
+
+            const customer = String(
+                orderCustomer(order)
+            ).toLowerCase();
+
+            const status = orderStatus(order)
+                .toLowerCase();
+
+            return (
+                number.includes(query) ||
+                customer.includes(query) ||
+                status.includes(query)
+            );
+        });
+
+        renderOrders(filtered);
+    });
 }
 
 
-/* ============================================================
+/* --------------------------------------------------------------------------
    VIEW ORDER
-============================================================ */
+   -------------------------------------------------------------------------- */
 
-function viewOrder(id) {
-
-    const order =
-        allOrders.find(
-            item =>
-                String(item.id) ===
-                String(id)
-        );
-
+function viewOrder(orderId) {
+    const order = allOrders.find(
+        item =>
+            String(item.id) === String(orderId)
+    );
 
     if (!order) {
-
-        alert(
-            "Order not found."
+        showToast(
+            'Order not found.',
+            'error'
         );
 
         return;
     }
 
+    const number = orderNumber(order);
+    const customer = orderCustomer(order);
+    const total = orderTotal(order);
+    const status = orderStatus(order);
 
     alert(
-
-        "ORDER DETAILS\n\n" +
-
-        "Order ID: " +
-        orderNumber(order) +
-
-        "\nCustomer: " +
-        orderCustomer(order) +
-
-        "\nTotal: " +
-        formatMoney(
-            orderTotal(order)
-        ) +
-
-        "\nStatus: " +
-        (
-            order.status ||
-            "-"
-        ) +
-
-        "\nDate: " +
-        orderDate(order)
-
+        'Order Details\n\n' +
+        'Order: #' + number + '\n' +
+        'Customer: ' + customer + '\n' +
+        'Total: ' + total + '\n' +
+        'Status: ' + status + '\n' +
+        'Date: ' +
+        formatDate(order.created_at)
     );
 }
 
 
-/* ============================================================
+/* --------------------------------------------------------------------------
    UPDATE ORDER STATUS
-============================================================ */
+   -------------------------------------------------------------------------- */
 
-async function updateOrderStatus(
-    id,
-    status
-) {
+async function updateOrderStatus(orderId) {
+    const order = allOrders.find(
+        item =>
+            String(item.id) === String(orderId)
+    );
 
-    if (!id || !status) {
+    if (!order) {
+        showToast(
+            'Order not found.',
+            'error'
+        );
+
         return;
     }
 
+    const currentStatus = orderStatus(order);
+
+    let newStatus = 'processing';
+
+    if (currentStatus === 'pending') {
+        newStatus = 'processing';
+    } else if (currentStatus === 'processing') {
+        newStatus = 'shipped';
+    } else if (currentStatus === 'shipped') {
+        newStatus = 'delivered';
+    } else if (currentStatus === 'delivered') {
+        newStatus = 'completed';
+    } else if (currentStatus === 'completed') {
+        newStatus = 'pending';
+    } else {
+        newStatus = 'processing';
+    }
+
+    const confirmed = confirm(
+        'Change order status to ' +
+        newStatus +
+        '?'
+    );
+
+    if (!confirmed) return;
 
     try {
-
-        const {
-            error
-        } =
-            await supabaseClient
-                .from("orders")
-                .update({
-                    status: status
-                })
-                .eq(
-                    "id",
-                    id
-                );
-
+        const { error } = await supabaseClient
+            .from('orders')
+            .update({
+                status: newStatus
+            })
+            .eq('id', orderId);
 
         if (error) {
-            throw error;
+            console.error(
+                'Update order status error:',
+                error
+            );
+
+            showToast(
+                'Failed to update order status.',
+                'error'
+            );
+
+            return;
         }
 
-
         showToast(
-            "Order status updated."
+            'Order status updated successfully.',
+            'success'
         );
-
 
         await loadOrders();
 
-        await loadDashboardData();
-
     } catch (error) {
-
         console.error(
-            "Order status error:",
+            'Unexpected order status error:',
             error
         );
 
-        alert(
-            "Could not update order status.\n\n" +
-            (
-                error?.message ||
-                "Unknown error"
-            )
+        showToast(
+            'Something went wrong.',
+            'error'
         );
     }
 }
 
 
-/* ============================================================
+/* --------------------------------------------------------------------------
    DELETE ORDER
-============================================================ */
+   -------------------------------------------------------------------------- */
 
-async function deleteOrder(
-    orderId
-) {
+async function deleteOrder(orderId) {
+    const order = allOrders.find(
+        item =>
+            String(item.id) === String(orderId)
+    );
 
-    if (!orderId) {
-        return;
-    }
-
-
-    const confirmed =
-        window.confirm(
-            "Are you sure you want to delete this order?\n\nThis action cannot be undone."
+    if (!order) {
+        showToast(
+            'Order not found.',
+            'error'
         );
 
-
-    if (!confirmed) {
         return;
     }
 
+    const number = orderNumber(order);
+
+    const confirmed = confirm(
+        'Are you sure you want to delete order #' +
+        number +
+        '?'
+    );
+
+    if (!confirmed) return;
 
     try {
-
-        const {
-            error
-        } =
-            await supabaseClient
-                .from("orders")
-                .delete()
-                .eq(
-                    "id",
-                    orderId
-                );
-
+        const { error } = await supabaseClient
+            .from('orders')
+            .delete()
+            .eq('id', orderId);
 
         if (error) {
-            throw error;
+            console.error(
+                'Delete order error:',
+                error
+            );
+
+            showToast(
+                'Failed to delete order.',
+                'error'
+            );
+
+            return;
         }
 
-
         showToast(
-            "Order deleted successfully."
+            'Order deleted successfully.',
+            'success'
         );
 
-
         await loadOrders();
-
         await loadDashboardData();
 
     } catch (error) {
-
         console.error(
-            "Order delete error:",
+            'Unexpected delete order error:',
             error
         );
 
-        alert(
-            "Could not delete order.\n\n" +
-            (
-                error?.message ||
-                "Unknown error"
-            )
+        showToast(
+            'Something went wrong.',
+            'error'
         );
     }
 }
-
-
-/* ============================================================
+/* ==========================================================================
    LOGOUT
-============================================================ */
+   ========================================================================== */
 
 async function logoutAdmin() {
-
     try {
-
-        localStorage.removeItem(
-            "khelzone_role"
+        const confirmed = confirm(
+            'Are you sure you want to logout?'
         );
 
-        localStorage.removeItem(
-            "khelzone_user_id"
-        );
+        if (!confirmed) return;
 
+        const { error } = await supabaseClient.auth.signOut();
 
-        if (supabaseClient) {
-
-            const {
+        if (error) {
+            console.error(
+                'Logout error:',
                 error
-            } =
-                await supabaseClient.auth.signOut();
+            );
 
+            showToast(
+                'Logout failed.',
+                'error'
+            );
 
-            if (error) {
-
-                console.error(
-                    "Supabase logout error:",
-                    error
-                );
-            }
+            return;
         }
 
+        localStorage.removeItem('khelzone_role');
+        localStorage.removeItem('khelzone_user_id');
+        localStorage.removeItem('khelzone_email');
 
-        window.location.replace(
-            "homepage.html"
-        );
+        window.location.href = 'login.html';
 
     } catch (error) {
-
         console.error(
-            "Logout exception:",
+            'Unexpected logout error:',
             error
         );
 
-        window.location.replace(
-            "homepage.html"
+        showToast(
+            'Something went wrong during logout.',
+            'error'
         );
     }
 }
 
 
-/* ============================================================
+/* --------------------------------------------------------------------------
    LOGOUT BUTTON
-============================================================ */
+   -------------------------------------------------------------------------- */
 
 function initLogout() {
+    const logoutBtn = $('logoutBtn');
 
-    const button =
-        $("logoutBtn");
+    if (!logoutBtn) return;
 
-    if (!button) {
-        return;
-    }
-
-
-    button.addEventListener(
-        "click",
-        async () => {
-
-            const confirmed =
-                window.confirm(
-                    "Are you sure you want to logout?"
-                );
-
-
-            if (!confirmed) {
-                return;
-            }
-
-
-            await logoutAdmin();
-        }
+    logoutBtn.addEventListener(
+        'click',
+        logoutAdmin
     );
 }
 
 
-/* ============================================================
-   KEYBOARD
-============================================================ */
+/* ==========================================================================
+   KEYBOARD SHORTCUTS
+   ========================================================================== */
 
 function initKeyboard() {
-
     document.addEventListener(
-        "keydown",
+        'keydown',
         event => {
 
             if (
-                event.key ===
-                "Escape"
+                (event.ctrlKey || event.metaKey) &&
+                event.key.toLowerCase() === 'k'
             ) {
+                event.preventDefault();
 
+                const searchInput =
+                    document.querySelector(
+                        '#productSearch:not(.hidden), ' +
+                        '#sellerSearch:not(.hidden), ' +
+                        '#customerSearch:not(.hidden), ' +
+                        '#orderSearch:not(.hidden)'
+                    );
+
+                if (searchInput) {
+                    searchInput.focus();
+                }
+            }
+
+            if (event.key === 'Escape') {
                 closeMobileMenu();
             }
         }
@@ -3254,55 +2834,50 @@ function initKeyboard() {
 }
 
 
-/* ============================================================
-   SUPABASE AUTH STATE
-============================================================ */
+/* ==========================================================================
+   AUTH LISTENER
+   ========================================================================== */
 
 function initAuthListener() {
-
-    if (!supabaseClient) {
+    if (
+        !supabaseClient ||
+        !supabaseClient.auth
+    ) {
         return;
     }
-
 
     supabaseClient.auth.onAuthStateChange(
         (event, session) => {
 
-            console.log(
-                "KHELZONE AUTH EVENT:",
-                event
-            );
-
-
             if (
-                event ===
-                "SIGNED_OUT" ||
+                event === 'SIGNED_OUT' ||
                 !session
             ) {
+                localStorage.removeItem(
+                    'khelzone_role'
+                );
 
-                if (
-                    window.location.pathname
-                        .toLowerCase()
-                        .includes("admin")
-                ) {
+                localStorage.removeItem(
+                    'khelzone_user_id'
+                );
 
-                    window.location.replace(
-                        "admin.html"
-                    );
-                }
+                localStorage.removeItem(
+                    'khelzone_email'
+                );
+
+                window.location.href =
+                    'login.html';
             }
         }
     );
 }
 
 
-/* ============================================================
-   EXPOSE GLOBAL FUNCTIONS
-   REQUIRED FOR INLINE ONCLICK / ONCHANGE
-============================================================ */
+/* ==========================================================================
+   GLOBAL FUNCTIONS
+   ========================================================================== */
 
-window.showSection =
-    showSection;
+window.showSection = showSection;
 
 window.openMobileMenu =
     openMobileMenu;
@@ -3310,11 +2885,25 @@ window.openMobileMenu =
 window.closeMobileMenu =
     closeMobileMenu;
 
+
+
+/* --------------------------------------------------------------------------
+   PRODUCT GLOBALS
+   -------------------------------------------------------------------------- */
+
+window.toggleBestSeller =
+    toggleBestSeller;
+
 window.toggleProduct =
     toggleProduct;
 
 window.deleteProduct =
     deleteProduct;
+
+
+/* --------------------------------------------------------------------------
+   SELLER GLOBALS
+   -------------------------------------------------------------------------- */
 
 window.viewSeller =
     viewSeller;
@@ -3325,11 +2914,21 @@ window.updateSellerStatus =
 window.deleteSeller =
     deleteSeller;
 
+
+/* --------------------------------------------------------------------------
+   CUSTOMER GLOBALS
+   -------------------------------------------------------------------------- */
+
 window.viewCustomer =
     viewCustomer;
 
 window.deleteCustomer =
     deleteCustomer;
+
+
+/* --------------------------------------------------------------------------
+   ORDER GLOBALS
+   -------------------------------------------------------------------------- */
 
 window.viewOrder =
     viewOrder;
@@ -3340,37 +2939,41 @@ window.updateOrderStatus =
 window.deleteOrder =
     deleteOrder;
 
+
+/* --------------------------------------------------------------------------
+   LOGOUT GLOBAL
+   -------------------------------------------------------------------------- */
+
 window.logoutAdmin =
     logoutAdmin;
 
 
-/* ============================================================
-   INITIALIZE ADMIN DASHBOARD
-============================================================ */
+/* ==========================================================================
+   MAIN DASHBOARD INITIALIZATION
+   ========================================================================== */
 
 async function initAdminDashboard() {
 
     console.log(
-        "KHELZONE ADMIN DASHBOARD STARTING..."
+        'KHELZONE Admin Dashboard initializing...'
     );
 
 
-    /* --------------------------------------------------------
-       CHECK ADMIN
-    -------------------------------------------------------- */
+    /* ----------------------------------------------------------------------
+       CHECK ADMIN ACCESS
+       ---------------------------------------------------------------------- */
 
     const isAdmin =
         await checkAdminAccess();
-
 
     if (!isAdmin) {
         return;
     }
 
 
-    /* --------------------------------------------------------
-       UI
-    -------------------------------------------------------- */
+    /* ----------------------------------------------------------------------
+       INITIALIZE UI
+       ---------------------------------------------------------------------- */
 
     initNavigation();
 
@@ -3383,9 +2986,9 @@ async function initAdminDashboard() {
     initAuthListener();
 
 
-    /* --------------------------------------------------------
-       SEARCH
-    -------------------------------------------------------- */
+    /* ----------------------------------------------------------------------
+       INITIALIZE SEARCH
+       ---------------------------------------------------------------------- */
 
     initProductSearch();
 
@@ -3396,55 +2999,45 @@ async function initAdminDashboard() {
     initOrderSearch();
 
 
-    /* --------------------------------------------------------
-       LOAD EVERYTHING
-    -------------------------------------------------------- */
+    /* ----------------------------------------------------------------------
+       LOAD DASHBOARD DATA
+       ---------------------------------------------------------------------- */
 
     await Promise.allSettled([
-
         loadDashboardData(),
-
         loadProducts(),
-
         loadSellers(),
-
         loadCustomers(),
-
         loadOrders()
-
     ]);
 
 
-    /* --------------------------------------------------------
-       DEFAULT PAGE
-    -------------------------------------------------------- */
+    /* ----------------------------------------------------------------------
+       OPEN DASHBOARD SECTION
+       ---------------------------------------------------------------------- */
 
     showSection(
-        "dashboardSection"
+        'dashboardSection'
     );
 
 
     console.log(
-        "KHELZONE ADMIN DASHBOARD READY."
+        'KHELZONE ADMIN DASHBOARD READY.'
     );
 }
 
 
-/* ============================================================
-   START AFTER DOM READY
-============================================================ */
+/* ==========================================================================
+   DOM READY
+   ========================================================================== */
 
 if (
-    document.readyState ===
-    "loading"
+    document.readyState === 'loading'
 ) {
-
     document.addEventListener(
-        "DOMContentLoaded",
+        'DOMContentLoaded',
         initAdminDashboard
     );
-
 } else {
-
     initAdminDashboard();
 }

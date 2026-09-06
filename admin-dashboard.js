@@ -1173,9 +1173,7 @@ async function loadSellers() {
 
 function renderSellers(sellers) {
     const tbody =
-        document.getElementById(
-            "sellersTableBody"
-        );
+        document.getElementById("sellersTableBody");
 
     if (!tbody) {
         return;
@@ -1187,7 +1185,6 @@ function renderSellers(sellers) {
             6,
             "No sellers found."
         );
-
         return;
     }
 
@@ -1195,7 +1192,74 @@ function renderSellers(sellers) {
         sellers.map(seller => {
 
             const status =
-                seller.status || "pending";
+                String(seller.status || "pending")
+                    .trim()
+                    .toLowerCase();
+
+            let actionButtons = "";
+
+            if (status === "pending") {
+
+                actionButtons = `
+                    <button
+                        type="button"
+                        onclick="approveSeller('${escapeHTML(seller.id)}')"
+                        class="px-3 py-2 rounded-lg bg-green-500/10 hover:bg-green-500/20 text-green-400 text-sm font-semibold"
+                    >
+                        ✓ Approve
+                    </button>
+
+                    <button
+                        type="button"
+                        onclick="rejectSeller('${escapeHTML(seller.id)}')"
+                        class="px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm font-semibold"
+                    >
+                        ✕ Reject
+                    </button>
+                `;
+
+            } else if (status === "approved") {
+
+                actionButtons = `
+                    <span
+                        class="px-3 py-2 rounded-lg bg-green-500/10 text-green-400 text-sm font-semibold"
+                    >
+                        ✓ Approved
+                    </span>
+
+                    <button
+                        type="button"
+                        onclick="rejectSeller('${escapeHTML(seller.id)}')"
+                        class="px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm font-semibold"
+                    >
+                        ✕ Reject
+                    </button>
+                `;
+
+            } else if (status === "rejected") {
+
+                actionButtons = `
+                    <button
+                        type="button"
+                        onclick="approveSeller('${escapeHTML(seller.id)}')"
+                        class="px-3 py-2 rounded-lg bg-green-500/10 hover:bg-green-500/20 text-green-400 text-sm font-semibold"
+                    >
+                        ✓ Approve
+                    </button>
+                `;
+
+            } else {
+
+                actionButtons = `
+                    <button
+                        type="button"
+                        onclick="approveSeller('${escapeHTML(seller.id)}')"
+                        class="px-3 py-2 rounded-lg bg-green-500/10 hover:bg-green-500/20 text-green-400 text-sm font-semibold"
+                    >
+                        ✓ Approve
+                    </button>
+                `;
+            }
 
             return `
                 <tr class="border-b border-white/10 hover:bg-white/5">
@@ -1248,7 +1312,7 @@ function renderSellers(sellers) {
 
                     <td class="px-6 py-4">
 
-                        <div class="flex gap-2">
+                        <div class="flex flex-wrap gap-2">
 
                             <button
                                 type="button"
@@ -1258,13 +1322,7 @@ function renderSellers(sellers) {
                                 View
                             </button>
 
-                            <button
-                                type="button"
-                                onclick="updateSellerStatus('${escapeHTML(seller.id)}')"
-                                class="px-3 py-2 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 text-sm"
-                            >
-                                Status
-                            </button>
+                            ${actionButtons}
 
                             <button
                                 type="button"
@@ -1310,41 +1368,42 @@ function viewSeller(sellerId) {
 }
 
 async function updateSellerStatus(sellerId) {
+    const seller =
+        allSellers.find(
+            item =>
+                String(item.id) ===
+                String(sellerId)
+        );
+
+    if (!seller) {
+        alert("Seller not found.");
+        return;
+    }
+
+    const statuses = [
+        "pending",
+        "approved",
+        "rejected",
+        "active"
+    ];
+
+    const currentStatus =
+        String(
+            seller.status || "pending"
+        ).toLowerCase();
+
+    const currentIndex =
+        statuses.indexOf(currentStatus);
+
+    const nextIndex =
+        currentIndex >= 0
+            ? (currentIndex + 1) % statuses.length
+            : 0;
+
+    const newStatus =
+        statuses[nextIndex];
+
     try {
-
-        const seller =
-            allSellers.find(
-                item =>
-                    String(item.id) ===
-                    String(sellerId)
-            );
-
-        if (!seller) {
-            return;
-        }
-
-        const statuses = [
-            "pending",
-            "approved",
-            "rejected",
-            "active"
-        ];
-
-        const currentStatus =
-            String(
-                seller.status || "pending"
-            ).toLowerCase();
-
-        const currentIndex =
-            statuses.indexOf(currentStatus);
-
-        const nextIndex =
-            currentIndex >= 0
-                ? (currentIndex + 1) % statuses.length
-                : 0;
-
-        const newStatus =
-            statuses[nextIndex];
 
         const { error } =
             await withTimeout(
@@ -1363,6 +1422,12 @@ async function updateSellerStatus(sellerId) {
         }
 
         await loadSellers();
+        await loadDashboardCounts();
+
+        showToast(
+            `Seller status changed to "${newStatus}".`,
+            "success"
+        );
 
     } catch (error) {
 
@@ -1377,7 +1442,170 @@ async function updateSellerStatus(sellerId) {
     }
 }
 
+
+/* =========================================================
+   APPROVE SELLER
+========================================================= */
+
+async function approveSeller(sellerId) {
+
+    const seller =
+        allSellers.find(
+            item =>
+                String(item.id) ===
+                String(sellerId)
+        );
+
+    if (!seller) {
+        alert("Seller not found.");
+        return;
+    }
+
+    if (
+        !confirm(
+            `Approve "${seller.business_name || seller.shop_name || "this seller"}" as a seller?`
+        )
+    ) {
+        return;
+    }
+
+    try {
+
+        const sellerResult =
+            await withTimeout(
+                supabaseClient
+                    .from("sellers")
+                    .update({
+                        status: "approved"
+                    })
+                    .eq("id", sellerId),
+                DATA_TIMEOUT,
+                "Seller approval timed out."
+            );
+
+        if (sellerResult?.error) {
+            throw sellerResult.error;
+        }
+
+
+        /* Change user's role to seller */
+
+        const profileResult =
+            await withTimeout(
+                supabaseClient
+                    .from("profiles")
+                    .update({
+                        role: "seller"
+                    })
+                    .eq("id", sellerId),
+                DATA_TIMEOUT,
+                "Seller role update timed out."
+            );
+
+        if (profileResult?.error) {
+            throw profileResult.error;
+        }
+
+
+        showToast(
+            "Seller approved successfully.",
+            "success"
+        );
+
+
+        await loadSellers();
+        await loadDashboardCounts();
+
+    } catch (error) {
+
+        console.error(
+            "Approve seller error:",
+            error
+        );
+
+        alert(
+            error?.message ||
+            "Could not approve seller."
+        );
+    }
+}
+
+
+/* =========================================================
+   REJECT SELLER
+========================================================= */
+
+async function rejectSeller(sellerId) {
+
+    const seller =
+        allSellers.find(
+            item =>
+                String(item.id) ===
+                String(sellerId)
+        );
+
+    if (!seller) {
+        alert("Seller not found.");
+        return;
+    }
+
+    if (
+        !confirm(
+            `Reject "${seller.business_name || seller.shop_name || "this seller"}" application?`
+        )
+    ) {
+        return;
+    }
+
+    try {
+
+        const { error } =
+            await withTimeout(
+                supabaseClient
+                    .from("sellers")
+                    .update({
+                        status: "rejected"
+                    })
+                    .eq("id", sellerId),
+                DATA_TIMEOUT,
+                "Seller rejection timed out."
+            );
+
+        if (error) {
+            throw error;
+        }
+
+
+        showToast(
+            "Seller application rejected.",
+            "success"
+        );
+
+
+        await loadSellers();
+        await loadDashboardCounts();
+
+    } catch (error) {
+
+        console.error(
+            "Reject seller error:",
+            error
+        );
+
+        alert(
+            error?.message ||
+            "Could not reject seller."
+        );
+    }
+}
+
+
+/* =========================================================
+   DELETE SELLER
+========================================================= */
+
 async function deleteSeller(sellerId) {
+
     if (
         !confirm(
             "Are you sure you want to delete this seller?"
@@ -1402,9 +1630,11 @@ async function deleteSeller(sellerId) {
             throw error;
         }
 
+
         alert(
             "Seller deleted successfully."
         );
+
 
         await loadSellers();
         await loadDashboardCounts();
@@ -2490,9 +2720,15 @@ window.viewSeller =
 window.updateSellerStatus =
     updateSellerStatus;
 
+window.approveSeller =
+    approveSeller;
+
+window.rejectSeller =
+    rejectSeller;
+
 window.deleteSeller =
     deleteSeller;
-
+    
 window.viewCustomer =
     viewCustomer;
 

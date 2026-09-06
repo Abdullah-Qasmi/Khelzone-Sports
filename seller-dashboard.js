@@ -1,24 +1,20 @@
 /* ============================================================
    KHELZONE SELLER DASHBOARD
-   COMPLETE VERSION
-   Tables:
-   - profiles
-   - products
-   - orders
-   - order_items
+   PART 1 / 4
+   CONFIG + SUPABASE + AUTH + PROFILE + NAVIGATION
 ============================================================ */
 
 "use strict";
 
 /* ============================================================
-   GLOBAL CONFIG
+   CONFIG
 ============================================================ */
-
-const supabaseClient = window.supabaseClient;
 
 const LOGIN_PAGE = "index.html";
 
 const DATA_TIMEOUT = 15000;
+
+const SUPABASE_CLIENT_WAIT = 10000;
 
 const ORDER_STATUSES = [
     "pending",
@@ -28,24 +24,39 @@ const ORDER_STATUSES = [
 ];
 
 /* ============================================================
+   SUPABASE
+============================================================ */
+
+let supabaseClient = null;
+
+/* ============================================================
    GLOBAL STATE
 ============================================================ */
 
 let currentUser = null;
+
 let currentProfile = null;
 
 let allProducts = [];
+
 let allOrders = [];
+
 let allOrderItems = [];
 
 let currentProductId = null;
+
+let dashboardStarted = false;
 
 /* ============================================================
    BASIC HELPERS
 ============================================================ */
 
 function escapeHTML(value) {
-    if (value === null || value === undefined) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
         return "";
     }
 
@@ -58,16 +69,41 @@ function escapeHTML(value) {
 }
 
 /* ============================================================
+   ELEMENT HELPER
+============================================================ */
+
+function updateElement(id, value) {
+
+    const element =
+        document.getElementById(id);
+
+    if (!element) {
+        return;
+    }
+
+    element.textContent =
+        value ?? "";
+}
+
+/* ============================================================
    CURRENCY
 ============================================================ */
 
 function formatCurrency(value) {
-    const number = Number(value || 0);
 
-    return "Rs. " + number.toLocaleString("en-PK", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2
-    });
+    const number =
+        Number(value || 0);
+
+    return (
+        "Rs. " +
+        number.toLocaleString(
+            "en-PK",
+            {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            }
+        )
+    );
 }
 
 /* ============================================================
@@ -75,25 +111,30 @@ function formatCurrency(value) {
 ============================================================ */
 
 function formatDate(value) {
+
     if (!value) {
         return "—";
     }
 
-    try {
-        const date = new Date(value);
+    const date =
+        new Date(value);
 
-        if (Number.isNaN(date.getTime())) {
-            return "—";
-        }
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+        return "—";
+    }
 
-        return date.toLocaleDateString("en-PK", {
+    return date.toLocaleDateString(
+        "en-PK",
+        {
             day: "2-digit",
             month: "short",
             year: "numeric"
-        });
-    } catch (error) {
-        return "—";
-    }
+        }
+    );
 }
 
 /* ============================================================
@@ -101,37 +142,60 @@ function formatDate(value) {
 ============================================================ */
 
 function normalizeStatus(status) {
-    const value = String(
-        status || "pending"
-    ).trim().toLowerCase();
 
-    if (ORDER_STATUSES.includes(value)) {
-        return value;
-    }
+    const value =
+        String(
+            status || "pending"
+        )
+            .trim()
+            .toLowerCase();
 
-    return "pending";
+    return ORDER_STATUSES.includes(
+        value
+    )
+        ? value
+        : "pending";
 }
 
 function getStatusClass(status) {
-    const value = normalizeStatus(status);
 
-    return {
-        pending: "status-pending",
-        processing: "status-processing",
-        shipped: "status-shipped",
-        delivered: "status-delivered"
-    }[value] || "status-pending";
+    const value =
+        normalizeStatus(status);
+
+    const classes = {
+
+        pending:
+            "status-pending",
+
+        processing:
+            "status-processing",
+
+        shipped:
+            "status-shipped",
+
+        delivered:
+            "status-delivered"
+    };
+
+    return (
+        classes[value] ||
+        "status-pending"
+    );
 }
 
 function formatStatus(status) {
-    const value = normalizeStatus(status);
 
-    return value.charAt(0).toUpperCase() +
-        value.slice(1);
+    const value =
+        normalizeStatus(status);
+
+    return (
+        value.charAt(0).toUpperCase() +
+        value.slice(1)
+    );
 }
 
 /* ============================================================
-   TIMEOUT HELPER
+   TIMEOUT
 ============================================================ */
 
 function withTimeout(
@@ -139,73 +203,44 @@ function withTimeout(
     timeout = DATA_TIMEOUT,
     message = "Request timed out."
 ) {
-    return Promise.race([
-        promise,
 
-        new Promise((_, reject) => {
-            setTimeout(() => {
-                reject(new Error(message));
-            }, timeout);
-        })
-    ]);
-}
+    let timer;
 
-/* ============================================================
-   TOAST
-============================================================ */
+    const timeoutPromise =
+        new Promise(
+            (_, reject) => {
 
-function showToast(message, type = "success") {
+                timer =
+                    setTimeout(
+                        () => {
 
-    let toast =
-        document.getElementById(
-            "sellerToast"
+                            reject(
+                                new Error(
+                                    message
+                                )
+                            );
+
+                        },
+                        timeout
+                    );
+            }
         );
 
-    if (!toast) {
+    return Promise.race(
+        [
+            Promise.resolve(
+                promise
+            ).finally(
+                () => {
+                    clearTimeout(
+                        timer
+                    );
+                }
+            ),
 
-        toast =
-            document.createElement("div");
-
-        toast.id =
-            "sellerToast";
-
-        toast.style.position = "fixed";
-        toast.style.right = "20px";
-        toast.style.bottom = "20px";
-        toast.style.zIndex = "99999";
-        toast.style.padding = "14px 18px";
-        toast.style.borderRadius = "10px";
-        toast.style.fontWeight = "800";
-        toast.style.fontSize = "13px";
-        toast.style.boxShadow =
-            "0 15px 40px rgba(0,0,0,.4)";
-
-        document.body.appendChild(toast);
-    }
-
-    toast.textContent = message;
-
-    if (type === "error") {
-        toast.style.background = "#7f1d1d";
-        toast.style.color = "#fecaca";
-        toast.style.border =
-            "1px solid #ef4444";
-    } else {
-        toast.style.background = "#14532d";
-        toast.style.color = "#bbf7d0";
-        toast.style.border =
-            "1px solid #22c55e";
-    }
-
-    toast.style.display = "block";
-
-    clearTimeout(
-        toast._timer
+            timeoutPromise
+        ]
     );
-
-    toast._timer = setTimeout(() => {
-        toast.style.display = "none";
-    }, 3000);
 }
 
 /* ============================================================
@@ -217,6 +252,7 @@ function showTableMessage(
     colspan,
     message
 ) {
+
     if (!tbody) {
         return;
     }
@@ -224,7 +260,7 @@ function showTableMessage(
     tbody.innerHTML = `
         <tr>
             <td
-                colspan="${colspan}"
+                colspan="${Number(colspan) || 1}"
                 class="table-message"
             >
                 ${escapeHTML(message)}
@@ -234,45 +270,124 @@ function showTableMessage(
 }
 
 /* ============================================================
-   SUPABASE CHECK
+   TOAST
 ============================================================ */
 
-function checkSupabaseClient() {
+function showToast(
+    message,
+    type = "success"
+) {
 
-    if (!supabaseClient) {
-
-        console.error(
-            "window.supabaseClient is missing."
+    let toast =
+        document.getElementById(
+            "sellerToast"
         );
 
-        showToast(
-            "Supabase is not configured.",
-            "error"
+    if (!toast) {
+
+        toast =
+            document.createElement(
+                "div"
+            );
+
+        toast.id =
+            "sellerToast";
+
+        Object.assign(
+            toast.style,
+            {
+                position:
+                    "fixed",
+
+                right:
+                    "20px",
+
+                bottom:
+                    "20px",
+
+                zIndex:
+                    "99999",
+
+                maxWidth:
+                    "420px",
+
+                padding:
+                    "14px 18px",
+
+                borderRadius:
+                    "10px",
+
+                fontWeight:
+                    "800",
+
+                fontSize:
+                    "13px",
+
+                lineHeight:
+                    "1.5",
+
+                boxShadow:
+                    "0 15px 40px rgba(0,0,0,.4)"
+            }
         );
 
-        return false;
+        document.body.appendChild(
+            toast
+        );
     }
 
-    return true;
+    toast.textContent =
+        String(
+            message || ""
+        );
+
+    if (
+        type === "error"
+    ) {
+
+        toast.style.background =
+            "#7f1d1d";
+
+        toast.style.color =
+            "#fecaca";
+
+        toast.style.border =
+            "1px solid #ef4444";
+
+    } else {
+
+        toast.style.background =
+            "#14532d";
+
+        toast.style.color =
+            "#bbf7d0";
+
+        toast.style.border =
+            "1px solid #22c55e";
+    }
+
+    toast.style.display =
+        "block";
+
+    clearTimeout(
+        toast._timer
+    );
+
+    toast._timer =
+        setTimeout(
+            () => {
+
+                toast.style.display =
+                    "none";
+
+            },
+            3500
+        );
 }
 
 /* ============================================================
    LOADING SCREEN
 ============================================================ */
-
-function hideLoadingScreen() {
-
-    const screen =
-        document.getElementById(
-            "loadingScreen"
-        );
-
-    if (!screen) {
-        return;
-    }
-
-    screen.style.display = "none";
-}
 
 function showLoadingScreen() {
 
@@ -285,47 +400,196 @@ function showLoadingScreen() {
         return;
     }
 
-    screen.style.display = "flex";
+    screen.style.display =
+        "flex";
+}
+
+function hideLoadingScreen() {
+
+    const screen =
+        document.getElementById(
+            "loadingScreen"
+        );
+
+    if (!screen) {
+        return;
+    }
+
+    screen.style.display =
+        "none";
 }
 
 /* ============================================================
-   AUTH
+   DASHBOARD ERROR
+============================================================ */
+
+function showDashboardError(
+    message
+) {
+
+    const screen =
+        document.getElementById(
+            "loadingScreen"
+        );
+
+    if (!screen) {
+
+        alert(
+            message ||
+            "Something went wrong."
+        );
+
+        return;
+    }
+
+    screen.innerHTML = `
+
+        <div
+            style="
+                width:min(92%,520px);
+                text-align:center;
+                padding:32px 26px;
+                background:#141414;
+                border:1px solid rgba(255,90,0,.3);
+                border-radius:16px;
+                box-shadow:0 20px 70px rgba(0,0,0,.5);
+            "
+        >
+
+            <div
+                style="
+                    color:#ff5a00;
+                    font-size:32px;
+                    font-weight:900;
+                    letter-spacing:1px;
+                    margin-bottom:16px;
+                "
+            >
+                KHELZONE
+            </div>
+
+            <div
+                style="
+                    color:#fff;
+                    font-size:19px;
+                    font-weight:900;
+                    margin-bottom:10px;
+                "
+            >
+                Dashboard could not load
+            </div>
+
+            <div
+                style="
+                    color:#999;
+                    font-size:13px;
+                    line-height:1.6;
+                    margin-bottom:22px;
+                    word-break:break-word;
+                "
+            >
+                ${escapeHTML(
+                    message ||
+                    "Something went wrong."
+                )}
+            </div>
+
+            <button
+                type="button"
+                onclick="window.location.reload()"
+                style="
+                    border:0;
+                    background:#ff5a00;
+                    color:#fff;
+                    padding:12px 22px;
+                    border-radius:9px;
+                    cursor:pointer;
+                    font-weight:900;
+                "
+            >
+                Try Again
+            </button>
+
+        </div>
+    `;
+
+    screen.style.display =
+        "flex";
+}
+
+/* ============================================================
+   WAIT FOR SUPABASE
+============================================================ */
+
+async function waitForSupabaseClient() {
+
+    const started =
+        Date.now();
+
+    while (
+        !window.supabaseClient &&
+        (
+            Date.now() -
+            started
+        ) <
+        SUPABASE_CLIENT_WAIT
+    ) {
+
+        await new Promise(
+            resolve =>
+                setTimeout(
+                    resolve,
+                    100
+                )
+        );
+    }
+
+    if (
+        !window.supabaseClient
+    ) {
+
+        throw new Error(
+            "Supabase client is not initialized. Make sure your Supabase configuration is loaded before seller-dashboard.js."
+        );
+    }
+
+    supabaseClient =
+        window.supabaseClient;
+
+    return supabaseClient;
+}
+
+/* ============================================================
+   GET CURRENT USER
 ============================================================ */
 
 async function getCurrentUser() {
 
-    if (!checkSupabaseClient()) {
+    if (!supabaseClient) {
         return null;
     }
 
-    try {
-
-        const result =
-            await withTimeout(
-                supabaseClient.auth.getUser(),
-                DATA_TIMEOUT,
-                "Authentication request timed out."
-            );
-
-        if (result.error) {
-            throw result.error;
-        }
-
-        return result.data?.user || null;
-
-    } catch (error) {
-
-        console.error(
-            "Get current user error:",
-            error
+    const result =
+        await withTimeout(
+            supabaseClient.auth.getUser(),
+            DATA_TIMEOUT,
+            "Authentication request timed out."
         );
 
-        return null;
+    if (result.error) {
+        throw result.error;
     }
+
+    return (
+        result.data &&
+        result.data.user
+    )
+        ? result.data.user
+        : null;
 }
 
 /* ============================================================
-   PROFILE
+   LOAD PROFILE
 ============================================================ */
 
 async function loadCurrentProfile() {
@@ -334,41 +598,36 @@ async function loadCurrentProfile() {
         return null;
     }
 
-    try {
+    const result =
+        await withTimeout(
 
-        const result =
-            await withTimeout(
-                supabaseClient
-                    .from("profiles")
-                    .select("*")
-                    .eq("id", currentUser.id)
-                    .maybeSingle(),
-                DATA_TIMEOUT,
-                "Profile request timed out."
-            );
+            supabaseClient
+                .from("profiles")
+                .select("*")
+                .eq(
+                    "id",
+                    currentUser.id
+                )
+                .maybeSingle(),
 
-        if (result.error) {
-            throw result.error;
-        }
+            DATA_TIMEOUT,
 
-        currentProfile =
-            result.data || null;
-
-        return currentProfile;
-
-    } catch (error) {
-
-        console.error(
-            "Profile loading error:",
-            error
+            "Profile request timed out."
         );
 
-        return null;
+    if (result.error) {
+        throw result.error;
     }
+
+    currentProfile =
+        result.data ||
+        null;
+
+    return currentProfile;
 }
 
 /* ============================================================
-   SELLER ACCESS
+   SELLER ACCESS CHECK
 ============================================================ */
 
 async function checkSellerAccess() {
@@ -376,62 +635,236 @@ async function checkSellerAccess() {
     currentUser =
         await getCurrentUser();
 
+    /* --------------------------------------------------------
+       NO USER
+    -------------------------------------------------------- */
+
     if (!currentUser) {
 
-        window.location.href =
-            LOGIN_PAGE;
+        showToast(
+            "Please login first.",
+            "error"
+        );
+
+        setTimeout(
+            () => {
+
+                window.location.href =
+                    LOGIN_PAGE;
+
+            },
+            800
+        );
 
         return false;
     }
+
+    /* --------------------------------------------------------
+       PROFILE
+    -------------------------------------------------------- */
 
     currentProfile =
         await loadCurrentProfile();
 
     if (!currentProfile) {
 
-        showToast(
-            "Seller profile not found.",
-            "error"
+        showDashboardError(
+            "Your profile was not found in the profiles table."
         );
-
-        setTimeout(() => {
-            window.location.href =
-                LOGIN_PAGE;
-        }, 1500);
 
         return false;
     }
 
+    /* --------------------------------------------------------
+       ROLE
+    -------------------------------------------------------- */
+
     const role =
         String(
-            currentProfile.role || ""
-        ).toLowerCase();
+            currentProfile.role ||
+            ""
+        )
+            .trim()
+            .toLowerCase();
 
-    /*
-     * Seller access.
-     *
-     * Some projects may use:
-     * seller
-     * vendor
-     *
-     * Admin is intentionally NOT treated
-     * as seller here.
-     */
+    console.log(
+        "KHELZONE Seller Access:",
+        {
+            userId:
+                currentUser.id,
+
+            email:
+                currentUser.email,
+
+            role:
+                role,
+
+            profile:
+                currentProfile
+        }
+    );
+
+    /* --------------------------------------------------------
+       ADMIN
+    -------------------------------------------------------- */
+
+    if (
+        role === "admin" ||
+        role === "administrator"
+    ) {
+
+        return true;
+    }
+
+    /* --------------------------------------------------------
+       SELLER
+    -------------------------------------------------------- */
 
     if (
         role !== "seller" &&
         role !== "vendor"
     ) {
 
-        showToast(
-            "Seller access denied.",
-            "error"
+        showDashboardError(
+            "Seller access denied. Your account role is not Seller or Vendor."
         );
 
-        setTimeout(() => {
-            window.location.href =
-                LOGIN_PAGE;
-        }, 1500);
+        return false;
+    }
+
+    /* --------------------------------------------------------
+       APPROVAL FIELDS
+    -------------------------------------------------------- */
+
+    const approvalFields = [
+
+        "seller_status",
+
+        "seller_approval",
+
+        "approval_status",
+
+        "seller_approved",
+
+        "approved"
+    ];
+
+    let approvalField =
+        null;
+
+    let approvalValue;
+
+    for (
+        const field
+        of approvalFields
+    ) {
+
+        if (
+            Object.prototype.hasOwnProperty.call(
+                currentProfile,
+                field
+            )
+        ) {
+
+            approvalField =
+                field;
+
+            approvalValue =
+                currentProfile[
+                    field
+                ];
+
+            break;
+        }
+    }
+
+    /* --------------------------------------------------------
+       NO APPROVAL FIELD
+    -------------------------------------------------------- */
+
+    if (
+        approvalField === null
+    ) {
+
+        return true;
+    }
+
+    /* --------------------------------------------------------
+       BOOLEAN APPROVAL
+    -------------------------------------------------------- */
+
+    if (
+        typeof approvalValue ===
+        "boolean"
+    ) {
+
+        if (
+            approvalValue ===
+            false
+        ) {
+
+            showDashboardError(
+                "Your seller account has not been approved yet."
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /* --------------------------------------------------------
+       STRING APPROVAL
+    -------------------------------------------------------- */
+
+    const approval =
+        String(
+            approvalValue ||
+            ""
+        )
+            .trim()
+            .toLowerCase();
+
+    if (!approval) {
+        return true;
+    }
+
+    /* APPROVED */
+
+    if (
+        [
+            "approved",
+            "active",
+            "accepted",
+            "true"
+        ].includes(
+            approval
+        )
+    ) {
+
+        return true;
+    }
+
+    /* BLOCKED */
+
+    if (
+        [
+            "pending",
+            "rejected",
+            "blocked",
+            "suspended",
+            "inactive",
+            "false"
+        ].includes(
+            approval
+        )
+    ) {
+
+        showDashboardError(
+            "Your seller account status is: " +
+            approval +
+            "."
+        );
 
         return false;
     }
@@ -440,7 +873,7 @@ async function checkSellerAccess() {
 }
 
 /* ============================================================
-   PROFILE UI
+   SELLER PROFILE UI
 ============================================================ */
 
 function renderSellerProfile() {
@@ -452,6 +885,7 @@ function renderSellerProfile() {
     const name =
         currentProfile.full_name ||
         currentProfile.name ||
+        currentProfile.username ||
         currentUser?.email ||
         "Seller";
 
@@ -462,6 +896,9 @@ function renderSellerProfile() {
 
     const phone =
         currentProfile.phone ||
+        currentProfile.contact_no ||
+        currentProfile.contactNo ||
+        currentProfile.mobile ||
         "—";
 
     const avatar =
@@ -470,150 +907,329 @@ function renderSellerProfile() {
         );
 
     if (avatar) {
+
         avatar.textContent =
-            name.charAt(0).toUpperCase();
+            String(name)
+                .charAt(0)
+                .toUpperCase();
     }
 
-    const sellerNameTop =
-        document.getElementById(
-            "sellerNameTop"
-        );
+    updateElement(
+        "sellerNameTop",
+        name
+    );
 
-    if (sellerNameTop) {
-        sellerNameTop.textContent =
-            name;
-    }
+    updateElement(
+        "profileName",
+        name
+    );
 
-    const profileName =
-        document.getElementById(
-            "profileName"
-        );
+    updateElement(
+        "profileEmail",
+        email
+    );
 
-    if (profileName) {
-        profileName.textContent =
-            name;
-    }
+    updateElement(
+        "profilePhone",
+        phone
+    );
 
-    const profileEmail =
-        document.getElementById(
-            "profileEmail"
-        );
-
-    if (profileEmail) {
-        profileEmail.textContent =
-            email;
-    }
-
-    const profilePhone =
-        document.getElementById(
-            "profilePhone"
-        );
-
-    if (profilePhone) {
-        profilePhone.textContent =
-            phone;
-    }
-
-    const profileRole =
-        document.getElementById(
-            "profileRole"
-        );
-
-    if (profileRole) {
-        profileRole.textContent =
-            "Seller";
-    }
+    updateElement(
+        "profileRole",
+        currentProfile.role ||
+        "Seller"
+    );
 }
 
 /* ============================================================
-   NAVIGATION
+   NAVIGATION CSS
 ============================================================ */
 
-function initNavigation() {
+function ensureSellerNavigationCSS() {
 
-    const buttons =
-        document.querySelectorAll(
-            "[data-section]"
+    if (
+        document.getElementById(
+            "kzSellerNavigationCSS"
+        )
+    ) {
+        return;
+    }
+
+    const style =
+        document.createElement(
+            "style"
         );
 
-    buttons.forEach(button => {
+    style.id =
+        "kzSellerNavigationCSS";
 
-        button.addEventListener(
-            "click",
-            () => {
+    style.textContent = `
 
-                const section =
-                    button.getAttribute(
-                        "data-section"
-                    );
+        /* DESKTOP SIDEBAR */
 
-                if (!section) {
-                    return;
-                }
+        #sidebar,
+        .sidebar {
 
-                showSection(section);
+            z-index:
+                9000 !important;
+        }
 
-                closeMobileMenu();
+        #sidebar [data-section],
+        .sidebar [data-section],
+        #sidebar .nav-btn,
+        .sidebar .nav-btn {
+
+            pointer-events:
+                auto !important;
+
+            cursor:
+                pointer !important;
+
+            position:
+                relative !important;
+
+            z-index:
+                9001 !important;
+        }
+
+        /* ACTIVE */
+
+        #sidebar [data-section].active,
+        .sidebar [data-section].active,
+        #sidebar .nav-btn.active,
+        .sidebar .nav-btn.active {
+
+            background:
+                #ff5a00 !important;
+
+            color:
+                #ffffff !important;
+        }
+
+        /* HOVER */
+
+        #sidebar [data-section]:hover,
+        .sidebar [data-section]:hover,
+        #sidebar .nav-btn:hover,
+        .sidebar .nav-btn:hover {
+
+            background:
+                rgba(255,90,0,.14) !important;
+
+            color:
+                #ffffff !important;
+        }
+
+        /* SECTION */
+
+        .section {
+
+            display:
+                none;
+        }
+
+        .section.active {
+
+            display:
+                block !important;
+        }
+
+        /* OVERLAY */
+
+        #sellerNavOverlay {
+
+            display:
+                none;
+        }
+
+        /* MOBILE */
+
+        @media (max-width:900px) {
+
+            #sidebar,
+            .sidebar {
+
+                transform:
+                    translateX(-105%) !important;
+
+                transition:
+                    transform .25s ease !important;
+
+                width:
+                    min(290px,86vw) !important;
+
+                box-shadow:
+                    20px 0 50px rgba(0,0,0,.55);
+
+                z-index:
+                    9000 !important;
             }
-        );
-    });
+
+            #sidebar.mobile-open,
+            .sidebar.mobile-open {
+
+                transform:
+                    translateX(0) !important;
+            }
+
+            #mobileMenuBtn {
+
+                display:
+                    inline-flex !important;
+
+                align-items:
+                    center;
+
+                justify-content:
+                    center;
+
+                cursor:
+                    pointer !important;
+
+                position:
+                    relative;
+
+                z-index:
+                    9002 !important;
+            }
+
+            #sellerNavOverlay.active {
+
+                display:
+                    block !important;
+
+                position:
+                    fixed;
+
+                inset:
+                    0;
+
+                z-index:
+                    8999;
+
+                background:
+                    rgba(0,0,0,.65);
+            }
+        }
+    `;
+
+    document.head.appendChild(
+        style
+    );
 }
 
-function showSection(sectionName) {
+/* ============================================================
+   NAVIGATION OVERLAY
+============================================================ */
 
-    const sections =
-        document.querySelectorAll(
-            ".section"
+function ensureSellerNavOverlay() {
+
+    let overlay =
+        document.getElementById(
+            "sellerNavOverlay"
         );
 
-    sections.forEach(section => {
+    if (!overlay) {
 
-        section.classList.remove(
-            "active"
+        overlay =
+            document.createElement(
+                "div"
+            );
+
+        overlay.id =
+            "sellerNavOverlay";
+
+        document.body.appendChild(
+            overlay
         );
+    }
 
-        section.style.display =
-            "none";
-    });
+    return overlay;
+}
+
+/* ============================================================
+   SHOW SECTION
+============================================================ */
+
+function showSection(
+    sectionName
+) {
 
     const target =
         document.getElementById(
             sectionName
         );
 
-    if (target) {
+    if (!target) {
 
-        target.classList.add(
-            "active"
+        console.error(
+            "KHELZONE: Section not found:",
+            sectionName
         );
 
-        target.style.display =
-            "block";
+        return false;
     }
 
-    const buttons =
-        document.querySelectorAll(
+    /* HIDE ALL */
+
+    document
+        .querySelectorAll(
+            ".section"
+        )
+        .forEach(
+            section => {
+
+                section.classList.remove(
+                    "active"
+                );
+
+                section.style.display =
+                    "none";
+            }
+        );
+
+    /* SHOW TARGET */
+
+    target.classList.add(
+        "active"
+    );
+
+    target.style.display =
+        "block";
+
+    /* ACTIVE NAV */
+
+    document
+        .querySelectorAll(
             "[data-section]"
+        )
+        .forEach(
+            button => {
+
+                const isActive =
+                    button.getAttribute(
+                        "data-section"
+                    ) ===
+                    sectionName;
+
+                button.classList.toggle(
+                    "active",
+                    isActive
+                );
+
+                button.setAttribute(
+                    "aria-current",
+                    isActive
+                        ? "page"
+                        : "false"
+                );
+            }
         );
 
-    buttons.forEach(button => {
-
-        button.classList.remove(
-            "active"
-        );
-
-        if (
-            button.getAttribute(
-                "data-section"
-            ) === sectionName
-        ) {
-            button.classList.add(
-                "active"
-            );
-        }
-    });
+    /* TITLES */
 
     const titles = {
+
         dashboardSection:
             "Seller Dashboard",
 
@@ -628,6 +1244,7 @@ function showSection(sectionName) {
     };
 
     const subtitles = {
+
         dashboardSection:
             "Manage your KHELZONE store",
 
@@ -641,26 +1258,117 @@ function showSection(sectionName) {
             "Your seller account"
     };
 
-    const title =
-        document.getElementById(
-            "pageTitle"
+    updateElement(
+        "pageTitle",
+        titles[
+            sectionName
+        ] ||
+        "Seller Dashboard"
+    );
+
+    updateElement(
+        "pageSubtitle",
+        subtitles[
+            sectionName
+        ] ||
+        "Manage your KHELZONE store"
+    );
+
+    return true;
+}
+
+/* ============================================================
+   INIT NAVIGATION
+============================================================ */
+
+function initNavigation() {
+
+    ensureSellerNavigationCSS();
+
+    const overlay =
+        ensureSellerNavOverlay();
+
+    const buttons =
+        document.querySelectorAll(
+            "[data-section]"
         );
 
-    const subtitle =
-        document.getElementById(
-            "pageSubtitle"
+    console.log(
+        "KHELZONE navigation buttons:",
+        buttons.length
+    );
+
+    buttons.forEach(
+        button => {
+
+            if (
+                button.dataset
+                    .navigationReady ===
+                "true"
+            ) {
+                return;
+            }
+
+            button.dataset
+                .navigationReady =
+                "true";
+
+            button.type =
+                "button";
+
+            button.style.pointerEvents =
+                "auto";
+
+            button.style.cursor =
+                "pointer";
+
+            button.addEventListener(
+                "click",
+                event => {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+                    const section =
+                        button.getAttribute(
+                            "data-section"
+                        );
+
+                    if (!section) {
+                        return;
+                    }
+
+                    console.log(
+                        "Opening seller section:",
+                        section
+                    );
+
+                    showSection(
+                        section
+                    );
+
+                    closeMobileMenu();
+                }
+            );
+        }
+    );
+
+    if (
+        overlay &&
+        overlay.dataset
+            .navigationReady !==
+        "true"
+    ) {
+
+        overlay.dataset
+            .navigationReady =
+            "true";
+
+        overlay.addEventListener(
+            "click",
+            closeMobileMenu
         );
-
-    if (title) {
-        title.textContent =
-            titles[sectionName] ||
-            "Seller Dashboard";
-    }
-
-    if (subtitle) {
-        subtitle.textContent =
-            subtitles[sectionName] ||
-            "Manage your KHELZONE store";
     }
 }
 
@@ -670,6 +1378,8 @@ function showSection(sectionName) {
 
 function initMobileMenu() {
 
+    ensureSellerNavigationCSS();
+
     const button =
         document.getElementById(
             "mobileMenuBtn"
@@ -678,34 +1388,123 @@ function initMobileMenu() {
     const sidebar =
         document.getElementById(
             "sidebar"
+        ) ||
+        document.querySelector(
+            ".sidebar"
         );
 
-    if (!button || !sidebar) {
+    const overlay =
+        ensureSellerNavOverlay();
+
+    if (
+        !button ||
+        !sidebar
+    ) {
+
+        console.warn(
+            "KHELZONE mobile menu elements not found."
+        );
+
         return;
     }
 
+    if (
+        button.dataset.menuReady ===
+        "true"
+    ) {
+        return;
+    }
+
+    button.dataset.menuReady =
+        "true";
+
+    button.type =
+        "button";
+
+    button.setAttribute(
+        "aria-expanded",
+        "false"
+    );
+
     button.addEventListener(
         "click",
-        () => {
+        event => {
+
+            event.preventDefault();
+
+            event.stopPropagation();
+
+            const shouldOpen =
+                !sidebar.classList.contains(
+                    "mobile-open"
+                );
 
             sidebar.classList.toggle(
-                "mobile-open"
+                "mobile-open",
+                shouldOpen
+            );
+
+            if (overlay) {
+
+                overlay.classList.toggle(
+                    "active",
+                    shouldOpen
+                );
+            }
+
+            button.setAttribute(
+                "aria-expanded",
+                String(
+                    shouldOpen
+                )
             );
         }
     );
 }
+
+/* ============================================================
+   CLOSE MOBILE MENU
+============================================================ */
 
 function closeMobileMenu() {
 
     const sidebar =
         document.getElementById(
             "sidebar"
+        ) ||
+        document.querySelector(
+            ".sidebar"
+        );
+
+    const overlay =
+        document.getElementById(
+            "sellerNavOverlay"
+        );
+
+    const button =
+        document.getElementById(
+            "mobileMenuBtn"
         );
 
     if (sidebar) {
 
         sidebar.classList.remove(
             "mobile-open"
+        );
+    }
+
+    if (overlay) {
+
+        overlay.classList.remove(
+            "active"
+        );
+    }
+
+    if (button) {
+
+        button.setAttribute(
+            "aria-expanded",
+            "false"
         );
     }
 }
@@ -725,6 +1524,19 @@ function initLogout() {
         return;
     }
 
+    if (
+        button.dataset.logoutReady ===
+        "true"
+    ) {
+        return;
+    }
+
+    button.dataset.logoutReady =
+        "true";
+
+    button.type =
+        "button";
+
     button.addEventListener(
         "click",
         async () => {
@@ -740,16 +1552,24 @@ function initLogout() {
 
             try {
 
-                button.disabled = true;
+                button.disabled =
+                    true;
 
                 const result =
                     await withTimeout(
-                        supabaseClient.auth.signOut(),
+
+                        supabaseClient
+                            .auth
+                            .signOut(),
+
                         DATA_TIMEOUT,
+
                         "Logout timed out."
                     );
 
-                if (result.error) {
+                if (
+                    result.error
+                ) {
                     throw result.error;
                 }
 
@@ -763,9 +1583,11 @@ function initLogout() {
                     error
                 );
 
-                button.disabled = false;
+                button.disabled =
+                    false;
 
                 showToast(
+                    error?.message ||
                     "Logout failed.",
                     "error"
                 );
@@ -775,7 +1597,42 @@ function initLogout() {
 }
 
 /* ============================================================
-   PRODUCTS
+   EXPORT PART 1
+============================================================ */
+
+window.startSellerDashboard =
+    window.startSellerDashboard ||
+    null;
+
+window.showSection =
+    showSection;
+
+window.closeMobileMenu =
+    closeMobileMenu;
+
+window.formatCurrency =
+    formatCurrency;
+
+window.formatDate =
+    formatDate;
+
+window.escapeHTML =
+    escapeHTML;
+
+window.showToast =
+    showToast;
+
+window.showDashboardError =
+    showDashboardError;
+/* ============================================================
+   KHELZONE SELLER DASHBOARD
+   PART 2 / 4
+   PRODUCTS + SEARCH + ADD + EDIT + DELETE
+============================================================ */
+
+
+/* ============================================================
+   LOAD PRODUCTS
 ============================================================ */
 
 async function loadProducts() {
@@ -785,31 +1642,34 @@ async function loadProducts() {
             "productsTableBody"
         );
 
-    if (!tbody) {
-        return;
+    if (tbody) {
+
+        showTableMessage(
+            tbody,
+            8,
+            "Loading products..."
+        );
     }
 
-    showTableMessage(
-        tbody,
-        8,
-        "Loading products..."
-    );
-
     if (!currentUser) {
+
+        if (tbody) {
+
+            showTableMessage(
+                tbody,
+                8,
+                "Seller account not found."
+            );
+        }
+
         return;
     }
 
     try {
 
-        /*
-         * IMPORTANT:
-         *
-         * seller_id must equal the logged-in
-         * user's profile ID.
-         */
-
         const result =
             await withTimeout(
+
                 supabaseClient
                     .from("products")
                     .select("*")
@@ -823,7 +1683,9 @@ async function loadProducts() {
                             ascending: false
                         }
                     ),
+
                 DATA_TIMEOUT,
+
                 "Products request timed out."
             );
 
@@ -845,23 +1707,41 @@ async function loadProducts() {
     } catch (error) {
 
         console.error(
-            "Load seller products error:",
+            "Load products error:",
             error
         );
 
-        showTableMessage(
-            tbody,
-            8,
-            "Failed to load products."
+        allProducts = [];
+
+        if (tbody) {
+
+            showTableMessage(
+                tbody,
+                8,
+                "Failed to load products: " +
+                (
+                    error?.message ||
+                    "Unknown error"
+                )
+            );
+        }
+
+        showToast(
+            error?.message ||
+            "Failed to load products.",
+            "error"
         );
     }
 }
+
 
 /* ============================================================
    RENDER PRODUCTS
 ============================================================ */
 
-function renderProducts(products) {
+function renderProducts(
+    products
+) {
 
     const tbody =
         document.getElementById(
@@ -887,211 +1767,281 @@ function renderProducts(products) {
     }
 
     tbody.innerHTML =
-        products.map(product => {
+        products
+            .map(
+                product => {
 
-            const active =
-                product.is_active !== false;
+                    const active =
+                        product.is_active !== false;
 
-            const status =
-                active
-                    ? "active"
-                    : "inactive";
+                    const image =
+                        product.image_url ||
+                        product.image ||
+                        "";
 
-            const image =
-                product.image_url ||
-                product.image ||
-                "";
+                    return `
+                        <tr>
 
-            return `
-                <tr>
+                            <!-- PRODUCT -->
 
-                    <td>
+                            <td>
 
-                        <div
-                            style="
-                                display:flex;
-                                align-items:center;
-                                gap:10px;
-                            "
-                        >
+                                <div
+                                    style="
+                                        display:flex;
+                                        align-items:center;
+                                        gap:10px;
+                                        min-width:190px;
+                                    "
+                                >
 
-                            ${
-                                image
-                                    ? `
-                                        <img
-                                            class="product-image"
-                                            src="${escapeHTML(image)}"
-                                            alt="${escapeHTML(product.name || "Product")}"
-                                        >
-                                      `
-                                    : `
+                                    ${
+                                        image
+                                            ? `
+                                                <img
+                                                    class="product-image"
+                                                    src="${escapeHTML(
+                                                        image
+                                                    )}"
+                                                    alt="${escapeHTML(
+                                                        product.name ||
+                                                        "Product"
+                                                    )}"
+                                                    onerror="
+                                                        this.style.display='none'
+                                                    "
+                                                >
+                                            `
+                                            : `
+                                                <div
+                                                    class="product-image"
+                                                    style="
+                                                        display:flex;
+                                                        align-items:center;
+                                                        justify-content:center;
+                                                        font-size:20px;
+                                                        flex-shrink:0;
+                                                    "
+                                                >
+                                                    📦
+                                                </div>
+                                            `
+                                    }
+
+                                    <div>
+
                                         <div
-                                            class="product-image"
                                             style="
-                                                display:flex;
-                                                align-items:center;
-                                                justify-content:center;
-                                                font-size:20px;
+                                                color:#fff;
+                                                font-weight:800;
+                                                line-height:1.35;
                                             "
                                         >
-                                            📦
+                                            ${escapeHTML(
+                                                product.name ||
+                                                "Unnamed Product"
+                                            )}
                                         </div>
-                                      `
-                            }
 
-                            <div>
+                                        ${
+                                            product.brand
+                                                ? `
+                                                    <div
+                                                        style="
+                                                            color:#777;
+                                                            font-size:11px;
+                                                            margin-top:3px;
+                                                        "
+                                                    >
+                                                        ${escapeHTML(
+                                                            product.brand
+                                                        )}
+                                                    </div>
+                                                `
+                                                : ""
+                                        }
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- CATEGORY -->
+
+                            <td>
+                                ${escapeHTML(
+                                    product.category ||
+                                    "—"
+                                )}
+                            </td>
+
+
+                            <!-- SPORT -->
+
+                            <td>
+                                ${escapeHTML(
+                                    product.sport ||
+                                    "—"
+                                )}
+                            </td>
+
+
+                            <!-- PRICE -->
+
+                            <td>
+
+                                <strong
+                                    style="
+                                        color:#ff5a00;
+                                    "
+                                >
+                                    ${formatCurrency(
+                                        product.price
+                                    )}
+                                </strong>
+
+                            </td>
+
+
+                            <!-- STOCK -->
+
+                            <td>
+
+                                ${Number(
+                                    product.stock || 0
+                                )}
+
+                            </td>
+
+
+                            <!-- STATUS -->
+
+                            <td>
+
+                                <span
+                                    class="
+                                        status
+                                        ${
+                                            active
+                                                ? "status-delivered"
+                                                : "status-pending"
+                                        }
+                                    "
+                                >
+                                    ${
+                                        active
+                                            ? "Active"
+                                            : "Inactive"
+                                    }
+                                </span>
+
+                            </td>
+
+
+                            <!-- BEST SELLER -->
+
+                            <td>
+
+                                ${
+                                    product.is_best_seller
+                                        ? `
+                                            <span
+                                                class="
+                                                    status
+                                                    status-shipped
+                                                "
+                                            >
+                                                ★ Yes
+                                            </span>
+                                        `
+                                        : `
+                                            <span
+                                                style="
+                                                    color:#777;
+                                                    font-size:12px;
+                                                "
+                                            >
+                                                No
+                                            </span>
+                                        `
+                                }
+
+                            </td>
+
+
+                            <!-- ACTIONS -->
+
+                            <td>
 
                                 <div
                                     style="
-                                        color:#fff;
-                                        font-weight:800;
+                                        display:flex;
+                                        gap:7px;
+                                        flex-wrap:wrap;
                                     "
                                 >
-                                    ${escapeHTML(
-                                        product.name ||
-                                        "Unnamed Product"
-                                    )}
-                                </div>
 
-                                <div
-                                    style="
-                                        color:#777;
-                                        font-size:11px;
-                                        margin-top:3px;
-                                    "
-                                >
-                                    ${escapeHTML(
-                                        product.brand ||
-                                        ""
-                                    )}
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                            product.category ||
-                            "—"
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                            product.sport ||
-                            "—"
-                        )}
-                    </td>
-
-                    <td>
-                        <strong
-                            style="color:#ff5a00;"
-                        >
-                            ${formatCurrency(
-                                product.price
-                            )}
-                        </strong>
-                    </td>
-
-                    <td>
-                        ${Number(
-                            product.stock || 0
-                        )}
-                    </td>
-
-                    <td>
-
-                        <span
-                            class="status ${
-                                active
-                                    ? "status-delivered"
-                                    : "status-pending"
-                            }"
-                        >
-                            ${
-                                active
-                                    ? "Active"
-                                    : "Inactive"
-                            }
-                        </span>
-
-                    </td>
-
-                    <td>
-
-                        ${
-                            product.is_best_seller
-                                ? `
-                                    <span
-                                        class="status status-shipped"
-                                    >
-                                        ★ Yes
-                                    </span>
-                                  `
-                                : `
-                                    <span
-                                        style="
-                                            color:#777;
-                                            font-size:12px;
+                                    <button
+                                        class="btn btn-dark"
+                                        type="button"
+                                        onclick="
+                                            editProduct(
+                                                '${escapeHTML(
+                                                    product.id
+                                                )}'
+                                            )
                                         "
                                     >
-                                        No
-                                    </span>
-                                  `
-                        }
+                                        Edit
+                                    </button>
 
-                    </td>
 
-                    <td>
+                                    <button
+                                        class="btn btn-dark"
+                                        type="button"
+                                        onclick="
+                                            toggleProductStatus(
+                                                '${escapeHTML(
+                                                    product.id
+                                                )}'
+                                            )
+                                        "
+                                    >
+                                        ${
+                                            active
+                                                ? "Disable"
+                                                : "Activate"
+                                        }
+                                    </button>
 
-                        <div
-                            style="
-                                display:flex;
-                                gap:7px;
-                                flex-wrap:wrap;
-                            "
-                        >
 
-                            <button
-                                class="btn btn-dark"
-                                type="button"
-                                onclick="editProduct('${escapeHTML(product.id)}')"
-                            >
-                                Edit
-                            </button>
+                                    <button
+                                        class="btn btn-danger"
+                                        type="button"
+                                        onclick="
+                                            deleteProduct(
+                                                '${escapeHTML(
+                                                    product.id
+                                                )}'
+                                            )
+                                        "
+                                    >
+                                        Delete
+                                    </button>
 
-                            <button
-                                class="btn btn-dark"
-                                type="button"
-                                onclick="toggleProductStatus('${escapeHTML(product.id)}')"
-                            >
-                                ${
-                                    active
-                                        ? "Disable"
-                                        : "Activate"
-                                }
-                            </button>
+                                </div>
 
-                            <button
-                                class="btn btn-danger"
-                                type="button"
-                                onclick="deleteProduct('${escapeHTML(product.id)}')"
-                            >
-                                Delete
-                            </button>
+                            </td>
 
-                        </div>
-
-                    </td>
-
-                </tr>
-            `;
-
-        }).join("");
+                        </tr>
+                    `;
+                }
+            )
+            .join("");
 }
+
 
 /* ============================================================
    PRODUCT SEARCH
@@ -1108,6 +2058,16 @@ function initProductSearch() {
         return;
     }
 
+    if (
+        input.dataset.searchReady ===
+        "true"
+    ) {
+        return;
+    }
+
+    input.dataset.searchReady =
+        "true";
+
     input.addEventListener(
         "input",
         () => {
@@ -1116,6 +2076,8 @@ function initProductSearch() {
                 input.value
                     .trim()
                     .toLowerCase();
+
+            /* EMPTY SEARCH */
 
             if (!query) {
 
@@ -1126,6 +2088,8 @@ function initProductSearch() {
                 return;
             }
 
+            /* FILTER */
+
             const filtered =
                 allProducts.filter(
                     product => {
@@ -1135,9 +2099,12 @@ function initProductSearch() {
                                 product.name,
                                 product.category,
                                 product.sport,
-                                product.brand
+                                product.brand,
+                                product.description
                             ]
-                                .filter(Boolean)
+                                .filter(
+                                    Boolean
+                                )
                                 .join(" ")
                                 .toLowerCase();
 
@@ -1154,13 +2121,15 @@ function initProductSearch() {
     );
 }
 
+
 /* ============================================================
-   OPEN ADD PRODUCT
+   OPEN ADD PRODUCT MODAL
 ============================================================ */
 
 function openAddProductModal() {
 
-    currentProductId = null;
+    currentProductId =
+        null;
 
     const form =
         document.getElementById(
@@ -1168,8 +2137,14 @@ function openAddProductModal() {
         );
 
     if (form) {
+
         form.reset();
     }
+
+    updateElement(
+        "productModalTitle",
+        "Add Product"
+    );
 
     const hidden =
         document.getElementById(
@@ -1177,17 +2152,9 @@ function openAddProductModal() {
         );
 
     if (hidden) {
-        hidden.value = "";
-    }
 
-    const title =
-        document.getElementById(
-            "productModalTitle"
-        );
-
-    if (title) {
-        title.textContent =
-            "Add Product";
+        hidden.value =
+            "";
     }
 
     const modal =
@@ -1196,11 +2163,13 @@ function openAddProductModal() {
         );
 
     if (modal) {
+
         modal.classList.add(
             "open"
         );
     }
 }
+
 
 /* ============================================================
    CLOSE PRODUCT MODAL
@@ -1214,19 +2183,24 @@ function closeProductModal() {
         );
 
     if (modal) {
+
         modal.classList.remove(
             "open"
         );
     }
 
-    currentProductId = null;
+    currentProductId =
+        null;
 }
+
 
 /* ============================================================
    EDIT PRODUCT
 ============================================================ */
 
-function editProduct(productId) {
+function editProduct(
+    productId
+) {
 
     const product =
         allProducts.find(
@@ -1248,107 +2222,60 @@ function editProduct(productId) {
     currentProductId =
         product.id;
 
-    const productIdInput =
-        document.getElementById(
-            "productId"
-        );
+    const fields = {
 
-    if (productIdInput) {
-        productIdInput.value =
-            product.id;
-    }
+        productId:
+            product.id,
 
-    const name =
-        document.getElementById(
-            "productName"
-        );
+        productName:
+            product.name || "",
 
-    const sport =
-        document.getElementById(
-            "productSport"
-        );
+        productSport:
+            product.sport || "",
 
-    const category =
-        document.getElementById(
-            "productCategory"
-        );
+        productCategory:
+            product.category || "",
 
-    const description =
-        document.getElementById(
-            "productDescription"
-        );
+        productDescription:
+            product.description || "",
 
-    const price =
-        document.getElementById(
-            "productPrice"
-        );
+        productPrice:
+            product.price ?? "",
 
-    const stock =
-        document.getElementById(
-            "productStock"
-        );
+        productStock:
+            product.stock ?? 0,
 
-    const brand =
-        document.getElementById(
-            "productBrand"
-        );
+        productBrand:
+            product.brand || "",
 
-    const image =
-        document.getElementById(
-            "productImage"
-        );
-
-    if (name) {
-        name.value =
-            product.name || "";
-    }
-
-    if (sport) {
-        sport.value =
-            product.sport || "";
-    }
-
-    if (category) {
-        category.value =
-            product.category || "";
-    }
-
-    if (description) {
-        description.value =
-            product.description || "";
-    }
-
-    if (price) {
-        price.value =
-            product.price ?? "";
-    }
-
-    if (stock) {
-        stock.value =
-            product.stock ?? 0;
-    }
-
-    if (brand) {
-        brand.value =
-            product.brand || "";
-    }
-
-    if (image) {
-        image.value =
+        productImage:
             product.image_url ||
             product.image ||
-            "";
-    }
+            ""
+    };
 
-    const title =
-        document.getElementById(
-            "productModalTitle"
-        );
+    Object.entries(
+        fields
+    ).forEach(
+        ([id, value]) => {
 
-    if (title) {
-        title.textContent =
-            "Edit Product";
-    }
+            const element =
+                document.getElementById(
+                    id
+                );
+
+            if (element) {
+
+                element.value =
+                    value;
+            }
+        }
+    );
+
+    updateElement(
+        "productModalTitle",
+        "Edit Product"
+    );
 
     const modal =
         document.getElementById(
@@ -1356,19 +2283,26 @@ function editProduct(productId) {
         );
 
     if (modal) {
+
         modal.classList.add(
             "open"
         );
     }
 }
 
+
 /* ============================================================
    SAVE PRODUCT
 ============================================================ */
 
-async function saveProduct(event) {
+async function saveProduct(
+    event
+) {
 
-    event.preventDefault();
+    if (event) {
+
+        event.preventDefault();
+    }
 
     if (!currentUser) {
 
@@ -1380,49 +2314,87 @@ async function saveProduct(event) {
         return;
     }
 
-    const name =
-        document.getElementById(
-            "productName"
-        )?.value.trim();
-
-    const sport =
-        document.getElementById(
-            "productSport"
-        )?.value.trim();
-
-    const category =
-        document.getElementById(
-            "productCategory"
-        )?.value.trim();
-
-    const description =
-        document.getElementById(
-            "productDescription"
-        )?.value.trim();
-
-    const price =
-        Number(
-            document.getElementById(
-                "productPrice"
-            )?.value || 0
+    const isEditing =
+        Boolean(
+            currentProductId
         );
 
-    const stock =
-        Number(
-            document.getElementById(
-                "productStock"
-            )?.value || 0
+    const getValue =
+        id => {
+
+            const element =
+                document.getElementById(
+                    id
+                );
+
+            return (
+                element?.value ||
+                ""
+            )
+                .trim();
+        };
+
+
+    /* BASIC FIELDS */
+
+    const name =
+        getValue(
+            "productName"
+        );
+
+    const sport =
+        getValue(
+            "productSport"
+        );
+
+    const category =
+        getValue(
+            "productCategory"
+        );
+
+    const description =
+        getValue(
+            "productDescription"
         );
 
     const brand =
-        document.getElementById(
+        getValue(
             "productBrand"
-        )?.value.trim();
+        );
 
     const image =
-        document.getElementById(
+        getValue(
             "productImage"
-        )?.value.trim();
+        );
+
+
+    /* PRICE */
+
+    const price =
+        Number(
+            document
+                .getElementById(
+                    "productPrice"
+                )
+                ?.value ||
+            0
+        );
+
+
+    /* STOCK */
+
+    const stock =
+        Number(
+            document
+                .getElementById(
+                    "productStock"
+                )
+                ?.value ||
+            0
+        );
+
+
+    /* VALIDATION */
 
     if (!name) {
 
@@ -1444,70 +2416,86 @@ async function saveProduct(event) {
         return;
     }
 
-    if (price < 0) {
+    if (
+        !Number.isFinite(
+            price
+        ) ||
+        price < 0
+    ) {
 
         showToast(
-            "Price cannot be negative.",
+            "Please enter a valid price.",
             "error"
         );
 
         return;
     }
 
-    if (stock < 0) {
+    if (
+        !Number.isInteger(
+            stock
+        ) ||
+        stock < 0
+    ) {
 
         showToast(
-            "Stock cannot be negative.",
+            "Please enter a valid stock quantity.",
             "error"
         );
 
         return;
     }
+
+
+    /* PAYLOAD */
 
     const payload = {
 
-        name: name,
+        name,
 
         description:
-            description || null,
+            description ||
+            null,
 
-        sport: sport,
+        sport,
 
         category:
-            category || null,
+            category ||
+            null,
 
         brand:
-            brand || null,
+            brand ||
+            null,
 
-        price: price,
+        price,
 
-        stock: stock,
+        stock,
 
         image_url:
-            image || null,
-
-        is_active: true,
-
-        is_best_seller: false
+            image ||
+            null
     };
+
 
     try {
 
         let result;
 
-        if (currentProductId) {
 
-            /*
-             * Security:
-             * Update only if this product belongs
-             * to the current seller.
-             */
+        /* ====================================================
+           UPDATE
+        ==================================================== */
+
+        if (isEditing) {
 
             result =
                 await withTimeout(
+
                     supabaseClient
                         .from("products")
-                        .update(payload)
+                        .update(
+                            payload
+                        )
                         .eq(
                             "id",
                             currentProductId
@@ -1516,43 +2504,76 @@ async function saveProduct(event) {
                             "seller_id",
                             currentUser.id
                         ),
+
                     DATA_TIMEOUT,
+
                     "Product update timed out."
                 );
 
-        } else {
+        }
+
+
+        /* ====================================================
+           INSERT
+        ==================================================== */
+
+        else {
 
             payload.seller_id =
                 currentUser.id;
 
+            payload.is_active =
+                true;
+
+            payload.is_best_seller =
+                false;
+
             result =
                 await withTimeout(
+
                     supabaseClient
                         .from("products")
                         .insert(
                             payload
                         ),
+
                     DATA_TIMEOUT,
+
                     "Product creation timed out."
                 );
         }
 
+
+        /* SUPABASE ERROR */
+
         if (result.error) {
+
             throw result.error;
         }
 
+
+        /* CLOSE */
+
         closeProductModal();
 
+
+        /* MESSAGE */
+
         showToast(
-            currentProductId
+
+            isEditing
                 ? "Product updated successfully."
                 : "Product added successfully.",
+
             "success"
         );
 
+
+        /* REFRESH */
+
         await loadProducts();
 
-        await loadDashboardStats();
+        updateDashboardStats();
 
     } catch (error) {
 
@@ -1568,6 +2589,7 @@ async function saveProduct(event) {
         );
     }
 }
+
 
 /* ============================================================
    TOGGLE PRODUCT STATUS
@@ -1594,18 +2616,23 @@ async function toggleProductStatus(
         return;
     }
 
+
     const newValue =
         product.is_active === false;
+
 
     try {
 
         const result =
             await withTimeout(
+
                 supabaseClient
                     .from("products")
                     .update({
+
                         is_active:
                             newValue
+
                     })
                     .eq(
                         "id",
@@ -1615,36 +2642,46 @@ async function toggleProductStatus(
                         "seller_id",
                         currentUser.id
                     ),
+
                 DATA_TIMEOUT,
+
                 "Product status update timed out."
             );
 
+
         if (result.error) {
+
             throw result.error;
         }
 
+
         showToast(
+
             newValue
                 ? "Product activated."
                 : "Product disabled.",
+
             "success"
         );
+
 
         await loadProducts();
 
     } catch (error) {
 
         console.error(
-            "Toggle product status error:",
+            "Toggle product error:",
             error
         );
 
         showToast(
+            error?.message ||
             "Failed to update product.",
             "error"
         );
     }
 }
+
 
 /* ============================================================
    DELETE PRODUCT
@@ -1662,22 +2699,37 @@ async function deleteProduct(
         );
 
     if (!product) {
+
+        showToast(
+            "Product not found.",
+            "error"
+        );
+
         return;
     }
 
+
     const confirmed =
         window.confirm(
-            `Delete "${product.name || "this product"}"?`
+
+            `Delete "${
+                product.name ||
+                "this product"
+            }"?`
+
         );
+
 
     if (!confirmed) {
         return;
     }
 
+
     try {
 
         const result =
             await withTimeout(
+
                 supabaseClient
                     .from("products")
                     .delete()
@@ -1689,22 +2741,28 @@ async function deleteProduct(
                         "seller_id",
                         currentUser.id
                     ),
+
                 DATA_TIMEOUT,
+
                 "Product deletion timed out."
             );
 
+
         if (result.error) {
+
             throw result.error;
         }
+
 
         showToast(
             "Product deleted successfully.",
             "success"
         );
 
+
         await loadProducts();
 
-        await loadDashboardStats();
+        updateDashboardStats();
 
     } catch (error) {
 
@@ -1720,6 +2778,304 @@ async function deleteProduct(
         );
     }
 }
+
+
+/* ============================================================
+   PRODUCT MODAL EVENTS
+============================================================ */
+
+function initProductModal() {
+
+    const form =
+        document.getElementById(
+            "productForm"
+        );
+
+    if (
+        form &&
+        form.dataset.productFormReady !==
+        "true"
+    ) {
+
+        form.dataset.productFormReady =
+            "true";
+
+        form.addEventListener(
+            "submit",
+            saveProduct
+        );
+    }
+
+
+    const addButtons =
+        document.querySelectorAll(
+            "[data-add-product], #addProductBtn, #openAddProductBtn"
+        );
+
+    addButtons.forEach(
+        button => {
+
+            if (
+                button.dataset
+                    .addProductReady ===
+                "true"
+            ) {
+                return;
+            }
+
+            button.dataset
+                .addProductReady =
+                "true";
+
+            button.type =
+                "button";
+
+            button.addEventListener(
+                "click",
+                event => {
+
+                    event.preventDefault();
+
+                    openAddProductModal();
+                }
+            );
+        }
+    );
+
+
+    const closeButtons =
+        document.querySelectorAll(
+            "[data-close-product], #closeProductModalBtn, #cancelProductBtn"
+        );
+
+    closeButtons.forEach(
+        button => {
+
+            if (
+                button.dataset
+                    .closeProductReady ===
+                "true"
+            ) {
+                return;
+            }
+
+            button.dataset
+                .closeProductReady =
+                "true";
+
+            button.type =
+                "button";
+
+            button.addEventListener(
+                "click",
+                event => {
+
+                    event.preventDefault();
+
+                    closeProductModal();
+                }
+            );
+        }
+    );
+
+
+    /* CLOSE WHEN CLICKING BACKDROP */
+
+    const modal =
+        document.getElementById(
+            "productModal"
+        );
+
+    if (
+        modal &&
+        modal.dataset.backdropReady !==
+        "true"
+    ) {
+
+        modal.dataset.backdropReady =
+            "true";
+
+        modal.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target ===
+                    modal
+                ) {
+
+                    closeProductModal();
+                }
+            }
+        );
+    }
+}
+
+
+/* ============================================================
+   EXPORT PRODUCT FUNCTIONS
+============================================================ */
+
+window.loadProducts =
+    loadProducts;
+
+window.renderProducts =
+    renderProducts;
+
+window.initProductSearch =
+    initProductSearch;
+
+window.openAddProductModal =
+    openAddProductModal;
+
+window.closeProductModal =
+    closeProductModal;
+
+window.editProduct =
+    editProduct;
+
+window.saveProduct =
+    saveProduct;
+
+window.toggleProductStatus =
+    toggleProductStatus;
+
+window.deleteProduct =
+    deleteProduct;
+
+window.initProductModal =
+    initProductModal;
+
+
+/* ============================================================
+   END PART 2
+============================================================ */
+/* ============================================================
+   KHELZONE SELLER DASHBOARD
+   PART 3 / 4
+   ORDERS + ORDER DETAILS + STATUS
+============================================================ */
+
+
+/* ============================================================
+   ORDER ITEM HELPERS
+============================================================ */
+
+function getItemQuantity(item) {
+
+    return Number(
+        item?.quantity || 0
+    );
+}
+
+
+function getItemPrice(item) {
+
+    return Number(
+        item?.price ??
+        item?.unit_price ??
+        0
+    );
+}
+
+
+function getItemProductName(item) {
+
+    return (
+        item?.product_name ||
+        item?.name ||
+        item?.product?.name ||
+        "Product"
+    );
+}
+
+
+/* ============================================================
+   CUSTOMER HELPERS
+============================================================ */
+
+function getCustomerName(order) {
+
+    return (
+        order?.shipping_name ||
+        order?.customer_name ||
+        order?.customerName ||
+        order?.name ||
+        "Customer"
+    );
+}
+
+
+function getCustomerEmail(order) {
+
+    return (
+        order?.shipping_email ||
+        order?.customer_email ||
+        order?.customerEmail ||
+        order?.email ||
+        "—"
+    );
+}
+
+
+function getCustomerPhone(order) {
+
+    return (
+        order?.shipping_phone ||
+        order?.customer_phone ||
+        order?.customerPhone ||
+        order?.phone ||
+        order?.contact_no ||
+        order?.contactNo ||
+        order?.mobile ||
+        "—"
+    );
+}
+
+
+function getOrderNumber(order) {
+
+    return (
+        order?.order_number ||
+        order?.orderNumber ||
+        order?.id ||
+        "—"
+    );
+}
+
+
+/* ============================================================
+   SELLER ORDER TOTAL
+============================================================ */
+
+function getSellerOrderTotal(order) {
+
+    const items =
+        Array.isArray(
+            order?.seller_items
+        )
+            ? order.seller_items
+            : [];
+
+    return items.reduce(
+        (
+            sum,
+            item
+        ) => {
+
+            return (
+                sum +
+                (
+                    getItemQuantity(item) *
+                    getItemPrice(item)
+                )
+            );
+
+        },
+        0
+    );
+}
+
 
 /* ============================================================
    LOAD ORDER ITEMS
@@ -1737,6 +3093,7 @@ async function loadOrderItems() {
 
         const result =
             await withTimeout(
+
                 supabaseClient
                     .from("order_items")
                     .select("*")
@@ -1750,25 +3107,33 @@ async function loadOrderItems() {
                             ascending: false
                         }
                     ),
+
                 DATA_TIMEOUT,
+
                 "Order items request timed out."
             );
 
+
         if (result.error) {
+
             throw result.error;
         }
 
+
         allOrderItems =
-            Array.isArray(result.data)
+            Array.isArray(
+                result.data
+            )
                 ? result.data
                 : [];
+
 
         return allOrderItems;
 
     } catch (error) {
 
         console.error(
-            "Load order items error:",
+            "Order items error:",
             error
         );
 
@@ -1777,6 +3142,7 @@ async function loadOrderItems() {
         return [];
     }
 }
+
 
 /* ============================================================
    LOAD ORDERS
@@ -1789,6 +3155,7 @@ async function loadOrders() {
             "ordersTableBody"
         );
 
+
     if (tbody) {
 
         showTableMessage(
@@ -1798,23 +3165,31 @@ async function loadOrders() {
         );
     }
 
+
     if (!currentUser) {
+
+        allOrders = [];
+
+        renderOrders([]);
+
+        renderRecentOrders([]);
+
         return;
     }
 
+
     try {
 
-        /*
-         * First get this seller's order_items.
-         */
+        /* GET SELLER ORDER ITEMS */
 
         await loadOrderItems();
 
+
+        /* NO ITEMS */
+
         if (
-            !Array.isArray(
-                allOrderItems
-            ) ||
-            allOrderItems.length === 0
+            allOrderItems.length ===
+            0
         ) {
 
             allOrders = [];
@@ -1828,16 +3203,29 @@ async function loadOrders() {
             return;
         }
 
+
+        /* GET UNIQUE ORDER IDS */
+
         const orderIds =
             [
                 ...new Set(
+
                     allOrderItems
-                        .map(item => item.order_id)
-                        .filter(Boolean)
+                        .map(
+                            item =>
+                                item.order_id
+                        )
+                        .filter(
+                            Boolean
+                        )
                 )
             ];
 
-        if (orderIds.length === 0) {
+
+        if (
+            orderIds.length ===
+            0
+        ) {
 
             allOrders = [];
 
@@ -1848,12 +3236,12 @@ async function loadOrders() {
             return;
         }
 
-        /*
-         * Then get only those orders.
-         */
+
+        /* LOAD ORDERS */
 
         const result =
             await withTimeout(
+
                 supabaseClient
                     .from("orders")
                     .select("*")
@@ -1867,171 +3255,124 @@ async function loadOrders() {
                             ascending: false
                         }
                     ),
+
                 DATA_TIMEOUT,
+
                 "Orders request timed out."
             );
 
+
         if (result.error) {
+
             throw result.error;
         }
 
-        allOrders =
-            Array.isArray(result.data)
+
+        const orders =
+            Array.isArray(
+                result.data
+            )
                 ? result.data
                 : [];
 
-        /*
-         * Attach seller's items to each order.
-         */
+
+        /* ATTACH SELLER ITEMS */
 
         allOrders =
-            allOrders.map(order => {
+            orders.map(
+                order => {
 
-                const items =
-                    allOrderItems.filter(
-                        item =>
-                            String(
-                                item.order_id
-                            ) ===
-                            String(order.id)
-                    );
+                    const sellerItems =
+                        allOrderItems.filter(
+                            item =>
+                                String(
+                                    item.order_id
+                                ) ===
+                                String(
+                                    order.id
+                                )
+                        );
 
-                return {
-                    ...order,
-                    seller_items:
-                        items
-                };
-            });
+
+                    return {
+
+                        ...order,
+
+                        seller_items:
+                            sellerItems
+                    };
+                }
+            );
+
+
+        /* RENDER */
 
         renderOrders(
             allOrders
         );
 
+
         renderRecentOrders(
             allOrders
         );
+
 
         updateDashboardStats();
 
     } catch (error) {
 
         console.error(
-            "Load seller orders error:",
+            "Load orders error:",
             error
         );
+
+
+        allOrders = [];
+
 
         if (tbody) {
 
             showTableMessage(
                 tbody,
                 11,
-                "Failed to load orders."
+                "Failed to load orders: " +
+                (
+                    error?.message ||
+                    "Unknown error"
+                )
             );
         }
+
+
+        renderRecentOrders([]);
+
+        showToast(
+            error?.message ||
+            "Failed to load orders.",
+            "error"
+        );
     }
 }
 
-/* ============================================================
-   GET CUSTOMER NAME
-============================================================ */
-
-function getCustomerName(order) {
-
-    return (
-        order.shipping_name ||
-        order.customer_name ||
-        order.name ||
-        "Customer"
-    );
-}
-
-/* ============================================================
-   GET CUSTOMER EMAIL
-============================================================ */
-
-function getCustomerEmail(order) {
-
-    return (
-        order.customer_email ||
-        order.email ||
-        "—"
-    );
-}
-
-/* ============================================================
-   GET CUSTOMER PHONE
-============================================================ */
-
-function getCustomerPhone(order) {
-
-    return (
-        order.shipping_phone ||
-        order.phone ||
-        "—"
-    );
-}
-
-/* ============================================================
-   GET ORDER NUMBER
-============================================================ */
-
-function getOrderNumber(order) {
-
-    return (
-        order.order_number ||
-        order.id ||
-        "—"
-    );
-}
-
-/* ============================================================
-   GET SELLER ORDER TOTAL
-============================================================ */
-
-function getSellerOrderTotal(order) {
-
-    const items =
-        Array.isArray(
-            order.seller_items
-        )
-            ? order.seller_items
-            : [];
-
-    return items.reduce(
-        (sum, item) => {
-
-            const quantity =
-                Number(
-                    item.quantity || 0
-                );
-
-            const price =
-                Number(
-                    item.price || 0
-                );
-
-            return sum +
-                (quantity * price);
-
-        },
-        0
-    );
-}
 
 /* ============================================================
    RENDER ORDERS
 ============================================================ */
 
-function renderOrders(orders) {
+function renderOrders(
+    orders
+) {
 
     const tbody =
         document.getElementById(
             "ordersTableBody"
         );
 
+
     if (!tbody) {
         return;
     }
+
 
     if (
         !Array.isArray(orders) ||
@@ -2047,159 +3388,388 @@ function renderOrders(orders) {
         return;
     }
 
-    let rows = [];
 
-    orders.forEach(order => {
+    const rows = [];
 
-        const items =
-            Array.isArray(
-                order.seller_items
-            )
-                ? order.seller_items
-                : [];
 
-        if (items.length === 0) {
-            return;
-        }
+    orders.forEach(
+        order => {
 
-        items.forEach(item => {
+            const items =
+                Array.isArray(
+                    order.seller_items
+                )
+                    ? order.seller_items
+                    : [];
 
-            const quantity =
-                Number(
-                    item.quantity || 0
-                );
 
-            const price =
-                Number(
-                    item.price || 0
-                );
+            /* FALLBACK ROW */
 
-            const lineTotal =
-                quantity * price;
+            if (
+                items.length === 0
+            ) {
 
-            rows.push(`
-                <tr>
+                rows.push(`
+                    <tr>
 
-                    <td>
-                        <strong
-                            style="color:#ff5a00;"
-                        >
-                            ${escapeHTML(
-                                String(
-                                    getOrderNumber(
-                                        order
+                        <td>
+                            <strong
+                                style="color:#ff5a00;"
+                            >
+                                ${escapeHTML(
+                                    String(
+                                        getOrderNumber(
+                                            order
+                                        )
+                                    ).slice(
+                                        0,
+                                        20
                                     )
-                                ).slice(0, 12)
-                            )}
-                        </strong>
-                    </td>
+                                )}
+                            </strong>
+                        </td>
 
-                    <td>
-                        ${escapeHTML(
-                            getCustomerName(
-                                order
-                            )
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                            getCustomerEmail(
-                                order
-                            )
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                            getCustomerPhone(
-                                order
-                            )
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                            item.product_name ||
-                            "Product"
-                        )}
-                    </td>
-
-                    <td>
-                        ${quantity}
-                    </td>
-
-                    <td>
-                        ${formatCurrency(
-                            price
-                        )}
-                    </td>
-
-                    <td>
-                        <strong>
-                            ${formatCurrency(
-                                lineTotal
-                            )}
-                        </strong>
-                    </td>
-
-                    <td>
-
-                        <span
-                            class="status ${getStatusClass(
-                                order.status
-                            )}"
-                        >
+                        <td>
                             ${escapeHTML(
-                                formatStatus(
-                                    order.status
+                                getCustomerName(
+                                    order
                                 )
                             )}
-                        </span>
+                        </td>
 
-                    </td>
+                        <td>
+                            ${escapeHTML(
+                                getCustomerEmail(
+                                    order
+                                )
+                            )}
+                        </td>
 
-                    <td>
-                        ${formatDate(
-                            order.created_at
-                        )}
-                    </td>
+                        <td>
+                            ${escapeHTML(
+                                getCustomerPhone(
+                                    order
+                                )
+                            )}
+                        </td>
 
-                    <td>
+                        <td>
+                            —
+                        </td>
 
-                        <div
-                            style="
-                                display:flex;
-                                gap:7px;
-                            "
-                        >
+                        <td>
+                            0
+                        </td>
 
-                            <button
-                                type="button"
-                                class="btn btn-dark"
-                                onclick="viewOrder('${escapeHTML(order.id)}')"
+                        <td>
+                            ${formatCurrency(0)}
+                        </td>
+
+                        <td>
+                            ${formatCurrency(0)}
+                        </td>
+
+                        <td>
+                            <span
+                                class="
+                                    status
+                                    ${getStatusClass(
+                                        order.status
+                                    )}
+                                "
                             >
-                                View
-                            </button>
+                                ${escapeHTML(
+                                    formatStatus(
+                                        order.status
+                                    )
+                                )}
+                            </span>
+                        </td>
 
-                            <button
-                                type="button"
-                                class="btn btn-orange"
-                                onclick="changeOrderStatus('${escapeHTML(order.id)}')"
+                        <td>
+                            ${formatDate(
+                                order.created_at
+                            )}
+                        </td>
+
+                        <td>
+
+                            <div
+                                style="
+                                    display:flex;
+                                    gap:7px;
+                                    flex-wrap:wrap;
+                                "
                             >
-                                Status
-                            </button>
 
-                        </div>
+                                <button
+                                    type="button"
+                                    class="btn btn-dark"
+                                    onclick="
+                                        viewOrder(
+                                            '${escapeHTML(
+                                                order.id
+                                            )}'
+                                        )
+                                    "
+                                >
+                                    View
+                                </button>
 
-                    </td>
+                                <button
+                                    type="button"
+                                    class="btn btn-orange"
+                                    onclick="
+                                        changeOrderStatus(
+                                            '${escapeHTML(
+                                                order.id
+                                            )}'
+                                        )
+                                    "
+                                >
+                                    Status
+                                </button>
 
-                </tr>
-            `);
-        });
-    });
+                            </div>
 
-    if (rows.length === 0) {
+                        </td>
+
+                    </tr>
+                `);
+
+                return;
+            }
+
+
+            /* NORMAL ITEM ROWS */
+
+            items.forEach(
+                item => {
+
+                    const quantity =
+                        getItemQuantity(
+                            item
+                        );
+
+                    const price =
+                        getItemPrice(
+                            item
+                        );
+
+                    const lineTotal =
+                        quantity *
+                        price;
+
+
+                    rows.push(`
+
+                        <tr>
+
+                            <!-- ORDER -->
+
+                            <td>
+
+                                <strong
+                                    style="
+                                        color:#ff5a00;
+                                    "
+                                >
+                                    ${escapeHTML(
+                                        String(
+                                            getOrderNumber(
+                                                order
+                                            )
+                                        ).slice(
+                                            0,
+                                            20
+                                        )
+                                    )}
+                                </strong>
+
+                            </td>
+
+
+                            <!-- CUSTOMER -->
+
+                            <td>
+
+                                ${escapeHTML(
+                                    getCustomerName(
+                                        order
+                                    )
+                                )}
+
+                            </td>
+
+
+                            <!-- EMAIL -->
+
+                            <td>
+
+                                ${escapeHTML(
+                                    getCustomerEmail(
+                                        order
+                                    )
+                                )}
+
+                            </td>
+
+
+                            <!-- CONTACT -->
+
+                            <td>
+
+                                ${escapeHTML(
+                                    getCustomerPhone(
+                                        order
+                                    )
+                                )}
+
+                            </td>
+
+
+                            <!-- PRODUCT -->
+
+                            <td>
+
+                                ${escapeHTML(
+                                    getItemProductName(
+                                        item
+                                    )
+                                )}
+
+                            </td>
+
+
+                            <!-- QTY -->
+
+                            <td>
+
+                                ${quantity}
+
+                            </td>
+
+
+                            <!-- PRICE -->
+
+                            <td>
+
+                                ${formatCurrency(
+                                    price
+                                )}
+
+                            </td>
+
+
+                            <!-- TOTAL -->
+
+                            <td>
+
+                                <strong
+                                    style="
+                                        color:#fff;
+                                    "
+                                >
+                                    ${formatCurrency(
+                                        lineTotal
+                                    )}
+                                </strong>
+
+                            </td>
+
+
+                            <!-- STATUS -->
+
+                            <td>
+
+                                <span
+                                    class="
+                                        status
+                                        ${getStatusClass(
+                                            order.status
+                                        )}
+                                    "
+                                >
+
+                                    ${escapeHTML(
+                                        formatStatus(
+                                            order.status
+                                        )
+                                    )}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- DATE -->
+
+                            <td>
+
+                                ${formatDate(
+                                    order.created_at
+                                )}
+
+                            </td>
+
+
+                            <!-- ACTIONS -->
+
+                            <td>
+
+                                <div
+                                    style="
+                                        display:flex;
+                                        gap:7px;
+                                        flex-wrap:wrap;
+                                    "
+                                >
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-dark"
+                                        onclick="
+                                            viewOrder(
+                                                '${escapeHTML(
+                                                    order.id
+                                                )}'
+                                            )
+                                        "
+                                    >
+                                        View
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-orange"
+                                        onclick="
+                                            changeOrderStatus(
+                                                '${escapeHTML(
+                                                    order.id
+                                                )}'
+                                            )
+                                        "
+                                    >
+                                        Status
+                                    </button>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    `);
+                }
+            );
+        }
+    );
+
+
+    if (
+        rows.length === 0
+    ) {
 
         showTableMessage(
             tbody,
@@ -2210,9 +3780,11 @@ function renderOrders(orders) {
         return;
     }
 
+
     tbody.innerHTML =
         rows.join("");
 }
+
 
 /* ============================================================
    RECENT ORDERS
@@ -2227,9 +3799,11 @@ function renderRecentOrders(
             "recentOrdersBody"
         );
 
+
     if (!tbody) {
         return;
     }
+
 
     if (
         !Array.isArray(orders) ||
@@ -2245,105 +3819,155 @@ function renderRecentOrders(
         return;
     }
 
-    const recent =
-        orders.slice(0, 5);
 
-    let rows = [];
+    const rows = [];
 
-    recent.forEach(order => {
 
-        const items =
-            Array.isArray(
-                order.seller_items
-            )
-                ? order.seller_items
-            : [];
+    orders
+        .slice(0, 5)
+        .forEach(
+            order => {
 
-        if (items.length === 0) {
-            return;
-        }
+                const items =
+                    Array.isArray(
+                        order.seller_items
+                    )
+                        ? order.seller_items
+                        : [];
 
-        const item =
-            items[0];
 
-        const quantity =
-            Number(
-                item.quantity || 0
-            );
+                if (
+                    items.length === 0
+                ) {
+                    return;
+                }
 
-        const price =
-            Number(
-                item.price || 0
-            );
 
-        const total =
-            quantity * price;
+                const item =
+                    items[0];
 
-        rows.push(`
-            <tr>
 
-                <td>
-                    ${escapeHTML(
-                        String(
-                            getOrderNumber(
-                                order
-                            )
-                        ).slice(0, 12)
-                    )}
-                </td>
+                const quantity =
+                    getItemQuantity(
+                        item
+                    );
 
-                <td>
-                    ${escapeHTML(
-                        getCustomerName(
-                            order
-                        )
-                    )}
-                </td>
 
-                <td>
-                    ${escapeHTML(
-                        item.product_name ||
-                        "Product"
-                    )}
-                </td>
+                const price =
+                    getItemPrice(
+                        item
+                    );
 
-                <td>
-                    ${quantity}
-                </td>
 
-                <td>
-                    ${formatCurrency(
-                        total
-                    )}
-                </td>
+                const total =
+                    quantity *
+                    price;
 
-                <td>
 
-                    <span
-                        class="status ${getStatusClass(
-                            order.status
-                        )}"
-                    >
-                        ${escapeHTML(
-                            formatStatus(
-                                order.status
-                            )
-                        )}
-                    </span>
+                rows.push(`
 
-                </td>
+                    <tr>
 
-                <td>
-                    ${formatDate(
-                        order.created_at
-                    )}
-                </td>
+                        <td>
 
-            </tr>
-        `);
-    });
+                            ${escapeHTML(
+                                String(
+                                    getOrderNumber(
+                                        order
+                                    )
+                                ).slice(
+                                    0,
+                                    20
+                                )
+                            )}
 
-    if (rows.length === 0) {
+                        </td>
+
+
+                        <td>
+
+                            ${escapeHTML(
+                                getCustomerName(
+                                    order
+                                )
+                            )}
+
+                        </td>
+
+
+                        <td>
+
+                            ${escapeHTML(
+                                getItemProductName(
+                                    item
+                                )
+                            )}
+
+                        </td>
+
+
+                        <td>
+
+                            ${quantity}
+
+                        </td>
+
+
+                        <td>
+
+                            <strong
+                                style="
+                                    color:#ff5a00;
+                                "
+                            >
+                                ${formatCurrency(
+                                    total
+                                )}
+                            </strong>
+
+                        </td>
+
+
+                        <td>
+
+                            <span
+                                class="
+                                    status
+                                    ${getStatusClass(
+                                        order.status
+                                    )}
+                                "
+                            >
+
+                                ${escapeHTML(
+                                    formatStatus(
+                                        order.status
+                                    )
+                                )}
+
+                            </span>
+
+                        </td>
+
+
+                        <td>
+
+                            ${formatDate(
+                                order.created_at
+                            )}
+
+                        </td>
+
+                    </tr>
+
+                `);
+            }
+        );
+
+
+    if (
+        rows.length === 0
+    ) {
 
         showTableMessage(
             tbody,
@@ -2354,15 +3978,19 @@ function renderRecentOrders(
         return;
     }
 
+
     tbody.innerHTML =
         rows.join("");
 }
 
+
 /* ============================================================
-   VIEW ORDER
+   VIEW ORDER DETAILS
 ============================================================ */
 
-function viewOrder(orderId) {
+function viewOrder(
+    orderId
+) {
 
     const order =
         allOrders.find(
@@ -2370,6 +3998,7 @@ function viewOrder(orderId) {
                 String(item.id) ===
                 String(orderId)
         );
+
 
     if (!order) {
 
@@ -2381,19 +4010,32 @@ function viewOrder(orderId) {
         return;
     }
 
+
     const modal =
         document.getElementById(
             "orderModal"
         );
+
 
     const body =
         document.getElementById(
             "orderModalBody"
         );
 
-    if (!modal || !body) {
+
+    if (
+        !modal ||
+        !body
+    ) {
+
+        showToast(
+            "Order details modal is missing.",
+            "error"
+        );
+
         return;
     }
+
 
     const items =
         Array.isArray(
@@ -2402,110 +4044,131 @@ function viewOrder(orderId) {
             ? order.seller_items
             : [];
 
-    let itemsHTML =
-        items.map(item => {
-
-            const quantity =
-                Number(
-                    item.quantity || 0
-                );
-
-            const price =
-                Number(
-                    item.price || 0
-                );
-
-            return `
-                <div
-                    style="
-                        background:#141414;
-                        border:1px solid rgba(255,255,255,.06);
-                        border-radius:10px;
-                        padding:13px;
-                        margin-bottom:10px;
-                    "
-                >
-
-                    <div
-                        style="
-                            display:flex;
-                            justify-content:space-between;
-                            gap:15px;
-                        "
-                    >
-
-                        <div>
-
-                            <div
-                                style="
-                                    color:#fff;
-                                    font-weight:800;
-                                "
-                            >
-                                ${escapeHTML(
-                                    item.product_name ||
-                                    "Product"
-                                )}
-                            </div>
-
-                            <div
-                                style="
-                                    color:#777;
-                                    font-size:12px;
-                                    margin-top:4px;
-                                "
-                            >
-                                Quantity:
-                                ${quantity}
-                            </div>
-
-                        </div>
-
-                        <div
-                            style="
-                                color:#ff5a00;
-                                font-weight:900;
-                            "
-                        >
-                            ${formatCurrency(
-                                quantity *
-                                price
-                            )}
-                        </div>
-
-                    </div>
-
-                    <div
-                        style="
-                            color:#888;
-                            font-size:11px;
-                            margin-top:7px;
-                        "
-                    >
-                        Unit price:
-                        ${formatCurrency(price)}
-                    </div>
-
-                </div>
-            `;
-
-        }).join("");
-
-    if (!itemsHTML) {
-        itemsHTML =
-            `<div style="color:#777;">No items.</div>`;
-    }
 
     const sellerTotal =
         getSellerOrderTotal(
             order
         );
 
+
+    const itemsHTML =
+        items
+            .map(
+                item => {
+
+                    const quantity =
+                        getItemQuantity(
+                            item
+                        );
+
+                    const price =
+                        getItemPrice(
+                            item
+                        );
+
+                    const productName =
+                        getItemProductName(
+                            item
+                        );
+
+
+                    return `
+
+                        <div
+                            style="
+                                background:#141414;
+                                border:1px solid rgba(255,255,255,.06);
+                                border-radius:10px;
+                                padding:13px;
+                                margin-bottom:10px;
+                            "
+                        >
+
+                            <div
+                                style="
+                                    display:flex;
+                                    justify-content:space-between;
+                                    gap:15px;
+                                "
+                            >
+
+                                <div>
+
+                                    <div
+                                        style="
+                                            color:#fff;
+                                            font-weight:800;
+                                        "
+                                    >
+                                        ${escapeHTML(
+                                            productName
+                                        )}
+                                    </div>
+
+                                    <div
+                                        style="
+                                            color:#777;
+                                            font-size:12px;
+                                            margin-top:4px;
+                                        "
+                                    >
+                                        Quantity:
+                                        ${quantity}
+                                    </div>
+
+                                </div>
+
+
+                                <div
+                                    style="
+                                        color:#ff5a00;
+                                        font-weight:900;
+                                        white-space:nowrap;
+                                    "
+                                >
+
+                                    ${formatCurrency(
+                                        quantity *
+                                        price
+                                    )}
+
+                                </div>
+
+                            </div>
+
+
+                            <div
+                                style="
+                                    color:#888;
+                                    font-size:11px;
+                                    margin-top:7px;
+                                "
+                            >
+
+                                Unit price:
+                                ${formatCurrency(
+                                    price
+                                )}
+
+                            </div>
+
+                        </div>
+
+                    `;
+                }
+            )
+            .join("");
+
+
     body.innerHTML = `
+
+        <!-- CUSTOMER INFORMATION -->
 
         <div
             class="detail-grid"
-            style="margin-bottom:20px;"
+            style="
+                margin-bottom:20px;
+            "
         >
 
             <div class="detail-item">
@@ -2524,6 +4187,7 @@ function viewOrder(orderId) {
 
             </div>
 
+
             <div class="detail-item">
 
                 <div class="detail-label">
@@ -2533,9 +4197,12 @@ function viewOrder(orderId) {
                 <div class="detail-value">
 
                     <span
-                        class="status ${getStatusClass(
-                            order.status
-                        )}"
+                        class="
+                            status
+                            ${getStatusClass(
+                                order.status
+                            )}
+                        "
                     >
                         ${escapeHTML(
                             formatStatus(
@@ -2547,6 +4214,7 @@ function viewOrder(orderId) {
                 </div>
 
             </div>
+
 
             <div class="detail-item">
 
@@ -2564,6 +4232,7 @@ function viewOrder(orderId) {
 
             </div>
 
+
             <div class="detail-item">
 
                 <div class="detail-label">
@@ -2579,6 +4248,7 @@ function viewOrder(orderId) {
                 </div>
 
             </div>
+
 
             <div class="detail-item">
 
@@ -2596,6 +4266,7 @@ function viewOrder(orderId) {
 
             </div>
 
+
             <div class="detail-item">
 
                 <div class="detail-label">
@@ -2605,11 +4276,13 @@ function viewOrder(orderId) {
                 <div class="detail-value">
                     ${escapeHTML(
                         order.shipping_city ||
+                        order.city ||
                         "—"
                     )}
                 </div>
 
             </div>
+
 
             <div class="detail-item">
 
@@ -2620,11 +4293,13 @@ function viewOrder(orderId) {
                 <div class="detail-value">
                     ${escapeHTML(
                         order.payment_method ||
+                        order.paymentMethod ||
                         "—"
                     )}
                 </div>
 
             </div>
+
 
             <div class="detail-item">
 
@@ -2634,7 +4309,9 @@ function viewOrder(orderId) {
 
                 <div
                     class="detail-value"
-                    style="color:#ff5a00;"
+                    style="
+                        color:#ff5a00;
+                    "
                 >
                     ${formatCurrency(
                         sellerTotal
@@ -2645,9 +4322,14 @@ function viewOrder(orderId) {
 
         </div>
 
+
+        <!-- SHIPPING ADDRESS -->
+
         <div
             class="detail-item"
-            style="margin-bottom:15px;"
+            style="
+                margin-bottom:15px;
+            "
         >
 
             <div class="detail-label">
@@ -2655,30 +4337,47 @@ function viewOrder(orderId) {
             </div>
 
             <div class="detail-value">
+
                 ${escapeHTML(
                     order.shipping_address ||
+                    order.address ||
                     "—"
                 )}
+
             </div>
 
         </div>
 
-        <div>
 
-            <div
-                style="
-                    color:#fff;
-                    font-size:15px;
-                    font-weight:900;
-                    margin-bottom:10px;
-                "
-            >
-                Your Order Items
-            </div>
+        <!-- ITEMS -->
 
-            ${itemsHTML}
-
+        <div
+            style="
+                color:#fff;
+                font-size:15px;
+                font-weight:900;
+                margin-bottom:10px;
+            "
+        >
+            Your Order Items
         </div>
+
+
+        ${
+            itemsHTML ||
+            `
+                <div
+                    style="
+                        color:#777;
+                    "
+                >
+                    No items found.
+                </div>
+            `
+        }
+
+
+        <!-- STATUS BUTTON -->
 
         <div
             style="
@@ -2691,18 +4390,27 @@ function viewOrder(orderId) {
             <button
                 type="button"
                 class="btn btn-orange"
-                onclick="changeOrderStatus('${escapeHTML(order.id)}')"
+                onclick="
+                    changeOrderStatus(
+                        '${escapeHTML(
+                            order.id
+                        )}'
+                    )
+                "
             >
                 Change Status
             </button>
 
         </div>
+
     `;
+
 
     modal.classList.add(
         "open"
     );
 }
+
 
 /* ============================================================
    CLOSE ORDER MODAL
@@ -2715,12 +4423,15 @@ function closeOrderModal() {
             "orderModal"
         );
 
+
     if (modal) {
+
         modal.classList.remove(
             "open"
         );
     }
 }
+
 
 /* ============================================================
    CHANGE ORDER STATUS
@@ -2737,6 +4448,7 @@ async function changeOrderStatus(
                 String(orderId)
         );
 
+
     if (!order) {
 
         showToast(
@@ -2747,88 +4459,113 @@ async function changeOrderStatus(
         return;
     }
 
+
     const current =
         normalizeStatus(
             order.status
         );
+
 
     const currentIndex =
         ORDER_STATUSES.indexOf(
             current
         );
 
-    let options =
-        ORDER_STATUSES;
-
-    /*
-     * Seller can move the order through
-     * the four normal statuses.
-     */
 
     const selected =
         window.prompt(
+
             "Enter status:\n\n" +
+
             "1. Pending\n" +
+
             "2. Processing\n" +
+
             "3. Shipped\n" +
+
             "4. Delivered\n\n" +
+
             "Current: " +
-            formatStatus(current),
+
+            formatStatus(
+                current
+            ),
+
             String(
-                currentIndex + 1
+                currentIndex >= 0
+                    ? currentIndex + 1
+                    : 1
             )
         );
 
-    if (selected === null) {
+
+    if (
+        selected === null
+    ) {
         return;
     }
 
-    let newStatus = null;
+
+    const value =
+        selected
+            .trim()
+            .toLowerCase();
+
+
+    let newStatus =
+        null;
+
 
     const numeric =
         Number(
-            selected.trim()
+            value
         );
 
+
     if (
+        Number.isInteger(
+            numeric
+        ) &&
         numeric >= 1 &&
         numeric <= 4
     ) {
+
         newStatus =
-            options[
+            ORDER_STATUSES[
                 numeric - 1
             ];
-    } else {
 
-        const typed =
-            selected
-                .trim()
-                .toLowerCase();
+    } else if (
+        ORDER_STATUSES.includes(
+            value
+        )
+    ) {
 
-        if (
-            ORDER_STATUSES.includes(
-                typed
-            )
-        ) {
-            newStatus = typed;
-        }
+        newStatus =
+            value;
     }
+
 
     if (!newStatus) {
 
         showToast(
-            "Invalid status.",
+            "Invalid status. Use 1, 2, 3 or 4.",
             "error"
         );
 
         return;
     }
 
-    if (newStatus === current) {
+
+    if (
+        newStatus === current
+    ) {
 
         showToast(
             "Order is already " +
-            formatStatus(current) +
+            formatStatus(
+                current
+            ) +
             ".",
             "error"
         );
@@ -2836,11 +4573,13 @@ async function changeOrderStatus(
         return;
     }
 
+
     await setOrderStatus(
         orderId,
         newStatus
     );
 }
+
 
 /* ============================================================
    SET ORDER STATUS
@@ -2856,82 +4595,138 @@ async function setOrderStatus(
             newStatus
         );
 
-    if (!ORDER_STATUSES.includes(status)) {
+
+    if (
+        !ORDER_STATUSES.includes(
+            status
+        )
+    ) {
 
         showToast(
             "Invalid order status.",
             "error"
         );
 
-        return;
+        return false;
     }
 
+
     if (!currentUser) {
-        return;
+
+        showToast(
+            "Seller account not found.",
+            "error"
+        );
+
+        return false;
     }
+
+
+    /* SECURITY CHECK:
+       Make sure this seller actually
+       owns an item in this order.
+    */
+
+    const sellerItems =
+        allOrderItems.filter(
+            item =>
+                String(
+                    item.order_id
+                ) ===
+                String(
+                    orderId
+                ) &&
+                String(
+                    item.seller_id
+                ) ===
+                String(
+                    currentUser.id
+                )
+        );
+
+
+    if (
+        sellerItems.length === 0
+    ) {
+
+        showToast(
+            "You cannot update this order.",
+            "error"
+        );
+
+        return false;
+    }
+
 
     try {
 
-        /*
-         * First verify this seller actually
-         * has items in this order.
-         */
-
-        const sellerItems =
-            allOrderItems.filter(
-                item =>
-                    String(
-                        item.order_id
-                    ) ===
-                    String(orderId) &&
-                    String(
-                        item.seller_id
-                    ) ===
-                    String(currentUser.id)
-            );
-
-        if (
-            sellerItems.length === 0
-        ) {
-
-            showToast(
-                "You cannot update this order.",
-                "error"
-            );
-
-            return;
-        }
-
-        /*
-         * IMPORTANT:
-         *
-         * Current orders table has ONE status
-         * for the whole order.
-         *
-         * Therefore updating it changes the
-         * order status for the customer/admin too.
-         */
-
         const result =
             await withTimeout(
+
                 supabaseClient
                     .from("orders")
                     .update({
-                        status: status,
-                        updated_at:
-                            new Date().toISOString()
+                        status: status
                     })
                     .eq(
                         "id",
                         orderId
                     ),
+
                 DATA_TIMEOUT,
+
                 "Order status update timed out."
             );
 
+
         if (result.error) {
+
             throw result.error;
         }
+
+
+        /* UPDATE LOCAL DATA */
+
+        allOrders =
+            allOrders.map(
+                order => {
+
+                    if (
+                        String(
+                            order.id
+                        ) !==
+                        String(
+                            orderId
+                        )
+                    ) {
+
+                        return order;
+                    }
+
+
+                    return {
+                        ...order,
+                        status: status
+                    };
+                }
+            );
+
+
+        /* REFRESH UI */
+
+        renderOrders(
+            allOrders
+        );
+
+        renderRecentOrders(
+            allOrders
+        );
+
+
+        /* CLOSE MODAL */
+
+        closeOrderModal();
+
 
         showToast(
             "Order status updated to " +
@@ -2940,9 +4735,11 @@ async function setOrderStatus(
             "success"
         );
 
-        closeOrderModal();
 
-        await loadOrders();
+        updateDashboardStats();
+
+
+        return true;
 
     } catch (error) {
 
@@ -2951,13 +4748,18 @@ async function setOrderStatus(
             error
         );
 
+
         showToast(
             error?.message ||
             "Failed to update order status.",
             "error"
         );
+
+
+        return false;
     }
 }
+
 
 /* ============================================================
    ORDER SEARCH
@@ -2970,9 +4772,23 @@ function initOrderSearch() {
             "orderSearch"
         );
 
+
     if (!input) {
         return;
     }
+
+
+    if (
+        input.dataset.orderSearchReady ===
+        "true"
+    ) {
+        return;
+    }
+
+
+    input.dataset.orderSearchReady =
+        "true";
+
 
     input.addEventListener(
         "input",
@@ -2983,6 +4799,7 @@ function initOrderSearch() {
                     .trim()
                     .toLowerCase();
 
+
             if (!query) {
 
                 renderOrders(
@@ -2991,6 +4808,7 @@ function initOrderSearch() {
 
                 return;
             }
+
 
             const filtered =
                 allOrders.filter(
@@ -3003,14 +4821,25 @@ function initOrderSearch() {
                                 ? order.seller_items
                                 : [];
 
+
                         const itemText =
                             items
                                 .map(
                                     item =>
-                                        item.product_name ||
-                                        ""
+                                        [
+                                            getItemProductName(
+                                                item
+                                            ),
+                                            item.category,
+                                            item.sport
+                                        ]
+                                            .filter(
+                                                Boolean
+                                            )
+                                            .join(" ")
                                 )
                                 .join(" ");
+
 
                         const text =
                             [
@@ -3026,17 +4855,22 @@ function initOrderSearch() {
                                 getCustomerPhone(
                                     order
                                 ),
-                                itemText,
-                                order.status
+                                order.status,
+                                itemText
                             ]
+                                .filter(
+                                    Boolean
+                                )
                                 .join(" ")
                                 .toLowerCase();
+
 
                         return text.includes(
                             query
                         );
                     }
                 );
+
 
             renderOrders(
                 filtered
@@ -3045,179 +4879,365 @@ function initOrderSearch() {
     );
 }
 
+
+/* ============================================================
+   ORDER MODAL EVENTS
+============================================================ */
+
+function initOrderModal() {
+
+    const modal =
+        document.getElementById(
+            "orderModal"
+        );
+
+
+    if (
+        !modal ||
+        modal.dataset.orderModalReady ===
+        "true"
+    ) {
+        return;
+    }
+
+
+    modal.dataset.orderModalReady =
+        "true";
+
+
+    modal.addEventListener(
+        "click",
+        event => {
+
+            if (
+                event.target ===
+                modal
+            ) {
+
+                closeOrderModal();
+            }
+        }
+    );
+
+
+    const closeButtons =
+        document.querySelectorAll(
+            [
+                "[data-close-order]",
+                "#closeOrderModalBtn",
+                "#closeOrderBtn"
+            ].join(",")
+        );
+
+
+    closeButtons.forEach(
+        button => {
+
+            if (
+                button.dataset
+                    .orderCloseReady ===
+                "true"
+            ) {
+                return;
+            }
+
+
+            button.dataset
+                .orderCloseReady =
+                "true";
+
+
+            button.type =
+                "button";
+
+
+            button.addEventListener(
+                "click",
+                event => {
+
+                    event.preventDefault();
+
+                    closeOrderModal();
+                }
+            );
+        }
+    );
+}
+
+
+/* ============================================================
+   EXPORT ORDER FUNCTIONS
+============================================================ */
+
+window.loadOrderItems =
+    loadOrderItems;
+
+window.loadOrders =
+    loadOrders;
+
+window.renderOrders =
+    renderOrders;
+
+window.renderRecentOrders =
+    renderRecentOrders;
+
+window.viewOrder =
+    viewOrder;
+
+window.closeOrderModal =
+    closeOrderModal;
+
+window.changeOrderStatus =
+    changeOrderStatus;
+
+window.setOrderStatus =
+    setOrderStatus;
+
+window.initOrderSearch =
+    initOrderSearch;
+
+window.initOrderModal =
+    initOrderModal;
+
+
+/* ============================================================
+   END PART 3
+============================================================ */
+/* ============================================================
+   KHELZONE SELLER DASHBOARD
+   PART 4 / 4
+   STATS + MODALS + REFRESH + STARTUP
+============================================================ */
+
+
 /* ============================================================
    DASHBOARD STATS
 ============================================================ */
 
-async function loadDashboardStats() {
+function updateDashboardStats() {
 
-    if (!currentUser) {
-        return;
-    }
+    /* --------------------------------------------------------
+       PRODUCT STATS
+    -------------------------------------------------------- */
 
-    try {
+    const totalProducts =
+        Array.isArray(allProducts)
+            ? allProducts.length
+            : 0;
 
-        /*
-         * Products count is based on loaded seller
-         * products.
-         */
+    const activeProducts =
+        Array.isArray(allProducts)
+            ? allProducts.filter(
+                product =>
+                    product.is_active !== false
+            ).length
+            : 0;
 
-        const totalProducts =
-            allProducts.length;
+    const inactiveProducts =
+        totalProducts -
+        activeProducts;
 
-        const totalOrders =
-            allOrders.length;
 
-        const pendingOrders =
-            allOrders.filter(
+    /* --------------------------------------------------------
+       ORDER STATS
+    -------------------------------------------------------- */
+
+    const totalOrders =
+        Array.isArray(allOrders)
+            ? allOrders.length
+            : 0;
+
+
+    const pendingOrders =
+        Array.isArray(allOrders)
+            ? allOrders.filter(
                 order =>
                     normalizeStatus(
                         order.status
                     ) === "pending"
-            ).length;
+            ).length
+            : 0;
 
-        const deliveredOrders =
-            allOrders.filter(
+
+    const processingOrders =
+        Array.isArray(allOrders)
+            ? allOrders.filter(
+                order =>
+                    normalizeStatus(
+                        order.status
+                    ) === "processing"
+            ).length
+            : 0;
+
+
+    const shippedOrders =
+        Array.isArray(allOrders)
+            ? allOrders.filter(
+                order =>
+                    normalizeStatus(
+                        order.status
+                    ) === "shipped"
+            ).length
+            : 0;
+
+
+    const deliveredOrders =
+        Array.isArray(allOrders)
+            ? allOrders.filter(
                 order =>
                     normalizeStatus(
                         order.status
                     ) === "delivered"
-            ).length;
+            ).length
+            : 0;
 
-        const totalSales =
-            allOrderItems.reduce(
-                (sum, item) => {
 
-                    const quantity =
-                        Number(
-                            item.quantity || 0
-                        );
+    /* --------------------------------------------------------
+       SALES
+    -------------------------------------------------------- */
 
-                    const price =
-                        Number(
-                            item.price || 0
-                        );
+    const totalSales =
+        Array.isArray(allOrders)
+            ? allOrders.reduce(
+                (
+                    total,
+                    order
+                ) => {
 
-                    return sum +
-                        quantity *
-                        price;
+                    return (
+                        total +
+                        getSellerOrderTotal(
+                            order
+                        )
+                    );
 
                 },
                 0
-            );
-
-        updateElement(
-            "totalProducts",
-            totalProducts
-        );
-
-        updateElement(
-            "totalOrders",
-            totalOrders
-        );
-
-        updateElement(
-            "pendingOrders",
-            pendingOrders
-        );
-
-        updateElement(
-            "deliveredOrders",
-            deliveredOrders
-        );
-
-        updateElement(
-            "totalSales",
-            formatCurrency(
-                totalSales
             )
-        );
+            : 0;
 
-    } catch (error) {
 
-        console.error(
-            "Dashboard stats error:",
-            error
-        );
-    }
-}
+    /* --------------------------------------------------------
+       UPDATE COMMON IDS
+    -------------------------------------------------------- */
 
-function updateDashboardStats() {
+    const values = {
 
-    const totalProducts =
-        allProducts.length;
+        totalProducts,
+        activeProducts,
+        inactiveProducts,
 
-    const totalOrders =
-        allOrders.length;
+        totalOrders,
+        pendingOrders,
+        processingOrders,
+        shippedOrders,
+        deliveredOrders,
 
-    const pendingOrders =
-        allOrders.filter(
-            order =>
-                normalizeStatus(
-                    order.status
-                ) === "pending"
-        ).length;
+        totalSales
+    };
 
-    const deliveredOrders =
-        allOrders.filter(
-            order =>
-                normalizeStatus(
-                    order.status
-                ) === "delivered"
-        ).length;
 
-    const totalSales =
-        allOrderItems.reduce(
-            (sum, item) => {
+    Object.entries(
+        values
+    ).forEach(
+        (
+            [key, value]
+        ) => {
 
-                const quantity =
-                    Number(
-                        item.quantity || 0
-                    );
-
-                const price =
-                    Number(
-                        item.price || 0
-                    );
-
-                return sum +
-                    quantity *
-                    price;
-
-            },
-            0
-        );
-
-    updateElement(
-        "totalProducts",
-        totalProducts
+            updateElement(
+                key,
+                key === "totalSales"
+                    ? formatCurrency(value)
+                    : String(value)
+            );
+        }
     );
 
-    updateElement(
-        "totalOrders",
-        totalOrders
-    );
 
-    updateElement(
-        "pendingOrders",
-        pendingOrders
-    );
+    /* --------------------------------------------------------
+       SUPPORT MULTIPLE POSSIBLE HTML IDS
+    -------------------------------------------------------- */
 
-    updateElement(
-        "deliveredOrders",
-        deliveredOrders
-    );
+    const aliases = {
 
-    updateElement(
-        "totalSales",
-        formatCurrency(
+        productCount:
+            totalProducts,
+
+        productsCount:
+            totalProducts,
+
+        totalProductCount:
+            totalProducts,
+
+        activeProductCount:
+            activeProducts,
+
+        orderCount:
+            totalOrders,
+
+        ordersCount:
+            totalOrders,
+
+        totalOrderCount:
+            totalOrders,
+
+        pendingCount:
+            pendingOrders,
+
+        processingCount:
+            processingOrders,
+
+        shippedCount:
+            shippedOrders,
+
+        deliveredCount:
+            deliveredOrders,
+
+        salesCount:
+            totalSales,
+
+        totalRevenue:
+            totalSales,
+
+        revenue:
             totalSales
-        )
+    };
+
+
+    Object.entries(
+        aliases
+    ).forEach(
+        (
+            [id, value]
+        ) => {
+
+            const element =
+                document.getElementById(
+                    id
+                );
+
+            if (!element) {
+                return;
+            }
+
+
+            element.textContent =
+                typeof value === "number" &&
+                (
+                    id.toLowerCase()
+                        .includes("sale") ||
+                    id.toLowerCase()
+                        .includes("revenue")
+                )
+                    ? formatCurrency(value)
+                    : String(value);
+        }
     );
 }
+
 
 /* ============================================================
-   UPDATE ELEMENT
+   GENERIC ELEMENT UPDATER
 ============================================================ */
 
 function updateElement(
@@ -3226,118 +5246,69 @@ function updateElement(
 ) {
 
     const element =
-        document.getElementById(id);
+        document.getElementById(
+            id
+        );
+
 
     if (!element) {
         return;
     }
 
+
     element.textContent =
-        value;
+        value == null
+            ? ""
+            : String(value);
 }
 
+
 /* ============================================================
-   MODAL EVENTS
+   MODAL INITIALIZATION
 ============================================================ */
 
 function initModals() {
 
-    const closeOrder =
-        document.getElementById(
-            "closeOrderModal"
-        );
+    /* --------------------------------------------------------
+       PRODUCT MODAL
+    -------------------------------------------------------- */
 
-    if (closeOrder) {
+    initProductModal();
 
-        closeOrder.addEventListener(
-            "click",
-            closeOrderModal
-        );
-    }
 
-    const closeProduct =
-        document.getElementById(
-            "closeProductModal"
-        );
+    /* --------------------------------------------------------
+       ORDER MODAL
+    -------------------------------------------------------- */
 
-    if (closeProduct) {
+    initOrderModal();
 
-        closeProduct.addEventListener(
-            "click",
-            closeProductModal
-        );
-    }
 
-    const cancelProduct =
-        document.getElementById(
-            "cancelProductBtn"
-        );
-
-    if (cancelProduct) {
-
-        cancelProduct.addEventListener(
-            "click",
-            closeProductModal
-        );
-    }
-
-    const addProduct =
-        document.getElementById(
-            "addProductBtn"
-        );
-
-    if (addProduct) {
-
-        addProduct.addEventListener(
-            "click",
-            openAddProductModal
-        );
-    }
-
-    const productForm =
-        document.getElementById(
-            "productForm"
-        );
-
-    if (productForm) {
-
-        productForm.addEventListener(
-            "submit",
-            saveProduct
-        );
-    }
-
-    /*
-     * Close modals by clicking backdrop.
-     */
-
-    const orderModal =
-        document.getElementById(
-            "orderModal"
-        );
-
-    if (orderModal) {
-
-        orderModal.addEventListener(
-            "click",
-            event => {
-
-                if (
-                    event.target ===
-                    orderModal
-                ) {
-                    closeOrderModal();
-                }
-            }
-        );
-    }
+    /* --------------------------------------------------------
+       ESCAPE / BACKDROP
+    -------------------------------------------------------- */
 
     const productModal =
         document.getElementById(
             "productModal"
         );
 
-    if (productModal) {
+
+    const orderModal =
+        document.getElementById(
+            "orderModal"
+        );
+
+
+    if (
+        productModal &&
+        productModal.dataset
+            .globalModalReady !==
+        "true"
+    ) {
+
+        productModal.dataset
+            .globalModalReady =
+            "true";
 
         productModal.addEventListener(
             "click",
@@ -3347,37 +5318,91 @@ function initModals() {
                     event.target ===
                     productModal
                 ) {
+
                     closeProductModal();
+                }
+            }
+        );
+    }
+
+
+    if (
+        orderModal &&
+        orderModal.dataset
+            .globalModalReady !==
+        "true"
+    ) {
+
+        orderModal.dataset
+            .globalModalReady =
+            "true";
+
+        orderModal.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target ===
+                    orderModal
+                ) {
+
+                    closeOrderModal();
                 }
             }
         );
     }
 }
 
+
 /* ============================================================
-   ESC KEY
+   ESCAPE KEY
 ============================================================ */
 
 function initEscapeKey() {
+
+    if (
+        document.body.dataset
+            .escapeKeyReady ===
+        "true"
+    ) {
+        return;
+    }
+
+
+    document.body.dataset
+        .escapeKeyReady =
+        "true";
+
 
     document.addEventListener(
         "keydown",
         event => {
 
             if (
-                event.key !== "Escape"
+                event.key !==
+                "Escape"
             ) {
                 return;
             }
 
-            closeOrderModal();
+
+            /* CLOSE PRODUCT */
 
             closeProductModal();
+
+
+            /* CLOSE ORDER */
+
+            closeOrderModal();
+
+
+            /* CLOSE MOBILE MENU */
 
             closeMobileMenu();
         }
     );
 }
+
 
 /* ============================================================
    REFRESH DASHBOARD
@@ -3385,35 +5410,133 @@ function initEscapeKey() {
 
 async function refreshDashboard() {
 
-    await loadProducts();
+    try {
 
-    await loadOrders();
+        showToast(
+            "Refreshing dashboard...",
+            "info"
+        );
 
-    updateDashboardStats();
+
+        await Promise.all([
+            loadProducts(),
+            loadOrders()
+        ]);
+
+
+        updateDashboardStats();
+
+
+        showToast(
+            "Dashboard refreshed.",
+            "success"
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Refresh dashboard error:",
+            error
+        );
+
+
+        showToast(
+            error?.message ||
+            "Failed to refresh dashboard.",
+            "error"
+        );
+    }
 }
 
+
 /* ============================================================
-   INITIALIZE
+   START SELLER DASHBOARD
 ============================================================ */
 
 async function startSellerDashboard() {
 
+    /* --------------------------------------------------------
+       PREVENT DOUBLE START
+    -------------------------------------------------------- */
+
+    if (
+        dashboardStarted
+    ) {
+        return;
+    }
+
+
+    dashboardStarted =
+        true;
+
+
+    /* --------------------------------------------------------
+       SHOW LOADING
+    -------------------------------------------------------- */
+
+    showLoadingScreen();
+
+
     try {
 
-        showLoadingScreen();
+        /* ====================================================
+           WAIT FOR SUPABASE
+        ==================================================== */
 
-        if (!checkSupabaseClient()) {
+        await waitForSupabaseClient();
+
+
+        /* ====================================================
+           GET USER
+        ==================================================== */
+
+        await getCurrentUser();
+
+
+        /* ====================================================
+           CHECK LOGIN
+        ==================================================== */
+
+        if (!currentUser) {
+
+            window.location.href =
+                LOGIN_PAGE;
+
             return;
         }
+
+
+        /* ====================================================
+           LOAD PROFILE
+        ==================================================== */
+
+        await loadCurrentProfile();
+
+
+        /* ====================================================
+           CHECK SELLER ACCESS
+        ==================================================== */
 
         const access =
             await checkSellerAccess();
 
+
         if (!access) {
+
             return;
         }
 
+
+        /* ====================================================
+           RENDER PROFILE
+        ==================================================== */
+
         renderSellerProfile();
+
+
+        /* ====================================================
+           INITIALIZE NAVIGATION
+        ==================================================== */
 
         initNavigation();
 
@@ -3421,90 +5544,153 @@ async function startSellerDashboard() {
 
         initLogout();
 
+
+        /* ====================================================
+           SEARCH
+        ==================================================== */
+
         initProductSearch();
 
         initOrderSearch();
+
+
+        /* ====================================================
+           MODALS
+        ==================================================== */
 
         initModals();
 
         initEscapeKey();
 
-        /*
-         * Start with dashboard.
-         */
+
+        /* ====================================================
+           DEFAULT SECTION
+        ==================================================== */
 
         showSection(
             "dashboardSection"
         );
 
-        /*
-         * Load seller products.
-         */
+
+        /* ====================================================
+           LOAD DATA
+        ==================================================== */
 
         await loadProducts();
 
-        /*
-         * Load seller orders.
-         */
-
         await loadOrders();
 
-        /*
-         * Update dashboard.
-         */
+
+        /* ====================================================
+           UPDATE STATS
+        ==================================================== */
 
         updateDashboardStats();
 
-        /*
-         * Hide loading only after initialization
-         * finishes.
-         */
 
-        hideLoadingScreen();
+        /* ====================================================
+           FINAL UI
+        ==================================================== */
+
+        document.body.classList.add(
+            "seller-dashboard-ready"
+        );
+
+
+        console.log(
+            "KHELZONE Seller Dashboard loaded successfully."
+        );
 
     } catch (error) {
 
         console.error(
-            "SELLER DASHBOARD START ERROR:",
+            "Seller dashboard startup error:",
             error
         );
 
-        hideLoadingScreen();
 
-        showToast(
-            "Seller dashboard failed to load.",
-            "error"
+        showDashboardError(
+            error?.message ||
+            "Unable to load seller dashboard."
         );
+
+    } finally {
+
+        /* ----------------------------------------------------
+           VERY IMPORTANT:
+           LOADING MUST ALWAYS STOP
+        ---------------------------------------------------- */
+
+        hideLoadingScreen();
     }
 }
 
+
 /* ============================================================
-   WINDOW EXPORTS
+   AUTOMATIC STARTUP
+============================================================ */
+
+function bootSellerDashboard() {
+
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            () => {
+
+                startSellerDashboard();
+
+            },
+            {
+                once: true
+            }
+        );
+
+    } else {
+
+        startSellerDashboard();
+    }
+}
+
+
+/* ============================================================
+   GLOBAL EXPORTS
 ============================================================ */
 
 window.startSellerDashboard =
     startSellerDashboard;
 
-window.showSection =
-    showSection;
+window.bootSellerDashboard =
+    bootSellerDashboard;
 
-window.editProduct =
-    editProduct;
+window.refreshDashboard =
+    refreshDashboard;
 
-window.deleteProduct =
-    deleteProduct;
+window.updateDashboardStats =
+    updateDashboardStats;
 
-window.toggleProductStatus =
-    toggleProductStatus;
+window.initModals =
+    initModals;
 
-window.viewOrder =
-    viewOrder;
+window.initEscapeKey =
+    initEscapeKey;
 
-window.changeOrderStatus =
-    changeOrderStatus;
 
-window.setOrderStatus =
-    setOrderStatus;
+/* ============================================================
+   PRODUCT EXPORTS
+============================================================ */
+
+window.loadProducts =
+    loadProducts;
+
+window.renderProducts =
+    renderProducts;
+
+window.initProductSearch =
+    initProductSearch;
 
 window.openAddProductModal =
     openAddProductModal;
@@ -3512,30 +5698,78 @@ window.openAddProductModal =
 window.closeProductModal =
     closeProductModal;
 
-window.closeOrderModal =
-    closeOrderModal;
+window.editProduct =
+    editProduct;
 
-window.loadProducts =
-    loadProducts;
+window.saveProduct =
+    saveProduct;
+
+window.toggleProductStatus =
+    toggleProductStatus;
+
+window.deleteProduct =
+    deleteProduct;
+
+
+/* ============================================================
+   ORDER EXPORTS
+============================================================ */
+
+window.loadOrderItems =
+    loadOrderItems;
 
 window.loadOrders =
     loadOrders;
 
+window.renderOrders =
+    renderOrders;
+
+window.renderRecentOrders =
+    renderRecentOrders;
+
+window.viewOrder =
+    viewOrder;
+
+window.closeOrderModal =
+    closeOrderModal;
+
+window.changeOrderStatus =
+    changeOrderStatus;
+
+window.setOrderStatus =
+    setOrderStatus;
+
+window.initOrderSearch =
+    initOrderSearch;
+
+window.initOrderModal =
+    initOrderModal;
+
+
 /* ============================================================
-   DOM READY
+   NAVIGATION EXPORTS
 ============================================================ */
 
-if (
-    document.readyState ===
-    "loading"
-) {
+window.initNavigation =
+    initNavigation;
 
-    document.addEventListener(
-        "DOMContentLoaded",
-        startSellerDashboard
-    );
+window.showSection =
+    showSection;
 
-} else {
+window.initMobileMenu =
+    initMobileMenu;
 
-    startSellerDashboard();
-}
+window.closeMobileMenu =
+    closeMobileMenu;
+
+
+/* ============================================================
+   FINAL START
+============================================================ */
+
+bootSellerDashboard();
+
+
+/* ============================================================
+   END OF KHELZONE SELLER DASHBOARD JS
+============================================================ */

@@ -2,6 +2,7 @@
 <html lang="en" class="dark">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -15,21 +16,18 @@
     <!-- =====================================================
          TAILWIND CONFIG
     ====================================================== -->
-
     <script src="tailwind.config.js"></script>
 
 
     <!-- =====================================================
          TAILWIND CSS
     ====================================================== -->
-
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
 
     <!-- =====================================================
          MATERIAL SYMBOLS
     ====================================================== -->
-
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700&display=swap"
         rel="stylesheet"
@@ -39,7 +37,6 @@
     <!-- =====================================================
          GOOGLE FONTS
     ====================================================== -->
-
     <link
         href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,400..700;1,400..700&family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..800&display=swap"
         rel="stylesheet"
@@ -49,7 +46,6 @@
     <!-- =====================================================
          SELLER CSS
     ====================================================== -->
-
     <link
         rel="stylesheet"
         href="seller.css"
@@ -57,111 +53,606 @@
 
 
     <!-- =====================================================
-         SELLER DASHBOARD BUTTON STYLE
+         KHELZONE NAVBAR + DASHBOARD OVERRIDES
     ====================================================== -->
-
     <style>
 
         /* ==================================================
-           DASHBOARD BUTTON
+           ROOT
         ================================================== */
 
-        .seller-dashboard-btn {
+        :root {
+            --kz-orange: #ff6b00;
+            --kz-orange-dark: #d63f00;
+            --kz-black: #111111;
+            --kz-black-2: #151515;
+            --kz-white: #f5f5f5;
+        }
 
-            display: none;
 
-            align-items: center;
+        /* ==================================================
+           IMPORTANT RESET
+           Prevent seller.css from breaking navbar
+        ================================================== */
 
-            justify-content: center;
+        .kz-header,
+        .kz-header * {
+            box-sizing: border-box;
+        }
 
-            gap: 8px;
 
-            min-height: 42px;
+        /* ==================================================
+           MAIN NAVBAR
+        ================================================== */
 
-            padding: 10px 16px;
+        .kz-header {
+            position: sticky !important;
+            top: 0 !important;
+            left: 0 !important;
 
-            border: 1px solid #FF6B00;
+            z-index: 99999 !important;
 
-            border-radius: 8px;
+            width: 100% !important;
 
-            color: #FF6B00;
+            min-height: 84px !important;
 
-            background: rgba(255, 107, 0, 0.08);
+            margin: 0 !important;
+            padding: 0 34px !important;
 
-            text-decoration: none;
+            display: flex !important;
+            align-items: center !important;
 
-            font-weight: 800;
+            gap: 0 !important;
+
+            background: #111111 !important;
+
+            border-bottom: 1px solid rgba(255, 107, 0, 0.35) !important;
+
+            box-shadow:
+                0 4px 22px rgba(0, 0, 0, 0.35) !important;
+        }
+
+
+        /* ==================================================
+           MENU BUTTON
+        ================================================== */
+
+        #menuButton {
+            width: 48px !important;
+            height: 48px !important;
+
+            flex: 0 0 48px !important;
+
+            display: none !important;
+
+            align-items: center !important;
+            justify-content: center !important;
+
+            margin: 0 24px 0 0 !important;
+            padding: 0 !important;
+
+            border: 1px solid var(--kz-orange) !important;
+            border-radius: 8px !important;
+
+            background: rgba(255, 107, 0, 0.06) !important;
+
+            color: var(--kz-orange) !important;
+
+            cursor: pointer !important;
+
+            transition:
+                background 0.2s ease,
+                color 0.2s ease,
+                transform 0.2s ease !important;
+        }
+
+
+        #menuButton:hover {
+            background: var(--kz-orange) !important;
+            color: #111111 !important;
+
+            transform: translateY(-1px);
+        }
+
+
+        #menuIcon {
+            font-size: 29px !important;
+
+            line-height: 1 !important;
+
+            color: inherit !important;
+        }
+
+
+        /* ==================================================
+           LOGO
+        ================================================== */
+
+        .kz-header .kz-logo {
+            position: relative !important;
+
+            flex: 0 0 auto !important;
+
+            display: inline-flex !important;
+            align-items: center !important;
+
+            width: auto !important;
+
+            margin: 0 !important;
+            padding: 0 !important;
+
+            color: var(--kz-orange) !important;
+
+            text-decoration: none !important;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif !important;
+
+            font-size: 38px !important;
+
+            line-height: 1 !important;
+
+            font-weight: 950 !important;
+
+            letter-spacing: 2px !important;
+
+            white-space: nowrap !important;
+
+            z-index: 2 !important;
+
+            transition: 0.2s ease !important;
+        }
+
+
+        .kz-header .kz-logo:hover {
+            color: #ff8735 !important;
+
+            transform: scale(1.015);
+        }
+
+
+        /* ==================================================
+           DESKTOP NAV
+        ================================================== */
+
+        .kz-header .desktop-nav {
+            position: relative !important;
+
+            flex: 1 1 auto !important;
+
+            width: auto !important;
+
+            min-width: 0 !important;
+
+            height: 84px !important;
+
+            margin: 0 0 0 42px !important;
+            padding: 0 !important;
+
+            display: flex !important;
+
+            align-items: center !important;
+            justify-content: flex-end !important;
+
+            gap: 24px !important;
+
+            overflow: visible !important;
+        }
+
+
+        /* ==================================================
+           NORMAL NAV LINKS
+        ================================================== */
+
+        .kz-header .desktop-nav > a:not(.desktop-seller-btn):not(.seller-dashboard-btn) {
+            position: relative !important;
+
+            flex: 0 0 auto !important;
+
+            display: inline-flex !important;
+
+            align-items: center !important;
+            justify-content: center !important;
+
+            min-height: 48px !important;
+
+            padding: 0 8px !important;
+
+            color: #f3f3f3 !important;
+
+            text-decoration: none !important;
+
+            font-family:
+                "JetBrains Mono",
+                monospace !important;
+
+            font-size: 12px !important;
+
+            font-weight: 800 !important;
+
+            letter-spacing: 1.5px !important;
+
+            white-space: nowrap !important;
+
+            transition:
+                color 0.2s ease,
+                transform 0.2s ease !important;
+        }
+
+
+        .kz-header .desktop-nav > a:not(.desktop-seller-btn):not(.seller-dashboard-btn):hover {
+            color: var(--kz-orange) !important;
+
+            transform: translateY(-1px);
+        }
+
+
+        /* ==================================================
+           BECOME SELLER BUTTON
+        ================================================== */
+
+        .kz-header .desktop-seller-btn {
+            position: relative !important;
+
+            flex: 0 0 auto !important;
+
+            min-height: 58px !important;
+
+            padding: 0 28px !important;
+
+            display: inline-flex !important;
+
+            align-items: center !important;
+            justify-content: center !important;
+
+            border: 1px solid var(--kz-orange) !important;
+
+            border-radius: 10px !important;
+
+            background: rgba(255, 107, 0, 0.04) !important;
+
+            color: var(--kz-orange) !important;
+
+            text-decoration: none !important;
+
+            font-family:
+                "JetBrains Mono",
+                monospace !important;
+
+            font-size: 12px !important;
+
+            font-weight: 800 !important;
+
+            letter-spacing: 1.8px !important;
+
+            white-space: nowrap !important;
+
+            transition:
+                background 0.2s ease,
+                color 0.2s ease,
+                box-shadow 0.2s ease,
+                transform 0.2s ease !important;
+        }
+
+
+        .kz-header .desktop-seller-btn:hover {
+            background: var(--kz-orange) !important;
+
+            color: #111111 !important;
+
+            box-shadow:
+                0 8px 24px rgba(255, 107, 0, 0.25) !important;
+
+            transform: translateY(-1px);
+        }
+
+
+        /* ==================================================
+           SELLER DASHBOARD BUTTON
+        ================================================== */
+
+        .kz-header .seller-dashboard-btn {
+            flex: 0 0 auto !important;
+
+            align-items: center !important;
+            justify-content: center !important;
+
+            gap: 9px !important;
+
+            min-height: 58px !important;
+
+            padding: 0 25px !important;
+
+            border: 1px solid var(--kz-orange) !important;
+
+            border-radius: 10px !important;
+
+            background: rgba(255, 107, 0, 0.04) !important;
+
+            color: var(--kz-orange) !important;
+
+            text-decoration: none !important;
+
+            font-family:
+                "JetBrains Mono",
+                monospace !important;
+
+            font-size: 12px !important;
+
+            font-weight: 800 !important;
+
+            letter-spacing: 1.6px !important;
+
+            white-space: nowrap !important;
 
             transition:
                 background 0.2s ease,
                 color 0.2s ease,
                 transform 0.2s ease,
-                box-shadow 0.2s ease;
-
+                box-shadow 0.2s ease !important;
         }
 
 
-        .seller-dashboard-btn:hover {
+        .kz-header .seller-dashboard-btn:hover {
+            background: var(--kz-orange) !important;
 
-            background: #FF6B00;
-
-            color: #000;
+            color: #111111 !important;
 
             transform: translateY(-1px);
 
             box-shadow:
-                0 8px 24px rgba(255, 107, 0, 0.25);
+                0 8px 24px rgba(255, 107, 0, 0.25) !important;
+        }
 
+
+        .kz-header .seller-dashboard-btn .material-symbols-outlined {
+            font-size: 20px !important;
+
+            line-height: 1 !important;
+
+            color: inherit !important;
         }
 
 
         /* ==================================================
-           DESKTOP DASHBOARD BUTTON
+           MOBILE MENU
         ================================================== */
 
-        .desktop-nav .seller-dashboard-btn {
+        .kz-header .mobile-menu {
+            display: none !important;
 
-            margin-left: 4px;
+            position: absolute !important;
 
+            top: 100% !important;
+            left: 0 !important;
+
+            width: 100% !important;
+
+            margin: 0 !important;
+
+            padding: 14px 18px 20px !important;
+
+            background: #151515 !important;
+
+            border-top: 1px solid rgba(255, 107, 0, 0.30) !important;
+
+            border-bottom: 1px solid rgba(255, 107, 0, 0.20) !important;
+
+            box-shadow:
+                0 12px 28px rgba(0, 0, 0, 0.45) !important;
+        }
+
+
+        .kz-header .mobile-menu.open,
+        .kz-header .mobile-menu.active,
+        .kz-header .mobile-menu.show {
+            display: flex !important;
+
+            flex-direction: column !important;
+
+            gap: 8px !important;
+        }
+
+
+        .kz-header .mobile-menu a {
+            width: 100% !important;
+
+            min-height: 52px !important;
+
+            margin: 0 !important;
+            padding: 0 18px !important;
+
+            display: flex !important;
+
+            align-items: center !important;
+
+            border: 1px solid rgba(255, 107, 0, 0.35) !important;
+
+            border-radius: 9px !important;
+
+            background: #111111 !important;
+
+            color: var(--kz-orange) !important;
+
+            text-decoration: none !important;
+
+            font-family:
+                "JetBrains Mono",
+                monospace !important;
+
+            font-size: 13px !important;
+
+            font-weight: 800 !important;
+
+            letter-spacing: 1.5px !important;
+
+            transition:
+                background 0.2s ease,
+                color 0.2s ease !important;
+        }
+
+
+        .kz-header .mobile-menu a:hover {
+            background: var(--kz-orange) !important;
+
+            color: #111111 !important;
+        }
+
+
+        .kz-header .mobile-menu a .material-symbols-outlined {
+            margin-right: 9px !important;
+
+            color: inherit !important;
+        }
+
+
+        .kz-header .mobile-menu .seller-dashboard-btn {
+            width: 100% !important;
+
+            min-height: 52px !important;
+
+            justify-content: flex-start !important;
+
+            box-sizing: border-box !important;
         }
 
 
         /* ==================================================
-           MOBILE DASHBOARD BUTTON
+           TABLET
         ================================================== */
 
-        .mobile-menu .seller-dashboard-btn {
+        @media (max-width: 1150px) {
 
-            width: 100%;
+            .kz-header {
+                min-height: 78px !important;
 
-            justify-content: flex-start;
+                padding: 0 22px !important;
+            }
 
-            box-sizing: border-box;
+
+            .kz-header .desktop-nav {
+                height: 78px !important;
+
+                margin-left: 25px !important;
+
+                gap: 14px !important;
+            }
+
+
+            .kz-header .kz-logo {
+                font-size: 32px !important;
+
+                letter-spacing: 1.5px !important;
+            }
+
+
+            .kz-header .desktop-nav > a:not(.desktop-seller-btn):not(.seller-dashboard-btn) {
+                font-size: 11px !important;
+
+                padding: 0 5px !important;
+            }
+
+
+            .kz-header .desktop-seller-btn,
+            .kz-header .seller-dashboard-btn {
+                min-height: 52px !important;
+
+                padding: 0 17px !important;
+
+                font-size: 10px !important;
+
+                letter-spacing: 1.2px !important;
+            }
 
         }
 
 
         /* ==================================================
-           MOBILE MENU LINK SPACING
-        ================================================== */
-
-        .mobile-menu a {
-
-            text-decoration: none;
-
-        }
-
-
-        /* ==================================================
-           MOBILE RESPONSIVE
+           MOBILE
         ================================================== */
 
         @media (max-width: 768px) {
 
-            .desktop-nav {
+            .kz-header {
+                min-height: 70px !important;
 
-                display: none;
+                padding: 0 17px !important;
 
+                justify-content: flex-start !important;
+            }
+
+
+            #menuButton {
+                display: flex !important;
+
+                width: 45px !important;
+                height: 45px !important;
+
+                flex: 0 0 45px !important;
+
+                margin-right: 16px !important;
+            }
+
+
+            .kz-header .kz-logo {
+                font-size: 29px !important;
+
+                letter-spacing: 1.5px !important;
+            }
+
+
+            .kz-header .desktop-nav {
+                display: none !important;
+            }
+
+
+            .kz-header .mobile-menu {
+                top: 70px !important;
+            }
+
+        }
+
+
+        /* ==================================================
+           SMALL MOBILE
+        ================================================== */
+
+        @media (max-width: 480px) {
+
+            .kz-header {
+                padding: 0 13px !important;
+            }
+
+
+            #menuButton {
+                width: 42px !important;
+                height: 42px !important;
+
+                flex: 0 0 42px !important;
+
+                margin-right: 13px !important;
+            }
+
+
+            #menuIcon {
+                font-size: 26px !important;
+            }
+
+
+            .kz-header .kz-logo {
+                font-size: 25px !important;
+
+                letter-spacing: 1px !important;
+            }
+
+
+            .kz-header .mobile-menu {
+                top: 70px !important;
+
+                padding-left: 12px !important;
+                padding-right: 12px !important;
             }
 
         }
@@ -181,9 +672,7 @@
     <header class="kz-header">
 
 
-        <!-- =================================================
-             MENU BUTTON
-        ================================================== -->
+        <!-- MENU BUTTON -->
 
         <button
             id="menuButton"
@@ -202,9 +691,7 @@
         </button>
 
 
-        <!-- =================================================
-             LOGO
-        ================================================== -->
+        <!-- LOGO -->
 
         <a
             href="seller.html"
@@ -214,9 +701,7 @@
         </a>
 
 
-        <!-- =================================================
-             DESKTOP NAV
-        ================================================== -->
+        <!-- DESKTOP NAV -->
 
         <nav class="desktop-nav">
 
@@ -251,15 +736,7 @@
             </a>
 
 
-            <!-- =================================================
-                 SELLER DASHBOARD
-
-                 HIDDEN BY DEFAULT
-
-                 seller.js will show this only for:
-                 1. Admin
-                 2. Approved Seller
-            ================================================== -->
+            <!-- SELLER DASHBOARD -->
 
             <a
                 href="seller-dashboard.html"
@@ -310,11 +787,7 @@
             </a>
 
 
-            <!-- =================================================
-                 MOBILE SELLER DASHBOARD
-
-                 HIDDEN BY DEFAULT
-            ================================================== -->
+            <!-- MOBILE DASHBOARD -->
 
             <a
                 href="seller-dashboard.html"
@@ -359,7 +832,6 @@
                 <div
                     class="hero-bg w-full h-full opacity-30"
                 ></div>
-
 
                 <div
                     class="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"
@@ -421,7 +893,6 @@
                     class="flex flex-col sm:flex-row gap-5 mt-4"
                 >
 
-
                     <!-- BECOME SELLER -->
 
                     <a
@@ -462,7 +933,6 @@
 
             <div class="mb-12">
 
-
                 <span
                     class="font-mono text-xs uppercase tracking-widest"
                     style="color:#FF6B00;"
@@ -494,9 +964,7 @@
             </div>
 
 
-            <!-- =================================================
-                 ADD PRODUCT CARD
-            ================================================== -->
+            <!-- ADD PRODUCT CARD -->
 
             <div
                 class="bg-surface-container border border-outline-variant rounded-2xl p-6 md:p-10 card-hover"
@@ -511,12 +979,9 @@
                 >
 
 
-                    <!-- =================================================
-                         PRODUCT IMAGE
-                    ================================================== -->
+                    <!-- PRODUCT IMAGE -->
 
                     <div>
-
 
                         <label
                             class="block font-mono text-xs font-bold tracking-widest uppercase text-on-surface mb-3"
@@ -529,7 +994,6 @@
                         <div
                             class="border-2 border-dashed border-outline-variant rounded-xl p-8 text-center hover:border-orange-500 transition"
                         >
-
 
                             <span
                                 class="material-symbols-outlined text-5xl mb-3"
@@ -562,9 +1026,7 @@
                     </div>
 
 
-                    <!-- =================================================
-                         PRODUCT INFORMATION
-                    ================================================== -->
+                    <!-- PRODUCT INFORMATION -->
 
                     <div
                         class="grid grid-cols-1 md:grid-cols-2 gap-6"
@@ -574,7 +1036,6 @@
                         <!-- PRODUCT NAME -->
 
                         <div>
-
 
                             <label
                                 for="productName"
@@ -600,7 +1061,6 @@
 
                         <div>
 
-
                             <label
                                 for="productCategory"
                                 class="block font-mono text-xs font-bold tracking-widest uppercase text-on-surface mb-3"
@@ -616,136 +1076,109 @@
                                 class="w-full rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface px-4 py-3 focus:border-orange-500 focus:ring-orange-500"
                             >
 
-
                                 <option value="">
                                     Select Category
                                 </option>
-
 
                                 <option value="cricket">
                                     Cricket
                                 </option>
 
-
                                 <option value="football">
                                     Football
                                 </option>
-
 
                                 <option value="running">
                                     Running
                                 </option>
 
-
                                 <option value="basketball">
                                     Basketball
                                 </option>
-
 
                                 <option value="badminton">
                                     Badminton
                                 </option>
 
-
                                 <option value="tennis">
                                     Tennis
                                 </option>
-
 
                                 <option value="volleyball">
                                     Volleyball
                                 </option>
 
-
                                 <option value="hockey">
                                     Hockey
                                 </option>
-
 
                                 <option value="table-tennis">
                                     Table Tennis
                                 </option>
 
-
                                 <option value="swimming">
                                     Swimming
                                 </option>
-
 
                                 <option value="boxing">
                                     Boxing
                                 </option>
 
-
                                 <option value="wrestling">
                                     Wrestling
                                 </option>
-
 
                                 <option value="cycling">
                                     Cycling
                                 </option>
 
-
                                 <option value="fitness">
                                     Fitness &amp; Gym
                                 </option>
-
 
                                 <option value="athletics">
                                     Athletics
                                 </option>
 
-
                                 <option value="baseball">
                                     Baseball
                                 </option>
-
 
                                 <option value="golf">
                                     Golf
                                 </option>
 
-
                                 <option value="rugby">
                                     Rugby
                                 </option>
-
 
                                 <option value="handball">
                                     Handball
                                 </option>
 
-
                                 <option value="squash">
                                     Squash
                                 </option>
-
 
                                 <option value="skateboarding">
                                     Skateboarding
                                 </option>
 
-
                                 <option value="sportswear">
                                     Sportswear
                                 </option>
-
 
                                 <option value="sports-shoes">
                                     Sports Shoes
                                 </option>
 
-
                                 <option value="accessories">
                                     Sports Accessories
                                 </option>
 
-
                                 <option value="other">
                                     Other
                                 </option>
-
 
                             </select>
 
@@ -755,7 +1188,6 @@
                         <!-- PRICE -->
 
                         <div>
-
 
                             <label
                                 for="productPrice"
@@ -782,7 +1214,6 @@
 
                         <div>
 
-
                             <label
                                 for="productStock"
                                 class="block font-mono text-xs font-bold tracking-widest uppercase text-on-surface mb-3"
@@ -806,12 +1237,9 @@
                     </div>
 
 
-                    <!-- =================================================
-                         DESCRIPTION
-                    ================================================== -->
+                    <!-- DESCRIPTION -->
 
                     <div>
-
 
                         <label
                             for="productDescription"
@@ -833,9 +1261,7 @@
                     </div>
 
 
-                    <!-- =================================================
-                         BRAND + SIZE
-                    ================================================== -->
+                    <!-- BRAND + SIZE -->
 
                     <div
                         class="grid grid-cols-1 md:grid-cols-2 gap-6"
@@ -845,7 +1271,6 @@
                         <!-- BRAND -->
 
                         <div>
-
 
                             <label
                                 for="brandName"
@@ -870,7 +1295,6 @@
 
                         <div>
 
-
                             <label
                                 for="productSize"
                                 class="block font-mono text-xs font-bold tracking-widest uppercase text-on-surface mb-3"
@@ -892,14 +1316,11 @@
                     </div>
 
 
-                    <!-- =================================================
-                         SUBMIT BUTTONS
-                    ================================================== -->
+                    <!-- SUBMIT BUTTONS -->
 
                     <div
                         class="pt-4 border-t border-outline-variant flex flex-col sm:flex-row gap-4 justify-end"
                     >
-
 
                         <!-- CLEAR -->
 
@@ -943,11 +1364,7 @@
             class="w-full max-w-container-max mx-auto px-gutter py-section-desktop"
         >
 
-
-            <!-- SECTION TITLE -->
-
             <div class="mb-12">
-
 
                 <h2
                     class="text-4xl md:text-5xl font-black uppercase text-on-surface"
@@ -964,8 +1381,6 @@
             </div>
 
 
-            <!-- CARDS -->
-
             <div
                 class="grid grid-cols-1 md:grid-cols-3 gap-6"
             >
@@ -976,7 +1391,6 @@
                 <div
                     class="card-hover bg-surface-container border border-outline-variant p-8 rounded-xl"
                 >
-
 
                     <div
                         class="w-16 h-16 rounded-full bg-surface-container-lowest border border-outline-variant flex items-center justify-center mb-6"
@@ -1015,7 +1429,6 @@
                     class="card-hover bg-surface-container border border-outline-variant p-8 rounded-xl"
                 >
 
-
                     <div
                         class="w-16 h-16 rounded-full bg-surface-container-lowest border border-outline-variant flex items-center justify-center mb-6"
                     >
@@ -1052,7 +1465,6 @@
                 <div
                     class="card-hover bg-surface-container border border-outline-variant p-8 rounded-xl"
                 >
-
 
                     <div
                         class="w-16 h-16 rounded-full bg-surface-container-lowest border border-outline-variant flex items-center justify-center mb-6"
@@ -1097,16 +1509,11 @@
             class="w-full max-w-container-max mx-auto px-gutter py-section-desktop"
         >
 
-
-            <!-- SECTION HEADER -->
-
             <div
                 class="flex flex-col md:flex-row justify-between md:items-end mb-12 pb-4 border-b border-surface-container-highest"
             >
 
-
                 <div>
-
 
                     <h2
                         class="text-4xl md:text-5xl font-black uppercase text-on-surface"
@@ -1123,8 +1530,6 @@
 
                 </div>
 
-
-                <!-- VIEW ALL -->
 
                 <button
                     type="button"
@@ -1143,23 +1548,18 @@
             </div>
 
 
-            <!-- =================================================
-                 PARTNER CARDS
-            ================================================== -->
+            <!-- PARTNER CARDS -->
 
             <div
                 class="flex overflow-x-auto gap-6 pb-6 snap-x snap-mandatory hide-scrollbar"
             >
 
 
-                <!-- =================================================
-                     SELLER 1
-                ================================================== -->
+                <!-- SELLER 1 -->
 
                 <div
                     class="min-w-[300px] md:min-w-[350px] bg-surface-container-low border border-outline-variant rounded-xl overflow-hidden snap-center flex-shrink-0 card-hover"
                 >
-
 
                     <div
                         class="h-32 bg-surface-container-high relative"
@@ -1192,7 +1592,6 @@
 
 
                     <div class="p-6">
-
 
                         <h4
                             class="text-2xl font-bold text-on-surface mb-2"
@@ -1238,7 +1637,6 @@
                             class="flex items-center justify-between border-t border-surface-container-high pt-4"
                         >
 
-
                             <div
                                 class="flex items-center gap-1"
                                 style="color:#FF6B00;"
@@ -1268,14 +1666,11 @@
                 </div>
 
 
-                <!-- =================================================
-                     SELLER 2
-                ================================================== -->
+                <!-- SELLER 2 -->
 
                 <div
                     class="min-w-[300px] md:min-w-[350px] bg-surface-container-low border border-outline-variant rounded-xl overflow-hidden snap-center flex-shrink-0 card-hover"
                 >
-
 
                     <div
                         class="h-32 bg-surface-container-high relative"
@@ -1308,7 +1703,6 @@
 
 
                     <div class="p-6">
-
 
                         <h4
                             class="text-2xl font-bold text-on-surface mb-2"
@@ -1354,7 +1748,6 @@
                             class="flex items-center justify-between border-t border-surface-container-high pt-4"
                         >
 
-
                             <div
                                 class="flex items-center gap-1"
                                 style="color:#FF6B00;"
@@ -1384,18 +1777,14 @@
                 </div>
 
 
-                <!-- =================================================
-                     YOUR BRAND
-                ================================================== -->
+                <!-- YOUR BRAND -->
 
                 <a
                     href="sellerinfo.html"
                     class="min-w-[300px] md:min-w-[350px] bg-surface-container-low border border-outline-variant rounded-xl snap-center flex-shrink-0 flex items-center justify-center card-hover opacity-80 hover:opacity-100"
                 >
 
-
                     <div class="text-center p-8">
-
 
                         <div
                             class="w-16 h-16 mx-auto rounded-full bg-surface-container-high border-2 border-dashed border-outline-variant flex items-center justify-center mb-6"
@@ -1442,18 +1831,14 @@
         class="border-t border-outline-variant bg-surface-container-lowest px-gutter py-16"
     >
 
-
         <div
             class="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-4 gap-12"
         >
 
 
-            <!-- =================================================
-                 BRAND
-            ================================================== -->
+            <!-- BRAND -->
 
             <div>
-
 
                 <a
                     href="seller.html"
@@ -1474,12 +1859,9 @@
             </div>
 
 
-            <!-- =================================================
-                 MARKETPLACE
-            ================================================== -->
+            <!-- MARKETPLACE -->
 
             <div>
-
 
                 <h4
                     class="font-mono text-xs tracking-widest uppercase text-on-surface mb-5"
@@ -1489,7 +1871,6 @@
 
 
                 <div class="flex flex-col gap-3">
-
 
                     <a
                         href="index.html"
@@ -1519,12 +1900,9 @@
             </div>
 
 
-            <!-- =================================================
-                 SELLERS
-            ================================================== -->
+            <!-- SELLERS -->
 
             <div>
-
 
                 <h4
                     class="font-mono text-xs tracking-widest uppercase text-on-surface mb-5"
@@ -1534,7 +1912,6 @@
 
 
                 <div class="flex flex-col gap-3">
-
 
                     <a
                         href="seller-guide.html"
@@ -1560,8 +1937,6 @@
                     </a>
 
 
-                    <!-- SELLER DASHBOARD -->
-
                     <a
                         href="seller-dashboard.html"
                         class="text-on-surface-variant hover:text-secondary-fixed"
@@ -1574,12 +1949,9 @@
             </div>
 
 
-            <!-- =================================================
-                 LEGAL
-            ================================================== -->
+            <!-- LEGAL -->
 
             <div>
-
 
                 <h4
                     class="font-mono text-xs tracking-widest uppercase text-on-surface mb-5"
@@ -1623,6 +1995,147 @@
 
     <script src="seller.js"></script>
 
+
+    <!-- =====================================================
+         NAVBAR FALLBACK JAVASCRIPT
+         Works with existing seller.js
+    ====================================================== -->
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const menuButton =
+                document.getElementById("menuButton");
+
+            const menuIcon =
+                document.getElementById("menuIcon");
+
+            const mobileMenu =
+                document.getElementById("mobileMenu");
+
+
+            if (!menuButton || !mobileMenu) {
+                return;
+            }
+
+
+            menuButton.addEventListener("click", function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                const isOpen =
+                    mobileMenu.classList.contains("open");
+
+
+                if (isOpen) {
+
+                    mobileMenu.classList.remove("open");
+
+                    menuButton.setAttribute(
+                        "aria-expanded",
+                        "false"
+                    );
+
+                    menuButton.setAttribute(
+                        "aria-label",
+                        "Open menu"
+                    );
+
+                    if (menuIcon) {
+                        menuIcon.textContent = "menu";
+                    }
+
+                } else {
+
+                    mobileMenu.classList.add("open");
+
+                    menuButton.setAttribute(
+                        "aria-expanded",
+                        "true"
+                    );
+
+                    menuButton.setAttribute(
+                        "aria-label",
+                        "Close menu"
+                    );
+
+                    if (menuIcon) {
+                        menuIcon.textContent = "close";
+                    }
+
+                }
+
+            });
+
+
+            /* Close menu when link is clicked */
+
+            mobileMenu
+                .querySelectorAll("a")
+                .forEach(function (link) {
+
+                    link.addEventListener(
+                        "click",
+                        function () {
+
+                            mobileMenu.classList.remove("open");
+
+                            menuButton.setAttribute(
+                                "aria-expanded",
+                                "false"
+                            );
+
+                            menuButton.setAttribute(
+                                "aria-label",
+                                "Open menu"
+                            );
+
+                            if (menuIcon) {
+                                menuIcon.textContent = "menu";
+                            }
+
+                        }
+                    );
+
+                });
+
+
+            /* Close menu when clicking outside */
+
+            document.addEventListener(
+                "click",
+                function (event) {
+
+                    if (
+                        !event.target.closest(".kz-header")
+                    ) {
+
+                        mobileMenu.classList.remove("open");
+
+                        menuButton.setAttribute(
+                            "aria-expanded",
+                            "false"
+                        );
+
+                        menuButton.setAttribute(
+                            "aria-label",
+                            "Open menu"
+                        );
+
+                        if (menuIcon) {
+                            menuIcon.textContent = "menu";
+                        }
+
+                    }
+
+                }
+            );
+
+        });
+
+    </script>
 
 </body>
 

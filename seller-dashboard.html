@@ -1,0 +1,1604 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>KHELZONE - Seller Dashboard</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --orange: #ff5a00;
+            --orange-dark: #d63f00;
+            --bg: #141313;
+            --panel: #1d1d1d;
+            --panel-2: #252525;
+            --border: rgba(255, 90, 0, 0.25);
+            --text: #f3f3f3;
+            --muted: #aaa;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family:
+                Inter,
+                Arial,
+                Helvetica,
+                sans-serif;
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        /* ============================
+           SCROLLBAR
+        ============================ */
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #101010;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--orange);
+            border-radius: 20px;
+        }
+
+        /* ============================
+           LOADING SCREEN
+        ============================ */
+
+        #loadingScreen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #090909;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-box {
+            text-align: center;
+        }
+
+        .loading-logo {
+            color: var(--orange);
+            font-size: 34px;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+
+        .loading-spinner {
+            width: 42px;
+            height: 42px;
+            border: 4px solid rgba(255, 90, 0, 0.2);
+            border-top-color: var(--orange);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ============================
+           SIDEBAR
+        ============================ */
+
+        .sidebar {
+            width: 260px;
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: #090909;
+            border-right: 1px solid var(--border);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-logo {
+            min-height: 82px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-logo span {
+            color: var(--orange);
+            font-size: 27px;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        .seller-label {
+            margin-left: 8px;
+            color: #aaa;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .sidebar-nav {
+            padding: 20px 12px;
+            flex: 1;
+        }
+
+        .nav-btn {
+            width: 100%;
+            min-height: 48px;
+            border: 0;
+            background: transparent;
+            color: #aaa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 0 15px;
+            margin-bottom: 7px;
+            cursor: pointer;
+            font-weight: 700;
+            text-align: left;
+            transition: 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 90, 0, 0.1);
+            color: #fff;
+        }
+
+        .nav-btn.active {
+            background: var(--orange);
+            color: #fff;
+            box-shadow:
+                0 8px 25px rgba(255, 90, 0, 0.18);
+        }
+
+        .nav-icon {
+            width: 22px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .sidebar-bottom {
+            padding: 15px 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .logout-btn {
+            width: 100%;
+            min-height: 46px;
+            border: 1px solid rgba(255, 90, 0, 0.25);
+            background: rgba(255, 90, 0, 0.07);
+            color: #ff7b3d;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 800;
+            transition: 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: var(--orange);
+            color: #fff;
+        }
+
+        /* ============================
+           MAIN
+        ============================ */
+
+        .main {
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            height: 82px;
+            position: sticky;
+            top: 0;
+            z-index: 900;
+            background: rgba(9, 9, 9, 0.94);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+
+        .topbar-left h1 {
+            margin: 0;
+            font-size: 25px;
+            font-weight: 900;
+        }
+
+        .topbar-left p {
+            margin: 3px 0 0;
+            color: #888;
+            font-size: 13px;
+        }
+
+        .seller-profile {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .profile-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+        }
+
+        .profile-info {
+            display: none;
+        }
+
+        /* ============================
+           CONTENT
+        ============================ */
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* ============================
+           STATS
+        ============================ */
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(5, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--panel);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 15px;
+            padding: 20px;
+            transition: 0.2s;
+        }
+
+        .stat-card:hover {
+            border-color: var(--border);
+            transform: translateY(-2px);
+        }
+
+        .stat-title {
+            color: #999;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .stat-value {
+            margin-top: 8px;
+            font-size: 28px;
+            font-weight: 900;
+        }
+
+        .stat-orange {
+            color: var(--orange);
+        }
+
+        /* ============================
+           PANELS
+        ============================ */
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            min-height: 70px;
+            padding: 18px 22px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .panel-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 900;
+        }
+
+        /* ============================
+           TABLE
+        ============================ */
+
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+
+        th {
+            text-align: left;
+            padding: 15px 18px;
+            color: #888;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #181818;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 16px 18px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            color: #ddd;
+            font-size: 13px;
+        }
+
+        tr:hover td {
+            background: rgba(255,255,255,0.025);
+        }
+
+        /* ============================
+           STATUS
+        ============================ */
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: capitalize;
+        }
+
+        .status-pending {
+            background: rgba(234,179,8,0.12);
+            color: #facc15;
+        }
+
+        .status-processing {
+            background: rgba(59,130,246,0.12);
+            color: #60a5fa;
+        }
+
+        .status-shipped {
+            background: rgba(168,85,247,0.12);
+            color: #c084fc;
+        }
+
+        .status-delivered {
+            background: rgba(34,197,94,0.12);
+            color: #4ade80;
+        }
+
+        /* ============================
+           BUTTONS
+        ============================ */
+
+        .btn {
+            border: 0;
+            border-radius: 9px;
+            min-height: 38px;
+            padding: 0 14px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 800;
+            transition: 0.2s;
+        }
+
+        .btn-orange {
+            background: var(--orange);
+            color: #fff;
+        }
+
+        .btn-orange:hover {
+            background: var(--orange-dark);
+        }
+
+        .btn-dark {
+            background: #2a2a2a;
+            color: #eee;
+        }
+
+        .btn-dark:hover {
+            background: #333;
+        }
+
+        .btn-danger {
+            background: rgba(239,68,68,0.1);
+            color: #f87171;
+        }
+
+        .btn-danger:hover {
+            background: rgba(239,68,68,0.2);
+        }
+
+        /* ============================
+           SEARCH
+        ============================ */
+
+        .search-box {
+            width: 280px;
+            height: 40px;
+            background: #111;
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #fff;
+            border-radius: 9px;
+            padding: 0 13px;
+            outline: none;
+        }
+
+        .search-box:focus {
+            border-color: var(--orange);
+        }
+
+        /* ============================
+           EMPTY / LOADING
+        ============================ */
+
+        .table-message {
+            text-align: center;
+            padding: 50px 20px;
+            color: #777;
+        }
+
+        /* ============================
+           PRODUCT IMAGE
+        ============================ */
+
+        .product-image {
+            width: 48px;
+            height: 48px;
+            border-radius: 9px;
+            object-fit: cover;
+            background: #111;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        /* ============================
+           MODAL
+        ============================ */
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 5000;
+            background: rgba(0,0,0,0.75);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .modal-box {
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: #1b1b1b;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow:
+                0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        .close-btn {
+            width: 36px;
+            height: 36px;
+            border: 0;
+            border-radius: 8px;
+            background: #292929;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            background: var(--orange);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        .detail-item {
+            background: #141414;
+            border-radius: 10px;
+            padding: 13px;
+        }
+
+        .detail-label {
+            color: #777;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            color: #eee;
+            font-size: 14px;
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        /* ============================
+           MOBILE
+        ============================ */
+
+        .mobile-menu-btn {
+            display: none;
+            width: 42px;
+            height: 42px;
+            border: 1px solid var(--border);
+            background: rgba(255,90,0,0.08);
+            color: var(--orange);
+            border-radius: 9px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns:
+                    repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 900px) {
+
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.25s ease;
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .topbar {
+                padding: 0 18px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 560px) {
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content {
+                padding: 14px;
+            }
+
+            .topbar-left h1 {
+                font-size: 20px;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .panel-header {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ============================
+         LOADING SCREEN
+    ============================= -->
+
+    <div id="loadingScreen">
+        <div class="loading-box">
+            <div class="loading-logo">
+                KHELZONE
+            </div>
+
+            <div class="loading-spinner"></div>
+
+            <div style="color:#777;font-size:13px;">
+                Checking seller access...
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================
+         SIDEBAR
+    ============================= -->
+
+    <aside
+        id="sidebar"
+        class="sidebar"
+    >
+
+        <div class="sidebar-logo">
+            <span>KHELZONE</span>
+            <span class="seller-label">
+                Seller
+            </span>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <button
+                class="nav-btn active"
+                data-section="dashboardSection"
+            >
+                <span class="nav-icon">📊</span>
+                Dashboard
+            </button>
+
+            <button
+                class="nav-btn"
+                data-section="productsSection"
+            >
+                <span class="nav-icon">📦</span>
+                My Products
+            </button>
+
+            <button
+                class="nav-btn"
+                data-section="ordersSection"
+            >
+                <span class="nav-icon">🛒</span>
+                My Orders
+            </button>
+
+            <button
+                class="nav-btn"
+                data-section="profileSection"
+            >
+                <span class="nav-icon">👤</span>
+                My Profile
+            </button>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <button
+                id="logoutBtn"
+                class="logout-btn"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </aside>
+
+    <!-- ============================
+         MAIN
+    ============================= -->
+
+    <main class="main">
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div
+                style="
+                    display:flex;
+                    align-items:center;
+                    gap:13px;
+                "
+            >
+
+                <button
+                    id="mobileMenuBtn"
+                    class="mobile-menu-btn"
+                    type="button"
+                >
+                    ☰
+                </button>
+
+                <div class="topbar-left">
+
+                    <h1 id="pageTitle">
+                        Seller Dashboard
+                    </h1>
+
+                    <p id="pageSubtitle">
+                        Manage your KHELZONE store
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="seller-profile">
+
+                <div
+                    id="profileAvatar"
+                    class="profile-avatar"
+                >
+                    S
+                </div>
+
+                <div class="profile-info">
+                    <strong id="sellerNameTop">
+                        Seller
+                    </strong>
+                </div>
+
+            </div>
+
+        </header>
+
+        <!-- CONTENT -->
+
+        <div class="content">
+
+            <!-- ============================
+                 DASHBOARD
+            ============================= -->
+
+            <section
+                id="dashboardSection"
+                class="section active"
+            >
+
+                <div class="stats-grid">
+
+                    <div class="stat-card">
+                        <div class="stat-title">
+                            Total Products
+                        </div>
+
+                        <div
+                            id="totalProducts"
+                            class="stat-value stat-orange"
+                        >
+                            0
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-title">
+                            Total Orders
+                        </div>
+
+                        <div
+                            id="totalOrders"
+                            class="stat-value"
+                        >
+                            0
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-title">
+                            Pending Orders
+                        </div>
+
+                        <div
+                            id="pendingOrders"
+                            class="stat-value"
+                        >
+                            0
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-title">
+                            Delivered Orders
+                        </div>
+
+                        <div
+                            id="deliveredOrders"
+                            class="stat-value"
+                        >
+                            0
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-title">
+                            Total Sales
+                        </div>
+
+                        <div
+                            id="totalSales"
+                            class="stat-value stat-orange"
+                        >
+                            Rs. 0
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <h2 class="panel-title">
+                                Recent Orders
+                            </h2>
+
+                            <p
+                                style="
+                                    margin:4px 0 0;
+                                    color:#777;
+                                    font-size:12px;
+                                "
+                            >
+                                Your latest customer orders
+                            </p>
+                        </div>
+
+                        <button
+                            class="btn btn-orange"
+                            data-section="ordersSection"
+                        >
+                            View All Orders
+                        </button>
+
+                    </div>
+
+                    <div class="table-wrap">
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Product</th>
+                                    <th>Qty</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+
+                            <tbody
+                                id="recentOrdersBody"
+                            >
+                                <tr>
+                                    <td
+                                        colspan="7"
+                                        class="table-message"
+                                    >
+                                        Loading...
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- ============================
+                 PRODUCTS
+            ============================= -->
+
+            <section
+                id="productsSection"
+                class="section"
+            >
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <h2 class="panel-title">
+                                My Products
+                            </h2>
+
+                            <p
+                                style="
+                                    margin:4px 0 0;
+                                    color:#777;
+                                    font-size:12px;
+                                "
+                            >
+                                Products added by your account
+                            </p>
+                        </div>
+
+                        <div
+                            style="
+                                display:flex;
+                                gap:10px;
+                                flex-wrap:wrap;
+                            "
+                        >
+
+                            <input
+                                id="productSearch"
+                                class="search-box"
+                                type="search"
+                                placeholder="Search products..."
+                            >
+
+                            <button
+                                id="addProductBtn"
+                                class="btn btn-orange"
+                                type="button"
+                            >
+                                + Add Product
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div class="table-wrap">
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Category</th>
+                                    <th>Sport</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Status</th>
+                                    <th>Best Seller</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody
+                                id="productsTableBody"
+                            >
+                                <tr>
+                                    <td
+                                        colspan="8"
+                                        class="table-message"
+                                    >
+                                        Loading products...
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- ============================
+                 ORDERS
+            ============================= -->
+
+            <section
+                id="ordersSection"
+                class="section"
+            >
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <h2 class="panel-title">
+                                My Orders
+                            </h2>
+
+                            <p
+                                style="
+                                    margin:4px 0 0;
+                                    color:#777;
+                                    font-size:12px;
+                                "
+                            >
+                                Orders containing your products
+                            </p>
+                        </div>
+
+                        <input
+                            id="orderSearch"
+                            class="search-box"
+                            type="search"
+                            placeholder="Search orders..."
+                        >
+
+                    </div>
+
+                    <div class="table-wrap">
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Email</th>
+                                    <th>Contact</th>
+                                    <th>Product</th>
+                                    <th>Qty</th>
+                                    <th>Price</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody
+                                id="ordersTableBody"
+                            >
+                                <tr>
+                                    <td
+                                        colspan="11"
+                                        class="table-message"
+                                    >
+                                        Loading orders...
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- ============================
+                 PROFILE
+            ============================= -->
+
+            <section
+                id="profileSection"
+                class="section"
+            >
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <h2 class="panel-title">
+                                My Profile
+                            </h2>
+
+                            <p
+                                style="
+                                    margin:4px 0 0;
+                                    color:#777;
+                                    font-size:12px;
+                                "
+                            >
+                                Seller account information
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="detail-grid">
+
+                            <div class="detail-item">
+
+                                <div class="detail-label">
+                                    Full Name
+                                </div>
+
+                                <div
+                                    id="profileName"
+                                    class="detail-value"
+                                >
+                                    —
+                                </div>
+
+                            </div>
+
+                            <div class="detail-item">
+
+                                <div class="detail-label">
+                                    Email
+                                </div>
+
+                                <div
+                                    id="profileEmail"
+                                    class="detail-value"
+                                >
+                                    —
+                                </div>
+
+                            </div>
+
+                            <div class="detail-item">
+
+                                <div class="detail-label">
+                                    Phone
+                                </div>
+
+                                <div
+                                    id="profilePhone"
+                                    class="detail-value"
+                                >
+                                    —
+                                </div>
+
+                            </div>
+
+                            <div class="detail-item">
+
+                                <div class="detail-label">
+                                    Role
+                                </div>
+
+                                <div
+                                    id="profileRole"
+                                    class="detail-value"
+                                >
+                                    Seller
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+    <!-- ============================
+         ORDER MODAL
+    ============================= -->
+
+    <div
+        id="orderModal"
+        class="modal"
+    >
+
+        <div class="modal-box">
+
+            <div class="modal-header">
+
+                <h2>
+                    Order Details
+                </h2>
+
+                <button
+                    id="closeOrderModal"
+                    class="close-btn"
+                    type="button"
+                >
+                    ✕
+                </button>
+
+            </div>
+
+            <div
+                id="orderModalBody"
+                class="modal-body"
+            >
+                Loading...
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ============================
+         PRODUCT MODAL
+    ============================= -->
+
+    <div
+        id="productModal"
+        class="modal"
+    >
+
+        <div class="modal-box">
+
+            <div class="modal-header">
+
+                <h2 id="productModalTitle">
+                    Add Product
+                </h2>
+
+                <button
+                    id="closeProductModal"
+                    class="close-btn"
+                    type="button"
+                >
+                    ✕
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <form
+                    id="productForm"
+                    class="space-y-4"
+                >
+
+                    <input
+                        type="hidden"
+                        id="productId"
+                    >
+
+                    <div>
+                        <label
+                            style="
+                                display:block;
+                                margin-bottom:7px;
+                                color:#aaa;
+                                font-size:12px;
+                                font-weight:800;
+                            "
+                        >
+                            Product Name
+                        </label>
+
+                        <input
+                            id="productName"
+                            type="text"
+                            required
+                            class="w-full bg-[#111] border border-white/10 rounded-lg px-3 py-3 text-white outline-none focus:border-[#ff5a00]"
+                        >
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        <div>
+
+                            <label
+                                style="
+                                    display:block;
+                                    margin-bottom:7px;
+                                    color:#aaa;
+                                    font-size:12px;
+                                    font-weight:800;
+                                "
+                            >
+                                Sport
+                            </label>
+
+                            <select
+                                id="productSport"
+                                required
+                                class="w-full bg-[#111] border border-white/10 rounded-lg px-3 py-3 text-white outline-none focus:border-[#ff5a00]"
+                            >
+                                <option value="">
+                                    Select Sport
+                                </option>
+                                <option value="Cricket">
+                                    Cricket
+                                </option>
+                                <option value="Football">
+                                    Football
+                                </option>
+                                <option value="Basketball">
+                                    Basketball
+                                </option>
+                                <option value="Tennis">
+                                    Tennis
+                                </option>
+                                <option value="Running">
+                                    Running
+                                </option>
+                                <option value="Other">
+                                    Other
+                                </option>
+                            </select>
+
+                        </div>
+
+                        <div>
+
+                            <label
+                                style="
+                                    display:block;
+                                    margin-bottom:7px;
+                                    color:#aaa;
+                                    font-size:12px;
+                                    font-weight:800;
+                                "
+                            >
+                                Category
+                            </label>
+
+                            <input
+                                id="productCategory"
+                                type="text"
+                                class="w-full bg-[#111] border border-white/10 rounded-lg px-3 py-3 text-white outline-none focus:border-[#ff5a00]"
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <div>
+
+                        <label
+                            style="
+                                display:block;
+                                margin-bottom:7px;
+                                color:#aaa;
+                                font-size:12px;
+                                font-weight:800;
+                            "
+                        >
+                            Description
+                        </label>
+
+                        <textarea
+                            id="productDescription"
+                            rows="3"
+                            class="w-full bg-[#111] border border-white/10 rounded-lg px-3 py-3 text-white outline-none focus:border-[#ff5a00]"
+                        ></textarea>
+
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                        <div>
+
+                            <label
+                                style="
+                                    display:block;
+                                    margin-bottom:7px;
+                                    color:#aaa;
+                                    font-size:12px;
+                                    font-weight:800;
+                                "
+                            >
+                                Price
+                            </label>
+
+                            <input
+                                id="productPrice"
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                required
+                                class="w-full bg-[#111] border border-white/10 rounded-lg px-3 py-3 text-white outline-none focus:border-[#ff5a00]"
+                            >
+
+                        </div>
+
+                        <div>
+
+                            <label
+                                style="
+                                    display:block;
+                                    margin-bottom:7px;
+                                    color:#aaa;
+                                    font-size:12px;
+                                    font-weight:800;
+                                "
+                            >
+                                Stock
+                            </label>
+
+                            <input
+                                id="productStock"
+                                type="number"
+                                min="0"
+                                required
+                                class="w-full bg-[#111] border border-white/10 rounded-lg px-3 py-3 text-white outline-none focus:border-[#ff5a00]"
+                            >
+
+                        </div>
+
+                        <div>
+
+                            <label
+                                style="
+                                    display:block;
+                                    margin-bottom:7px;
+                                    color:#aaa;
+                                    font-size:12px;
+                                    font-weight:800;
+                                "
+                            >
+                                Brand
+                            </label>
+
+                            <input
+                                id="productBrand"
+                                type="text"
+                                class="w-full bg-[#111] border border-white/10 rounded-lg px-3 py-3 text-white outline-none focus:border-[#ff5a00]"
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <div>
+
+                        <label
+                            style="
+                                display:block;
+                                margin-bottom:7px;
+                                color:#aaa;
+                                font-size:12px;
+                                font-weight:800;
+                            "
+                        >
+                            Image URL
+                        </label>
+
+                        <input
+                            id="productImage"
+                            type="url"
+                            placeholder="https://..."
+                            class="w-full bg-[#111] border border-white/10 rounded-lg px-3 py-3 text-white outline-none focus:border-[#ff5a00]"
+                        >
+
+                    </div>
+
+                    <div
+                        style="
+                            display:flex;
+                            justify-content:flex-end;
+                            gap:10px;
+                            margin-top:20px;
+                        "
+                    >
+
+                        <button
+                            type="button"
+                            id="cancelProductBtn"
+                            class="btn btn-dark"
+                        >
+                            Cancel
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="btn btn-orange"
+                        >
+                            Save Product
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Supabase configuration -->
+    <script>
+        /*
+         * IMPORTANT:
+         * Agar tumhare project mein supabaseClient
+         * pehle se kisi common JS file se ban raha hai,
+         * to usi ko use karna.
+         *
+         * Seller-dashboard.js:
+         * window.supabaseClient
+         */
+
+        window.KHELZONE_SELLER_DASHBOARD = true;
+    </script>
+
+    <script src="seller-dashboard.js"></script>
+
+</body>
+</html>
+```

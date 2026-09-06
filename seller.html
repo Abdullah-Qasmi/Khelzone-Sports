@@ -11,36 +11,162 @@
 
     <title>KHELZONE | Sell With Us</title>
 
+
     <!-- =====================================================
          TAILWIND CONFIG
     ====================================================== -->
+
     <script src="tailwind.config.js"></script>
+
 
     <!-- =====================================================
          TAILWIND CSS
     ====================================================== -->
+
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
 
     <!-- =====================================================
          MATERIAL SYMBOLS
     ====================================================== -->
+
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700&display=swap"
         rel="stylesheet"
     >
 
+
     <!-- =====================================================
          GOOGLE FONTS
     ====================================================== -->
+
     <link
         href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,400..700;1,400..700&family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..800&display=swap"
         rel="stylesheet"
     >
 
+
     <!-- =====================================================
-         YOUR CSS
+         SELLER CSS
     ====================================================== -->
-    <link rel="stylesheet" href="seller.css">
+
+    <link
+        rel="stylesheet"
+        href="seller.css"
+    >
+
+
+    <!-- =====================================================
+         SELLER DASHBOARD BUTTON STYLE
+    ====================================================== -->
+
+    <style>
+
+        /* ==================================================
+           DASHBOARD BUTTON
+        ================================================== */
+
+        .seller-dashboard-btn {
+
+            display: none;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 8px;
+
+            min-height: 42px;
+
+            padding: 10px 16px;
+
+            border: 1px solid #FF6B00;
+
+            border-radius: 8px;
+
+            color: #FF6B00;
+
+            background: rgba(255, 107, 0, 0.08);
+
+            text-decoration: none;
+
+            font-weight: 800;
+
+            transition:
+                background 0.2s ease,
+                color 0.2s ease,
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+
+        }
+
+
+        .seller-dashboard-btn:hover {
+
+            background: #FF6B00;
+
+            color: #000;
+
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 8px 24px rgba(255, 107, 0, 0.25);
+
+        }
+
+
+        /* ==================================================
+           DESKTOP DASHBOARD BUTTON
+        ================================================== */
+
+        .desktop-nav .seller-dashboard-btn {
+
+            margin-left: 4px;
+
+        }
+
+
+        /* ==================================================
+           MOBILE DASHBOARD BUTTON
+        ================================================== */
+
+        .mobile-menu .seller-dashboard-btn {
+
+            width: 100%;
+
+            justify-content: flex-start;
+
+            box-sizing: border-box;
+
+        }
+
+
+        /* ==================================================
+           MOBILE MENU LINK SPACING
+        ================================================== */
+
+        .mobile-menu a {
+
+            text-decoration: none;
+
+        }
+
+
+        /* ==================================================
+           MOBILE RESPONSIVE
+        ================================================== */
+
+        @media (max-width: 768px) {
+
+            .desktop-nav {
+
+                display: none;
+
+            }
+
+        }
+
+    </style>
 
 </head>
 
@@ -54,23 +180,32 @@
 
     <header class="kz-header">
 
-        <!-- MENU BUTTON -->
+
+        <!-- =================================================
+             MENU BUTTON
+        ================================================== -->
+
         <button
             id="menuButton"
             type="button"
             aria-label="Open menu"
             aria-expanded="false"
         >
+
             <span
                 id="menuIcon"
                 class="material-symbols-outlined"
             >
                 menu
             </span>
+
         </button>
 
 
-        <!-- LOGO -->
+        <!-- =================================================
+             LOGO
+        ================================================== -->
+
         <a
             href="seller.html"
             class="kz-logo"
@@ -79,8 +214,14 @@
         </a>
 
 
-        <!-- DESKTOP NAV -->
+        <!-- =================================================
+             DESKTOP NAV
+        ================================================== -->
+
         <nav class="desktop-nav">
+
+
+            <!-- HOME -->
 
             <a
                 href="index.html"
@@ -89,6 +230,9 @@
                 HOME
             </a>
 
+
+            <!-- SELLER GUIDE -->
+
             <a
                 href="seller-guide.html"
                 class="font-mono text-xs font-bold tracking-widest uppercase"
@@ -96,11 +240,40 @@
                 SELLER GUIDE
             </a>
 
+
+            <!-- BECOME A SELLER -->
+
             <a
                 href="sellerinfo.html"
                 class="desktop-seller-btn font-mono text-xs font-bold tracking-widest uppercase"
             >
                 BECOME A SELLER
+            </a>
+
+
+            <!-- =================================================
+                 SELLER DASHBOARD
+
+                 HIDDEN BY DEFAULT
+
+                 seller.js will show this only for:
+                 1. Admin
+                 2. Approved Seller
+            ================================================== -->
+
+            <a
+                href="seller-dashboard.html"
+                id="sellerDashboardBtn"
+                class="seller-dashboard-btn font-mono text-xs font-bold tracking-widest uppercase"
+                style="display:none;"
+            >
+
+                <span class="material-symbols-outlined text-base">
+                    dashboard
+                </span>
+
+                SELLER DASHBOARD
+
             </a>
 
         </nav>
@@ -115,16 +288,47 @@
             class="mobile-menu"
         >
 
+
+            <!-- HOME -->
+
             <a href="index.html">
                 HOME
             </a>
+
+
+            <!-- SELLER GUIDE -->
 
             <a href="seller-guide.html">
                 SELLER GUIDE
             </a>
 
+
+            <!-- BECOME A SELLER -->
+
             <a href="sellerinfo.html">
                 BECOME A SELLER
+            </a>
+
+
+            <!-- =================================================
+                 MOBILE SELLER DASHBOARD
+
+                 HIDDEN BY DEFAULT
+            ================================================== -->
+
+            <a
+                href="seller-dashboard.html"
+                id="mobileSellerDashboardBtn"
+                class="seller-dashboard-btn"
+                style="display:none;"
+            >
+
+                <span class="material-symbols-outlined text-base">
+                    dashboard
+                </span>
+
+                SELLER DASHBOARD
+
             </a>
 
         </div>
@@ -147,11 +351,15 @@
             class="relative w-full min-h-[620px] flex items-center justify-center px-gutter py-24 border-b border-surface-container-highest overflow-hidden"
         >
 
+
+            <!-- HERO BACKGROUND -->
+
             <div class="absolute inset-0 z-0">
 
                 <div
                     class="hero-bg w-full h-full opacity-30"
                 ></div>
+
 
                 <div
                     class="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"
@@ -160,11 +368,15 @@
             </div>
 
 
+            <!-- HERO CONTENT -->
+
             <div
                 class="relative z-10 max-w-4xl mx-auto text-center flex flex-col items-center gap-8"
             >
 
+
                 <!-- BADGE -->
+
                 <span
                     class="font-mono text-xs uppercase tracking-widest inline-block border px-4 py-2 rounded-full"
                     style="
@@ -178,18 +390,22 @@
 
 
                 <!-- TITLE -->
+
                 <h1
                     class="hero-title font-black text-6xl md:text-8xl leading-none tracking-tight uppercase"
                 >
+
                     SELL WITH
 
                     <span style="color:#FF6B00;">
                         KHELZONE
                     </span>
+
                 </h1>
 
 
                 <!-- DESCRIPTION -->
+
                 <p
                     class="max-w-3xl mx-auto text-base md:text-lg leading-8 text-on-surface-variant"
                 >
@@ -200,9 +416,13 @@
 
 
                 <!-- BUTTONS -->
+
                 <div
                     class="flex flex-col sm:flex-row gap-5 mt-4"
                 >
+
+
+                    <!-- BECOME SELLER -->
 
                     <a
                         href="sellerinfo.html"
@@ -211,6 +431,8 @@
                         BECOME A SELLER
                     </a>
 
+
+                    <!-- SELLER GUIDE -->
 
                     <a
                         href="seller-guide.html"
@@ -235,7 +457,11 @@
             class="w-full max-w-container-max mx-auto px-gutter py-section-desktop"
         >
 
+
+            <!-- SECTION HEADER -->
+
             <div class="mb-12">
+
 
                 <span
                     class="font-mono text-xs uppercase tracking-widest"
@@ -244,16 +470,19 @@
                     SELLER DASHBOARD
                 </span>
 
+
                 <h2
                     class="text-4xl md:text-5xl font-black uppercase text-on-surface mt-3"
                 >
                     Add Product
                 </h2>
 
+
                 <div
                     class="h-1 w-24 mt-5"
                     style="background:#FF6B00;"
                 ></div>
+
 
                 <p
                     class="text-on-surface-variant mt-5 max-w-2xl leading-7"
@@ -265,11 +494,16 @@
             </div>
 
 
-            <!-- ADD PRODUCT CARD -->
+            <!-- =================================================
+                 ADD PRODUCT CARD
+            ================================================== -->
 
             <div
                 class="bg-surface-container border border-outline-variant rounded-2xl p-6 md:p-10 card-hover"
             >
+
+
+                <!-- PRODUCT FORM -->
 
                 <form
                     id="productForm"
@@ -277,9 +511,12 @@
                 >
 
 
-                    <!-- PRODUCT IMAGE -->
+                    <!-- =================================================
+                         PRODUCT IMAGE
+                    ================================================== -->
 
                     <div>
+
 
                         <label
                             class="block font-mono text-xs font-bold tracking-widest uppercase text-on-surface mb-3"
@@ -288,9 +525,11 @@
                             Product Image
                         </label>
 
+
                         <div
                             class="border-2 border-dashed border-outline-variant rounded-xl p-8 text-center hover:border-orange-500 transition"
                         >
+
 
                             <span
                                 class="material-symbols-outlined text-5xl mb-3"
@@ -299,13 +538,16 @@
                                 cloud_upload
                             </span>
 
+
                             <p class="text-on-surface font-semibold">
                                 Upload Product Image
                             </p>
 
+
                             <p class="text-sm text-on-surface-variant mt-2">
                                 PNG, JPG or WEBP
                             </p>
+
 
                             <input
                                 id="productImage"
@@ -320,7 +562,9 @@
                     </div>
 
 
-                    <!-- PRODUCT INFORMATION -->
+                    <!-- =================================================
+                         PRODUCT INFORMATION
+                    ================================================== -->
 
                     <div
                         class="grid grid-cols-1 md:grid-cols-2 gap-6"
@@ -331,12 +575,14 @@
 
                         <div>
 
+
                             <label
                                 for="productName"
                                 class="block font-mono text-xs font-bold tracking-widest uppercase text-on-surface mb-3"
                             >
                                 Product Name
                             </label>
+
 
                             <input
                                 id="productName"
@@ -354,12 +600,14 @@
 
                         <div>
 
+
                             <label
                                 for="productCategory"
                                 class="block font-mono text-xs font-bold tracking-widest uppercase text-on-surface mb-3"
                             >
                                 Category
                             </label>
+
 
                             <select
                                 id="productCategory"
@@ -368,109 +616,136 @@
                                 class="w-full rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface px-4 py-3 focus:border-orange-500 focus:ring-orange-500"
                             >
 
+
                                 <option value="">
                                     Select Category
                                 </option>
+
 
                                 <option value="cricket">
                                     Cricket
                                 </option>
 
+
                                 <option value="football">
                                     Football
                                 </option>
+
 
                                 <option value="running">
                                     Running
                                 </option>
 
+
                                 <option value="basketball">
                                     Basketball
                                 </option>
+
 
                                 <option value="badminton">
                                     Badminton
                                 </option>
 
+
                                 <option value="tennis">
                                     Tennis
                                 </option>
+
 
                                 <option value="volleyball">
                                     Volleyball
                                 </option>
 
+
                                 <option value="hockey">
                                     Hockey
                                 </option>
+
 
                                 <option value="table-tennis">
                                     Table Tennis
                                 </option>
 
+
                                 <option value="swimming">
                                     Swimming
                                 </option>
+
 
                                 <option value="boxing">
                                     Boxing
                                 </option>
 
+
                                 <option value="wrestling">
                                     Wrestling
                                 </option>
+
 
                                 <option value="cycling">
                                     Cycling
                                 </option>
 
+
                                 <option value="fitness">
                                     Fitness &amp; Gym
                                 </option>
+
 
                                 <option value="athletics">
                                     Athletics
                                 </option>
 
+
                                 <option value="baseball">
                                     Baseball
                                 </option>
+
 
                                 <option value="golf">
                                     Golf
                                 </option>
 
+
                                 <option value="rugby">
                                     Rugby
                                 </option>
+
 
                                 <option value="handball">
                                     Handball
                                 </option>
 
+
                                 <option value="squash">
                                     Squash
                                 </option>
+
 
                                 <option value="skateboarding">
                                     Skateboarding
                                 </option>
 
+
                                 <option value="sportswear">
                                     Sportswear
                                 </option>
+
 
                                 <option value="sports-shoes">
                                     Sports Shoes
                                 </option>
 
+
                                 <option value="accessories">
                                     Sports Accessories
                                 </option>
 
+
                                 <option value="other">
                                     Other
                                 </option>
+
 
                             </select>
 
@@ -481,12 +756,14 @@
 
                         <div>
 
+
                             <label
                                 for="productPrice"
                                 class="block font-mono text-xs font-bold tracking-widest uppercase text-on-surface mb-3"
                             >
                                 Price (PKR)
                             </label>
+
 
                             <input
                                 id="productPrice"
@@ -505,12 +782,14 @@
 
                         <div>
 
+
                             <label
                                 for="productStock"
                                 class="block font-mono text-xs font-bold tracking-widest uppercase text-on-surface mb-3"
                             >
                                 Stock Quantity
                             </label>
+
 
                             <input
                                 id="productStock"
@@ -527,9 +806,12 @@
                     </div>
 
 
-                    <!-- DESCRIPTION -->
+                    <!-- =================================================
+                         DESCRIPTION
+                    ================================================== -->
 
                     <div>
+
 
                         <label
                             for="productDescription"
@@ -537,6 +819,7 @@
                         >
                             Product Description
                         </label>
+
 
                         <textarea
                             id="productDescription"
@@ -550,13 +833,19 @@
                     </div>
 
 
-                    <!-- BRAND -->
+                    <!-- =================================================
+                         BRAND + SIZE
+                    ================================================== -->
 
                     <div
                         class="grid grid-cols-1 md:grid-cols-2 gap-6"
                     >
 
+
+                        <!-- BRAND -->
+
                         <div>
+
 
                             <label
                                 for="brandName"
@@ -564,6 +853,7 @@
                             >
                                 Brand
                             </label>
+
 
                             <input
                                 id="brandName"
@@ -576,7 +866,10 @@
                         </div>
 
 
+                        <!-- SIZE -->
+
                         <div>
+
 
                             <label
                                 for="productSize"
@@ -584,6 +877,7 @@
                             >
                                 Size / Variant
                             </label>
+
 
                             <input
                                 id="productSize"
@@ -598,11 +892,16 @@
                     </div>
 
 
-                    <!-- SUBMIT -->
+                    <!-- =================================================
+                         SUBMIT BUTTONS
+                    ================================================== -->
 
                     <div
                         class="pt-4 border-t border-outline-variant flex flex-col sm:flex-row gap-4 justify-end"
                     >
+
+
+                        <!-- CLEAR -->
 
                         <button
                             type="reset"
@@ -611,6 +910,8 @@
                             CLEAR
                         </button>
 
+
+                        <!-- ADD PRODUCT -->
 
                         <button
                             type="submit"
@@ -642,13 +943,18 @@
             class="w-full max-w-container-max mx-auto px-gutter py-section-desktop"
         >
 
+
+            <!-- SECTION TITLE -->
+
             <div class="mb-12">
+
 
                 <h2
                     class="text-4xl md:text-5xl font-black uppercase text-on-surface"
                 >
                     Why Sell With Us?
                 </h2>
+
 
                 <div
                     class="h-1 w-24 mt-5"
@@ -657,6 +963,8 @@
 
             </div>
 
+
+            <!-- CARDS -->
 
             <div
                 class="grid grid-cols-1 md:grid-cols-3 gap-6"
@@ -668,6 +976,7 @@
                 <div
                     class="card-hover bg-surface-container border border-outline-variant p-8 rounded-xl"
                 >
+
 
                     <div
                         class="w-16 h-16 rounded-full bg-surface-container-lowest border border-outline-variant flex items-center justify-center mb-6"
@@ -682,11 +991,13 @@
 
                     </div>
 
+
                     <h3
                         class="text-2xl font-bold text-on-surface mb-3"
                     >
                         Verified Authority
                     </h3>
+
 
                     <p
                         class="text-on-surface-variant leading-7"
@@ -704,6 +1015,7 @@
                     class="card-hover bg-surface-container border border-outline-variant p-8 rounded-xl"
                 >
 
+
                     <div
                         class="w-16 h-16 rounded-full bg-surface-container-lowest border border-outline-variant flex items-center justify-center mb-6"
                     >
@@ -717,11 +1029,13 @@
 
                     </div>
 
+
                     <h3
                         class="text-2xl font-bold text-on-surface mb-3"
                     >
                         Nationwide Reach
                     </h3>
+
 
                     <p
                         class="text-on-surface-variant leading-7"
@@ -739,6 +1053,7 @@
                     class="card-hover bg-surface-container border border-outline-variant p-8 rounded-xl"
                 >
 
+
                     <div
                         class="w-16 h-16 rounded-full bg-surface-container-lowest border border-outline-variant flex items-center justify-center mb-6"
                     >
@@ -752,11 +1067,13 @@
 
                     </div>
 
+
                     <h3
                         class="text-2xl font-bold text-on-surface mb-3"
                     >
                         Secure Payments
                     </h3>
+
 
                     <p
                         class="text-on-surface-variant leading-7"
@@ -780,17 +1097,23 @@
             class="w-full max-w-container-max mx-auto px-gutter py-section-desktop"
         >
 
+
+            <!-- SECTION HEADER -->
+
             <div
                 class="flex flex-col md:flex-row justify-between md:items-end mb-12 pb-4 border-b border-surface-container-highest"
             >
 
+
                 <div>
+
 
                     <h2
                         class="text-4xl md:text-5xl font-black uppercase text-on-surface"
                     >
                         Elite Partners
                     </h2>
+
 
                     <p
                         class="text-on-surface-variant mt-3"
@@ -800,6 +1123,8 @@
 
                 </div>
 
+
+                <!-- VIEW ALL -->
 
                 <button
                     type="button"
@@ -818,18 +1143,23 @@
             </div>
 
 
-            <!-- PARTNER CARDS -->
+            <!-- =================================================
+                 PARTNER CARDS
+            ================================================== -->
 
             <div
                 class="flex overflow-x-auto gap-6 pb-6 snap-x snap-mandatory hide-scrollbar"
             >
 
 
-                <!-- SELLER 1 -->
+                <!-- =================================================
+                     SELLER 1
+                ================================================== -->
 
                 <div
                     class="min-w-[300px] md:min-w-[350px] bg-surface-container-low border border-outline-variant rounded-xl overflow-hidden snap-center flex-shrink-0 card-hover"
                 >
+
 
                     <div
                         class="h-32 bg-surface-container-high relative"
@@ -839,9 +1169,11 @@
                             class="seller1-bg w-full h-full opacity-60"
                         ></div>
 
+
                         <div
                             class="absolute inset-0 bg-gradient-to-t from-surface-container-low to-transparent"
                         ></div>
+
 
                         <div
                             class="absolute top-3 right-3 text-black text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1"
@@ -861,11 +1193,13 @@
 
                     <div class="p-6">
 
+
                         <h4
                             class="text-2xl font-bold text-on-surface mb-2"
                         >
                             ABC Sports
                         </h4>
+
 
                         <p
                             class="text-on-surface-variant text-sm flex items-center gap-1 mb-5"
@@ -890,6 +1224,7 @@
                                 Cricket
                             </span>
 
+
                             <span
                                 class="px-3 py-1 border border-outline-variant rounded-full text-xs text-on-surface-variant"
                             >
@@ -902,6 +1237,7 @@
                         <div
                             class="flex items-center justify-between border-t border-surface-container-high pt-4"
                         >
+
 
                             <div
                                 class="flex items-center gap-1"
@@ -932,11 +1268,14 @@
                 </div>
 
 
-                <!-- SELLER 2 -->
+                <!-- =================================================
+                     SELLER 2
+                ================================================== -->
 
                 <div
                     class="min-w-[300px] md:min-w-[350px] bg-surface-container-low border border-outline-variant rounded-xl overflow-hidden snap-center flex-shrink-0 card-hover"
                 >
+
 
                     <div
                         class="h-32 bg-surface-container-high relative"
@@ -945,6 +1284,7 @@
                         <div
                             class="seller2-bg w-full h-full opacity-60"
                         ></div>
+
 
                         <div
                             class="absolute inset-0 bg-gradient-to-t from-surface-container-low to-transparent"
@@ -968,6 +1308,7 @@
 
 
                     <div class="p-6">
+
 
                         <h4
                             class="text-2xl font-bold text-on-surface mb-2"
@@ -999,6 +1340,7 @@
                                 Apparel
                             </span>
 
+
                             <span
                                 class="px-3 py-1 border border-outline-variant rounded-full text-xs text-on-surface-variant"
                             >
@@ -1011,6 +1353,7 @@
                         <div
                             class="flex items-center justify-between border-t border-surface-container-high pt-4"
                         >
+
 
                             <div
                                 class="flex items-center gap-1"
@@ -1041,14 +1384,18 @@
                 </div>
 
 
-                <!-- YOUR BRAND -->
+                <!-- =================================================
+                     YOUR BRAND
+                ================================================== -->
 
                 <a
                     href="sellerinfo.html"
                     class="min-w-[300px] md:min-w-[350px] bg-surface-container-low border border-outline-variant rounded-xl snap-center flex-shrink-0 flex items-center justify-center card-hover opacity-80 hover:opacity-100"
                 >
 
+
                     <div class="text-center p-8">
+
 
                         <div
                             class="w-16 h-16 mx-auto rounded-full bg-surface-container-high border-2 border-dashed border-outline-variant flex items-center justify-center mb-6"
@@ -1095,14 +1442,18 @@
         class="border-t border-outline-variant bg-surface-container-lowest px-gutter py-16"
     >
 
+
         <div
             class="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-4 gap-12"
         >
 
 
-            <!-- BRAND -->
+            <!-- =================================================
+                 BRAND
+            ================================================== -->
 
             <div>
+
 
                 <a
                     href="seller.html"
@@ -1123,9 +1474,12 @@
             </div>
 
 
-            <!-- MARKETPLACE -->
+            <!-- =================================================
+                 MARKETPLACE
+            ================================================== -->
 
             <div>
+
 
                 <h4
                     class="font-mono text-xs tracking-widest uppercase text-on-surface mb-5"
@@ -1136,6 +1490,7 @@
 
                 <div class="flex flex-col gap-3">
 
+
                     <a
                         href="index.html"
                         class="text-on-surface-variant hover:text-secondary-fixed"
@@ -1143,12 +1498,14 @@
                         Cricket Gear
                     </a>
 
+
                     <a
                         href="index.html"
                         class="text-on-surface-variant hover:text-secondary-fixed"
                     >
                         Football Kits
                     </a>
+
 
                     <a
                         href="shop.html"
@@ -1162,9 +1519,12 @@
             </div>
 
 
-            <!-- SELLERS -->
+            <!-- =================================================
+                 SELLERS
+            ================================================== -->
 
             <div>
+
 
                 <h4
                     class="font-mono text-xs tracking-widest uppercase text-on-surface mb-5"
@@ -1175,12 +1535,14 @@
 
                 <div class="flex flex-col gap-3">
 
+
                     <a
                         href="seller-guide.html"
                         class="text-on-surface-variant hover:text-secondary-fixed"
                     >
                         Seller Guide
                     </a>
+
 
                     <a
                         href="sellerinfo.html"
@@ -1189,6 +1551,7 @@
                         Become a Seller
                     </a>
 
+
                     <a
                         href="#add-product"
                         class="text-on-surface-variant hover:text-secondary-fixed"
@@ -1196,14 +1559,27 @@
                         Add Product
                     </a>
 
+
+                    <!-- SELLER DASHBOARD -->
+
+                    <a
+                        href="seller-dashboard.html"
+                        class="text-on-surface-variant hover:text-secondary-fixed"
+                    >
+                        Seller Dashboard
+                    </a>
+
                 </div>
 
             </div>
 
 
-            <!-- LEGAL -->
+            <!-- =================================================
+                 LEGAL
+            ================================================== -->
 
             <div>
+
 
                 <h4
                     class="font-mono text-xs tracking-widest uppercase text-on-surface mb-5"
@@ -1237,12 +1613,16 @@
     <!-- =====================================================
          SUPABASE
     ====================================================== -->
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 
     <!-- =====================================================
          KHELZONE SELLER JAVASCRIPT
     ====================================================== -->
+
     <script src="seller.js"></script>
+
 
 </body>
 

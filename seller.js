@@ -1,30 +1,116 @@
-/* =========================================================
-   KHELZONE SELLER.JS
-   Seller Status + Add Product + Supabase Storage
-========================================================= */
+/* ============================================================
+   KHELZONE SELLER PAGE
+   COMPLETE SELLER ACCESS + PRODUCT ADD SYSTEM
+   + SELLER DASHBOARD BUTTON
+============================================================ */
 
-document.addEventListener("DOMContentLoaded", async function () {
+"use strict";
 
-    /* =====================================================
-       SUPABASE CONFIG
-    ===================================================== */
 
-    const SUPABASE_URL =
-        "https://antqexjhlsaynunlmzqa.supabase.co";
+/* ============================================================
+   SUPABASE
+============================================================ */
 
-    const SUPABASE_KEY =
-        "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
+const SUPABASE_URL =
+    "https://antqexjhlsaynunlmzqa.supabase.co";
 
-    const supabaseClient =
-        window.supabase.createClient(
+const SUPABASE_KEY =
+    "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
+
+
+/* ============================================================
+   GLOBAL
+============================================================ */
+
+let supabaseClient = null;
+let currentUser = null;
+let currentProfile = null;
+let currentSeller = null;
+
+
+/* ============================================================
+   DOM READY
+============================================================ */
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    console.log("KHELZONE seller.js started");
+
+
+    /* ========================================================
+       CREATE SUPABASE CLIENT
+    ======================================================== */
+
+    try {
+
+        if (!window.supabase) {
+            console.error("Supabase library not loaded.");
+            showStatusMessage(
+                "Supabase could not be loaded. Please refresh the page."
+            );
+            return;
+        }
+
+        supabaseClient = window.supabase.createClient(
             SUPABASE_URL,
             SUPABASE_KEY
         );
 
+        console.log("Supabase connected.");
 
-    /* =====================================================
+    } catch (error) {
+
+        console.error(
+            "Supabase initialization error:",
+            error
+        );
+
+        showStatusMessage(
+            "Unable to connect to server."
+        );
+
+        return;
+    }
+
+
+    /* ========================================================
        MOBILE MENU
-    ===================================================== */
+    ======================================================== */
+
+    setupMobileMenu();
+
+
+    /* ========================================================
+       HIDE DASHBOARD BUTTON BY DEFAULT
+    ======================================================== */
+
+    updateSellerDashboardButton(
+        null,
+        null
+    );
+
+
+    /* ========================================================
+       CHECK SELLER / ADMIN ACCESS
+    ======================================================== */
+
+    await checkSellerStatus();
+
+
+    /* ========================================================
+       PRODUCT FORM
+    ======================================================== */
+
+    setupProductForm();
+
+});
+
+
+/* ============================================================
+   MOBILE MENU
+============================================================ */
+
+function setupMobileMenu() {
 
     const menuButton =
         document.getElementById("menuButton");
@@ -32,417 +118,970 @@ document.addEventListener("DOMContentLoaded", async function () {
     const mobileMenu =
         document.getElementById("mobileMenu");
 
-    if (menuButton && mobileMenu) {
-
-        menuButton.addEventListener("click", function () {
-
-            const isOpen =
-                mobileMenu.classList.toggle("show");
-
-            menuButton.classList.toggle(
-                "active",
-                isOpen
-            );
-
-            menuButton.setAttribute(
-                "aria-expanded",
-                isOpen ? "true" : "false"
-            );
-        });
+    const menuIcon =
+        document.getElementById("menuIcon");
 
 
-        const menuLinks =
-            mobileMenu.querySelectorAll("a");
-
-        menuLinks.forEach(function (link) {
-
-            link.addEventListener("click", function () {
-
-                mobileMenu.classList.remove("show");
-
-                menuButton.classList.remove("active");
-
-                menuButton.setAttribute(
-                    "aria-expanded",
-                    "false"
-                );
-            });
-        });
-
-
-        document.addEventListener("click", function (event) {
-
-            const clickedInsideMenu =
-                mobileMenu.contains(event.target);
-
-            const clickedButton =
-                menuButton.contains(event.target);
-
-            if (
-                !clickedInsideMenu &&
-                !clickedButton &&
-                mobileMenu.classList.contains("show")
-            ) {
-
-                mobileMenu.classList.remove("show");
-
-                menuButton.classList.remove("active");
-
-                menuButton.setAttribute(
-                    "aria-expanded",
-                    "false"
-                );
-            }
-        });
+    if (!menuButton || !mobileMenu) {
+        return;
     }
 
 
-    /* =====================================================
-       ADD PRODUCT ELEMENTS
-    ===================================================== */
+    /* --------------------------------------------------------
+       MENU BUTTON CLICK
+    -------------------------------------------------------- */
 
-    const productForm =
-        document.getElementById("productForm");
+    menuButton.addEventListener("click", (event) => {
 
-    const addProductSection =
-        document.getElementById("add-product");
+        event.stopPropagation();
 
-    const productImage =
-        document.getElementById("productImage");
+        const isOpen =
+            mobileMenu.classList.contains("show");
 
-    const productName =
-        document.getElementById("productName");
+        if (isOpen) {
 
-    const productCategory =
-        document.getElementById("productCategory");
-
-    const productPrice =
-        document.getElementById("productPrice");
-
-    const productStock =
-        document.getElementById("productStock");
-
-    const productDescription =
-        document.getElementById("productDescription");
-
-    const brandName =
-        document.getElementById("brandName");
-
-    const productSize =
-        document.getElementById("productSize");
-
-
-    /* =====================================================
-       STATUS MESSAGE
-    ===================================================== */
-
-    let statusBox =
-        document.getElementById("sellerStatusMessage");
-
-
-    if (!statusBox && addProductSection) {
-
-        statusBox =
-            document.createElement("div");
-
-        statusBox.id =
-            "sellerStatusMessage";
-
-        statusBox.style.display = "none";
-
-        statusBox.style.margin =
-            "20px auto";
-
-        statusBox.style.maxWidth =
-            "900px";
-
-        statusBox.style.padding =
-            "18px 22px";
-
-        statusBox.style.borderRadius =
-            "12px";
-
-        statusBox.style.fontFamily =
-            "Arial, sans-serif";
-
-        addProductSection.parentNode.insertBefore(
-            statusBox,
-            addProductSection
-        );
-    }
-
-
-    function showSellerMessage(
-        message,
-        type = "info"
-    ) {
-
-        if (!statusBox) return;
-
-        statusBox.style.display = "block";
-
-        statusBox.textContent = message;
-
-        if (type === "success") {
-
-            statusBox.style.background =
-                "rgba(124,252,90,.10)";
-
-            statusBox.style.border =
-                "1px solid #7CFC5A";
-
-            statusBox.style.color =
-                "#7CFC5A";
-
-        } else if (type === "error") {
-
-            statusBox.style.background =
-                "rgba(255,90,31,.10)";
-
-            statusBox.style.border =
-                "1px solid #ff5a1f";
-
-            statusBox.style.color =
-                "#ff5a1f";
+            closeMobileMenu();
 
         } else {
 
-            statusBox.style.background =
-                "rgba(255,255,255,.05)";
+            openMobileMenu();
 
-            statusBox.style.border =
-                "1px solid #444";
-
-            statusBox.style.color =
-                "#f2f2f0";
         }
+
+    });
+
+
+    /* --------------------------------------------------------
+       MOBILE LINKS
+    -------------------------------------------------------- */
+
+    const mobileLinks =
+        mobileMenu.querySelectorAll("a");
+
+    mobileLinks.forEach((link) => {
+
+        link.addEventListener("click", () => {
+
+            closeMobileMenu();
+
+        });
+
+    });
+
+
+    /* --------------------------------------------------------
+       CLICK OUTSIDE
+    -------------------------------------------------------- */
+
+    document.addEventListener("click", (event) => {
+
+        if (
+            mobileMenu.classList.contains("show") &&
+            !mobileMenu.contains(event.target) &&
+            !menuButton.contains(event.target)
+        ) {
+
+            closeMobileMenu();
+
+        }
+
+    });
+
+
+    /* --------------------------------------------------------
+       ESC KEY
+    -------------------------------------------------------- */
+
+    document.addEventListener("keydown", (event) => {
+
+        if (event.key === "Escape") {
+
+            closeMobileMenu();
+
+        }
+
+    });
+
+
+    function openMobileMenu() {
+
+        mobileMenu.classList.add("show");
+        menuButton.classList.add("active");
+
+        menuButton.setAttribute(
+            "aria-expanded",
+            "true"
+        );
+
+        menuButton.setAttribute(
+            "aria-label",
+            "Close menu"
+        );
+
+        if (menuIcon) {
+
+            menuIcon.textContent = "close";
+
+        }
+
     }
 
 
-    /* =====================================================
-       HIDE ADD PRODUCT BY DEFAULT
-    ===================================================== */
+    function closeMobileMenu() {
 
-    if (addProductSection) {
+        mobileMenu.classList.remove("show");
+        menuButton.classList.remove("active");
 
-        addProductSection.style.display =
+        menuButton.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+
+        menuButton.setAttribute(
+            "aria-label",
+            "Open menu"
+        );
+
+        if (menuIcon) {
+
+            menuIcon.textContent = "menu";
+
+        }
+
+    }
+
+}
+
+
+/* ============================================================
+   SELLER DASHBOARD BUTTON
+============================================================ */
+
+function updateSellerDashboardButton(
+    role,
+    sellerStatus
+) {
+
+    const desktopButton =
+        document.getElementById(
+            "sellerDashboardBtn"
+        );
+
+    const mobileButton =
+        document.getElementById(
+            "mobileSellerDashboardBtn"
+        );
+
+
+    /* --------------------------------------------------------
+       DEFAULT = HIDDEN
+    -------------------------------------------------------- */
+
+    let shouldShow = false;
+
+
+    /* --------------------------------------------------------
+       ADMIN CAN ACCESS
+    -------------------------------------------------------- */
+
+    if (
+        role &&
+        String(role).toLowerCase() === "admin"
+    ) {
+
+        shouldShow = true;
+
+    }
+
+
+    /* --------------------------------------------------------
+       APPROVED SELLER CAN ACCESS
+    -------------------------------------------------------- */
+
+    if (
+        role &&
+        String(role).toLowerCase() === "seller" &&
+        sellerStatus &&
+        String(sellerStatus).toLowerCase() === "approved"
+    ) {
+
+        shouldShow = true;
+
+    }
+
+
+    /* --------------------------------------------------------
+       UPDATE DESKTOP BUTTON
+    -------------------------------------------------------- */
+
+    if (desktopButton) {
+
+        desktopButton.style.display =
+            shouldShow ? "inline-flex" : "none";
+
+    }
+
+
+    /* --------------------------------------------------------
+       UPDATE MOBILE BUTTON
+    -------------------------------------------------------- */
+
+    if (mobileButton) {
+
+        mobileButton.style.display =
+            shouldShow ? "flex" : "none";
+
+    }
+
+
+    console.log(
+        "Seller Dashboard Button:",
+        shouldShow ? "VISIBLE" : "HIDDEN",
+        "| role:",
+        role,
+        "| status:",
+        sellerStatus
+    );
+
+}
+
+
+/* ============================================================
+   STATUS MESSAGE
+============================================================ */
+
+function createStatusMessage() {
+
+    let message =
+        document.getElementById(
+            "sellerStatusMessage"
+        );
+
+
+    if (message) {
+        return message;
+    }
+
+
+    const addProductSection =
+        document.getElementById(
+            "add-product"
+        );
+
+
+    if (!addProductSection) {
+        return null;
+    }
+
+
+    message =
+        document.createElement("div");
+
+    message.id =
+        "sellerStatusMessage";
+
+    message.style.display =
+        "none";
+
+    message.style.marginBottom =
+        "24px";
+
+    message.style.padding =
+        "16px 20px";
+
+    message.style.borderRadius =
+        "12px";
+
+    message.style.fontWeight =
+        "700";
+
+    message.style.fontFamily =
+        "Inter, sans-serif";
+
+
+    addProductSection.parentNode.insertBefore(
+        message,
+        addProductSection
+    );
+
+
+    return message;
+
+}
+
+
+/* ============================================================
+   SHOW STATUS MESSAGE
+============================================================ */
+
+function showStatusMessage(
+    text,
+    type = "error"
+) {
+
+    const message =
+        createStatusMessage();
+
+
+    if (!message) {
+
+        console.warn(text);
+
+        return;
+
+    }
+
+
+    message.textContent =
+        text;
+
+
+    message.style.display =
+        "block";
+
+
+    if (type === "success") {
+
+        message.style.background =
+            "rgba(34,197,94,.12)";
+
+        message.style.border =
+            "1px solid rgba(34,197,94,.45)";
+
+        message.style.color =
+            "#4ade80";
+
+    } else if (type === "warning") {
+
+        message.style.background =
+            "rgba(245,158,11,.12)";
+
+        message.style.border =
+            "1px solid rgba(245,158,11,.45)";
+
+        message.style.color =
+            "#fbbf24";
+
+    } else {
+
+        message.style.background =
+            "rgba(239,68,68,.12)";
+
+        message.style.border =
+            "1px solid rgba(239,68,68,.45)";
+
+        message.style.color =
+            "#f87171";
+
+    }
+
+}
+
+
+/* ============================================================
+   HIDE STATUS MESSAGE
+============================================================ */
+
+function hideStatusMessage() {
+
+    const message =
+        document.getElementById(
+            "sellerStatusMessage"
+        );
+
+    if (message) {
+
+        message.style.display =
             "none";
+
     }
 
-
-    /* =====================================================
-       CHECK SELLER STATUS
-    ===================================================== */
-
-    async function checkSellerStatus() {
-
-        try {
-
-            /*
-             * Get currently logged-in user
-             */
-
-            const {
-                data: {
-                    user
-                },
-                error: authError
-            } =
-                await supabaseClient.auth.getUser();
+}
 
 
-            if (authError) {
+/* ============================================================
+   GET ADD PRODUCT SECTION
+============================================================ */
 
-                console.error(
-                    "Auth error:",
-                    authError
-                );
+function getAddProductSection() {
 
-                showSellerMessage(
-                    "Unable to check your account. Please try again.",
-                    "error"
-                );
+    return document.getElementById(
+        "add-product"
+    );
 
-                return null;
-            }
+}
 
 
-            /*
-             * User is NOT logged in
-             */
+/* ============================================================
+   HIDE ADD PRODUCT
+============================================================ */
 
-            if (!user) {
+function hideAddProduct() {
 
-                showSellerMessage(
-                    "Please login first and apply to become a seller.",
-                    "error"
-                );
+    const section =
+        getAddProductSection();
 
-                return null;
-            }
+    if (section) {
 
+        section.style.display =
+            "none";
 
-            /*
-             * Find seller record
-             */
+    }
 
-            const {
-                data: seller,
-                error: sellerError
-            } =
-                await supabaseClient
-                    .from("sellers")
-                    .select("*")
-                    .eq("id", user.id)
-                    .maybeSingle();
+}
 
 
-            if (sellerError) {
+/* ============================================================
+   SHOW ADD PRODUCT
+============================================================ */
 
-                console.error(
-                    "Seller status error:",
-                    sellerError
-                );
+function showAddProduct() {
 
-                showSellerMessage(
-                    "Seller information could not be loaded.",
-                    "error"
-                );
+    const section =
+        getAddProductSection();
 
-                return null;
-            }
+    if (section) {
 
+        section.style.display =
+            "block";
 
-            /*
-             * No seller application
-             */
+    }
 
-            if (!seller) {
-
-                showSellerMessage(
-                    "You are not a seller yet. Please use Become a Seller to apply.",
-                    "info"
-                );
-
-                return {
-                    user,
-                    status: "not_seller"
-                };
-            }
+}
 
 
-            /*
-             * APPROVED
-             */
+/* ============================================================
+   CHECK SELLER / ADMIN STATUS
+============================================================ */
 
-            if (
-                seller.status === "approved"
-            ) {
+async function checkSellerStatus() {
 
-                if (addProductSection) {
+    try {
 
-                    addProductSection.style.display =
-                        "";
-                }
-
-                showSellerMessage(
-                    "✓ Your seller account is approved. You can add products now.",
-                    "success"
-                );
-
-                return {
-                    user,
-                    seller,
-                    status: "approved"
-                };
-            }
+        hideAddProduct();
 
 
-            /*
-             * PENDING
-             */
+        /* ====================================================
+           GET CURRENT USER
+        ==================================================== */
 
-            if (
-                seller.status === "pending"
-            ) {
-
-                showSellerMessage(
-                    "Your seller application is currently under review. Add Product will be available after approval.",
-                    "info"
-                );
-
-                return {
-                    user,
-                    seller,
-                    status: "pending"
-                };
-            }
+        const {
+            data: userData,
+            error: userError
+        } =
+            await supabaseClient.auth.getUser();
 
 
-            /*
-             * REJECTED
-             */
-
-            if (
-                seller.status === "rejected"
-            ) {
-
-                showSellerMessage(
-                    "Your seller application was not approved. Please contact KHELZONE for more information.",
-                    "error"
-                );
-
-                return {
-                    user,
-                    seller,
-                    status: "rejected"
-                };
-            }
-
-
-            /*
-             * DEFAULT
-             */
-
-            showSellerMessage(
-                "Your seller account is not approved yet.",
-                "info"
-            );
-
-            return {
-                user,
-                seller,
-                status: seller.status || "pending"
-            };
-
-        } catch (error) {
+        if (userError) {
 
             console.error(
-                "Seller check failed:",
-                error
+                "Auth error:",
+                userError
             );
 
-            showSellerMessage(
-                "Something went wrong while checking seller status.",
-                "error"
+            updateSellerDashboardButton(
+                null,
+                null
+            );
+
+            showStatusMessage(
+                "Unable to check login status."
             );
 
             return null;
+
         }
+
+
+        currentUser =
+            userData?.user || null;
+
+
+        /* ====================================================
+           NOT LOGGED IN
+        ==================================================== */
+
+        if (!currentUser) {
+
+            console.log(
+                "No logged-in user."
+            );
+
+
+            updateSellerDashboardButton(
+                null,
+                null
+            );
+
+
+            showStatusMessage(
+                "Please login as an approved seller to add products.",
+                "warning"
+            );
+
+
+            return null;
+
+        }
+
+
+        console.log(
+            "Logged in user:",
+            currentUser.id
+        );
+
+
+        /* ====================================================
+           GET PROFILE
+        ==================================================== */
+
+        let profile = null;
+        let profileError = null;
+
+
+        const profileResult =
+            await supabaseClient
+                .from("profiles")
+                .select(
+                    "id, role, seller_status, full_name, email, phone"
+                )
+                .eq(
+                    "id",
+                    currentUser.id
+                )
+                .maybeSingle();
+
+
+        profile =
+            profileResult.data;
+
+        profileError =
+            profileResult.error;
+
+
+        /* ====================================================
+           PROFILE FOUND
+        ==================================================== */
+
+        if (profile) {
+
+            currentProfile =
+                profile;
+
+            const role =
+                String(
+                    profile.role || "customer"
+                ).toLowerCase();
+
+            const status =
+                String(
+                    profile.seller_status || ""
+                ).toLowerCase();
+
+
+            console.log(
+                "Profile:",
+                profile
+            );
+
+
+            /* ------------------------------------------------
+               DASHBOARD BUTTON
+            ------------------------------------------------ */
+
+            updateSellerDashboardButton(
+                role,
+                status
+            );
+
+
+            /* ------------------------------------------------
+               ADMIN
+            ------------------------------------------------ */
+
+            if (role === "admin") {
+
+                currentSeller = {
+                    user: currentUser,
+                    profile: profile,
+                    role: "admin",
+                    status: "approved"
+                };
+
+
+                showAddProduct();
+
+                hideStatusMessage();
+
+
+                console.log(
+                    "Admin access granted."
+                );
+
+
+                return currentSeller;
+
+            }
+
+
+            /* ------------------------------------------------
+               APPROVED SELLER
+            ------------------------------------------------ */
+
+            if (
+                role === "seller" &&
+                status === "approved"
+            ) {
+
+                currentSeller = {
+                    user: currentUser,
+                    profile: profile,
+                    role: "seller",
+                    status: "approved"
+                };
+
+
+                showAddProduct();
+
+                hideStatusMessage();
+
+
+                console.log(
+                    "Approved seller access granted."
+                );
+
+
+                return currentSeller;
+
+            }
+
+
+            /* ------------------------------------------------
+               PENDING SELLER
+            ------------------------------------------------ */
+
+            if (
+                role === "seller" &&
+                status === "pending"
+            ) {
+
+                hideAddProduct();
+
+                showStatusMessage(
+                    "Your seller account is still pending approval. Please wait for admin approval.",
+                    "warning"
+                );
+
+
+                console.log(
+                    "Seller pending."
+                );
+
+
+                return null;
+
+            }
+
+
+            /* ------------------------------------------------
+               REJECTED SELLER
+            ------------------------------------------------ */
+
+            if (
+                role === "seller" &&
+                status === "rejected"
+            ) {
+
+                hideAddProduct();
+
+                showStatusMessage(
+                    "Your seller application was rejected. Please contact support for more information.",
+                    "error"
+                );
+
+
+                console.log(
+                    "Seller rejected."
+                );
+
+
+                return null;
+
+            }
+
+
+            /* ------------------------------------------------
+               CUSTOMER
+            ------------------------------------------------ */
+
+            if (role === "customer") {
+
+                hideAddProduct();
+
+                showStatusMessage(
+                    "Customer accounts cannot add products. Please apply as a seller.",
+                    "warning"
+                );
+
+
+                console.log(
+                    "Customer access denied."
+                );
+
+
+                return null;
+
+            }
+
+
+            /* ------------------------------------------------
+               UNKNOWN ROLE
+            ------------------------------------------------ */
+
+            hideAddProduct();
+
+            showStatusMessage(
+                "You do not have seller access.",
+                "error"
+            );
+
+
+            return null;
+
+        }
+
+
+        /* ====================================================
+           PROFILE NOT FOUND
+           FALLBACK TO SELLERS TABLE
+        ==================================================== */
+
+        if (profileError) {
+
+            console.warn(
+                "Profiles query returned an error:",
+                profileError
+            );
+
+        }
+
+
+        console.log(
+            "Profile not found. Checking sellers table..."
+        );
+
+
+        const {
+            data: seller,
+            error: sellerError
+        } =
+            await supabaseClient
+                .from("sellers")
+                .select("*")
+                .eq(
+                    "id",
+                    currentUser.id
+                )
+                .maybeSingle();
+
+
+        if (sellerError) {
+
+            console.error(
+                "Sellers query error:",
+                sellerError
+            );
+
+
+            updateSellerDashboardButton(
+                null,
+                null
+            );
+
+
+            hideAddProduct();
+
+
+            showStatusMessage(
+                "Unable to verify seller account. Please try again."
+            );
+
+
+            return null;
+
+        }
+
+
+        /* ====================================================
+           NO SELLER RECORD
+        ==================================================== */
+
+        if (!seller) {
+
+            updateSellerDashboardButton(
+                "customer",
+                ""
+            );
+
+
+            hideAddProduct();
+
+
+            showStatusMessage(
+                "You are not registered as a seller. Please apply as a seller.",
+                "warning"
+            );
+
+
+            return null;
+
+        }
+
+
+        /* ====================================================
+           SELLER TABLE STATUS
+        ==================================================== */
+
+        const sellerStatus =
+            String(
+                seller.status || ""
+            ).toLowerCase();
+
+
+        currentSeller = {
+            user: currentUser,
+            seller: seller,
+            role: "seller",
+            status: sellerStatus
+        };
+
+
+        updateSellerDashboardButton(
+            "seller",
+            sellerStatus
+        );
+
+
+        /* ------------------------------------------------
+           APPROVED
+        ------------------------------------------------ */
+
+        if (
+            sellerStatus === "approved"
+        ) {
+
+            showAddProduct();
+
+            hideStatusMessage();
+
+
+            console.log(
+                "Approved seller access granted from sellers table."
+            );
+
+
+            return currentSeller;
+
+        }
+
+
+        /* ------------------------------------------------
+           PENDING
+        ------------------------------------------------ */
+
+        if (
+            sellerStatus === "pending"
+        ) {
+
+            hideAddProduct();
+
+            showStatusMessage(
+                "Your seller account is still pending approval. Please wait for admin approval.",
+                "warning"
+            );
+
+
+            return null;
+
+        }
+
+
+        /* ------------------------------------------------
+           REJECTED
+        ------------------------------------------------ */
+
+        if (
+            sellerStatus === "rejected"
+        ) {
+
+            hideAddProduct();
+
+            showStatusMessage(
+                "Your seller application was rejected.",
+                "error"
+            );
+
+
+            return null;
+
+        }
+
+
+        /* ------------------------------------------------
+           UNKNOWN STATUS
+        ------------------------------------------------ */
+
+        hideAddProduct();
+
+        showStatusMessage(
+            "Your seller account status could not be verified.",
+            "error"
+        );
+
+
+        return null;
+
+
+    } catch (error) {
+
+        console.error(
+            "checkSellerStatus error:",
+            error
+        );
+
+
+        updateSellerDashboardButton(
+            null,
+            null
+        );
+
+
+        hideAddProduct();
+
+
+        showStatusMessage(
+            "Something went wrong while checking seller access."
+        );
+
+
+        return null;
+
     }
 
-
-    /*
-     * Check seller immediately
-     */
-
-    const sellerInfo =
-        await checkSellerStatus();
+}
 
 
-    /* =====================================================
-       IF PRODUCT FORM DOES NOT EXIST
-    ===================================================== */
+/* ============================================================
+   PRODUCT FORM SETUP
+============================================================ */
+
+function setupProductForm() {
+
+    const productForm =
+        document.getElementById(
+            "productForm"
+        );
+
 
     if (!productForm) {
 
@@ -451,790 +1090,924 @@ document.addEventListener("DOMContentLoaded", async function () {
         );
 
         return;
+
     }
 
 
-    /* =====================================================
-       ALLOW PRODUCT SUBMISSION ONLY TO APPROVED SELLER
-    ===================================================== */
+    /* ========================================================
+       IMAGE PREVIEW
+    ======================================================== */
 
-    if (
-        !sellerInfo ||
-        sellerInfo.status !== "approved"
-    ) {
+    setupImagePreview();
 
-        productForm.addEventListener(
-            "submit",
-            function (event) {
 
-                event.preventDefault();
+    /* ========================================================
+       FORM SUBMIT
+    ======================================================== */
 
-                alert(
-                    "Only approved sellers can add products."
-                );
-            }
+    productForm.addEventListener(
+        "submit",
+        handleProductSubmit
+    );
+
+
+    /* ========================================================
+       FORM RESET
+    ======================================================== */
+
+    productForm.addEventListener(
+        "reset",
+        () => {
+
+            setTimeout(() => {
+
+                removeImagePreview();
+
+            }, 0);
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   IMAGE PREVIEW
+============================================================ */
+
+function setupImagePreview() {
+
+    const imageInput =
+        document.getElementById(
+            "productImage"
         );
 
+
+    if (!imageInput) {
         return;
     }
 
 
-    /* =====================================================
-       IMAGE VALIDATION
-    ===================================================== */
+    imageInput.addEventListener(
+        "change",
+        () => {
 
-    function validateImage(file) {
+            removeImagePreview();
 
-        if (!file) {
 
-            throw new Error(
-                "Please select a product image."
+            const file =
+                imageInput.files?.[0];
+
+
+            if (!file) {
+                return;
+            }
+
+
+            if (
+                ![
+                    "image/png",
+                    "image/jpeg",
+                    "image/webp"
+                ].includes(file.type)
+            ) {
+
+                alert(
+                    "Only PNG, JPG or WEBP images are allowed."
+                );
+
+                imageInput.value =
+                    "";
+
+                return;
+
+            }
+
+
+            if (
+                file.size >
+                10 * 1024 * 1024
+            ) {
+
+                alert(
+                    "Image size must be less than 10 MB."
+                );
+
+                imageInput.value =
+                    "";
+
+                return;
+
+            }
+
+
+            const preview =
+                document.createElement(
+                    "img"
+                );
+
+
+            preview.id =
+                "productImagePreview";
+
+
+            preview.src =
+                URL.createObjectURL(file);
+
+
+            preview.alt =
+                "Product preview";
+
+
+            preview.style.width =
+                "180px";
+
+            preview.style.height =
+                "180px";
+
+            preview.style.objectFit =
+                "cover";
+
+            preview.style.borderRadius =
+                "12px";
+
+            preview.style.margin =
+                "20px auto 0";
+
+            preview.style.display =
+                "block";
+
+            preview.style.border =
+                "2px solid #FF6B00";
+
+
+            imageInput.parentElement.appendChild(
+                preview
             );
+
         }
+    );
+
+}
 
 
-        const allowedTypes = [
-            "image/png",
-            "image/jpeg",
-            "image/webp"
-        ];
+/* ============================================================
+   REMOVE IMAGE PREVIEW
+============================================================ */
 
+function removeImagePreview() {
+
+    const oldPreview =
+        document.getElementById(
+            "productImagePreview"
+        );
+
+
+    if (oldPreview) {
 
         if (
-            !allowedTypes.includes(
-                file.type
+            oldPreview.src.startsWith(
+                "blob:"
             )
         ) {
 
-            throw new Error(
-                "Only PNG, JPG or WEBP images are allowed."
+            URL.revokeObjectURL(
+                oldPreview.src
             );
+
         }
 
 
-        const maxSize =
-            10 * 1024 * 1024;
+        oldPreview.remove();
+
+    }
+
+}
 
 
-        if (
-            file.size > maxSize
-        ) {
+/* ============================================================
+   PRODUCT SUBMIT
+============================================================ */
 
-            throw new Error(
-                "Image must be smaller than 10 MB."
-            );
-        }
+async function handleProductSubmit(event) {
+
+    event.preventDefault();
+
+
+    /* ========================================================
+       VERIFY SELLER AGAIN
+       IMPORTANT: NEVER TRUST UI ONLY
+    ======================================================== */
+
+    const sellerAccess =
+        await checkSellerStatus();
+
+
+    if (!sellerAccess) {
+
+        alert(
+            "Only an approved seller or admin can add products."
+        );
+
+        return;
+
     }
 
 
-    /* =====================================================
-       CREATE UNIQUE IMAGE PATH
-    ===================================================== */
+    /* ========================================================
+       FORM ELEMENTS
+    ======================================================== */
 
-    function createImagePath(file) {
+    const form =
+        event.currentTarget;
+
+
+    const imageInput =
+        document.getElementById(
+            "productImage"
+        );
+
+    const nameInput =
+        document.getElementById(
+            "productName"
+        );
+
+    const categoryInput =
+        document.getElementById(
+            "productCategory"
+        );
+
+    const priceInput =
+        document.getElementById(
+            "productPrice"
+        );
+
+    const stockInput =
+        document.getElementById(
+            "productStock"
+        );
+
+    const descriptionInput =
+        document.getElementById(
+            "productDescription"
+        );
+
+    const brandInput =
+        document.getElementById(
+            "brandName"
+        );
+
+    const sizeInput =
+        document.getElementById(
+            "productSize"
+        );
+
+
+    /* ========================================================
+       VALIDATE ELEMENTS
+    ======================================================== */
+
+    if (
+        !imageInput ||
+        !nameInput ||
+        !categoryInput ||
+        !priceInput ||
+        !stockInput ||
+        !descriptionInput
+    ) {
+
+        alert(
+            "Some product fields are missing."
+        );
+
+        return;
+
+    }
+
+
+    /* ========================================================
+       GET VALUES
+    ======================================================== */
+
+    const name =
+        nameInput.value.trim();
+
+    const category =
+        categoryInput.value.trim();
+
+    const price =
+        Number(
+            priceInput.value
+        );
+
+    const stock =
+        Number(
+            stockInput.value
+        );
+
+    const description =
+        descriptionInput.value.trim();
+
+    const brand =
+        brandInput
+            ? brandInput.value.trim()
+            : "";
+
+    const size =
+        sizeInput
+            ? sizeInput.value.trim()
+            : "";
+
+
+    /* ========================================================
+       VALIDATION
+    ======================================================== */
+
+    if (!name) {
+
+        alert(
+            "Please enter product name."
+        );
+
+        return;
+
+    }
+
+
+    if (!category) {
+
+        alert(
+            "Please select a category."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !Number.isFinite(price) ||
+        price < 0
+    ) {
+
+        alert(
+            "Please enter a valid price."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !Number.isInteger(stock) ||
+        stock < 0
+    ) {
+
+        alert(
+            "Please enter a valid stock quantity."
+        );
+
+        return;
+
+    }
+
+
+    if (!description) {
+
+        alert(
+            "Please enter product description."
+        );
+
+        return;
+
+    }
+
+
+    /* ========================================================
+       IMAGE REQUIRED
+    ======================================================== */
+
+    const imageFile =
+        imageInput.files?.[0];
+
+
+    if (!imageFile) {
+
+        alert(
+            "Please select a product image."
+        );
+
+        return;
+
+    }
+
+
+    /* ========================================================
+       IMAGE TYPE
+    ======================================================== */
+
+    const allowedTypes = [
+        "image/png",
+        "image/jpeg",
+        "image/webp"
+    ];
+
+
+    if (
+        !allowedTypes.includes(
+            imageFile.type
+        )
+    ) {
+
+        alert(
+            "Only PNG, JPG or WEBP images are allowed."
+        );
+
+        return;
+
+    }
+
+
+    /* ========================================================
+       IMAGE SIZE
+    ======================================================== */
+
+    if (
+        imageFile.size >
+        10 * 1024 * 1024
+    ) {
+
+        alert(
+            "Image size must be less than 10 MB."
+        );
+
+        return;
+
+    }
+
+
+    /* ========================================================
+       SUBMIT BUTTON
+    ======================================================== */
+
+    const submitButton =
+        form.querySelector(
+            'button[type="submit"]'
+        );
+
+
+    const originalButtonHTML =
+        submitButton
+            ? submitButton.innerHTML
+            : "";
+
+
+    if (submitButton) {
+
+        submitButton.disabled =
+            true;
+
+        submitButton.innerHTML =
+            `
+                <span class="material-symbols-outlined text-base">
+                    progress_activity
+                </span>
+                UPLOADING...
+            `;
+
+    }
+
+
+    let uploadedImagePath =
+        null;
+
+
+    try {
+
+        /* ====================================================
+           FILE EXTENSION
+        ==================================================== */
 
         const extension =
-            file.name
-                .split(".")
-                .pop()
-                .toLowerCase();
+            getFileExtension(
+                imageFile
+            );
 
+
+        /* ====================================================
+           SAFE PRODUCT NAME
+        ==================================================== */
 
         const safeName =
-            file.name
+            name
+                .toLowerCase()
                 .replace(
-                    /\.[^/.]+$/,
-                    ""
-                )
-                .replace(
-                    /[^a-zA-Z0-9-_]/g,
+                    /[^a-z0-9]+/g,
                     "-"
                 )
-                .toLowerCase();
+                .replace(
+                    /^-+|-+$/g,
+                    ""
+                )
+                .substring(
+                    0,
+                    60
+                );
 
 
-        const unique =
-            Date.now() +
-            "-" +
-            Math.random()
-                .toString(36)
-                .substring(2, 9);
+        /* ====================================================
+           UNIQUE FILE NAME
+        ==================================================== */
+
+        const uniqueName =
+            `${Date.now()}-${cryptoRandomString(8)}-${safeName || "product"}.${extension}`;
 
 
-        return (
-            "products/" +
-            unique +
-            "-" +
-            safeName +
-            "." +
-            extension
-        );
-    }
+        uploadedImagePath =
+            `products/${uniqueName}`;
 
 
-    /* =====================================================
-       UPLOAD IMAGE TO SUPABASE STORAGE
-    ===================================================== */
-
-    async function uploadProductImage(file) {
-
-        validateImage(file);
-
-
-        const filePath =
-            createImagePath(file);
-
+        /* ====================================================
+           UPLOAD IMAGE
+        ==================================================== */
 
         const {
-            data,
-            error
+            data: uploadData,
+            error: uploadError
         } =
             await supabaseClient
                 .storage
                 .from("product-images")
                 .upload(
-                    filePath,
-                    file,
+                    uploadedImagePath,
+                    imageFile,
                     {
                         cacheControl: "3600",
                         upsert: false,
-                        contentType: file.type
+                        contentType: imageFile.type
                     }
                 );
 
 
-        if (error) {
+        if (uploadError) {
 
             console.error(
-                "Storage upload error:",
-                error
+                "Image upload error:",
+                uploadError
             );
 
             throw new Error(
-                "Image upload failed: " +
-                error.message
+                uploadError.message ||
+                "Image upload failed."
             );
+
         }
 
 
+        console.log(
+            "Image uploaded:",
+            uploadData
+        );
+
+
+        /* ====================================================
+           PUBLIC IMAGE URL
+        ==================================================== */
+
         const {
-            data: publicData
+            data: publicUrlData
         } =
             supabaseClient
                 .storage
                 .from("product-images")
                 .getPublicUrl(
-                    data.path
+                    uploadedImagePath
                 );
 
 
-        if (
-            !publicData ||
-            !publicData.publicUrl
-        ) {
+        const imageUrl =
+            publicUrlData?.publicUrl;
+
+
+        if (!imageUrl) {
 
             throw new Error(
-                "Could not create image URL."
+                "Could not generate product image URL."
             );
+
         }
 
 
-        return {
-            path: data.path,
-            url: publicData.publicUrl
+        /* ====================================================
+           PRODUCT DATA
+        ==================================================== */
+
+        const productData = {
+
+            name: name,
+
+            sport: category,
+
+            category: category,
+
+            price: price,
+
+            stock: stock,
+
+            image_url: imageUrl,
+
+            description: description,
+
+            brand:
+                brand || "KHELZONE",
+
+            size:
+                size || "Standard",
+
+            is_active: true,
+
+            seller_id:
+                currentUser.id
+
         };
-    }
 
 
-    /* =====================================================
-       DELETE IMAGE
-    ===================================================== */
+        console.log(
+            "Product data:",
+            productData
+        );
 
-    async function deleteStorageImage(
-        filePath
-    ) {
 
-        if (!filePath) {
-            return;
-        }
-
+        /* ====================================================
+           INSERT PRODUCT
+        ==================================================== */
 
         const {
-            error
+            data: insertedProduct,
+            error: productError
         } =
+            await supabaseClient
+                .from("products")
+                .insert(
+                    productData
+                )
+                .select()
+                .single();
+
+
+        if (productError) {
+
+            console.error(
+                "Product insert error:",
+                productError
+            );
+
+
+            /* -----------------------------------------------
+               DELETE IMAGE IF PRODUCT INSERT FAILED
+            ------------------------------------------------ */
+
             await supabaseClient
                 .storage
                 .from("product-images")
                 .remove([
-                    filePath
+                    uploadedImagePath
                 ]);
 
 
-        if (error) {
-
-            console.warn(
-                "Could not delete image:",
-                error
-            );
-        }
-    }
-
-
-    /* =====================================================
-       IMAGE PREVIEW
-    ===================================================== */
-
-    if (productImage) {
-
-        productImage.addEventListener(
-            "change",
-            function () {
-
-                const file =
-                    productImage.files[0];
-
-                if (!file) return;
-
-                try {
-
-                    validateImage(file);
-
-                } catch (error) {
-
-                    alert(error.message);
-
-                    productImage.value =
-                        "";
-
-                    return;
-                }
-
-
-                const reader =
-                    new FileReader();
-
-
-                reader.onload =
-                    function (event) {
-
-                        let preview =
-                            document.getElementById(
-                                "productImagePreview"
-                            );
-
-
-                        if (!preview) {
-
-                            preview =
-                                document.createElement(
-                                    "img"
-                                );
-
-                            preview.id =
-                                "productImagePreview";
-
-                            preview.style.width =
-                                "180px";
-
-                            preview.style.height =
-                                "180px";
-
-                            preview.style.objectFit =
-                                "cover";
-
-                            preview.style.borderRadius =
-                                "12px";
-
-                            preview.style.margin =
-                                "15px auto";
-
-                            preview.style.display =
-                                "block";
-
-                            productImage.parentNode.appendChild(
-                                preview
-                            );
-                        }
-
-
-                        preview.src =
-                            event.target.result;
-                    };
-
-
-                reader.readAsDataURL(file);
-            }
-        );
-    }
-
-
-    /* =====================================================
-       STATUS BOX FOR PRODUCT FORM
-    ===================================================== */
-
-    let productStatus =
-        document.getElementById(
-            "productStatus"
-        );
-
-
-    if (!productStatus) {
-
-        productStatus =
-            document.createElement("div");
-
-        productStatus.id =
-            "productStatus";
-
-        productStatus.style.marginTop =
-            "15px";
-
-        productStatus.style.padding =
-            "12px";
-
-        productStatus.style.borderRadius =
-            "8px";
-
-        productStatus.style.display =
-            "none";
-
-        productForm.appendChild(
-            productStatus
-        );
-    }
-
-
-    function showStatus(
-        message,
-        success = true
-    ) {
-
-        productStatus.style.display =
-            "block";
-
-        productStatus.textContent =
-            message;
-
-
-        if (success) {
-
-            productStatus.style.color =
-                "#7CFC5A";
-
-            productStatus.style.border =
-                "1px solid #7CFC5A";
-
-            productStatus.style.background =
-                "rgba(124,252,90,.08)";
-
-        } else {
-
-            productStatus.style.color =
-                "#ff5a1f";
-
-            productStatus.style.border =
-                "1px solid #ff5a1f";
-
-            productStatus.style.background =
-                "rgba(255,90,31,.08)";
-        }
-    }
-
-
-    /* =====================================================
-       SUBMIT PRODUCT
-    ===================================================== */
-
-    productForm.addEventListener(
-        "submit",
-        async function (event) {
-
-            event.preventDefault();
-
-
-            /*
-             * Re-check seller before every product
-             */
-
-            const currentSeller =
-                await checkSellerStatus();
-
-
-            if (
-                !currentSeller ||
-                currentSeller.status !== "approved"
-            ) {
-
-                showStatus(
-                    "Only approved sellers can add products.",
-                    false
-                );
-
-                return;
-            }
-
-
-            /* ---------------------------------------------
-               GET VALUES
-            --------------------------------------------- */
-
-            const name =
-                productName.value.trim();
-
-
-            const category =
-                productCategory.value.trim();
-
-
-            const price =
-                Number(
-                    productPrice.value
-                );
-
-
-            const stock =
-                Number(
-                    productStock.value
-                );
-
-
-            const description =
-                productDescription.value.trim();
-
-
-            const brand =
-                brandName
-                    ? brandName.value.trim()
-                    : "";
-
-
-            const size =
-                productSize
-                    ? productSize.value.trim()
-                    : "";
-
-
-            const imageFile =
-                productImage.files[0];
-
-
-            /* ---------------------------------------------
-               VALIDATION
-            --------------------------------------------- */
-
-            if (!name) {
-
-                showStatus(
-                    "Please enter product name.",
-                    false
-                );
-
-                productName.focus();
-
-                return;
-            }
-
-
-            if (!category) {
-
-                showStatus(
-                    "Please select a category.",
-                    false
-                );
-
-                productCategory.focus();
-
-                return;
-            }
-
-
-            if (
-                !Number.isFinite(price) ||
-                price < 0
-            ) {
-
-                showStatus(
-                    "Please enter a valid price.",
-                    false
-                );
-
-                productPrice.focus();
-
-                return;
-            }
-
-
-            if (
-                !Number.isInteger(stock) ||
-                stock < 0
-            ) {
-
-                showStatus(
-                    "Please enter a valid stock quantity.",
-                    false
-                );
-
-                productStock.focus();
-
-                return;
-            }
-
-
-            if (!description) {
-
-                showStatus(
-                    "Please enter product description.",
-                    false
-                );
-
-                productDescription.focus();
-
-                return;
-            }
-
-
-            if (!imageFile) {
-
-                showStatus(
-                    "Please select a product image.",
-                    false
-                );
-
-                productImage.focus();
-
-                return;
-            }
-
-
-            /* ---------------------------------------------
-               SUBMIT BUTTON
-            --------------------------------------------- */
-
-            const submitButton =
-                productForm.querySelector(
-                    'button[type="submit"]'
-                );
-
-
-            if (submitButton) {
-
-                submitButton.disabled =
-                    true;
-
-                submitButton.innerHTML =
-                    `
-                    <span class="material-symbols-outlined text-base animate-spin">
-                        progress_activity
-                    </span>
-                    UPLOADING...
-                    `;
-            }
-
-
-            let uploadedImage =
+            uploadedImagePath =
                 null;
 
 
-            try {
-
-                /* -----------------------------------------
-                   STEP 1 — UPLOAD IMAGE
-                ----------------------------------------- */
-
-                showStatus(
-                    "Uploading product image...",
-                    true
-                );
-
-
-                uploadedImage =
-                    await uploadProductImage(
-                        imageFile
-                    );
-
-
-                /* -----------------------------------------
-                   STEP 2 — PRODUCT DATA
-                ----------------------------------------- */
-
-                showStatus(
-                    "Saving product...",
-                    true
-                );
-
-
-                /*
-                 * Category is also used as sport
-                 */
-
-                const sport =
-                    category;
-
-
-                const productData = {
-
-                    name:
-                        name,
-
-                    sport:
-                        sport,
-
-                    category:
-                        category,
-
-                    price:
-                        price,
-
-                    stock:
-                        stock,
-
-                    image_url:
-                        uploadedImage.url,
-
-                    description:
-                        description,
-
-                    brand:
-                        brand || "KHELZONE",
-
-                    size:
-                        size || "Standard",
-
-                    is_active:
-                        true,
-
-                    /*
-                     * VERY IMPORTANT
-                     * Save seller's user ID
-                     */
-
-                    seller_id:
-                        currentSeller.user.id
-                };
-
-
-                /* -----------------------------------------
-                   STEP 3 — INSERT PRODUCT
-                ----------------------------------------- */
-
-                const {
-                    data,
-                    error
-                } =
-                    await supabaseClient
-                        .from("products")
-                        .insert([
-                            productData
-                        ])
-                        .select()
-                        .single();
-
-
-                if (error) {
-
-                    console.error(
-                        "Database error:",
-                        error
-                    );
-
-
-                    /*
-                     * Product save failed.
-                     * Delete uploaded image.
-                     */
-
-                    await deleteStorageImage(
-                        uploadedImage.path
-                    );
-
-
-                    throw new Error(
-                        "Product could not be saved: " +
-                        error.message
-                    );
-                }
-
-
-                console.log(
-                    "Product saved:",
-                    data
-                );
-
-
-                /* -----------------------------------------
-                   SUCCESS
-                ----------------------------------------- */
-
-                showStatus(
-                    "✅ Product added successfully!",
-                    true
-                );
-
-
-                productForm.reset();
-
-
-                /*
-                 * Remove preview
-                 */
-
-                const preview =
-                    document.getElementById(
-                        "productImagePreview"
-                    );
-
-
-                if (preview) {
-
-                    preview.remove();
-                }
-
-
-                /*
-                 * Scroll to form
-                 */
-
-                setTimeout(
-                    function () {
-
-                        productForm.scrollIntoView({
-                            behavior: "smooth",
-                            block: "start"
-                        });
-
-                    },
-                    200
-                );
-
-
-            } catch (error) {
-
-                console.error(
-                    "Product submission error:",
-                    error
-                );
-
-
-                showStatus(
-                    "❌ " +
-                    error.message,
-                    false
-                );
-
-
-            } finally {
-
-                if (submitButton) {
-
-                    submitButton.disabled =
-                        false;
-
-                    submitButton.innerHTML =
-                        "ADD PRODUCT";
-                }
-            }
+            throw new Error(
+                productError.message ||
+                "Product could not be added."
+            );
 
         }
-    );
 
-});
+
+        console.log(
+            "Product added:",
+            insertedProduct
+        );
+
+
+        /* ====================================================
+           SUCCESS
+        ==================================================== */
+
+        alert(
+            "Product added successfully!"
+        );
+
+
+        form.reset();
+
+        removeImagePreview();
+
+
+        console.log(
+            "Product successfully added."
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Product submit error:",
+            error
+        );
+
+
+        alert(
+            error?.message ||
+            "Something went wrong while adding the product."
+        );
+
+
+    } finally {
+
+        if (submitButton) {
+
+            submitButton.disabled =
+                false;
+
+            submitButton.innerHTML =
+                originalButtonHTML;
+
+        }
+
+    }
+
+}
+
+
+/* ============================================================
+   GET FILE EXTENSION
+============================================================ */
+
+function getFileExtension(file) {
+
+    const fileName =
+        file?.name || "";
+
+
+    const parts =
+        fileName.split(".");
+
+
+    if (parts.length < 2) {
+
+        if (
+            file.type === "image/png"
+        ) {
+            return "png";
+        }
+
+        if (
+            file.type === "image/webp"
+        ) {
+            return "webp";
+        }
+
+        return "jpg";
+
+    }
+
+
+    const extension =
+        parts
+            .pop()
+            .toLowerCase();
+
+
+    if (
+        ["png", "jpg", "jpeg", "webp"].includes(
+            extension
+        )
+    ) {
+
+        return extension === "jpeg"
+            ? "jpg"
+            : extension;
+
+    }
+
+
+    return "jpg";
+
+}
+
+
+/* ============================================================
+   RANDOM STRING
+============================================================ */
+
+function cryptoRandomString(length = 8) {
+
+    const chars =
+        "abcdefghijklmnopqrstuvwxyz0123456789";
+
+
+    let result =
+        "";
+
+
+    try {
+
+        if (
+            window.crypto &&
+            window.crypto.getRandomValues
+        ) {
+
+            const values =
+                new Uint32Array(
+                    length
+                );
+
+
+            window.crypto.getRandomValues(
+                values
+            );
+
+
+            for (
+                let i = 0;
+                i < length;
+                i++
+            ) {
+
+                result +=
+                    chars[
+                        values[i] %
+                        chars.length
+                    ];
+
+            }
+
+
+            return result;
+
+        }
+
+    } catch (error) {
+
+        console.warn(
+            "Crypto random generation failed:",
+            error
+        );
+
+    }
+
+
+    for (
+        let i = 0;
+        i < length;
+        i++
+    ) {
+
+        result +=
+            chars[
+                Math.floor(
+                    Math.random() *
+                    chars.length
+                )
+            ];
+
+    }
+
+
+    return result;
+
+}
+
+
+/* ============================================================
+   DEBUG HELPERS
+============================================================ */
+
+window.KHELZONE_SELLER = {
+
+    getCurrentUser: () =>
+        currentUser,
+
+    getCurrentProfile: () =>
+        currentProfile,
+
+    getCurrentSeller: () =>
+        currentSeller,
+
+    checkSellerStatus:
+        checkSellerStatus,
+
+    updateSellerDashboardButton:
+        updateSellerDashboardButton
+
+};
+
+
+console.log(
+    "KHELZONE seller.js loaded successfully."
+);

@@ -1,10 +1,14 @@
-/* =========================================================
-   KHELZONE - PAYMENT / CHECKOUT
-   ========================================================= */
+/* ============================================================
+   KHELZONE PAYMENT.JS
+   COMPLETE CLEAN CHECKOUT VERSION
+============================================================ */
 
-/* =========================================================
+"use strict";
+
+
+/* ============================================================
    SUPABASE
-   ========================================================= */
+============================================================ */
 
 const SUPABASE_URL =
     "https://antqexjhlsaynunlmzqa.supabase.co";
@@ -12,39 +16,48 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
     "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
 
+
 const supabaseClient =
-    window.supabase
-        ? window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_KEY
-        )
-        : null;
+    window.supabaseClient ||
+    (
+        window.supabase &&
+        typeof window.supabase.createClient === "function"
+            ? window.supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_KEY
+            )
+            : null
+    );
 
 
-/* =========================================================
+/* ============================================================
    GLOBALS
-   ========================================================= */
+============================================================ */
 
 const CART_KEY = "khz_cart";
 
 let cartItems = [];
+
 let currentUser = null;
 
-let subtotal = 0;
-let shipping = 0;
-let discount = 0;
-let grandTotal = 0;
+let currentProfile = null;
 
-/*
- * Loaded from the payment_settings table.
- * No fake payment values are ever used.
- */
 let paymentSettings = null;
 
+let subtotal = 0;
 
-/* =========================================================
-   HELPERS
-   ========================================================= */
+let shipping = 0;
+
+let discount = 0;
+
+let grandTotal = 0;
+
+let isPlacingOrder = false;
+
+
+/* ============================================================
+   BASIC HELPERS
+============================================================ */
 
 function getElement(id) {
 
@@ -75,9 +88,38 @@ function formatPrice(value) {
     const number =
         Number(value) || 0;
 
-    return `Rs. ${number.toLocaleString("en-PK")}`;
+    return (
+        "Rs. " +
+        number.toLocaleString("en-PK")
+    );
 }
 
+
+function getFormValue(...ids) {
+
+    for (const id of ids) {
+
+        const element =
+            getElement(id);
+
+        if (
+            element &&
+            String(element.value || "").trim()
+        ) {
+
+            return String(
+                element.value
+            ).trim();
+        }
+    }
+
+    return "";
+}
+
+
+/* ============================================================
+   FIELD ERRORS
+============================================================ */
 
 function setFieldError(
     fieldId,
@@ -88,8 +130,9 @@ function setFieldError(
     const field =
         getElement(fieldId);
 
-    const errorEl =
+    const error =
         getElement(errorId);
+
 
     if (field) {
 
@@ -98,15 +141,15 @@ function setFieldError(
         );
     }
 
-    if (errorEl) {
+
+    if (error) {
 
         if (message) {
-
-            errorEl.textContent =
+            error.textContent =
                 message;
         }
 
-        errorEl.classList.remove(
+        error.classList.remove(
             "hidden"
         );
     }
@@ -121,8 +164,9 @@ function clearFieldError(
     const field =
         getElement(fieldId);
 
-    const errorEl =
+    const error =
         getElement(errorId);
+
 
     if (field) {
 
@@ -131,18 +175,19 @@ function clearFieldError(
         );
     }
 
-    if (errorEl) {
 
-        errorEl.classList.add(
+    if (error) {
+
+        error.classList.add(
             "hidden"
         );
     }
 }
 
 
-/* =========================================================
+/* ============================================================
    LOAD CART
-   ========================================================= */
+============================================================ */
 
 function loadCart() {
 
@@ -153,19 +198,25 @@ function loadCart() {
                 CART_KEY
             );
 
+
         if (!savedCart) {
 
             cartItems = [];
 
-            return;
+            return cartItems;
         }
 
+
         const parsed =
-            JSON.parse(savedCart);
+            JSON.parse(
+                savedCart
+            );
+
 
         if (Array.isArray(parsed)) {
 
-            cartItems = parsed;
+            cartItems =
+                parsed;
 
         } else if (
             parsed &&
@@ -180,167 +231,195 @@ function loadCart() {
             cartItems = [];
         }
 
+
+        console.log(
+            "KHELZONE CART:",
+            cartItems
+        );
+
+
+        return cartItems;
+
     } catch (error) {
 
         console.error(
-            "Cart loading error:",
+            "Cart load error:",
             error
         );
 
         cartItems = [];
+
+        return cartItems;
     }
 }
 
 
-/* =========================================================
+/* ============================================================
    NORMALIZE CART
-   ========================================================= */
+============================================================ */
 
-function normalizeCartItem(
-    item,
-    index
-) {
+function normalizeCartItem(item) {
 
     if (
         !item ||
         typeof item !== "object"
     ) {
+
         return null;
     }
 
+
+    const id =
+        item.id ||
+        item.product_id ||
+        item.productId;
+
+
+    if (!id) {
+        return null;
+    }
+
+
     const quantity =
-        Number(
-            item.quantity ??
-            item.qty ??
-            item.count ??
-            1
-        ) || 1;
+        Math.max(
+            1,
+            Number(
+                item.quantity ??
+                item.qty ??
+                1
+            ) || 1
+        );
+
 
     const price =
         Number(
             item.price ??
-            item.productPrice ??
-            item.unit_price ??
+            item.product_price ??
+            item.sale_price ??
             0
         ) || 0;
 
-    const name =
-        item.name ??
-        item.productName ??
-        item.title ??
-        "Sports Product";
-
-    const image =
-        item.image_url ??
-        item.imageUrl ??
-        item.image ??
-        item.productImage ??
-        item.thumbnail ??
-        "";
-
-    const id =
-        item.id ??
-        item.product_id ??
-        item.productId ??
-        `cart-item-${index}`;
-
-    const category =
-        item.category ??
-        item.sport ??
-        item.productCategory ??
-        "";
-
-    const size =
-        item.size ??
-        item.productSize ??
-        "";
-
-    const shippingOrigin =
-        item.seller_city ??
-        item.sellerCity ??
-        item.shipping_origin ??
-        item.shippingOrigin ??
-        item.shippingFrom ??
-        item.origin_city ??
-        null;
 
     return {
 
+        ...item,
+
         id,
 
-        name,
+        product_id:
+            id,
+
+        name:
+            item.name ||
+            item.product_name ||
+            item.title ||
+            "Sports Product",
 
         price,
 
         quantity,
 
-        image,
+        image:
+            item.image ||
+            item.image_url ||
+            item.imageUrl ||
+            "",
 
-        category,
+        category:
+            item.category ||
+            "",
 
-        size,
+        size:
+            item.size ||
+            "",
 
-        shippingOrigin,
-
-        total:
-            price * quantity,
-
-        original:
-            item
+        shippingOrigin:
+            item.shippingOrigin ||
+            item.shipping_origin ||
+            ""
     };
 }
 
+
+/* ============================================================
+   PREPARE CART
+============================================================ */
 
 function prepareCart() {
 
     const normalized = [];
 
-    cartItems.forEach(
-        (item, index) => {
 
-            const normalizedItem =
-                normalizeCartItem(
-                    item,
-                    index
-                );
+    cartItems.forEach(item => {
 
-            if (normalizedItem) {
+        const clean =
+            normalizeCartItem(
+                item
+            );
 
-                normalized.push(
-                    normalizedItem
-                );
-            }
+
+        if (clean) {
+
+            normalized.push(
+                clean
+            );
         }
-    );
+    });
+
 
     cartItems =
         normalized;
+
+
+    return cartItems;
 }
 
 
-/* =========================================================
+/* ============================================================
+   SAVE CART
+============================================================ */
+
+function saveCart() {
+
+    try {
+
+        localStorage.setItem(
+            CART_KEY,
+            JSON.stringify(
+                cartItems
+            )
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Cart save error:",
+            error
+        );
+    }
+}
+
+
+/* ============================================================
    CALCULATE TOTALS
-   ========================================================= */
+============================================================ */
 
 function calculateTotals() {
 
-    subtotal =
-        cartItems.reduce(
-            (
-                total,
-                item
-            ) => {
+    subtotal = 0;
 
-                return (
-                    total +
-                    (
-                        Number(item.price) *
-                        Number(item.quantity)
-                    )
-                );
-            },
-            0
-        );
+
+    cartItems.forEach(item => {
+
+        subtotal +=
+            (
+                Number(item.price) || 0
+            ) *
+            (
+                Number(item.quantity) || 1
+            );
+    });
+
 
     if (subtotal <= 0) {
 
@@ -357,46 +436,66 @@ function calculateTotals() {
         shipping = 200;
     }
 
+
     discount = 0;
+
 
     grandTotal =
         subtotal +
         shipping -
         discount;
 
-    if (grandTotal < 0) {
 
-        grandTotal = 0;
-    }
+    return {
+
+        subtotal,
+
+        shipping,
+
+        discount,
+
+        grandTotal
+    };
 }
 
 
-/* =========================================================
+/* ============================================================
    RENDER ORDER ITEMS
-   ========================================================= */
+============================================================ */
 
 function renderOrderItems() {
 
     const container =
-        getElement("orderItems");
+        getElement(
+            "orderItems"
+        );
+
 
     if (!container) {
 
         console.warn(
-            "orderItems element not found."
+            "orderItems not found."
         );
 
         return;
     }
 
+
     container.innerHTML = "";
 
 
-    if (!cartItems.length) {
+    if (
+        !cartItems.length
+    ) {
 
         container.innerHTML = `
 
-            <div class="py-10 text-center">
+            <div
+                class="
+                    py-10
+                    text-center
+                "
+            >
 
                 <div
                     class="
@@ -424,6 +523,7 @@ function renderOrderItems() {
 
                 </div>
 
+
                 <h3
                     class="
                         text-base
@@ -434,6 +534,7 @@ function renderOrderItems() {
                     Your cart is empty
                 </h3>
 
+
                 <p
                     class="
                         mt-2
@@ -441,8 +542,10 @@ function renderOrderItems() {
                         text-white/50
                     "
                 >
-                    Add some sports products before placing your order.
+                    Add some sports products
+                    before placing your order.
                 </p>
+
 
                 <a
                     href="shop.html"
@@ -462,18 +565,7 @@ function renderOrderItems() {
                         text-black
                     "
                 >
-
-                    <span
-                        class="
-                            material-symbols-outlined
-                            text-[20px]
-                        "
-                    >
-                        shopping_bag
-                    </span>
-
                     Continue Shopping
-
                 </a>
 
             </div>
@@ -483,403 +575,375 @@ function renderOrderItems() {
     }
 
 
-    cartItems.forEach(
-        (item) => {
+    cartItems.forEach(item => {
 
-            const itemTotal =
-                Number(item.price) *
-                Number(item.quantity);
+        const itemTotal =
+            (
+                Number(item.price) || 0
+            ) *
+            (
+                Number(item.quantity) || 1
+            );
 
-            let imageHtml = "";
+
+        const image =
+            item.image || "";
 
 
-            if (item.image) {
+        let imageHtml = "";
 
-                imageHtml = `
 
-                    <img
-                        src="${escapeHtml(item.image)}"
-                        alt="${escapeHtml(item.name)}"
+        if (image) {
+
+            imageHtml = `
+
+                <img
+                    src="${escapeHtml(image)}"
+                    alt="${escapeHtml(item.name)}"
+                    class="
+                        h-20
+                        w-20
+                        rounded-xl
+                        object-cover
+                        bg-black/20
+                    "
+                    onerror="
+                        this.style.display='none';
+                        this.nextElementSibling.style.display='flex';
+                    "
+                >
+
+                <div
+                    class="
+                        hidden
+                        h-20
+                        w-20
+                        items-center
+                        justify-center
+                        rounded-xl
+                        bg-white/5
+                    "
+                >
+                    <span
                         class="
-                            h-20
-                            w-20
-                            rounded-xl
-                            object-cover
-                            bg-black/20
-                        "
-                        onerror="
-                            this.style.display='none';
-                            this.nextElementSibling.style.display='flex';
+                            material-symbols-outlined
+                            text-2xl
+                            text-white/30
                         "
                     >
+                        sports
+                    </span>
+                </div>
+            `;
 
-                    <div
-                        class="
-                            hidden
-                            h-20
-                            w-20
-                            items-center
-                            justify-center
-                            rounded-xl
-                            bg-white/5
-                        "
-                    >
+        } else {
 
-                        <span
-                            class="
-                                material-symbols-outlined
-                                text-2xl
-                                text-white/30
-                            "
-                        >
-                            sports
-                        </span>
-
-                    </div>
-                `;
-
-            } else {
-
-                imageHtml = `
-
-                    <div
-                        class="
-                            flex
-                            h-20
-                            w-20
-                            items-center
-                            justify-center
-                            rounded-xl
-                            bg-white/5
-                        "
-                    >
-
-                        <span
-                            class="
-                                material-symbols-outlined
-                                text-2xl
-                                text-white/30
-                            "
-                        >
-                            sports
-                        </span>
-
-                    </div>
-                `;
-            }
-
-
-            const shippingOriginHtml =
-                item.shippingOrigin
-                    ? `
-                        <p class="mt-1 text-[11px] text-white/40 flex items-center gap-1">
-
-                            <span class="material-symbols-outlined text-[13px]">
-                                local_shipping
-                            </span>
-
-                            Shipping from:
-                            ${escapeHtml(item.shippingOrigin)}
-
-                        </p>
-                    `
-                    : `
-                        <p class="mt-1 text-[11px] text-white/30 italic">
-                            Shipping origin unavailable
-                        </p>
-                    `;
-
-
-            const itemHtml = `
+            imageHtml = `
 
                 <div
                     class="
                         flex
-                        gap-4
-                        border-b
-                        border-white/10
-                        py-5
+                        h-20
+                        w-20
+                        items-center
+                        justify-center
+                        rounded-xl
+                        bg-white/5
+                    "
+                >
+                    <span
+                        class="
+                            material-symbols-outlined
+                            text-2xl
+                            text-white/30
+                        "
+                    >
+                        sports
+                    </span>
+                </div>
+            `;
+        }
+
+
+        container.insertAdjacentHTML(
+            "beforeend",
+            `
+
+            <div
+                class="
+                    flex
+                    gap-4
+                    border-b
+                    border-white/10
+                    py-5
+                "
+            >
+
+                <div
+                    class="shrink-0"
+                >
+                    ${imageHtml}
+                </div>
+
+
+                <div
+                    class="
+                        min-w-0
+                        flex-1
                     "
                 >
 
-                    <div class="shrink-0">
-
-                        ${imageHtml}
-
-                    </div>
-
-
                     <div
                         class="
-                            min-w-0
-                            flex-1
+                            flex
+                            items-start
+                            justify-between
+                            gap-3
                         "
                     >
 
                         <div
-                            class="
-                                flex
-                                items-start
-                                justify-between
-                                gap-3
-                            "
+                            class="min-w-0"
                         >
 
-                            <div class="min-w-0">
-
-                                <h3
-                                    class="
-                                        truncate
-                                        text-sm
-                                        font-black
-                                        text-white
-                                    "
-                                    title="${escapeHtml(item.name)}"
-                                >
-                                    ${escapeHtml(item.name)}
-                                </h3>
-
-
-                                ${
-                                    item.category
-                                        ? `
-                                            <p
-                                                class="
-                                                    mt-1
-                                                    text-xs
-                                                    font-bold
-                                                    uppercase
-                                                    tracking-wide
-                                                    text-orange-400
-                                                "
-                                            >
-                                                ${escapeHtml(item.category)}
-                                            </p>
-                                        `
-                                        : ""
-                                }
-
-
-                                ${
-                                    item.size
-                                        ? `
-                                            <p
-                                                class="
-                                                    mt-1
-                                                    text-xs
-                                                    text-white/50
-                                                "
-                                            >
-                                                Size:
-                                                ${escapeHtml(item.size)}
-                                            </p>
-                                        `
-                                        : ""
-                                }
-
-
-                                ${shippingOriginHtml}
-
-                            </div>
-
-
-                            <div
+                            <h3
                                 class="
-                                    shrink-0
-                                    text-right
+                                    truncate
+                                    text-sm
+                                    font-black
+                                    text-white
                                 "
                             >
+                                ${escapeHtml(
+                                    item.name
+                                )}
+                            </h3>
 
-                                <p
-                                    class="
-                                        text-sm
-                                        font-black
-                                        text-orange-400
-                                    "
-                                >
-                                    ${formatPrice(itemTotal)}
-                                </p>
 
-                            </div>
+                            ${
+                                item.category
+                                    ? `
+                                        <p
+                                            class="
+                                                mt-1
+                                                text-xs
+                                                font-bold
+                                                uppercase
+                                                text-orange-400
+                                            "
+                                        >
+                                            ${escapeHtml(
+                                                item.category
+                                            )}
+                                        </p>
+                                    `
+                                    : ""
+                            }
+
+
+                            ${
+                                item.size
+                                    ? `
+                                        <p
+                                            class="
+                                                mt-1
+                                                text-xs
+                                                text-white/50
+                                            "
+                                        >
+                                            Size:
+                                            ${escapeHtml(
+                                                item.size
+                                            )}
+                                        </p>
+                                    `
+                                    : ""
+                            }
 
                         </div>
 
 
                         <div
                             class="
-                                mt-3
-                                flex
-                                items-center
-                                justify-between
-                                gap-3
+                                shrink-0
+                                text-right
                             "
                         >
 
                             <p
                                 class="
-                                    text-xs
-                                    text-white/50
-                                "
-                            >
-                                ${formatPrice(item.price)}
-                                ×
-                                ${item.quantity}
-                            </p>
-
-
-                            <div
-                                class="
-                                    flex
-                                    h-8
-                                    min-w-8
-                                    items-center
-                                    justify-center
-                                    rounded-lg
-                                    bg-white/5
-                                    px-2
-                                    text-xs
+                                    text-sm
                                     font-black
-                                    text-white
+                                    text-orange-400
                                 "
                             >
-                                Qty:
-                                ${item.quantity}
-                            </div>
+                                ${formatPrice(
+                                    itemTotal
+                                )}
+                            </p>
 
                         </div>
 
                     </div>
 
-                </div>
-            `;
 
-            container.insertAdjacentHTML(
-                "beforeend",
-                itemHtml
-            );
-        }
-    );
+                    <div
+                        class="
+                            mt-3
+                            flex
+                            items-center
+                            justify-between
+                        "
+                    >
+
+                        <span
+                            class="
+                                text-xs
+                                font-bold
+                                text-white/50
+                            "
+                        >
+                            Qty:
+                            ${Number(
+                                item.quantity
+                            ) || 1}
+                        </span>
+
+
+                        <span
+                            class="
+                                text-xs
+                                text-white/40
+                            "
+                        >
+                            ${formatPrice(
+                                item.price
+                            )}
+                            each
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+        `
+        );
+    });
 }
 
 
-/* =========================================================
+/* ============================================================
    RENDER TOTALS
-   ========================================================= */
+============================================================ */
 
 function renderTotals() {
 
-    const summaryItemCount =
-        getElement(
-            "summaryItemCount"
-        );
-
-    const subtotalValue =
-        getElement(
-            "subtotalValue"
-        );
-
-    const shippingValue =
-        getElement(
-            "shippingValue"
-        );
-
-    const discountRow =
-        getElement(
-            "discountRow"
-        );
-
-    const discountValue =
-        getElement(
-            "discountValue"
-        );
-
-    const grandTotalValue =
-        getElement(
-            "grandTotalValue"
-        );
-
-
-    const totalQuantity =
+    const count =
         cartItems.reduce(
-            (
-                total,
-                item
-            ) => {
-
-                return (
-                    total +
-                    Number(item.quantity)
-                );
-            },
+            (total, item) =>
+                total +
+                (
+                    Number(
+                        item.quantity
+                    ) || 1
+                ),
             0
         );
 
 
-    if (summaryItemCount) {
+    const countElement =
+        getElement(
+            "summaryItemCount"
+        );
 
-        summaryItemCount.textContent =
-            `${totalQuantity} ${
-                totalQuantity === 1
+
+    if (countElement) {
+
+        countElement.textContent =
+            `${count} ${
+                count === 1
                     ? "item"
                     : "items"
             }`;
     }
 
 
-    if (subtotalValue) {
+    const subtotalElement =
+        getElement(
+            "subtotalValue"
+        );
 
-        subtotalValue.textContent =
+
+    if (subtotalElement) {
+
+        subtotalElement.textContent =
             formatPrice(
                 subtotal
             );
     }
 
 
-    if (shippingValue) {
+    const shippingElement =
+        getElement(
+            "shippingValue"
+        );
+
+
+    if (shippingElement) {
 
         if (
             shipping === 0 &&
             subtotal > 0
         ) {
 
-            shippingValue.textContent =
+            shippingElement.textContent =
                 "FREE";
-
-            shippingValue.classList.add(
-                "text-green-400"
-            );
 
         } else {
 
-            shippingValue.textContent =
+            shippingElement.textContent =
                 formatPrice(
                     shipping
                 );
-
-            shippingValue.classList.remove(
-                "text-green-400"
-            );
         }
     }
 
 
-    if (discountRow) {
+    const discountRow =
+        getElement(
+            "discountRow"
+        );
 
-        if (discount > 0) {
+
+    const discountElement =
+        getElement(
+            "discountValue"
+        );
+
+
+    if (discount > 0) {
+
+        if (discountRow) {
 
             discountRow.classList.remove(
                 "hidden"
             );
+        }
 
-            if (discountValue) {
 
-                discountValue.textContent =
-                    `- ${formatPrice(
-                        discount
-                    )}`;
-            }
+        if (discountElement) {
 
-        } else {
+            discountElement.textContent =
+                "- " +
+                formatPrice(
+                    discount
+                );
+        }
+
+    } else {
+
+        if (discountRow) {
 
             discountRow.classList.add(
                 "hidden"
@@ -888,9 +952,15 @@ function renderTotals() {
     }
 
 
-    if (grandTotalValue) {
+    const grandTotalElement =
+        getElement(
+            "grandTotalValue"
+        );
 
-        grandTotalValue.textContent =
+
+    if (grandTotalElement) {
+
+        grandTotalElement.textContent =
             formatPrice(
                 grandTotal
             );
@@ -898,9 +968,45 @@ function renderTotals() {
 }
 
 
-/* =========================================================
-   CHECKOUT BUTTON
-   ========================================================= */
+/* ============================================================
+   CART BUTTON
+============================================================ */
+
+function updateCartCount() {
+
+    const count =
+        cartItems.reduce(
+            (total, item) =>
+                total +
+                (
+                    Number(
+                        item.quantity
+                    ) || 1
+                ),
+            0
+        );
+
+
+    document
+        .querySelectorAll(
+            "#cartCount, .cart-count, .cart-badge"
+        )
+        .forEach(element => {
+
+            element.textContent =
+                String(count);
+
+            element.style.display =
+                count > 0
+                    ? ""
+                    : "none";
+        });
+}
+
+
+/* ============================================================
+   CHECKOUT BUTTON VISIBILITY
+============================================================ */
 
 function updateCheckoutVisibility() {
 
@@ -909,8 +1015,8 @@ function updateCheckoutVisibility() {
             "placeOrderBtn"
         );
 
-    if (!button) {
 
+    if (!button) {
         return;
     }
 
@@ -924,11 +1030,6 @@ function updateCheckoutVisibility() {
             "cursor-not-allowed"
         );
 
-        button.setAttribute(
-            "aria-disabled",
-            "true"
-        );
-
     } else {
 
         button.disabled = false;
@@ -937,25 +1038,17 @@ function updateCheckoutVisibility() {
             "opacity-50",
             "cursor-not-allowed"
         );
-
-        button.removeAttribute(
-            "aria-disabled"
-        );
     }
 }
 
 
-/* =========================================================
+/* ============================================================
    CURRENT USER
-   ========================================================= */
+============================================================ */
 
 async function loadCurrentUser() {
 
     if (!supabaseClient) {
-
-        console.error(
-            "Supabase client not available."
-        );
 
         currentUser = null;
 
@@ -985,24 +1078,9 @@ async function loadCurrentUser() {
         }
 
 
-        const session =
-            data?.session;
-
-
-        if (!session?.user) {
-
-            console.warn(
-                "No active Supabase session."
-            );
-
-            currentUser = null;
-
-            return null;
-        }
-
-
         currentUser =
-            session.user;
+            data?.session?.user ||
+            null;
 
 
         return currentUser;
@@ -1010,7 +1088,7 @@ async function loadCurrentUser() {
     } catch (error) {
 
         console.error(
-            "Current user error:",
+            "User error:",
             error
         );
 
@@ -1021,9 +1099,160 @@ async function loadCurrentUser() {
 }
 
 
-/* =========================================================
+/* ============================================================
+   CUSTOMER PROFILE
+============================================================ */
+
+async function loadCustomerProfile() {
+
+    if (
+        !supabaseClient ||
+        !currentUser?.id
+    ) {
+
+        return null;
+    }
+
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from("profiles")
+                .select("*")
+                .eq(
+                    "id",
+                    currentUser.id
+                )
+                .maybeSingle();
+
+
+        if (error) {
+
+            console.warn(
+                "Profile error:",
+                error
+            );
+
+            return null;
+        }
+
+
+        currentProfile =
+            data || null;
+
+
+        return currentProfile;
+
+    } catch (error) {
+
+        console.warn(
+            "Profile exception:",
+            error
+        );
+
+        return null;
+    }
+}
+
+
+/* ============================================================
+   FILL CUSTOMER DETAILS
+============================================================ */
+
+async function fillCustomerDetails() {
+
+    if (!currentUser) {
+        return;
+    }
+
+
+    if (!currentProfile) {
+
+        await loadCustomerProfile();
+    }
+
+
+    const metadata =
+        currentUser.user_metadata ||
+        {};
+
+
+    const name =
+        currentProfile?.full_name ||
+        currentProfile?.name ||
+        metadata.full_name ||
+        metadata.name ||
+        "";
+
+
+    const phone =
+        currentProfile?.phone ||
+        metadata.phone ||
+        "";
+
+
+    const email =
+        currentUser.email ||
+        currentProfile?.email ||
+        "";
+
+
+    const nameField =
+        getElement(
+            "customerName"
+        );
+
+
+    const emailField =
+        getElement(
+            "customerEmail"
+        );
+
+
+    const phoneField =
+        getElement(
+            "customerPhone"
+        );
+
+
+    if (
+        nameField &&
+        !nameField.value
+    ) {
+
+        nameField.value =
+            name;
+    }
+
+
+    if (
+        emailField &&
+        !emailField.value
+    ) {
+
+        emailField.value =
+            email;
+    }
+
+
+    if (
+        phoneField &&
+        !phoneField.value
+    ) {
+
+        phoneField.value =
+            phone;
+    }
+}
+
+
+/* ============================================================
    PAYMENT SETTINGS
-   ========================================================= */
+============================================================ */
 
 async function loadPaymentSettings() {
 
@@ -1033,6 +1262,7 @@ async function loadPaymentSettings() {
 
         return;
     }
+
 
     try {
 
@@ -1049,8 +1279,8 @@ async function loadPaymentSettings() {
 
         if (error) {
 
-            console.error(
-                "Payment settings load error:",
+            console.warn(
+                "Payment settings error:",
                 error
             );
 
@@ -1063,9 +1293,15 @@ async function loadPaymentSettings() {
         paymentSettings =
             data || null;
 
+
+        console.log(
+            "PAYMENT SETTINGS:",
+            paymentSettings
+        );
+
     } catch (error) {
 
-        console.error(
+        console.warn(
             "Payment settings exception:",
             error
         );
@@ -1075,9 +1311,964 @@ async function loadPaymentSettings() {
 }
 
 
-/* =========================================================
+/* ============================================================
+   PAYMENT DETAIL WRAPPER
+============================================================ */
+
+function detailsWrapper(
+    html
+) {
+
+    return `
+
+        <div
+            class="
+                mt-4
+                rounded-2xl
+                border
+                border-orange-500/20
+                bg-orange-500/5
+                p-5
+                space-y-4
+            "
+        >
+            ${html}
+        </div>
+    `;
+}
+
+
+/* ============================================================
+   CARD DETAILS
+============================================================ */
+
+function cardDetailsTemplate() {
+
+    return detailsWrapper(`
+
+        <div
+            class="
+                flex
+                items-center
+                gap-3
+            "
+        >
+
+            <div
+                class="
+                    flex
+                    h-11
+                    w-11
+                    items-center
+                    justify-center
+                    rounded-xl
+                    bg-orange-500/10
+                "
+            >
+
+                <span
+                    class="
+                        material-symbols-outlined
+                        text-orange-500
+                    "
+                >
+                    credit_card
+                </span>
+
+            </div>
+
+
+            <div>
+
+                <h3
+                    class="
+                        font-black
+                        text-lg
+                    "
+                >
+                    Card Payment
+                </h3>
+
+                <p
+                    class="
+                        text-xs
+                        text-white/50
+                    "
+                >
+                    Secure card payment
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="
+                rounded-xl
+                border
+                border-white/10
+                bg-black/20
+                p-4
+            "
+        >
+
+            <p
+                class="
+                    text-sm
+                    text-white/70
+                "
+            >
+                Card payment instructions
+                will appear here.
+            </p>
+
+            <p
+                class="
+                    mt-2
+                    text-xs
+                    text-white/40
+                "
+            >
+                Never share your card PIN,
+                CVV or OTP with anyone.
+            </p>
+
+        </div>
+    `);
+}
+
+
+/* ============================================================
+   BANK DETAILS
+============================================================ */
+
+function bankDetailsTemplate() {
+
+    const s =
+        paymentSettings || {};
+
+
+    const accountName =
+        s.bank_account_name ||
+        s.account_name ||
+        "KHELZONE";
+
+
+    const accountNumber =
+        s.bank_account_number ||
+        s.account_number ||
+        "Not configured";
+
+
+    const bankName =
+        s.bank_name ||
+        "Not configured";
+
+
+    return detailsWrapper(`
+
+        <div>
+
+            <h3
+                class="
+                    text-lg
+                    font-black
+                "
+            >
+                Bank Transfer
+            </h3>
+
+            <p
+                class="
+                    mt-1
+                    text-xs
+                    text-white/50
+                "
+            >
+                Transfer the payment using
+                the details below.
+            </p>
+
+        </div>
+
+
+        <div
+            class="
+                grid
+                gap-4
+                sm:grid-cols-3
+            "
+        >
+
+            <div
+                class="
+                    rounded-xl
+                    border
+                    border-white/10
+                    bg-black/20
+                    p-4
+                "
+            >
+
+                <p
+                    class="
+                        text-xs
+                        uppercase
+                        text-white/40
+                    "
+                >
+                    Bank
+                </p>
+
+                <p
+                    class="
+                        mt-1
+                        font-black
+                    "
+                >
+                    ${escapeHtml(
+                        bankName
+                    )}
+                </p>
+
+            </div>
+
+
+            <div
+                class="
+                    rounded-xl
+                    border
+                    border-white/10
+                    bg-black/20
+                    p-4
+                "
+            >
+
+                <p
+                    class="
+                        text-xs
+                        uppercase
+                        text-white/40
+                    "
+                >
+                    Account Name
+                </p>
+
+                <p
+                    class="
+                        mt-1
+                        font-black
+                    "
+                >
+                    ${escapeHtml(
+                        accountName
+                    )}
+                </p>
+
+            </div>
+
+
+            <div
+                class="
+                    rounded-xl
+                    border
+                    border-white/10
+                    bg-black/20
+                    p-4
+                "
+            >
+
+                <p
+                    class="
+                        text-xs
+                        uppercase
+                        text-white/40
+                    "
+                >
+                    Account Number
+                </p>
+
+                <p
+                    class="
+                        mt-1
+                        font-black
+                    "
+                >
+                    ${escapeHtml(
+                        accountNumber
+                    )}
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div>
+
+            <label
+                class="
+                    mb-2
+                    block
+                    text-xs
+                    font-bold
+                    uppercase
+                    text-white/50
+                "
+            >
+                Transaction ID / Reference
+            </label>
+
+            <input
+                id="paymentReference"
+                type="text"
+                class="input-field w-full"
+                placeholder="Enter transaction ID"
+            >
+
+        </div>
+    `);
+}
+
+
+/* ============================================================
+   EASYPAISA DETAILS
+============================================================ */
+
+function easypaisaDetailsTemplate() {
+
+    const s =
+        paymentSettings || {};
+
+
+    const accountName =
+        s.easypaisa_account_name ||
+        s.easypaisa_name ||
+        "KHELZONE";
+
+
+    const accountNumber =
+        s.easypaisa_number ||
+        s.easypaisa_account_number ||
+        "Not configured";
+
+
+    return detailsWrapper(`
+
+        <div
+            class="
+                flex
+                items-center
+                gap-3
+            "
+        >
+
+            <div
+                class="
+                    flex
+                    h-11
+                    w-11
+                    items-center
+                    justify-center
+                    rounded-xl
+                    bg-orange-500/10
+                "
+            >
+
+                <span
+                    class="
+                        material-symbols-outlined
+                        text-orange-500
+                    "
+                >
+                    phone_iphone
+                </span>
+
+            </div>
+
+
+            <div>
+
+                <h3
+                    class="
+                        text-lg
+                        font-black
+                    "
+                >
+                    Easypaisa Payment
+                </h3>
+
+                <p
+                    class="
+                        text-xs
+                        text-white/50
+                    "
+                >
+                    Send your payment to this
+                    Easypaisa account.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="
+                grid
+                gap-4
+                sm:grid-cols-2
+            "
+        >
+
+            <div
+                class="
+                    rounded-xl
+                    border
+                    border-white/10
+                    bg-black/20
+                    p-4
+                "
+            >
+
+                <p
+                    class="
+                        text-xs
+                        uppercase
+                        text-white/40
+                    "
+                >
+                    Account Name
+                </p>
+
+                <p
+                    class="
+                        mt-1
+                        font-black
+                    "
+                >
+                    ${escapeHtml(
+                        accountName
+                    )}
+                </p>
+
+            </div>
+
+
+            <div
+                class="
+                    rounded-xl
+                    border
+                    border-white/10
+                    bg-black/20
+                    p-4
+                "
+            >
+
+                <p
+                    class="
+                        text-xs
+                        uppercase
+                        text-white/40
+                    "
+                >
+                    Easypaisa Number
+                </p>
+
+                <p
+                    class="
+                        mt-1
+                        font-black
+                    "
+                >
+                    ${escapeHtml(
+                        accountNumber
+                    )}
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div>
+
+            <label
+                for="senderMobileNumber"
+                class="
+                    mb-2
+                    block
+                    text-xs
+                    font-bold
+                    uppercase
+                    text-white/50
+                "
+            >
+                Your Easypaisa Number
+            </label>
+
+            <input
+                id="senderMobileNumber"
+                type="tel"
+                class="input-field w-full"
+                placeholder="03XX XXXXXXX"
+            >
+
+            <p
+                id="senderMobileNumberError"
+                class="
+                    hidden
+                    mt-2
+                    text-xs
+                    text-red-400
+                "
+            >
+                Please enter the Easypaisa
+                number you paid from.
+            </p>
+
+        </div>
+
+
+        <div>
+
+            <label
+                for="paymentReference"
+                class="
+                    mb-2
+                    block
+                    text-xs
+                    font-bold
+                    uppercase
+                    text-white/50
+                "
+            >
+                Transaction ID / Reference
+            </label>
+
+            <input
+                id="paymentReference"
+                type="text"
+                class="input-field w-full"
+                placeholder="Enter transaction ID"
+            >
+
+        </div>
+    `);
+}
+
+
+/* ============================================================
+   JAZZCASH DETAILS
+============================================================ */
+
+function jazzcashDetailsTemplate() {
+
+    const s =
+        paymentSettings || {};
+
+
+    const accountName =
+        s.jazzcash_account_name ||
+        s.jazzcash_name ||
+        "KHELZONE";
+
+
+    const accountNumber =
+        s.jazzcash_number ||
+        s.jazzcash_account_number ||
+        "Not configured";
+
+
+    return detailsWrapper(`
+
+        <div
+            class="
+                flex
+                items-center
+                gap-3
+            "
+        >
+
+            <div
+                class="
+                    flex
+                    h-11
+                    w-11
+                    items-center
+                    justify-center
+                    rounded-xl
+                    bg-orange-500/10
+                "
+            >
+
+                <span
+                    class="
+                        material-symbols-outlined
+                        text-orange-500
+                    "
+                >
+                    phone_iphone
+                </span>
+
+            </div>
+
+
+            <div>
+
+                <h3
+                    class="
+                        text-lg
+                        font-black
+                    "
+                >
+                    JazzCash Payment
+                </h3>
+
+                <p
+                    class="
+                        text-xs
+                        text-white/50
+                    "
+                >
+                    Send your payment to this
+                    JazzCash account.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="
+                grid
+                gap-4
+                sm:grid-cols-2
+            "
+        >
+
+            <div
+                class="
+                    rounded-xl
+                    border
+                    border-white/10
+                    bg-black/20
+                    p-4
+                "
+            >
+
+                <p
+                    class="
+                        text-xs
+                        uppercase
+                        text-white/40
+                    "
+                >
+                    Account Name
+                </p>
+
+                <p
+                    class="
+                        mt-1
+                        font-black
+                    "
+                >
+                    ${escapeHtml(
+                        accountName
+                    )}
+                </p>
+
+            </div>
+
+
+            <div
+                class="
+                    rounded-xl
+                    border
+                    border-white/10
+                    bg-black/20
+                    p-4
+                "
+            >
+
+                <p
+                    class="
+                        text-xs
+                        uppercase
+                        text-white/40
+                    "
+                >
+                    JazzCash Number
+                </p>
+
+                <p
+                    class="
+                        mt-1
+                        font-black
+                    "
+                >
+                    ${escapeHtml(
+                        accountNumber
+                    )}
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div>
+
+            <label
+                for="senderMobileNumber"
+                class="
+                    mb-2
+                    block
+                    text-xs
+                    font-bold
+                    uppercase
+                    text-white/50
+                "
+            >
+                Your JazzCash Number
+            </label>
+
+            <input
+                id="senderMobileNumber"
+                type="tel"
+                class="input-field w-full"
+                placeholder="03XX XXXXXXX"
+            >
+
+            <p
+                id="senderMobileNumberError"
+                class="
+                    hidden
+                    mt-2
+                    text-xs
+                    text-red-400
+                "
+            >
+                Please enter the JazzCash
+                number you paid from.
+            </p>
+
+        </div>
+
+
+        <div>
+
+            <label
+                for="paymentReference"
+                class="
+                    mb-2
+                    block
+                    text-xs
+                    font-bold
+                    uppercase
+                    text-white/50
+                "
+            >
+                Transaction ID / Reference
+            </label>
+
+            <input
+                id="paymentReference"
+                type="text"
+                class="input-field w-full"
+                placeholder="Enter transaction ID"
+            >
+
+        </div>
+    `);
+}
+
+
+/* ============================================================
+   COD DETAILS
+============================================================ */
+
+function codDetailsTemplate() {
+
+    return detailsWrapper(`
+
+        <div
+            class="
+                flex
+                items-center
+                gap-3
+            "
+        >
+
+            <div
+                class="
+                    flex
+                    h-11
+                    w-11
+                    items-center
+                    justify-center
+                    rounded-xl
+                    bg-orange-500/10
+                "
+            >
+
+                <span
+                    class="
+                        material-symbols-outlined
+                        text-orange-500
+                    "
+                >
+                    payments
+                </span>
+
+            </div>
+
+
+            <div>
+
+                <h3
+                    class="
+                        text-lg
+                        font-black
+                    "
+                >
+                    Cash on Delivery
+                </h3>
+
+                <p
+                    class="
+                        mt-1
+                        text-sm
+                        text-white/60
+                    "
+                >
+                    Pay when your order is
+                    delivered to your address.
+                </p>
+
+            </div>
+
+        </div>
+    `);
+}
+
+
+/* ============================================================
+   PAYMENT DETAILS RENDER
+============================================================ */
+
+function renderPaymentDetailsUI(
+    method
+) {
+
+    const container =
+        getElement(
+            "paymentDetails"
+        );
+
+
+    if (!container) {
+
+        console.warn(
+            "paymentDetails container not found."
+        );
+
+        return;
+    }
+
+
+    let html = "";
+
+
+    switch (method) {
+
+        case "card":
+
+            html =
+                cardDetailsTemplate();
+
+            break;
+
+
+        case "bank":
+
+            html =
+                bankDetailsTemplate();
+
+            break;
+
+
+        case "easypaisa":
+
+            html =
+                easypaisaDetailsTemplate();
+
+            break;
+
+
+        case "jazzcash":
+
+            html =
+                jazzcashDetailsTemplate();
+
+            break;
+
+
+        case "cod":
+
+        case "cash_on_delivery":
+
+            html =
+                codDetailsTemplate();
+
+            break;
+
+
+        default:
+
+            html = "";
+    }
+
+
+    container.innerHTML =
+        html;
+
+
+    attachDynamicFieldListeners();
+}
+
+
+/* ============================================================
+   PAYMENT OPTION HIGHLIGHT
+============================================================ */
+
+function highlightPaymentOption(
+    method
+) {
+
+    document
+        .querySelectorAll(
+            ".payment-option"
+        )
+        .forEach(option => {
+
+            const optionMethod =
+                option.dataset.paymentOption;
+
+
+            option.classList.toggle(
+                "active",
+                optionMethod === method
+            );
+        });
+}
+
+
+/* ============================================================
    PAYMENT METHODS
-   ========================================================= */
+============================================================ */
 
 function setupPaymentMethods() {
 
@@ -1087,24 +2278,76 @@ function setupPaymentMethods() {
         );
 
 
-    methods.forEach(
-        (radio) => {
+    methods.forEach(radio => {
 
-            radio.addEventListener(
-                "change",
-                () => {
+        radio.addEventListener(
+            "change",
+            function() {
 
-                    highlightPaymentOption(
-                        radio.value
-                    );
+                const method =
+                    this.value;
 
-                    renderPaymentDetailsUI(
-                        radio.value
+
+                highlightPaymentOption(
+                    method
+                );
+
+
+                renderPaymentDetailsUI(
+                    method
+                );
+            }
+        );
+    });
+
+
+    /*
+       Click anywhere on payment card
+    */
+
+    document
+        .querySelectorAll(
+            ".payment-option"
+        )
+        .forEach(option => {
+
+            option.addEventListener(
+                "click",
+                function(event) {
+
+                    const radio =
+                        this.querySelector(
+                            'input[name="paymentMethod"]'
+                        );
+
+
+                    if (!radio) {
+                        return;
+                    }
+
+
+                    if (
+                        event.target === radio
+                    ) {
+                        return;
+                    }
+
+
+                    radio.checked =
+                        true;
+
+
+                    radio.dispatchEvent(
+                        new Event(
+                            "change",
+                            {
+                                bubbles: true
+                            }
+                        )
                     );
                 }
             );
-        }
-    );
+        });
 
 
     const selected =
@@ -1119,6 +2362,7 @@ function setupPaymentMethods() {
             selected.value
         );
 
+
         renderPaymentDetailsUI(
             selected.value
         );
@@ -1126,1067 +2370,84 @@ function setupPaymentMethods() {
 }
 
 
-function highlightPaymentOption(
-    method
-) {
-
-    document
-        .querySelectorAll(
-            ".payment-option"
-        )
-        .forEach(
-            (el) => {
-
-                el.classList.toggle(
-                    "active",
-                    el.dataset.paymentOption === method
-                );
-            }
-        );
-}
-
-
-/* =========================================================
-   PAYMENT DETAILS UI
-   ========================================================= */
-
-function renderPaymentDetailsUI(
-    method
-) {
-
-    const container =
-        getElement(
-            "paymentDetails"
-        );
-
-
-    if (!container) {
-
-        return;
-    }
-
-
-    let html = "";
-
-
-    if (method === "card") {
-
-        html =
-            cardDetailsTemplate();
-
-    } else if (method === "bank") {
-
-        html =
-            bankDetailsTemplate();
-
-    } else if (method === "easypaisa") {
-
-        html =
-            easypaisaDetailsTemplate();
-
-    } else if (method === "jazzcash") {
-
-        html =
-            jazzcashDetailsTemplate();
-
-    } else if (
-        method === "cod" ||
-        method === "cash_on_delivery"
-    ) {
-
-        html =
-            codDetailsTemplate();
-    }
-
-
-    container.innerHTML =
-        html;
-
-
-    attachDynamicFieldListeners();
-}
-
-
-/* =========================================================
-   DETAILS WRAPPER
-   ========================================================= */
-
-function detailsWrapper(
-    innerHtml
-) {
-
-    return `
-        <div class="rounded-2xl border border-orange-500/20 bg-orange-500/5 p-5 space-y-4">
-            ${innerHtml}
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   TRANSACTION REFERENCE
-   ========================================================= */
-
-function transactionReferenceFieldHtml() {
-
-    return `
-        <div>
-
-            <label
-                for="paymentReference"
-                class="
-                    block
-                    text-xs
-                    uppercase
-                    tracking-wider
-                    font-bold
-                    text-gray-400
-                    mb-2
-                "
-            >
-                Transaction ID / Reference *
-            </label>
-
-            <input
-                id="paymentReference"
-                type="text"
-                class="input-field"
-                placeholder="Enter the transaction ID after you complete the transfer"
-            >
-
-            <p
-                id="paymentReferenceError"
-                class="hidden text-red-400 text-xs mt-2"
-            >
-                Transaction ID / Reference is required.
-            </p>
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   BANK TRANSFER
-   ========================================================= */
-
-function bankDetailsTemplate() {
-
-    const s =
-        paymentSettings || {};
-
-
-    /*
-     * IMPORTANT:
-     * No "not configured" warning anymore.
-     *
-     * If admin has entered details,
-     * real details are shown.
-     *
-     * If a particular field is empty,
-     * only that field shows "—".
-     */
-
-    return detailsWrapper(`
-
-        <div
-            class="
-                text-xs
-                uppercase
-                tracking-wider
-                text-gray-400
-                font-bold
-            "
-        >
-            Bank Transfer Details
-        </div>
-
-
-        <div
-            class="
-                grid
-                sm:grid-cols-2
-                gap-4
-                text-sm
-            "
-        >
-
-            <div>
-
-                <div
-                    class="
-                        text-gray-500
-                        text-xs
-                        mb-1
-                    "
-                >
-                    Bank Name
-                </div>
-
-                <div class="font-bold">
-                    ${escapeHtml(
-                        s.bank_name || "—"
-                    )}
-                </div>
-
-            </div>
-
-
-            <div>
-
-                <div
-                    class="
-                        text-gray-500
-                        text-xs
-                        mb-1
-                    "
-                >
-                    Account Title
-                </div>
-
-                <div class="font-bold">
-                    ${escapeHtml(
-                        s.account_title || "—"
-                    )}
-                </div>
-
-            </div>
-
-
-            <div>
-
-                <div
-                    class="
-                        text-gray-500
-                        text-xs
-                        mb-1
-                    "
-                >
-                    Account Number
-                </div>
-
-                <div class="font-bold">
-                    ${escapeHtml(
-                        s.account_number || "—"
-                    )}
-                </div>
-
-            </div>
-
-
-            <div>
-
-                <div
-                    class="
-                        text-gray-500
-                        text-xs
-                        mb-1
-                    "
-                >
-                    IBAN
-                </div>
-
-                <div class="font-bold">
-                    ${escapeHtml(
-                        s.iban || "—"
-                    )}
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="h-px bg-white/10"></div>
-
-
-        <div
-            class="
-                text-xs
-                uppercase
-                tracking-wider
-                text-gray-400
-                font-bold
-            "
-        >
-            After you transfer, tell us who sent it
-        </div>
-
-
-        <div
-            class="
-                grid
-                sm:grid-cols-2
-                gap-4
-            "
-        >
-
-            <div>
-
-                <label
-                    for="senderAccountTitle"
-                    class="
-                        block
-                        text-xs
-                        uppercase
-                        tracking-wider
-                        font-bold
-                        text-gray-400
-                        mb-2
-                    "
-                >
-                    Your Account Title (sender) *
-                </label>
-
-                <input
-                    id="senderAccountTitle"
-                    type="text"
-                    class="input-field"
-                    placeholder="Name on the account you paid from"
-                >
-
-                <p
-                    id="senderAccountTitleError"
-                    class="
-                        hidden
-                        text-red-400
-                        text-xs
-                        mt-2
-                    "
-                >
-                    Please enter the account title you paid from.
-                </p>
-
-            </div>
-
-
-            <div>
-
-                <label
-                    for="senderAccountNumber"
-                    class="
-                        block
-                        text-xs
-                        uppercase
-                        tracking-wider
-                        font-bold
-                        text-gray-400
-                        mb-2
-                    "
-                >
-                    Your Account Number (sender) *
-                </label>
-
-                <input
-                    id="senderAccountNumber"
-                    type="text"
-                    class="input-field"
-                    placeholder="Account number you paid from"
-                >
-
-                <p
-                    id="senderAccountNumberError"
-                    class="
-                        hidden
-                        text-red-400
-                        text-xs
-                        mt-2
-                    "
-                >
-                    Please enter the account number you paid from.
-                </p>
-
-            </div>
-
-        </div>
-
-
-        ${transactionReferenceFieldHtml()}
-
-    `);
-}
-
-
-/* =========================================================
-   EASYPAISA
-   ========================================================= */
-
-function easypaisaDetailsTemplate() {
-
-    const s =
-        paymentSettings || {};
-
-
-    const hasEasypaisaDetails =
-        s.easypaisa_account_name &&
-        s.easypaisa_number;
-
-
-    const receivingDetailsHtml =
-        hasEasypaisaDetails
-            ? `
-
-                <div
-                    class="
-                        text-xs
-                        uppercase
-                        tracking-wider
-                        text-gray-400
-                        font-bold
-                    "
-                >
-                    Easypaisa Details
-                </div>
-
-
-                <div
-                    class="
-                        grid
-                        sm:grid-cols-2
-                        gap-4
-                        text-sm
-                    "
-                >
-
-                    <div>
-
-                        <div
-                            class="
-                                text-gray-500
-                                text-xs
-                                mb-1
-                            "
-                        >
-                            Account Name
-                        </div>
-
-                        <div class="font-bold">
-                            ${escapeHtml(
-                                s.easypaisa_account_name
-                            )}
-                        </div>
-
-                    </div>
-
-
-                    <div>
-
-                        <div
-                            class="
-                                text-gray-500
-                                text-xs
-                                mb-1
-                            "
-                        >
-                            Easypaisa Number
-                        </div>
-
-                        <div class="font-bold">
-                            ${escapeHtml(
-                                s.easypaisa_number
-                            )}
-                        </div>
-
-                    </div>
-
-                </div>
-
-            `
-            : `
-                <div
-                    class="
-                        text-sm
-                        text-gray-400
-                    "
-                >
-                    Easypaisa receiving details are currently unavailable.
-                </div>
-            `;
-
-
-    return detailsWrapper(`
-
-        ${receivingDetailsHtml}
-
-
-        <div class="h-px bg-white/10"></div>
-
-
-        <div>
-
-            <label
-                for="senderMobileNumber"
-                class="
-                    block
-                    text-xs
-                    uppercase
-                    tracking-wider
-                    font-bold
-                    text-gray-400
-                    mb-2
-                "
-            >
-                Your Easypaisa Number (the number you paid from) *
-            </label>
-
-            <input
-                id="senderMobileNumber"
-                type="tel"
-                class="input-field"
-                placeholder="03XX XXXXXXX"
-            >
-
-            <p
-                id="senderMobileNumberError"
-                class="
-                    hidden
-                    text-red-400
-                    text-xs
-                    mt-2
-                "
-            >
-                Please enter the Easypaisa number you paid from.
-            </p>
-
-        </div>
-
-
-        ${transactionReferenceFieldHtml()}
-
-    `);
-}
-
-
-/* =========================================================
-   JAZZCASH
-   ========================================================= */
-
-function jazzcashDetailsTemplate() {
-
-    const s =
-        paymentSettings || {};
-
-
-    /*
-     * IMPORTANT:
-     * No "not configured" warning anymore.
-     *
-     * Admin details are shown if available.
-     * Empty fields simply display "—".
-     */
-
-    return detailsWrapper(`
-
-        <div
-            class="
-                text-xs
-                uppercase
-                tracking-wider
-                text-gray-400
-                font-bold
-            "
-        >
-            JazzCash Details
-        </div>
-
-
-        <div
-            class="
-                grid
-                sm:grid-cols-2
-                gap-4
-                text-sm
-            "
-        >
-
-            <div>
-
-                <div
-                    class="
-                        text-gray-500
-                        text-xs
-                        mb-1
-                    "
-                >
-                    Account Name
-                </div>
-
-                <div class="font-bold">
-                    ${escapeHtml(
-                        s.jazzcash_account_name || "—"
-                    )}
-                </div>
-
-            </div>
-
-
-            <div>
-
-                <div
-                    class="
-                        text-gray-500
-                        text-xs
-                        mb-1
-                    "
-                >
-                    JazzCash Number
-                </div>
-
-                <div class="font-bold">
-                    ${escapeHtml(
-                        s.jazzcash_number || "—"
-                    )}
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="h-px bg-white/10"></div>
-
-
-        <div>
-
-            <label
-                for="senderMobileNumber"
-                class="
-                    block
-                    text-xs
-                    uppercase
-                    tracking-wider
-                    font-bold
-                    text-gray-400
-                    mb-2
-                "
-            >
-                Your JazzCash Number (the number you paid from) *
-            </label>
-
-            <input
-                id="senderMobileNumber"
-                type="tel"
-                class="input-field"
-                placeholder="03XX XXXXXXX"
-            >
-
-            <p
-                id="senderMobileNumberError"
-                class="
-                    hidden
-                    text-red-400
-                    text-xs
-                    mt-2
-                "
-            >
-                Please enter the JazzCash number you paid from.
-            </p>
-
-        </div>
-
-
-        ${transactionReferenceFieldHtml()}
-
-    `);
-}
-
-
-/* =========================================================
-   COD
-   ========================================================= */
-
-function codDetailsTemplate() {
-
-    return `
-        <div
-            class="
-                rounded-2xl
-                border
-                border-white/10
-                bg-white/5
-                p-5
-                text-sm
-                text-gray-400
-            "
-        >
-            Pay in cash when your order is delivered.
-            No advance payment required.
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   CARD
-   ========================================================= */
-
-function cardDetailsTemplate() {
-
-    return `
-        <div
-            class="
-                rounded-2xl
-                border
-                border-white/10
-                bg-white/5
-                p-5
-                space-y-4
-            "
-        >
-
-            <div>
-
-                <label
-                    for="cardNumber"
-                    class="
-                        block
-                        text-xs
-                        uppercase
-                        tracking-wider
-                        font-bold
-                        text-gray-400
-                        mb-2
-                    "
-                >
-                    Card Number *
-                </label>
-
-                <input
-                    id="cardNumber"
-                    type="text"
-                    inputmode="numeric"
-                    class="input-field"
-                    placeholder="1234 5678 9012 3456"
-                >
-
-                <p
-                    id="cardNumberError"
-                    class="
-                        hidden
-                        text-red-400
-                        text-xs
-                        mt-2
-                    "
-                >
-                    Please enter a valid card number.
-                </p>
-
-            </div>
-
-
-            <div
-                class="
-                    grid
-                    grid-cols-2
-                    gap-4
-                "
-            >
-
-                <div>
-
-                    <label
-                        for="expiry"
-                        class="
-                            block
-                            text-xs
-                            uppercase
-                            tracking-wider
-                            font-bold
-                            text-gray-400
-                            mb-2
-                        "
-                    >
-                        Expiry *
-                    </label>
-
-                    <input
-                        id="expiry"
-                        type="text"
-                        inputmode="numeric"
-                        class="input-field"
-                        placeholder="MM/YY"
-                    >
-
-                    <p
-                        id="expiryError"
-                        class="
-                            hidden
-                            text-red-400
-                            text-xs
-                            mt-2
-                        "
-                    >
-                        Enter expiry as MM/YY.
-                    </p>
-
-                </div>
-
-
-                <div>
-
-                    <label
-                        for="cvv"
-                        class="
-                            block
-                            text-xs
-                            uppercase
-                            tracking-wider
-                            font-bold
-                            text-gray-400
-                            mb-2
-                        "
-                    >
-                        CVV *
-                    </label>
-
-                    <input
-                        id="cvv"
-                        type="text"
-                        inputmode="numeric"
-                        class="input-field"
-                        placeholder="123"
-                    >
-
-                    <p
-                        id="cvvError"
-                        class="
-                            hidden
-                            text-red-400
-                            text-xs
-                            mt-2
-                        "
-                    >
-                        CVV is required.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-    `;
-}
-
-
-/* =========================================================
-   DYNAMIC FIELD LISTENERS
-   ========================================================= */
+/* ============================================================
+   DYNAMIC PAYMENT INPUT LISTENERS
+============================================================ */
 
 function attachDynamicFieldListeners() {
 
-    const cardNumber =
-        getElement("cardNumber");
+    const fields = [
+
+        "paymentReference",
+
+        "senderMobileNumber",
+
+        "senderAccountTitle",
+
+        "senderAccountNumber"
+    ];
 
 
-    if (cardNumber) {
+    fields.forEach(id => {
 
-        cardNumber.addEventListener(
-            "input",
-            function () {
-
-                let value =
-                    this.value
-                        .replace(/\D/g, "")
-                        .slice(0, 16);
-
-
-                value =
-                    value.match(
-                        /.{1,4}/g
-                    )?.join(" ") || "";
-
-
-                this.value =
-                    value;
-
-
-                clearFieldError(
-                    "cardNumber",
-                    "cardNumberError"
-                );
-            }
-        );
-    }
-
-
-    const expiry =
-        getElement("expiry");
-
-
-    if (expiry) {
-
-        expiry.addEventListener(
-            "input",
-            function () {
-
-                let value =
-                    this.value
-                        .replace(/\D/g, "")
-                        .slice(0, 4);
-
-
-                if (
-                    value.length > 2
-                ) {
-
-                    value =
-                        value.slice(0, 2) +
-                        "/" +
-                        value.slice(2);
-                }
-
-
-                this.value =
-                    value;
-
-
-                clearFieldError(
-                    "expiry",
-                    "expiryError"
-                );
-            }
-        );
-    }
-
-
-    const cvv =
-        getElement("cvv");
-
-
-    if (cvv) {
-
-        cvv.addEventListener(
-            "input",
-            function () {
-
-                this.value =
-                    this.value
-                        .replace(/\D/g, "")
-                        .slice(0, 4);
-
-
-                clearFieldError(
-                    "cvv",
-                    "cvvError"
-                );
-            }
-        );
-    }
-
-
-    const paymentReference =
-        getElement(
-            "paymentReference"
-        );
-
-
-    if (paymentReference) {
-
-        paymentReference.addEventListener(
-            "input",
-            function () {
-
-                clearFieldError(
-                    "paymentReference",
-                    "paymentReferenceError"
-                );
-            }
-        );
-    }
-
-
-    const senderAccountTitle =
-        getElement(
-            "senderAccountTitle"
-        );
-
-
-    if (senderAccountTitle) {
-
-        senderAccountTitle.addEventListener(
-            "input",
-            function () {
-
-                clearFieldError(
-                    "senderAccountTitle",
-                    "senderAccountTitleError"
-                );
-            }
-        );
-    }
-
-
-    const senderAccountNumber =
-        getElement(
-            "senderAccountNumber"
-        );
-
-
-    if (senderAccountNumber) {
-
-        senderAccountNumber.addEventListener(
-            "input",
-            function () {
-
-                clearFieldError(
-                    "senderAccountNumber",
-                    "senderAccountNumberError"
-                );
-            }
-        );
-    }
-
-
-    const senderMobileNumber =
-        getElement(
-            "senderMobileNumber"
-        );
-
-
-    if (senderMobileNumber) {
-
-        senderMobileNumber.addEventListener(
-            "input",
-            function () {
-
-                clearFieldError(
-                    "senderMobileNumber",
-                    "senderMobileNumberError"
-                );
-            }
-        );
-    }
-}
-
-
-/* =========================================================
-   FORM VALUE
-   ========================================================= */
-
-function getFormValue(...ids) {
-
-    for (
-        const id of ids
-    ) {
-
-        const element =
+        const field =
             getElement(id);
 
 
-        if (element) {
-
-            return element.value.trim();
+        if (!field) {
+            return;
         }
-    }
 
 
-    return "";
+        field.addEventListener(
+            "input",
+            function() {
+
+                this.classList.remove(
+                    "border-red-500"
+                );
+
+
+                const error =
+                    getElement(
+                        id + "Error"
+                    );
+
+
+                if (error) {
+
+                    error.classList.add(
+                        "hidden"
+                    );
+                }
+            }
+        );
+    });
 }
 
 
-/* =========================================================
-   CUSTOMER VALIDATION
-   ========================================================= */
+/* ============================================================
+   SELECTED PAYMENT METHOD
+============================================================ */
+
+function getSelectedPaymentMethod() {
+
+    const selected =
+        document.querySelector(
+            'input[name="paymentMethod"]:checked'
+        );
+
+
+    return (
+        selected?.value ||
+        "cod"
+    );
+}
+
+
+/* ============================================================
+   VALIDATE CUSTOMER
+============================================================ */
 
 function validateCustomerDetails() {
 
@@ -2195,50 +2456,29 @@ function validateCustomerDetails() {
     let firstInvalid = null;
 
 
-    /* FULL NAME */
-
     const name =
-        getElement(
-            "customerName"
+        getFormValue(
+            "customerName",
+            "name",
+            "fullName"
         );
 
-    const trimmedName =
-        name
-            ? name.value.trim()
-            : "";
 
-
-    if (!trimmedName) {
+    if (!name) {
 
         setFieldError(
             "customerName",
             "nameError",
-            "Full name is required."
+            "Please enter your full name."
         );
 
         valid = false;
 
         firstInvalid =
             firstInvalid ||
-            name;
-
-    } else if (
-        !/\s/.test(
-            trimmedName
-        )
-    ) {
-
-        setFieldError(
-            "customerName",
-            "nameError",
-            "Please enter your full name (first and last name)."
-        );
-
-        valid = false;
-
-        firstInvalid =
-            firstInvalid ||
-            name;
+            getElement(
+                "customerName"
+            );
 
     } else {
 
@@ -2249,96 +2489,47 @@ function validateCustomerDetails() {
     }
 
 
-    /* PHONE */
-
-    const phone =
-        getElement(
-            "customerPhone"
+    const email =
+        getFormValue(
+            "customerEmail",
+            "email"
         );
 
-    const phoneRegex =
-        /^(?:\+92|0092|0)3\d{9}$/;
 
-
-    if (
-        !phone ||
-        !phone.value.trim()
-    ) {
+    if (!email) {
 
         setFieldError(
-            "customerPhone",
-            "phoneError",
-            "Phone number is required."
+            "customerEmail",
+            "emailError",
+            "Please enter your email."
         );
 
         valid = false;
 
         firstInvalid =
             firstInvalid ||
-            phone;
+            getElement(
+                "customerEmail"
+            );
 
     } else if (
-        !phoneRegex.test(
-            phone.value
-                .replace(
-                    /[\s-]/g,
-                    ""
-                )
-                .trim()
-        )
-    ) {
-
-        setFieldError(
-            "customerPhone",
-            "phoneError",
-            "Please enter a valid Pakistani phone number."
-        );
-
-        valid = false;
-
-        firstInvalid =
-            firstInvalid ||
-            phone;
-
-    } else {
-
-        clearFieldError(
-            "customerPhone",
-            "phoneError"
-        );
-    }
-
-
-    /* EMAIL */
-
-    const email =
-        getElement(
-            "customerEmail"
-        );
-
-    const emailRegex =
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-
-    if (
-        email &&
-        email.value.trim() &&
-        !emailRegex.test(
-            email.value.trim()
-        )
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/
+            .test(email)
     ) {
 
         setFieldError(
             "customerEmail",
             "emailError",
-            "Please enter a valid email address."
+            "Please enter a valid email."
         );
 
         valid = false;
 
         firstInvalid =
             firstInvalid ||
-            email;
+            getElement(
+                "customerEmail"
+            );
 
     } else {
 
@@ -2349,30 +2540,70 @@ function validateCustomerDetails() {
     }
 
 
-    /* CITY */
+    const phone =
+        getFormValue(
+            "customerPhone",
+            "phone"
+        );
 
-    const city =
-        getElement(
-            "customerCity"
+
+    const phoneDigits =
+        phone.replace(
+            /\D/g,
+            ""
         );
 
 
     if (
-        !city ||
-        !city.value.trim()
+        !phone ||
+        phoneDigits.length < 10
     ) {
 
         setFieldError(
-            "customerCity",
-            "cityError",
-            "City is required."
+            "customerPhone",
+            "phoneError",
+            "Please enter a valid phone number."
         );
 
         valid = false;
 
         firstInvalid =
             firstInvalid ||
-            city;
+            getElement(
+                "customerPhone"
+            );
+
+    } else {
+
+        clearFieldError(
+            "customerPhone",
+            "phoneError"
+        );
+    }
+
+
+    const city =
+        getFormValue(
+            "customerCity",
+            "city"
+        );
+
+
+    if (!city) {
+
+        setFieldError(
+            "customerCity",
+            "cityError",
+            "Please enter your city."
+        );
+
+        valid = false;
+
+        firstInvalid =
+            firstInvalid ||
+            getElement(
+                "customerCity"
+            );
 
     } else {
 
@@ -2383,30 +2614,28 @@ function validateCustomerDetails() {
     }
 
 
-    /* ADDRESS */
-
     const address =
-        getElement(
-            "customerAddress"
+        getFormValue(
+            "customerAddress",
+            "address"
         );
 
 
-    if (
-        !address ||
-        !address.value.trim()
-    ) {
+    if (!address) {
 
         setFieldError(
             "customerAddress",
             "addressError",
-            "Please enter your complete delivery address."
+            "Please enter your delivery address."
         );
 
         valid = false;
 
         firstInvalid =
             firstInvalid ||
-            address;
+            getElement(
+                "customerAddress"
+            );
 
     } else {
 
@@ -2418,16 +2647,19 @@ function validateCustomerDetails() {
 
 
     if (
-        !valid &&
         firstInvalid
     ) {
 
-        firstInvalid.focus();
+        try {
 
-        firstInvalid.scrollIntoView({
-            behavior: "smooth",
-            block: "center"
-        });
+            firstInvalid.focus();
+
+            firstInvalid.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+        } catch (error) {}
     }
 
 
@@ -2435,292 +2667,39 @@ function validateCustomerDetails() {
 }
 
 
-/* =========================================================
-   PAYMENT VALIDATION
-   ========================================================= */
+/* ============================================================
+   VALIDATE PAYMENT
+============================================================ */
 
 function validatePaymentMethod() {
 
-    const selected =
-        document.querySelector(
-            'input[name="paymentMethod"]:checked'
-        );
-
-
-    if (!selected) {
-
-        alert(
-            "Please select a payment method."
-        );
-
-        return false;
-    }
-
-
     const method =
-        selected.value;
+        getSelectedPaymentMethod();
 
-
-    let valid = true;
-
-    let firstInvalid = null;
-
-
-    /* CARD */
-
-    if (
-        method === "card"
-    ) {
-
-        const cardNumber =
-            getElement(
-                "cardNumber"
-            );
-
-        const expiry =
-            getElement(
-                "expiry"
-            );
-
-        const cvv =
-            getElement(
-                "cvv"
-            );
-
-
-        const cardDigits =
-            cardNumber
-                ? cardNumber.value
-                    .replace(
-                        /\s/g,
-                        ""
-                    )
-                : "";
-
-
-        if (
-            !cardDigits ||
-            cardDigits.length < 13
-        ) {
-
-            setFieldError(
-                "cardNumber",
-                "cardNumberError",
-                "Please enter a valid card number."
-            );
-
-            valid = false;
-
-            firstInvalid =
-                firstInvalid ||
-                cardNumber;
-
-        } else {
-
-            clearFieldError(
-                "cardNumber",
-                "cardNumberError"
-            );
-        }
-
-
-        const expiryRegex =
-            /^(0[1-9]|1[0-2])\/\d{2}$/;
-
-
-        if (
-            !expiry ||
-            !expiryRegex.test(
-                expiry.value.trim()
-            )
-        ) {
-
-            setFieldError(
-                "expiry",
-                "expiryError",
-                "Enter expiry as MM/YY."
-            );
-
-            valid = false;
-
-            firstInvalid =
-                firstInvalid ||
-                expiry;
-
-        } else {
-
-            clearFieldError(
-                "expiry",
-                "expiryError"
-            );
-        }
-
-
-        if (
-            !cvv ||
-            !cvv.value.trim()
-        ) {
-
-            setFieldError(
-                "cvv",
-                "cvvError",
-                "CVV is required."
-            );
-
-            valid = false;
-
-            firstInvalid =
-                firstInvalid ||
-                cvv;
-
-        } else {
-
-            clearFieldError(
-                "cvv",
-                "cvvError"
-            );
-        }
-    }
-
-
-    /* BANK / EASYPAISA / JAZZCASH */
-
-    if (
-        method === "bank" ||
-        method === "easypaisa" ||
-        method === "jazzcash"
-    ) {
-
-        const reference =
-            getElement(
-                "paymentReference"
-            );
-
-
-        if (
-            !reference ||
-            !reference.value.trim()
-        ) {
-
-            setFieldError(
-                "paymentReference",
-                "paymentReferenceError",
-                "Transaction ID / Reference is required."
-            );
-
-            valid = false;
-
-            firstInvalid =
-                firstInvalid ||
-                reference;
-
-        } else {
-
-            clearFieldError(
-                "paymentReference",
-                "paymentReferenceError"
-            );
-        }
-    }
-
-
-    /* BANK SENDER DETAILS */
-
-    if (
-        method === "bank"
-    ) {
-
-        const senderAccountTitle =
-            getElement(
-                "senderAccountTitle"
-            );
-
-
-        if (
-            !senderAccountTitle ||
-            !senderAccountTitle.value.trim()
-        ) {
-
-            setFieldError(
-                "senderAccountTitle",
-                "senderAccountTitleError",
-                "Please enter the account title you paid from."
-            );
-
-            valid = false;
-
-            firstInvalid =
-                firstInvalid ||
-                senderAccountTitle;
-
-        } else {
-
-            clearFieldError(
-                "senderAccountTitle",
-                "senderAccountTitleError"
-            );
-        }
-
-
-        const senderAccountNumber =
-            getElement(
-                "senderAccountNumber"
-            );
-
-
-        if (
-            !senderAccountNumber ||
-            !senderAccountNumber.value.trim()
-        ) {
-
-            setFieldError(
-                "senderAccountNumber",
-                "senderAccountNumberError",
-                "Please enter the account number you paid from."
-            );
-
-            valid = false;
-
-            firstInvalid =
-                firstInvalid ||
-                senderAccountNumber;
-
-        } else {
-
-            clearFieldError(
-                "senderAccountNumber",
-                "senderAccountNumberError"
-            );
-        }
-    }
-
-
-    /* EASYPAISA / JAZZCASH SENDER MOBILE */
 
     if (
         method === "easypaisa" ||
         method === "jazzcash"
     ) {
 
-        const senderMobileNumber =
+        const sender =
             getElement(
                 "senderMobileNumber"
             );
 
 
-        const digitsOnly =
-            senderMobileNumber
-                ? senderMobileNumber.value
-                    .replace(
-                        /\D/g,
-                        ""
-                    )
+        const digits =
+            sender
+                ? sender.value.replace(
+                    /\D/g,
+                    ""
+                )
                 : "";
 
 
         if (
-            !senderMobileNumber ||
-            digitsOnly.length < 10
+            !sender ||
+            digits.length < 10
         ) {
 
             setFieldError(
@@ -2732,43 +2711,26 @@ function validatePaymentMethod() {
                     : "Please enter the Easypaisa number you paid from."
             );
 
-            valid = false;
 
-            firstInvalid =
-                firstInvalid ||
-                senderMobileNumber;
+            try {
 
-        } else {
+                sender?.focus();
 
-            clearFieldError(
-                "senderMobileNumber",
-                "senderMobileNumberError"
-            );
+            } catch (error) {}
+
+
+            return false;
         }
     }
 
 
-    if (
-        !valid &&
-        firstInvalid
-    ) {
-
-        firstInvalid.focus();
-
-        firstInvalid.scrollIntoView({
-            behavior: "smooth",
-            block: "center"
-        });
-    }
-
-
-    return valid;
+    return true;
 }
 
 
-/* =========================================================
+/* ============================================================
    BUILD ORDER
-   ========================================================= */
+============================================================ */
 
 function buildOrder() {
 
@@ -2808,16 +2770,8 @@ function buildOrder() {
         );
 
 
-    const selectedPayment =
-        document.querySelector(
-            'input[name="paymentMethod"]:checked'
-        );
-
-
     const paymentMethod =
-        selectedPayment
-            ? selectedPayment.value
-            : "cod";
+        getSelectedPaymentMethod();
 
 
     const paymentReference =
@@ -2905,62 +2859,60 @@ function buildOrder() {
             paymentSenderInfo,
 
         items:
-            cartItems.map(
-                (item) => ({
+            cartItems.map(item => ({
 
-                    product_id:
-                        item.id,
+                product_id:
+                    item.id,
 
-                    name:
-                        item.name,
+                name:
+                    item.name,
 
-                    price:
-                        Number(
-                            item.price
-                        ),
+                price:
+                    Number(
+                        item.price
+                    ) || 0,
 
-                    quantity:
-                        Number(
-                            item.quantity
-                        ),
+                quantity:
+                    Number(
+                        item.quantity
+                    ) || 1,
 
-                    size:
-                        item.size ||
-                        "",
+                size:
+                    item.size ||
+                    "",
 
-                    image_url:
-                        item.image ||
-                        "",
+                image_url:
+                    item.image ||
+                    "",
 
-                    category:
-                        item.category ||
-                        "",
+                category:
+                    item.category ||
+                    "",
 
-                    shipping_origin:
-                        item.shippingOrigin ||
-                        null
-                })
-            ),
+                shipping_origin:
+                    item.shippingOrigin ||
+                    null
+            })),
 
         subtotal:
             Number(
                 subtotal
-            ),
+            ) || 0,
 
         shipping:
             Number(
                 shipping
-            ),
+            ) || 0,
 
         discount:
             Number(
                 discount
-            ),
+            ) || 0,
 
         total:
             Number(
                 grandTotal
-            ),
+            ) || 0,
 
         status:
             "pending",
@@ -2971,9 +2923,9 @@ function buildOrder() {
 }
 
 
-/* =========================================================
-   SAVE LOCAL ORDER
-   ========================================================= */
+/* ============================================================
+   SAVE ORDER LOCALLY
+============================================================ */
 
 function saveOrderLocally(
     order
@@ -3007,7 +2959,7 @@ function saveOrderLocally(
     } catch (error) {
 
         console.error(
-            "Local order save error:",
+            "Local order error:",
             error
         );
 
@@ -3016,9 +2968,9 @@ function saveOrderLocally(
 }
 
 
-/* =========================================================
+/* ============================================================
    SAVE ORDER TO SUPABASE
-   ========================================================= */
+============================================================ */
 
 async function saveOrderToSupabase(
     order
@@ -3047,11 +2999,6 @@ async function saveOrderToSupabase(
 
         if (error) {
 
-            console.error(
-                "Session error:",
-                error
-            );
-
             return {
 
                 success: false,
@@ -3062,12 +3009,8 @@ async function saveOrderToSupabase(
         }
 
 
-        const session =
-            data?.session;
-
-
         const user =
-            session?.user;
+            data?.session?.user;
 
 
         if (!user) {
@@ -3082,22 +3025,18 @@ async function saveOrderToSupabase(
         }
 
 
-        const userId =
-            user.id;
-
-
         const orderData = {
 
             user_id:
-                userId,
+                user.id,
 
             customer_id:
-                userId,
+                user.id,
 
             total_amount:
                 Number(
                     order.total
-                ),
+                ) || 0,
 
             status:
                 "pending",
@@ -3137,47 +3076,31 @@ async function saveOrderToSupabase(
             order_number:
                 order.orderNumber,
 
-            /*
-             * ------------------------------------------------
-             * FIX: This is the actual bug that caused the admin
-             * dashboard to always show "Order items are not
-             * saved in this order record."
-             *
-             * buildOrder() already computes a clean "items"
-             * array (product_id, name, price, quantity, size,
-             * image_url, category, shipping_origin) but this
-             * object — the one actually inserted into Supabase —
-             * never included it. So items were being thrown away
-             * right before saving, every single time.
-             *
-             * "items" must be a JSONB column on the "orders"
-             * table in Supabase for this insert to work. If that
-             * column does not exist yet, create it:
-             *
-             *   alter table orders add column items jsonb;
-             * ------------------------------------------------
-             */
             items:
                 order.items || []
         };
 
 
         const {
+            data: savedOrder,
             error: insertError
         } =
             await supabaseClient
                 .from("orders")
                 .insert([
                     orderData
-                ]);
+                ])
+                .select()
+                .single();
 
 
         if (insertError) {
 
             console.error(
-                "SUPABASE ORDER INSERT ERROR:",
+                "SUPABASE ORDER ERROR:",
                 insertError
             );
+
 
             return {
 
@@ -3196,15 +3119,26 @@ async function saveOrderToSupabase(
 
             success: true,
 
-            data:
-                orderData
-        };
+            id:
+                savedOrder?.id ||
+                null,
 
+            order_id:
+                savedOrder?.id ||
+                null,
+
+            order_number:
+                savedOrder?.order_number ||
+                order.orderNumber,
+
+            data:
+                savedOrder
+        };
 
     } catch (error) {
 
         console.error(
-            "Order save exception:",
+            "Save order exception:",
             error
         );
 
@@ -3221,19 +3155,28 @@ async function saveOrderToSupabase(
 }
 
 
-/* =========================================================
+/* ============================================================
    CLEAR CART
-   ========================================================= */
+============================================================ */
 
 function clearCart() {
+
+    cartItems = [];
+
+    subtotal = 0;
+
+    shipping = 0;
+
+    discount = 0;
+
+    grandTotal = 0;
+
 
     try {
 
         localStorage.removeItem(
             CART_KEY
         );
-
-        cartItems = [];
 
     } catch (error) {
 
@@ -3245,45 +3188,121 @@ function clearCart() {
 }
 
 
-/* =========================================================
-   PLACE ORDER
-   ========================================================= */
+/* ============================================================
+   CHECKOUT MESSAGE
+============================================================ */
 
-async function placeOrder(
-    event
+function showCheckoutMessage(
+    message,
+    type = "error"
 ) {
 
-    if (event) {
+    let element =
+        getElement(
+            "checkoutMessage"
+        );
 
-        event.preventDefault();
+
+    if (!element) {
+
+        element =
+            document.createElement(
+                "div"
+            );
+
+        element.id =
+            "checkoutMessage";
+
+
+        element.className =
+            "mb-5 rounded-xl border px-4 py-3 font-bold";
+
+
+        const form =
+            getElement(
+                "checkoutForm"
+            );
+
+
+        if (form) {
+
+            form.prepend(
+                element
+            );
+        }
     }
 
 
-    if (!cartItems.length) {
+    if (!element) {
 
         alert(
-            "Your cart is empty."
+            String(message)
         );
 
         return;
     }
 
 
+    element.innerHTML =
+        message;
+
+
+    element.classList.remove(
+        "hidden",
+        "border-red-500/30",
+        "bg-red-500/10",
+        "text-red-300",
+        "border-green-500/30",
+        "bg-green-500/10",
+        "text-green-300"
+    );
+
+
     if (
-        !validateCustomerDetails()
+        type === "success"
     ) {
 
-        return;
+        element.classList.add(
+            "border-green-500/30",
+            "bg-green-500/10",
+            "text-green-300"
+        );
+
+    } else {
+
+        element.classList.add(
+            "border-red-500/30",
+            "bg-red-500/10",
+            "text-red-300"
+        );
     }
+}
 
 
-    if (
-        !validatePaymentMethod()
-    ) {
+function hideCheckoutMessage() {
 
-        return;
+    const element =
+        getElement(
+            "checkoutMessage"
+        );
+
+
+    if (element) {
+
+        element.classList.add(
+            "hidden"
+        );
     }
+}
 
+
+/* ============================================================
+   BUTTON LOADING
+============================================================ */
+
+function setOrderButtonLoading(
+    loading
+) {
 
     const button =
         getElement(
@@ -3291,12 +3310,25 @@ async function placeOrder(
         );
 
 
-    if (button) {
+    if (!button) {
+        return;
+    }
 
-        button.disabled = true;
 
-        button.dataset.originalText =
-            button.innerHTML;
+    if (loading) {
+
+        if (
+            !button.dataset.originalText
+        ) {
+
+            button.dataset.originalText =
+                button.innerHTML;
+        }
+
+
+        button.disabled =
+            true;
+
 
         button.innerHTML = `
 
@@ -3309,44 +3341,160 @@ async function placeOrder(
                 progress_activity
             </span>
 
-            Placing Order...
+            PLACING ORDER...
         `;
+
+    } else {
+
+        button.disabled =
+            false;
+
+
+        button.innerHTML =
+            button.dataset.originalText ||
+            `
+                <span
+                    class="material-symbols-outlined"
+                >
+                    lock
+                </span>
+
+                PLACE ORDER
+            `;
+
+
+        delete button.dataset.originalText;
     }
+}
+
+
+/* ============================================================
+   PLACE ORDER
+============================================================ */
+
+async function placeOrder(
+    event
+) {
+
+    if (event) {
+
+        event.preventDefault();
+
+        event.stopPropagation();
+    }
+
+
+    if (isPlacingOrder) {
+        return;
+    }
+
+
+    hideCheckoutMessage();
 
 
     try {
 
-        const user =
+        isPlacingOrder =
+            true;
+
+
+        /*
+           USER
+        */
+
+        if (!currentUser) {
+
             await loadCurrentUser();
+        }
 
 
-        if (!user) {
+        if (!currentUser) {
 
-            alert(
+            throw new Error(
                 "Please login before placing your order."
             );
+        }
 
 
-            if (button) {
+        /*
+           CART
+        */
 
-                button.disabled = false;
+        loadCart();
 
-                button.innerHTML =
-                    button.dataset.originalText ||
-                    "Place Order";
-            }
+        prepareCart();
 
+
+        if (!cartItems.length) {
+
+            throw new Error(
+                "Your cart is empty."
+            );
+        }
+
+
+        /*
+           TOTALS
+        */
+
+        calculateTotals();
+
+
+        renderOrderItems();
+
+        renderTotals();
+
+
+        /*
+           CUSTOMER VALIDATION
+        */
+
+        if (
+            !validateCustomerDetails()
+        ) {
 
             return;
         }
 
 
-        calculateTotals();
+        /*
+           PAYMENT VALIDATION
+        */
 
+        if (
+            !validatePaymentMethod()
+        ) {
+
+            return;
+        }
+
+
+        /*
+           BUTTON
+        */
+
+        setOrderButtonLoading(
+            true
+        );
+
+
+        /*
+           BUILD ORDER
+        */
 
         const order =
             buildOrder();
 
+
+        console.log(
+            "KHELZONE ORDER:",
+            order
+        );
+
+
+        /*
+           SAVE
+        */
 
         const result =
             await saveOrderToSupabase(
@@ -3359,34 +3507,16 @@ async function placeOrder(
             !result.success
         ) {
 
-            console.error(
-                "ORDER NOT SAVED:",
-                result?.error
+            throw new Error(
+                result?.error ||
+                "Order could not be saved."
             );
-
-
-            alert(
-                "Order could not be saved.\n\n" +
-                (
-                    result?.error ||
-                    "Unknown Supabase error."
-                )
-            );
-
-
-            if (button) {
-
-                button.disabled = false;
-
-                button.innerHTML =
-                    button.dataset.originalText ||
-                    "Place Order";
-            }
-
-
-            return;
         }
 
+
+        /*
+           LOCAL SAVE
+        */
 
         saveOrderLocally(
             order
@@ -3401,47 +3531,100 @@ async function placeOrder(
         );
 
 
-        clearCart();
-
-
-        window.location.href =
-            `order-success.html?order=${encodeURIComponent(
-                order.orderNumber
-            )}`;
-
-
-    } catch (error) {
-
-        console.error(
-            "Place order error:",
-            error
-        );
-
-
-        alert(
-            "Something went wrong while placing your order.\n\n" +
-            (
-                error?.message ||
-                "Please try again."
+        localStorage.setItem(
+            "khz_last_order_id",
+            String(
+                result.id ||
+                ""
             )
         );
 
 
-        if (button) {
+        localStorage.setItem(
+            "khz_last_order_number",
+            String(
+                result.order_number ||
+                order.orderNumber
+            )
+        );
 
-            button.disabled = false;
 
-            button.innerHTML =
-                button.dataset.originalText ||
-                "Place Order";
-        }
+        /*
+           CLEAR CART
+        */
+
+        clearCart();
+
+
+        updateCartCount();
+
+        renderOrderItems();
+
+        calculateTotals();
+
+        renderTotals();
+
+
+        /*
+           SUCCESS
+        */
+
+        showCheckoutMessage(
+            "Order placed successfully! Redirecting...",
+            "success"
+        );
+
+
+        const orderNumber =
+            result.order_number ||
+            order.orderNumber;
+
+
+        setTimeout(
+            () => {
+
+                window.location.href =
+                    "order-success.html?order=" +
+                    encodeURIComponent(
+                        orderNumber
+                    );
+
+            },
+            900
+        );
+
+    } catch (error) {
+
+        console.error(
+            "PLACE ORDER ERROR:",
+            error
+        );
+
+
+        showCheckoutMessage(
+            escapeHtml(
+                error?.message ||
+                "Something went wrong while placing your order."
+            ),
+            "error"
+        );
+
+    } finally {
+
+        isPlacingOrder =
+            false;
+
+
+        setOrderButtonLoading(
+            false
+        );
     }
 }
 
 
-/* =========================================================
+/* ============================================================
    CHECKOUT FORM
-   ========================================================= */
+============================================================ */
 
 function setupCheckoutForm() {
 
@@ -3452,16 +3635,27 @@ function setupCheckoutForm() {
 
 
     if (!form) {
-
         return;
     }
 
 
     form.addEventListener(
         "submit",
-        placeOrder
-    );
+        function(event) {
 
+            event.preventDefault();
+
+            placeOrder(event);
+        }
+    );
+}
+
+
+/* ============================================================
+   PLACE ORDER BUTTON
+============================================================ */
+
+function setupPlaceOrderButton() {
 
     const button =
         getElement(
@@ -3469,226 +3663,270 @@ function setupCheckoutForm() {
         );
 
 
-    if (button) {
+    if (!button) {
 
-        if (
-            !form.contains(
-                button
-            )
-        ) {
-
-            button.addEventListener(
-                "click",
-                placeOrder
-            );
-        }
-    }
-}
-
-
-/* =========================================================
-   VALIDATION FEEDBACK
-   ========================================================= */
-
-function setupValidationFeedback() {
-
-    const form =
-        getElement(
-            "checkoutForm"
+        console.warn(
+            "placeOrderBtn not found."
         );
-
-
-    if (!form) {
 
         return;
     }
 
 
-    const errorMap = {
+    /*
+       Your HTML button is type="button",
+       so direct click is required.
+    */
 
-        customerName:
-            "nameError",
-
-        customerPhone:
-            "phoneError",
-
-        customerEmail:
-            "emailError",
-
-        customerCity:
-            "cityError",
-
-        customerAddress:
-            "addressError"
-    };
-
-
-    const fields =
-        form.querySelectorAll(
-            "input, select, textarea"
-        );
-
-
-    fields.forEach(
-        (field) => {
-
-            const errorId =
-                errorMap[field.id];
-
-
-            const clear = () => {
-
-                if (errorId) {
-
-                    clearFieldError(
-                        field.id,
-                        errorId
-                    );
-
-                } else {
-
-                    field.classList.remove(
-                        "border-red-500"
-                    );
-                }
-            };
-
-
-            field.addEventListener(
-                "input",
-                clear
-            );
-
-
-            field.addEventListener(
-                "change",
-                clear
-            );
-        }
-    );
+    button.onclick =
+        placeOrder;
 }
 
 
-/* =========================================================
+/* ============================================================
+   VALIDATION FEEDBACK
+============================================================ */
+
+function setupValidationFeedback() {
+
+    const fields = [
+
+        "customerName",
+
+        "customerEmail",
+
+        "customerPhone",
+
+        "customerCity",
+
+        "customerAddress"
+    ];
+
+
+    fields.forEach(id => {
+
+        const field =
+            getElement(id);
+
+
+        if (!field) {
+            return;
+        }
+
+
+        field.addEventListener(
+            "input",
+            () => {
+
+                field.classList.remove(
+                    "border-red-500"
+                );
+            }
+        );
+
+
+        field.addEventListener(
+            "change",
+            () => {
+
+                field.classList.remove(
+                    "border-red-500"
+                );
+            }
+        );
+    });
+}
+
+
+/* ============================================================
    AUTH LISTENER
-   ========================================================= */
+============================================================ */
 
 function setupAuthListener() {
 
-    if (!supabaseClient) {
+    if (
+        !supabaseClient?.auth
+    ) {
 
         return;
     }
 
 
     supabaseClient.auth.onAuthStateChange(
-        (
+        async (
             event,
             session
         ) => {
 
+            console.log(
+                "KHELZONE AUTH:",
+                event
+            );
+
+
             currentUser =
                 session?.user ||
                 null;
+
+
+            if (currentUser) {
+
+                await fillCustomerDetails();
+            }
         }
     );
 }
 
 
-/* =========================================================
+/* ============================================================
    INITIALIZE
-   ========================================================= */
+============================================================ */
 
 async function initializePaymentPage() {
 
-    /*
-     * 1. Load cart
-     */
-
-    loadCart();
+    console.log(
+        "KHELZONE PAYMENT: START"
+    );
 
 
-    /*
-     * 2. Normalize cart
-     */
+    try {
 
-    prepareCart();
+        /*
+           1. CART
+        */
 
+        loadCart();
 
-    /*
-     * 3. Calculate totals
-     */
-
-    calculateTotals();
+        prepareCart();
 
 
-    /*
-     * 4. Render products
-     */
+        /*
+           2. TOTALS
+        */
 
-    renderOrderItems();
-
-
-    /*
-     * 5. Render totals
-     */
-
-    renderTotals();
+        calculateTotals();
 
 
-    /*
-     * 6. Checkout button
-     */
+        /*
+           3. PRODUCTS
+        */
 
-    updateCheckoutVisibility();
-
-
-    /*
-     * 7. Get logged-in user
-     */
-
-    await loadCurrentUser();
+        renderOrderItems();
 
 
-    /*
-     * 8. Load admin payment settings
-     */
+        /*
+           4. TOTAL UI
+        */
 
-    await loadPaymentSettings();
-
-
-    /*
-     * 9. Payment methods
-     */
-
-    setupPaymentMethods();
+        renderTotals();
 
 
-    /*
-     * 10. Checkout form
-     */
+        /*
+           5. CART COUNT
+        */
 
-    setupCheckoutForm();
-
-
-    /*
-     * 11. Validation
-     */
-
-    setupValidationFeedback();
+        updateCartCount();
 
 
-    /*
-     * 12. Auth listener
-     */
+        /*
+           6. BUTTON STATE
+        */
 
-    setupAuthListener();
+        updateCheckoutVisibility();
+
+
+        /*
+           7. USER
+        */
+
+        await loadCurrentUser();
+
+
+        /*
+           8. PROFILE
+        */
+
+        if (currentUser) {
+
+            await loadCustomerProfile();
+
+            await fillCustomerDetails();
+        }
+
+
+        /*
+           9. PAYMENT SETTINGS
+        */
+
+        await loadPaymentSettings();
+
+
+        /*
+           10. PAYMENT METHODS
+        */
+
+        setupPaymentMethods();
+
+
+        /*
+           11. FORM
+        */
+
+        setupCheckoutForm();
+
+
+        /*
+           12. BUTTON
+        */
+
+        setupPlaceOrderButton();
+
+
+        /*
+           13. VALIDATION
+        */
+
+        setupValidationFeedback();
+
+
+        /*
+           14. AUTH
+        */
+
+        setupAuthListener();
+
+
+        /*
+           15. FINAL
+        */
+
+        console.log(
+            "KHELZONE PAYMENT: READY"
+        );
+
+    } catch (error) {
+
+        console.error(
+            "PAYMENT INITIALIZATION ERROR:",
+            error
+        );
+
+
+        showCheckoutMessage(
+            "Checkout load error: " +
+            escapeHtml(
+                error?.message ||
+                "Unknown error"
+            ),
+            "error"
+        );
+    }
 }
 
 
-/* =========================================================
+/* ============================================================
    START
-   ========================================================= */
+============================================================ */
 
 if (
     document.readyState ===
@@ -3697,10 +3935,66 @@ if (
 
     document.addEventListener(
         "DOMContentLoaded",
-        initializePaymentPage
+        initializePaymentPage,
+        {
+            once: true
+        }
     );
 
 } else {
 
     initializePaymentPage();
 }
+
+
+/* ============================================================
+   GLOBAL ACCESS
+============================================================ */
+
+window.KHELZONE_PAYMENT = {
+
+    loadCart,
+
+    prepareCart,
+
+    calculateTotals,
+
+    renderOrderItems,
+
+    renderTotals,
+
+    loadCurrentUser,
+
+    loadCustomerProfile,
+
+    fillCustomerDetails,
+
+    loadPaymentSettings,
+
+    setupPaymentMethods,
+
+    renderPaymentDetailsUI,
+
+    getSelectedPaymentMethod,
+
+    validateCustomerDetails,
+
+    validatePaymentMethod,
+
+    buildOrder,
+
+    saveOrderToSupabase,
+
+    saveOrderLocally,
+
+    clearCart,
+
+    placeOrder,
+
+    initializePaymentPage
+};
+
+
+/* ============================================================
+   END OF PAYMENT.JS
+============================================================ */

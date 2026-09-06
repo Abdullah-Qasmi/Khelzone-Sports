@@ -1859,8 +1859,18 @@
     submitBtn.classList.add("loading");
     submitBtnLabel.textContent = "SUBMITTING APPLICATION...";
 
-    try{
-      const user = currentUser;
+   try{
+  const user = currentUser;
+
+  if (!user || !user.id) {
+    throw new Error(
+      "Your login session has expired. Please log in again."
+    );
+  }
+
+  console.log("Uploading CNIC for user:", user.id);
+
+  /* upload CNIC image to PRIVATE bucket */
 
       /* upload CNIC image to PRIVATE bucket */
       const cnicFile = cnicImage.files[0];
@@ -1870,7 +1880,10 @@
       const { error: cnicUploadError } = await client
         .storage
         .from(CNIC_BUCKET)
-        .upload(cnicPath, cnicFile, { upsert: true, contentType: cnicFile.type });
+       .upload(cnicPath, cnicFile, {
+    upsert: false,
+    contentType: cnicFile.type
+});
 
       if(cnicUploadError){
         throw new Error("Failed to upload CNIC image: " + cnicUploadError.message);
@@ -1884,7 +1897,8 @@
       const { error: logoUploadError } = await client
         .storage
         .from(LOGO_BUCKET)
-        .upload(logoPath, logoFile, { upsert: true, contentType: logoFile.type });
+        .upload(logoPath, logoFile, { upsert: false,
+contentType: logoFile.type });
 
       if(logoUploadError){
         throw new Error("Failed to upload shop logo: " + logoUploadError.message);

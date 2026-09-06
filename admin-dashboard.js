@@ -1,11 +1,11 @@
 /* ============================================================
    KHELZONE ADMIN DASHBOARD
-   FULL FIXED VERSION
-   ADMIN ONLY
+   FIXED COMPLETE VERSION
+   NO INFINITE LOADING
+   + WORKING ORDER STATUS DROPDOWN
 ============================================================ */
 
-'use strict';
-
+"use strict";
 
 /* ============================================================
    SUPABASE
@@ -13,134 +13,108 @@
 
 const supabaseClient = window.supabaseClient;
 
-if (!supabaseClient) {
-    console.error(
-        'KHELZONE ERROR: Supabase client not found.'
-    );
-}
-
-
 /* ============================================================
-   BASIC HELPER
+   GLOBAL STATE
 ============================================================ */
 
-function $(id) {
-    return document.getElementById(id);
-}
+let currentUser = null;
+let currentProfile = null;
 
+let allProducts = [];
+let allSellers = [];
+let allCustomers = [];
+let allOrders = [];
 
 /* ============================================================
-   ESCAPE HTML
+   CONSTANTS
+============================================================ */
+
+const LOGIN_PAGE = "login.html";
+const HOME_PAGE = "homepage.html";
+
+const ACCESS_TIMEOUT = 15000;
+const DATA_TIMEOUT = 15000;
+
+/* ============================================================
+   BASIC HELPERS
 ============================================================ */
 
 function escapeHTML(value) {
-
-    if (
-        value === null ||
-        value === undefined
-    ) {
-        return '';
+    if (value === null || value === undefined) {
+        return "";
     }
 
     return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
+function formatCurrency(value) {
+    const number = Number(value || 0);
 
-/* ============================================================
-   MONEY
-============================================================ */
-
-function formatMoney(value) {
-
-    const number = Number(
-        value ?? 0
-    );
-
-    if (!Number.isFinite(number)) {
-        return 'Rs. 0';
-    }
-
-    return (
-        'Rs. ' +
-        number.toLocaleString('en-PK')
-    );
+    return `Rs ${number.toLocaleString("en-PK")}`;
 }
-
-
-/* ============================================================
-   DATE
-============================================================ */
 
 function formatDate(value) {
-
     if (!value) {
-        return '-';
+        return "—";
     }
 
     const date = new Date(value);
 
     if (Number.isNaN(date.getTime())) {
-        return '-';
+        return "—";
     }
 
-    return date.toLocaleDateString(
-        'en-PK',
-        {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-        }
-    );
+    return date.toLocaleString("en-PK", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
 }
 
-
-/* ============================================================
-   INITIALS
-============================================================ */
-
-function initials(name) {
-
-    if (!name) {
-        return 'U';
-    }
-
-    const words = String(name)
+function getStatusClass(status) {
+    const value = String(status || "")
         .trim()
-        .split(/\s+/)
-        .filter(Boolean);
+        .toLowerCase();
 
-    return (
-        words
-            .slice(0, 2)
-            .map(
-                word =>
-                    word
-                        .charAt(0)
-                        .toUpperCase()
-            )
-            .join('')
-        || 'U'
-    );
+    if (
+        value === "active" ||
+        value === "approved" ||
+        value === "completed" ||
+        value === "delivered"
+    ) {
+        return "bg-green-500/15 text-green-400 border border-green-500/30";
+    }
+
+    if (
+        value === "pending" ||
+        value === "processing"
+    ) {
+        return "bg-yellow-500/15 text-yellow-400 border border-yellow-500/30";
+    }
+
+    if (value === "shipped") {
+        return "bg-blue-500/15 text-blue-400 border border-blue-500/30";
+    }
+
+    if (
+        value === "inactive" ||
+        value === "cancelled" ||
+        value === "rejected"
+    ) {
+        return "bg-red-500/15 text-red-400 border border-red-500/30";
+    }
+
+    return "bg-gray-500/15 text-gray-300 border border-gray-500/30";
 }
 
-
-/* ============================================================
-   TABLE MESSAGE
-============================================================ */
-
-function showTableMessage(
-    tbodyId,
-    message,
-    colspan = 6
-) {
-
-    const tbody = $(tbodyId);
-
+function showTableMessage(tbody, colspan, message) {
     if (!tbody) {
         return;
     }
@@ -148,13 +122,8 @@ function showTableMessage(
     tbody.innerHTML = `
         <tr>
             <td
-                colspan='${colspan}'
-                style='
-                    text-align:center;
-                    padding:35px 20px;
-                    color:#999;
-                    font-weight:600;
-                '
+                colspan="${colspan}"
+                class="px-6 py-8 text-center text-gray-400"
             >
                 ${escapeHTML(message)}
             </td>
@@ -162,771 +131,661 @@ function showTableMessage(
     `;
 }
 
+function getCustomerName(order) {
+    return (
+        order?.shipping_name ||
+        order?.customer_name ||
+        order?.full_name ||
+        order?.name ||
+        order?.customer_email ||
+        "Unknown Customer"
+    );
+}
+
+function getOrderNumber(order) {
+    return (
+        order?.order_number ||
+        order?.order_id ||
+        order?.id ||
+        "—"
+    );
+}
 
 /* ============================================================
-   TOAST
+   TOAST NOTIFICATION
 ============================================================ */
 
-function showToast(message) {
-
-    let toast = $('adminToast');
+function showToast(message, type = "success") {
+    const toast = document.getElementById("adminToast");
 
     if (!toast) {
-
-        toast =
-            document.createElement('div');
-
-        toast.id = 'adminToast';
-
-        Object.assign(
-            toast.style,
-            {
-                position: 'fixed',
-                right: '20px',
-                bottom: '20px',
-                zIndex: '999999',
-                padding: '14px 20px',
-                borderRadius: '10px',
-                background: '#ff5a00',
-                color: '#fff',
-                fontWeight: '800',
-                boxShadow:
-                    '0 10px 30px rgba(0,0,0,.4)',
-                maxWidth: '90%',
-                transition: 'opacity .2s ease'
-            }
-        );
-
-        document.body.appendChild(toast);
+        return;
     }
 
     toast.textContent = message;
-    toast.style.opacity = '1';
-    toast.style.display = 'block';
+    toast.className = "";
+    toast.classList.add(type, "show");
 
-    clearTimeout(
-        window.kzToastTimer
-    );
+    clearTimeout(showToast._timer);
 
-    window.kzToastTimer =
-        setTimeout(
-            () => {
-
-                toast.style.opacity = '0';
-
-                setTimeout(
-                    () => {
-                        toast.style.display =
-                            'none';
-                    },
-                    200
-                );
-
-            },
-            3000
-        );
+    showToast._timer = setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2500);
 }
 
+/* ============================================================
+   TIMEOUT HELPER
+============================================================ */
+
+function withTimeout(promise, timeout = 15000, message = "Request timed out.") {
+    let timer;
+
+    const timeoutPromise = new Promise((_, reject) => {
+        timer = setTimeout(() => {
+            reject(new Error(message));
+        }, timeout);
+    });
+
+    return Promise.race([
+        promise,
+        timeoutPromise
+    ]).finally(() => {
+        clearTimeout(timer);
+    });
+}
+
+/* ============================================================
+   SUPABASE CHECK
+============================================================ */
+
+function checkSupabaseClient() {
+    if (!window.supabaseClient) {
+        console.error(
+            "KHELZONE: window.supabaseClient not found."
+        );
+
+        showAccessError(
+            "Supabase connection was not initialized."
+        );
+
+        return false;
+    }
+
+    if (!window.supabaseClient.auth) {
+        console.error(
+            "KHELZONE: Supabase Auth not available."
+        );
+
+        showAccessError(
+            "Supabase Auth is not available."
+        );
+
+        return false;
+    }
+
+    return true;
+}
+
+/* ============================================================
+   ACCESS UI
+============================================================ */
+
+function hideCheckingScreen() {
+    const screen = document.getElementById("checkingScreen");
+
+    if (screen) {
+        screen.classList.add("hidden");
+        screen.style.display = "none";
+    }
+}
+
+function showCheckingScreen() {
+    const screen = document.getElementById("checkingScreen");
+
+    if (screen) {
+        screen.classList.remove("hidden");
+        screen.style.display = "flex";
+    }
+}
+
+function showAccessDenied(message = "You do not have admin access.") {
+    hideCheckingScreen();
+
+    const accessDenied =
+        document.getElementById("accessDenied");
+
+    const dashboard =
+        document.getElementById("dashboard");
+
+    if (dashboard) {
+        dashboard.classList.add("hidden");
+        dashboard.style.display = "none";
+    }
+
+    if (accessDenied) {
+        accessDenied.classList.remove("hidden");
+        accessDenied.style.display = "flex";
+
+        const messageElement =
+            accessDenied.querySelector("[data-access-message]") ||
+            accessDenied.querySelector(".access-text") ||
+            accessDenied.querySelector("p");
+
+        if (messageElement) {
+            messageElement.textContent = message;
+        }
+    }
+}
+
+function showAccessError(message) {
+    console.error("KHELZONE ACCESS ERROR:", message);
+
+    showAccessDenied(message);
+}
+
+function showAdminDashboard() {
+    hideCheckingScreen();
+
+    const accessDenied =
+        document.getElementById("accessDenied");
+
+    const dashboard =
+        document.getElementById("dashboard");
+
+    if (accessDenied) {
+        accessDenied.classList.add("hidden");
+        accessDenied.style.display = "none";
+    }
+
+    if (dashboard) {
+        dashboard.classList.remove("hidden");
+        dashboard.style.display = "block";
+    }
+
+    if (currentUser) {
+        const adminName =
+            document.getElementById("adminName");
+
+        const adminEmail =
+            document.getElementById("adminEmail");
+
+        if (adminName) {
+            adminName.textContent =
+                currentProfile?.full_name ||
+                currentUser.user_metadata?.full_name ||
+                "Admin";
+        }
+
+        if (adminEmail) {
+            adminEmail.textContent =
+                currentUser.email || "-";
+        }
+    }
+}
 
 /* ============================================================
    ADMIN ACCESS CHECK
 ============================================================ */
 
 async function checkAdminAccess() {
+    showCheckingScreen();
 
-    const checkingScreen =
-        $('checkingScreen');
-
-    const dashboard =
-        $('dashboard');
-
-    const accessDenied =
-        $('accessDenied');
-
-
-    if (dashboard) {
-        dashboard.classList.add('hidden');
+    if (!checkSupabaseClient()) {
+        return false;
     }
-
-    if (accessDenied) {
-        accessDenied.style.display = 'none';
-    }
-
-    if (checkingScreen) {
-        checkingScreen.style.display = 'flex';
-    }
-
 
     try {
+        console.log(
+            "KHELZONE: Checking admin access..."
+        );
 
-        if (!supabaseClient) {
-            throw new Error(
-                'Supabase client is not initialized.'
-            );
-        }
+        const sessionResult = await withTimeout(
+            supabaseClient.auth.getSession(),
+            ACCESS_TIMEOUT,
+            "Login session check timed out."
+        );
 
-
-        const {
-            data: sessionData,
-            error: sessionError
-        } =
-            await supabaseClient.auth.getSession();
-
-
-        if (sessionError) {
-            throw sessionError;
-        }
-
+        const sessionError =
+            sessionResult?.error;
 
         const session =
-            sessionData?.session;
+            sessionResult?.data?.session;
 
-
-        if (!session?.user) {
-
-            console.warn(
-                'KHELZONE: No logged-in user.'
+        if (sessionError) {
+            console.error(
+                "KHELZONE SESSION ERROR:",
+                sessionError
             );
 
-            window.location.replace(
-                'admin.html'
+            showAccessError(
+                "Could not check your login session."
             );
 
             return false;
         }
 
+        if (!session || !session.user) {
+            console.warn(
+                "KHELZONE: No logged-in user."
+            );
 
-        const user =
-            session.user;
+            showAccessDenied(
+                "Please login with your admin account first."
+            );
 
+            setTimeout(() => {
+                window.location.href = LOGIN_PAGE;
+            }, 1500);
+
+            return false;
+        }
+
+        currentUser = session.user;
 
         console.log(
-            'KHELZONE LOGGED USER:',
-            user.email
+            "KHELZONE USER:",
+            currentUser.email
         );
 
+        const profileResult = await withTimeout(
+            supabaseClient
+                .from("profiles")
+                .select("id, email, full_name, role")
+                .eq("id", currentUser.id)
+                .maybeSingle(),
 
-        const {
-            data: profile,
-            error: profileError
-        } =
-            await supabaseClient
-                .from('profiles')
-                .select(
-                    'id, email, full_name, role'
-                )
-                .eq(
-                    'id',
-                    user.id
-                )
-                .maybeSingle();
+            ACCESS_TIMEOUT,
 
+            "Admin profile check timed out."
+        );
+
+        const profile =
+            profileResult?.data;
+
+        const profileError =
+            profileResult?.error;
 
         if (profileError) {
-            throw profileError;
-        }
-
-
-        console.log(
-            'KHELZONE ADMIN PROFILE:',
-            profile
-        );
-
-
-        if (
-            !profile ||
-            profile.role !== 'admin'
-        ) {
-
-            console.warn(
-                'KHELZONE: User is not admin.'
+            console.error(
+                "KHELZONE PROFILE ERROR:",
+                profileError
             );
 
-            if (checkingScreen) {
-                checkingScreen.style.display =
-                    'none';
-            }
-
-            if (dashboard) {
-                dashboard.classList.add(
-                    'hidden'
-                );
-            }
-
-            if (accessDenied) {
-                accessDenied.style.display =
-                    'flex';
-            }
+            showAccessError(
+                "Could not verify your admin profile."
+            );
 
             return false;
         }
 
+        if (!profile) {
+            console.warn(
+                "KHELZONE: Profile not found."
+            );
+
+            showAccessDenied(
+                "Your account profile was not found."
+            );
+
+            return false;
+        }
+
+        currentProfile = profile;
 
         console.log(
-            'KHELZONE ADMIN VERIFIED:',
-            user.id
+            "KHELZONE PROFILE:",
+            currentProfile
         );
 
+        const role =
+            String(profile.role || "")
+                .trim()
+                .toLowerCase();
 
-        localStorage.setItem(
-            'khelzone_role',
-            'admin'
+        console.log(
+            "KHELZONE ROLE:",
+            role
         );
 
-        localStorage.setItem(
-            'khelzone_user_id',
-            user.id
-        );
-
-
-        const adminName =
-            profile.full_name ||
-            user.user_metadata?.full_name ||
-            user.user_metadata?.name ||
-            user.email?.split('@')[0] ||
-            'Admin';
-
-
-        const adminEmail =
-            user.email ||
-            profile.email ||
-            '-';
-
-
-        if ($('adminName')) {
-            $('adminName').textContent =
-                adminName;
-        }
-
-
-        if ($('adminEmail')) {
-            $('adminEmail').textContent =
-                adminEmail;
-        }
-
-
-        if (checkingScreen) {
-            checkingScreen.style.display =
-                'none';
-        }
-
-
-        if (dashboard) {
-            dashboard.classList.remove(
-                'hidden'
+        if (role !== "admin") {
+            console.warn(
+                "KHELZONE: NOT ADMIN"
             );
+
+            showAccessDenied(
+                "This account does not have admin access."
+            );
+
+            return false;
         }
 
+        console.log(
+            "KHELZONE: ADMIN ACCESS GRANTED"
+        );
+
+        showAdminDashboard();
 
         return true;
 
-
     } catch (error) {
-
         console.error(
-            'KHELZONE ADMIN ACCESS ERROR:',
+            "KHELZONE ADMIN CHECK ERROR:",
             error
         );
 
-
-        if (checkingScreen) {
-            checkingScreen.style.display =
-                'none';
-        }
-
-
-        if (dashboard) {
-            dashboard.classList.add(
-                'hidden'
-            );
-        }
-
-
-        if (accessDenied) {
-            accessDenied.style.display =
-                'flex';
-        }
-
+        showAccessError(
+            error?.message ||
+            "An error occurred while checking admin access."
+        );
 
         return false;
     }
 }
-
-
-/* ============================================================
-   SHOW SECTION
-   IMPORTANT:
-   HTML USES .section + .section.active
-============================================================ */
-
-function showSection(sectionId) {
-
-    if (!sectionId) {
-        return;
-    }
-
-
-    const sections =
-        document.querySelectorAll(
-            '.section'
-        );
-
-
-    sections.forEach(
-        section => {
-            section.classList.remove(
-                'active'
-            );
-        }
-    );
-
-
-    const target =
-        $(sectionId);
-
-
-    if (target) {
-
-        target.classList.add(
-            'active'
-        );
-    }
-
-
-    const links =
-        document.querySelectorAll(
-            '[data-section]'
-        );
-
-
-    links.forEach(
-        link => {
-
-            const linkSection =
-                link.getAttribute(
-                    'data-section'
-                );
-
-
-            if (
-                linkSection ===
-                sectionId
-            ) {
-
-                link.classList.add(
-                    'active'
-                );
-
-            } else {
-
-                link.classList.remove(
-                    'active'
-                );
-            }
-        }
-    );
-
-
-    const pageTitle =
-        $('pageTitle');
-
-
-    if (pageTitle) {
-
-        const titles = {
-
-            dashboardSection:
-                'Dashboard',
-
-            productsSection:
-                'Products',
-
-            sellersSection:
-                'Sellers',
-
-            customersSection:
-                'Customers',
-
-            ordersSection:
-                'Orders'
-        };
-
-
-        pageTitle.textContent =
-            titles[sectionId] ||
-            'Dashboard';
-    }
-
-
-    closeMobileMenu();
-}
-
 
 /* ============================================================
    NAVIGATION
 ============================================================ */
 
 function initNavigation() {
+    const buttons =
+        document.querySelectorAll("[data-section]");
 
-    const links =
-        document.querySelectorAll(
-            '[data-section]'
-        );
+    buttons.forEach(button => {
+        button.addEventListener("click", () => {
+            const section =
+                button.dataset.section;
 
+            if (!section) {
+                return;
+            }
 
-    links.forEach(
-        link => {
+            showSection(section);
 
-            link.addEventListener(
-                'click',
-                event => {
-
-                    event.preventDefault();
-
-                    const sectionId =
-                        link.getAttribute(
-                            'data-section'
-                        );
-
-
-                    if (sectionId) {
-
-                        showSection(
-                            sectionId
-                        );
-                    }
-                }
-            );
-        }
-    );
+            closeMobileMenu();
+        });
+    });
 }
 
+function showSection(sectionName) {
+    const sections =
+        document.querySelectorAll(".section");
+
+    sections.forEach(section => {
+        section.classList.remove("active");
+        section.style.display = "none";
+    });
+
+    const target =
+        document.getElementById(sectionName);
+
+    if (target) {
+        target.classList.add("active");
+        target.style.display = "block";
+    }
+
+    const buttons =
+        document.querySelectorAll("[data-section]");
+
+    buttons.forEach(button => {
+        button.classList.remove("active");
+    });
+
+    document
+        .querySelectorAll(
+            `[data-section="${sectionName}"]`
+        )
+        .forEach(button => {
+            button.classList.add("active");
+        });
+
+    const titles = {
+        dashboardSection: "Dashboard",
+        productsSection: "Products",
+        sellersSection: "Sellers",
+        customersSection: "Customers",
+        ordersSection: "Orders"
+    };
+
+    const pageTitle =
+        document.getElementById("pageTitle");
+
+    if (pageTitle) {
+        pageTitle.textContent =
+            titles[sectionName] || "Dashboard";
+    }
+}
 
 /* ============================================================
    MOBILE MENU
 ============================================================ */
 
-let mobileOverlay = null;
-
-
-function createMobileOverlay() {
-
-    if (mobileOverlay) {
-        return mobileOverlay;
-    }
-
-
-    mobileOverlay =
-        document.createElement('div');
-
-
-    mobileOverlay.id =
-        'kzMobileOverlay';
-
-
-    Object.assign(
-        mobileOverlay.style,
-        {
-            position: 'fixed',
-            inset: '0',
-            background:
-                'rgba(0,0,0,.65)',
-            zIndex: '99',
-            display: 'none'
-        }
-    );
-
-
-    mobileOverlay.addEventListener(
-        'click',
-        closeMobileMenu
-    );
-
-
-    document.body.appendChild(
-        mobileOverlay
-    );
-
-
-    return mobileOverlay;
-}
-
-
-function openMobileMenu() {
-
-    const sidebar =
-        $('sidebar');
-
-    const overlay =
-        createMobileOverlay();
-
-
-    if (sidebar) {
-
-        sidebar.classList.add(
-            'mobile-open'
-        );
-    }
-
-
-    if (overlay) {
-
-        overlay.style.display =
-            'block';
-    }
-}
-
-
-function closeMobileMenu() {
-
-    const sidebar =
-        $('sidebar');
-
-
-    if (sidebar) {
-
-        sidebar.classList.remove(
-            'mobile-open'
-        );
-    }
-
-
-    if (mobileOverlay) {
-
-        mobileOverlay.style.display =
-            'none';
-    }
-}
-
-
 function initMobileMenu() {
-
     const button =
-        $('mobileMenuBtn');
+        document.getElementById("mobileMenuBtn");
 
+    const sidebar =
+        document.getElementById("sidebar");
 
-    if (!button) {
+    if (!button || !sidebar) {
         return;
     }
 
-
-    button.addEventListener(
-        'click',
-        () => {
-
-            const sidebar =
-                $('sidebar');
-
-
-            if (
-                sidebar &&
-                sidebar.classList.contains(
-                    'mobile-open'
-                )
-            ) {
-
-                closeMobileMenu();
-
-            } else {
-
-                openMobileMenu();
-            }
-        }
-    );
+    button.addEventListener("click", () => {
+        sidebar.classList.toggle("mobile-open");
+    });
 }
 
+function closeMobileMenu() {
+    const sidebar =
+        document.getElementById("sidebar");
+
+    if (sidebar) {
+        sidebar.classList.remove("mobile-open");
+    }
+}
+
+/* ============================================================
+   LOGOUT
+============================================================ */
+
+function initLogout() {
+    const buttons =
+        document.querySelectorAll(
+            "#logoutBtn, #logoutButton, [data-logout]"
+        );
+
+    buttons.forEach(button => {
+        button.addEventListener(
+            "click",
+            async () => {
+
+                try {
+                    button.disabled = true;
+
+                    const { error } =
+                        await withTimeout(
+                            supabaseClient.auth.signOut(),
+                            DATA_TIMEOUT,
+                            "Logout timed out."
+                        );
+
+                    if (error) {
+                        throw error;
+                    }
+
+                    window.location.href =
+                        LOGIN_PAGE;
+
+                } catch (error) {
+
+                    console.error(
+                        "KHELZONE LOGOUT ERROR:",
+                        error
+                    );
+
+                    button.disabled = false;
+
+                    alert(
+                        "Logout failed. Please try again."
+                    );
+                }
+            }
+        );
+    });
+}
 
 /* ============================================================
    DASHBOARD COUNTS
 ============================================================ */
 
-async function safeCount(table) {
-
+async function loadDashboardCounts() {
     try {
 
-        if (!supabaseClient) {
-            return 0;
-        }
+        const results =
+            await Promise.allSettled([
 
+                withTimeout(
+                    supabaseClient
+                        .from("products")
+                        .select("id", {
+                            count: "exact",
+                            head: true
+                        }),
+                    DATA_TIMEOUT
+                ),
 
-        const {
-            count,
-            error
-        } =
-            await supabaseClient
-                .from(table)
-                .select(
-                    '*',
-                    {
-                        count: 'exact',
-                        head: true
-                    }
-                );
+                withTimeout(
+                    supabaseClient
+                        .from("sellers")
+                        .select("id", {
+                            count: "exact",
+                            head: true
+                        }),
+                    DATA_TIMEOUT
+                ),
 
+                withTimeout(
+                    supabaseClient
+                        .from("profiles")
+                        .select("id", {
+                            count: "exact",
+                            head: true
+                        })
+                        .eq("role", "customer"),
+                    DATA_TIMEOUT
+                ),
 
-        if (error) {
-
-            console.error(
-                `Count error [${table}]:`,
-                error
-            );
-
-            return 0;
-        }
-
-
-        return count || 0;
-
-
-    } catch (error) {
-
-        console.error(
-            `Count exception [${table}]:`,
-            error
-        );
-
-        return 0;
-    }
-}
-
-
-/* ============================================================
-   CUSTOMER COUNT
-============================================================ */
-
-async function safeCustomerCount() {
-
-    try {
-
-        if (!supabaseClient) {
-            return 0;
-        }
-
-
-        const {
-            count,
-            error
-        } =
-            await supabaseClient
-                .from('profiles')
-                .select(
-                    '*',
-                    {
-                        count: 'exact',
-                        head: true
-                    }
+                withTimeout(
+                    supabaseClient
+                        .from("orders")
+                        .select("id", {
+                            count: "exact",
+                            head: true
+                        }),
+                    DATA_TIMEOUT
                 )
-                .eq(
-                    'role',
-                    'customer'
-                );
+            ]);
 
+        const productResult =
+            results[0].status === "fulfilled"
+                ? results[0].value
+                : null;
 
-        if (error) {
+        const sellerResult =
+            results[1].status === "fulfilled"
+                ? results[1].value
+                : null;
 
-            console.error(
-                'Customer count error:',
-                error
-            );
+        const customerResult =
+            results[2].status === "fulfilled"
+                ? results[2].value
+                : null;
 
-            return 0;
+        const orderResult =
+            results[3].status === "fulfilled"
+                ? results[3].value
+                : null;
+
+        const productCount =
+            document.getElementById("productCount");
+
+        const sellerCount =
+            document.getElementById("sellerCount");
+
+        const customerCount =
+            document.getElementById("customerCount");
+
+        const orderCount =
+            document.getElementById("orderCount");
+
+        if (productCount) {
+            productCount.textContent =
+                productResult?.count ?? 0;
         }
 
+        if (sellerCount) {
+            sellerCount.textContent =
+                sellerResult?.count ?? 0;
+        }
 
-        return count || 0;
+        if (customerCount) {
+            customerCount.textContent =
+                customerResult?.count ?? 0;
+        }
 
+        if (orderCount) {
+            orderCount.textContent =
+                orderResult?.count ?? 0;
+        }
 
     } catch (error) {
 
         console.error(
-            'Customer count exception:',
+            "Dashboard count error:",
             error
         );
-
-        return 0;
     }
 }
 
-
-/* ============================================================
-   LOAD DASHBOARD DATA
-============================================================ */
-
-async function loadDashboardData() {
-
-    const results =
-        await Promise.all([
-            safeCount('products'),
-            safeCount('sellers'),
-            safeCustomerCount(),
-            safeCount('orders')
-        ]);
-
-
-    if ($('productCount')) {
-        $('productCount').textContent =
-            results[0];
-    }
-
-
-    if ($('sellerCount')) {
-        $('sellerCount').textContent =
-            results[1];
-    }
-
-
-    if ($('customerCount')) {
-        $('customerCount').textContent =
-            results[2];
-    }
-
-
-    if ($('orderCount')) {
-        $('orderCount').textContent =
-            results[3];
-    }
-}
 /* ============================================================
    PRODUCTS
 ============================================================ */
 
-let allProducts = [];
-
-
-/* ============================================================
-   LOAD PRODUCTS
-============================================================ */
-
 async function loadProducts() {
-
     const tbody =
-        $('productsTableBody');
+        document.getElementById(
+            "productsTableBody"
+        );
 
     if (!tbody) {
         return;
     }
 
     showTableMessage(
-        'productsTableBody',
-        'Loading products...',
-        7
+        tbody,
+        7,
+        "Loading products..."
     );
 
     try {
 
-        const {
-            data,
-            error
-        } =
-            await supabaseClient
-                .from('products')
-                .select('*')
-                .order(
-                    'created_at',
-                    {
+        const result =
+            await withTimeout(
+                supabaseClient
+                    .from("products")
+                    .select("*")
+                    .order("created_at", {
                         ascending: false
-                    }
-                );
+                    }),
+                DATA_TIMEOUT,
+                "Products request timed out."
+            );
+
+        const data =
+            result?.data;
+
+        const error =
+            result?.error;
 
         if (error) {
             throw error;
@@ -937,338 +796,175 @@ async function loadProducts() {
                 ? data
                 : [];
 
-        renderProducts(
-            allProducts
-        );
+        renderProducts(allProducts);
 
     } catch (error) {
 
         console.error(
-            'Products error:',
+            "Products error:",
             error
         );
 
         showTableMessage(
-            'productsTableBody',
-            error?.message ||
-            'Unable to load products.',
-            7
+            tbody,
+            7,
+            "Failed to load products."
         );
     }
 }
 
-
-/* ============================================================
-   RENDER PRODUCTS
-============================================================ */
-
 function renderProducts(products) {
-
     const tbody =
-        $('productsTableBody');
+        document.getElementById(
+            "productsTableBody"
+        );
 
     if (!tbody) {
         return;
     }
 
-
-    if (
-        !Array.isArray(products) ||
-        products.length === 0
-    ) {
-
+    if (!Array.isArray(products) || !products.length) {
         showTableMessage(
-            'productsTableBody',
-            'No products found.',
-            7
+            tbody,
+            7,
+            "No products found."
         );
 
         return;
     }
-
 
     tbody.innerHTML =
-        products.map(
-            product => {
+        products.map(product => {
 
-                const id =
-                    product.id || '';
+            const status =
+                String(
+                    product.status || "active"
+                ).toLowerCase();
 
-                const name =
-                    product.name ||
-                    product.title ||
-                    'Unnamed Product';
+            return `
+                <tr class="border-b border-white/10 hover:bg-white/5">
 
-                const price =
-                    product.sale_price ??
-                    product.price ??
-                    0;
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
 
-                const category =
-                    product.category ||
-                    '-';
+                            ${
+                                product.image_url
+                                    ? `
+                                        <img
+                                            src="${escapeHTML(product.image_url)}"
+                                            alt="${escapeHTML(product.name || "Product")}"
+                                            class="w-12 h-12 rounded-lg object-cover"
+                                        >
+                                      `
+                                    : `
+                                        <div class="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center">
+                                            🏷️
+                                        </div>
+                                      `
+                            }
 
-                const seller =
-                    product.seller_name ||
-                    product.seller_email ||
-                    product.seller_id ||
-                    '-';
+                            <div>
+                                <div class="font-semibold text-white">
+                                    ${escapeHTML(
+                                        product.name ||
+                                        "Unnamed Product"
+                                    )}
+                                </div>
 
-                const active =
-                    product.is_active !== false;
-
-                const bestSeller =
-                    product.is_best_seller === true;
-
-
-                return `
-                    <tr>
-
-                        <td>
-                            <strong>
-                                ${escapeHTML(name)}
-                            </strong>
-                        </td>
-
-                        <td>
-                            ${formatMoney(price)}
-                        </td>
-
-                        <td>
-                            ${escapeHTML(category)}
-                        </td>
-
-                        <td>
-                            ${escapeHTML(seller)}
-                        </td>
-
-                        <td>
-
-                            <span
-                                style='
-                                    color:${active
-                                        ? '#42d392'
-                                        : '#ff5a00'};
-                                    font-weight:800;
-                                '
-                            >
-                                ${active
-                                    ? 'Active'
-                                    : 'Inactive'}
-                            </span>
-
-                        </td>
-
-                        <td>
-
-                            <button
-                                type='button'
-                                onclick='toggleBestSeller(${JSON.stringify(String(id))})'
-                                style='
-                                    min-width:100px;
-                                    padding:8px 13px;
-                                    border-radius:8px;
-                                    border:1px solid ${bestSeller
-                                        ? '#ff5a00'
-                                        : '#444'};
-                                    background:${bestSeller
-                                        ? 'rgba(255,90,0,.15)'
-                                        : '#202020'};
-                                    color:${bestSeller
-                                        ? '#ff5a00'
-                                        : '#aaa'};
-                                    cursor:pointer;
-                                    font-size:12px;
-                                    font-weight:800;
-                                '
-                            >
-                                ${bestSeller
-                                    ? '★ ON'
-                                    : '☆ OFF'}
-                            </button>
-
-                        </td>
-
-                        <td>
-
-                            <div
-                                style='
-                                    display:flex;
-                                    gap:6px;
-                                    flex-wrap:wrap;
-                                '
-                            >
-
-                                <button
-                                    type='button'
-                                    onclick='toggleProduct(${JSON.stringify(String(id))}, ${active})'
-                                    style='
-                                        padding:8px 12px;
-                                        border-radius:7px;
-                                        border:1px solid #333;
-                                        background:#191919;
-                                        color:#fff;
-                                        cursor:pointer;
-                                        font-weight:700;
-                                    '
-                                >
-                                    ${active
-                                        ? 'Disable'
-                                        : 'Enable'}
-                                </button>
-
-
-                                <button
-                                    type='button'
-                                    onclick='deleteProduct(${JSON.stringify(String(id))})'
-                                    style='
-                                        padding:8px 12px;
-                                        border-radius:7px;
-                                        border:1px solid #6b1f1f;
-                                        background:#3a1515;
-                                        color:#ff7777;
-                                        cursor:pointer;
-                                        font-weight:800;
-                                    '
-                                >
-                                    Delete
-                                </button>
-
+                                <div class="text-xs text-gray-500">
+                                    ${escapeHTML(
+                                        product.brand || ""
+                                    )}
+                                </div>
                             </div>
 
-                        </td>
+                        </div>
+                    </td>
 
-                    </tr>
-                `;
-            }
-        ).join('');
+                    <td class="px-6 py-4 text-white font-semibold">
+                        ${formatCurrency(product.price)}
+                    </td>
+
+                    <td class="px-6 py-4 text-gray-300">
+                        ${escapeHTML(
+                            product.category || "—"
+                        )}
+                    </td>
+
+                    <td class="px-6 py-4 text-gray-300">
+                        ${escapeHTML(
+                            product.seller_name ||
+                            product.seller ||
+                            "—"
+                        )}
+                    </td>
+
+                    <td class="px-6 py-4">
+
+                        <span
+                            class="px-3 py-1 rounded-full text-xs font-semibold ${getStatusClass(status)}"
+                        >
+                            ${escapeHTML(status)}
+                        </span>
+
+                    </td>
+
+                    <td class="px-6 py-4">
+
+                        <button
+                            type="button"
+                            onclick="toggleBestSeller('${escapeHTML(product.id)}')"
+                            class="best-seller-btn ${
+                                product.is_best_seller
+                                    ? "active"
+                                    : ""
+                            }"
+                        >
+                            ${
+                                product.is_best_seller
+                                    ? "★ Best Seller"
+                                    : "☆ Best Seller"
+                            }
+                        </button>
+
+                    </td>
+
+                    <td class="px-6 py-4">
+
+                        <div class="flex gap-2">
+
+                            <button
+                                type="button"
+                                onclick="toggleProductStatus('${escapeHTML(product.id)}')"
+                                class="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm"
+                            >
+                                ${
+                                    status === "active"
+                                        ? "Disable"
+                                        : "Activate"
+                                }
+                            </button>
+
+                            <button
+                                type="button"
+                                onclick="deleteProduct('${escapeHTML(product.id)}')"
+                                class="px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm"
+                            >
+                                Delete
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+            `;
+
+        }).join("");
 }
-
-
-/* ============================================================
-   TOGGLE BEST SELLER
-============================================================ */
 
 async function toggleBestSeller(productId) {
-
-    if (!productId) {
-        return;
-    }
-
-
-    const product =
-        allProducts.find(
-            item =>
-                String(item.id) ===
-                String(productId)
-        );
-
-
-    if (!product) {
-
-        alert(
-            'Product not found.'
-        );
-
-        return;
-    }
-
-
-    const newValue =
-        product.is_best_seller !== true;
-
-
     try {
-
-        const {
-            error
-        } =
-            await supabaseClient
-                .from('products')
-                .update({
-                    is_best_seller: newValue
-                })
-                .eq(
-                    'id',
-                    productId
-                );
-
-
-        if (error) {
-            throw error;
-        }
-
-
-        product.is_best_seller =
-            newValue;
-
-
-        showToast(
-            newValue
-                ? 'Product added to Best Sellers.'
-                : 'Product removed from Best Sellers.'
-        );
-
-
-        renderProductSearchResults();
-
-    } catch (error) {
-
-        console.error(
-            'Best Seller update error:',
-            error
-        );
-
-
-        alert(
-            'Could not update Best Seller status.\n\n' +
-            (
-                error?.message ||
-                'Unknown error'
-            )
-        );
-    }
-}
-
-
-/* ============================================================
-   TOGGLE PRODUCT STATUS
-============================================================ */
-
-async function toggleProduct(
-    productId,
-    currentStatus
-) {
-
-    if (!productId) {
-        return;
-    }
-
-
-    const newStatus =
-        !currentStatus;
-
-
-    try {
-
-        const {
-            error
-        } =
-            await supabaseClient
-                .from('products')
-                .update({
-                    is_active: newStatus
-                })
-                .eq(
-                    'id',
-                    productId
-                );
-
-
-        if (error) {
-            throw error;
-        }
-
 
         const product =
             allProducts.find(
@@ -1277,1633 +973,1516 @@ async function toggleProduct(
                     String(productId)
             );
 
-
-        if (product) {
-
-            product.is_active =
-                newStatus;
+        if (!product) {
+            return;
         }
 
+        const newValue =
+            !Boolean(product.is_best_seller);
 
-        showToast(
-            newStatus
-                ? 'Product enabled.'
-                : 'Product disabled.'
-        );
-
-
-        renderProductSearchResults();
-
-    } catch (error) {
-
-        console.error(
-            'Product status error:',
-            error
-        );
-
-
-        alert(
-            'Could not update product status.\n\n' +
-            (
-                error?.message ||
-                'Unknown error'
-            )
-        );
-    }
-}
-
-
-/* ============================================================
-   DELETE PRODUCT
-============================================================ */
-
-async function deleteProduct(
-    productId
-) {
-
-    if (!productId) {
-        return;
-    }
-
-
-    const confirmed =
-        window.confirm(
-            'Are you sure you want to delete this product?\n\nThis action cannot be undone.'
-        );
-
-
-    if (!confirmed) {
-        return;
-    }
-
-
-    try {
-
-        const {
-            error
-        } =
-            await supabaseClient
-                .from('products')
-                .delete()
-                .eq(
-                    'id',
-                    productId
-                );
-
+        const { error } =
+            await withTimeout(
+                supabaseClient
+                    .from("products")
+                    .update({
+                        is_best_seller: newValue
+                    })
+                    .eq("id", productId),
+                DATA_TIMEOUT,
+                "Best seller update timed out."
+            );
 
         if (error) {
             throw error;
         }
 
+        await loadProducts();
 
-        allProducts =
-            allProducts.filter(
-                product =>
-                    String(product.id) !==
+    } catch (error) {
+
+        console.error(
+            "Best seller error:",
+            error
+        );
+
+        alert(
+            "Could not update Best Seller status."
+        );
+    }
+}
+
+async function toggleProductStatus(productId) {
+    try {
+
+        const product =
+            allProducts.find(
+                item =>
+                    String(item.id) ===
                     String(productId)
             );
 
+        if (!product) {
+            return;
+        }
 
-        showToast(
-            'Product deleted successfully.'
-        );
+        const currentStatus =
+            String(
+                product.status || "active"
+            ).toLowerCase();
 
+        const newStatus =
+            currentStatus === "active"
+                ? "inactive"
+                : "active";
 
-        renderProductSearchResults();
+        const { error } =
+            await withTimeout(
+                supabaseClient
+                    .from("products")
+                    .update({
+                        status: newStatus
+                    })
+                    .eq("id", productId),
+                DATA_TIMEOUT,
+                "Product status update timed out."
+            );
 
+        if (error) {
+            throw error;
+        }
 
-        await loadDashboardData();
-
+        await loadProducts();
 
     } catch (error) {
 
         console.error(
-            'Product delete error:',
+            "Product status error:",
             error
         );
-
 
         alert(
-            'Could not delete product.\n\n' +
-            (
-                error?.message ||
-                'Unknown error'
-            )
+            "Could not update product status."
         );
     }
 }
 
-
-/* ============================================================
-   PRODUCT SEARCH RESULTS
-============================================================ */
-
-function renderProductSearchResults() {
-
-    const input =
-        $('productSearch');
-
-
-    if (!input) {
-
-        renderProducts(
-            allProducts
-        );
-
-        return;
-    }
-
-
-    const query =
-        input.value
-            .trim()
-            .toLowerCase();
-
-
-    if (!query) {
-
-        renderProducts(
-            allProducts
-        );
-
-        return;
-    }
-
-
-    const filtered =
-        allProducts.filter(
-            product => {
-
-                return [
-
-                    product.name,
-                    product.title,
-                    product.category,
-                    product.seller_name,
-                    product.seller_email,
-                    product.seller_id
-
-                ]
-                    .filter(Boolean)
-                    .some(
-                        value =>
-                            String(value)
-                                .toLowerCase()
-                                .includes(query)
-                    );
-            }
-        );
-
-
-    renderProducts(
-        filtered
-    );
-}
-
-
-/* ============================================================
-   PRODUCT SEARCH
-============================================================ */
-
-function initProductSearch() {
-
-    const input =
-        $('productSearch');
-
-
-    if (!input) {
-        return;
-    }
-
-
-    input.addEventListener(
-        'input',
-        renderProductSearchResults
-    );
-}
-/* ==========================================================================
-   SELLERS
-   ========================================================================== */
-
-let allSellers = [];
-
-
-/* --------------------------------------------------------------------------
-   SELLER HELPERS
-   -------------------------------------------------------------------------- */
-
-function sellerName(seller) {
-    return (
-        seller.full_name ||
-        seller.name ||
-        seller.seller_name ||
-        seller.username ||
-        seller.display_name ||
-        'Seller'
-    );
-}
-
-function sellerEmail(seller) {
-    return seller.email || seller.seller_email || '-';
-}
-
-function sellerPhone(seller) {
-    return (
-        seller.phone ||
-        seller.phone_number ||
-        seller.seller_phone ||
-        '-'
-    );
-}
-
-function sellerStatus(seller) {
-    return String(
-        seller.status || 'pending'
-    ).toLowerCase();
-}
-
-
-/* --------------------------------------------------------------------------
-   LOAD SELLERS
-   -------------------------------------------------------------------------- */
-
-async function loadSellers() {
-    const tbody = $('sellersTableBody');
-
-    if (!tbody) return;
-
-    showTableMessage(
-        tbody,
-        6,
-        'Loading sellers...'
-    );
-
-    try {
-        const { data, error } = await supabaseClient
-            .from('sellers')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            console.error('Load sellers error:', error);
-
-            allSellers = [];
-
-            showTableMessage(
-                tbody,
-                6,
-                'Unable to load sellers.'
-            );
-
-            return;
-        }
-
-        allSellers = data || [];
-
-        renderSellers(allSellers);
-
-    } catch (error) {
-        console.error('Unexpected sellers error:', error);
-
-        allSellers = [];
-
-        showTableMessage(
-            tbody,
-            6,
-            'Unable to load sellers.'
-        );
-    }
-}
-
-
-/* --------------------------------------------------------------------------
-   RENDER SELLERS
-   -------------------------------------------------------------------------- */
-
-function renderSellers(sellers = allSellers) {
-    const tbody = $('sellersTableBody');
-
-    if (!tbody) return;
-
-    if (!sellers || sellers.length === 0) {
-        showTableMessage(
-            tbody,
-            6,
-            'No sellers found.'
-        );
-
-        return;
-    }
-
-    tbody.innerHTML = sellers.map(seller => {
-        const name = sellerName(seller);
-        const email = sellerEmail(seller);
-        const phone = sellerPhone(seller);
-        const status = sellerStatus(seller);
-
-        const sellerId = seller.id || '';
-
-        let statusClass = 'status-pending';
-
-        if (status === 'approved' || status === 'active') {
-            statusClass = 'status-active';
-        } else if (
-            status === 'rejected' ||
-            status === 'inactive' ||
-            status === 'blocked'
-        ) {
-            statusClass = 'status-inactive';
-        }
-
-        return `
-            <tr class='border-b border-white/5 hover:bg-white/[0.02]'>
-                <td class='px-4 py-4'>
-                    <div class='flex items-center gap-3'>
-                        <div class='w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-400 font-bold'>
-                            ${escapeHTML(initials(name))}
-                        </div>
-
-                        <div>
-                            <div class='font-semibold text-white'>
-                                ${escapeHTML(name)}
-                            </div>
-
-                            <div class='text-xs text-gray-500'>
-                                ID: ${escapeHTML(String(sellerId))}
-                            </div>
-                        </div>
-                    </div>
-                </td>
-
-                <td class='px-4 py-4 text-gray-300'>
-                    ${escapeHTML(email)}
-                </td>
-
-                <td class='px-4 py-4 text-gray-300'>
-                    ${escapeHTML(phone)}
-                </td>
-
-                <td class='px-4 py-4'>
-                    <span class='status-badge ${statusClass}'>
-                        ${escapeHTML(status)}
-                    </span>
-                </td>
-
-                <td class='px-4 py-4 text-gray-400'>
-                    ${formatDate(seller.created_at)}
-                </td>
-
-                <td class='px-4 py-4'>
-                    <div class='flex items-center gap-2'>
-
-                        <button
-                            type='button'
-                            onclick='viewSeller("${sellerId}")'
-                            class='action-btn'
-                            title='View seller'
-                        >
-                            <span class='material-symbols-outlined'>
-                                visibility
-                            </span>
-                        </button>
-
-                        <button
-                            type='button'
-                            onclick='updateSellerStatus("${sellerId}")'
-                            class='action-btn'
-                            title='Update status'
-                        >
-                            <span class='material-symbols-outlined'>
-                                edit
-                            </span>
-                        </button>
-
-                        <button
-                            type='button'
-                            onclick='deleteSeller("${sellerId}")'
-                            class='action-btn danger'
-                            title='Delete seller'
-                        >
-                            <span class='material-symbols-outlined'>
-                                delete
-                            </span>
-                        </button>
-
-                    </div>
-                </td>
-            </tr>
-        `;
-    }).join('');
-}
-
-
-/* --------------------------------------------------------------------------
-   SELLER SEARCH
-   -------------------------------------------------------------------------- */
-
-function initSellerSearch() {
-    const searchInput = $('sellerSearch');
-
-    if (!searchInput) return;
-
-    searchInput.addEventListener('input', () => {
-        const query = searchInput.value
-            .trim()
-            .toLowerCase();
-
-        if (!query) {
-            renderSellers(allSellers);
-            return;
-        }
-
-        const filtered = allSellers.filter(seller => {
-            const name = sellerName(seller).toLowerCase();
-            const email = sellerEmail(seller).toLowerCase();
-            const phone = sellerPhone(seller).toLowerCase();
-            const status = sellerStatus(seller).toLowerCase();
-
-            return (
-                name.includes(query) ||
-                email.includes(query) ||
-                phone.includes(query) ||
-                status.includes(query)
-            );
-        });
-
-        renderSellers(filtered);
-    });
-}
-
-
-/* --------------------------------------------------------------------------
-   VIEW SELLER
-   -------------------------------------------------------------------------- */
-
-function viewSeller(sellerId) {
-    const seller = allSellers.find(
-        item => String(item.id) === String(sellerId)
-    );
-
-    if (!seller) {
-        showToast(
-            'Seller not found.',
-            'error'
-        );
-
-        return;
-    }
-
-    const name = sellerName(seller);
-    const email = sellerEmail(seller);
-    const phone = sellerPhone(seller);
-    const status = sellerStatus(seller);
-
-    alert(
-        'Seller Details\n\n' +
-        'Name: ' + name + '\n' +
-        'Email: ' + email + '\n' +
-        'Phone: ' + phone + '\n' +
-        'Status: ' + status + '\n' +
-        'Created: ' + formatDate(seller.created_at)
-    );
-}
-
-
-/* --------------------------------------------------------------------------
-   UPDATE SELLER STATUS
-   -------------------------------------------------------------------------- */
-
-async function updateSellerStatus(sellerId) {
-    const seller = allSellers.find(
-        item => String(item.id) === String(sellerId)
-    );
-
-    if (!seller) {
-        showToast(
-            'Seller not found.',
-            'error'
-        );
-
-        return;
-    }
-
-    const currentStatus = sellerStatus(seller);
-
-    let newStatus = 'approved';
-
-    if (currentStatus === 'approved' || currentStatus === 'active') {
-        newStatus = 'inactive';
-    } else if (currentStatus === 'inactive') {
-        newStatus = 'approved';
-    }
-
-    const confirmed = confirm(
-        'Change seller status to ' +
-        newStatus +
-        '?'
-    );
-
-    if (!confirmed) return;
-
-    try {
-        const { error } = await supabaseClient
-            .from('sellers')
-            .update({
-                status: newStatus
-            })
-            .eq('id', sellerId);
-
-        if (error) {
-            console.error(
-                'Update seller status error:',
-                error
-            );
-
-            showToast(
-                'Failed to update seller status.',
-                'error'
-            );
-
-            return;
-        }
-
-        showToast(
-            'Seller status updated successfully.',
-            'success'
-        );
-
-        await loadSellers();
-
-    } catch (error) {
-        console.error(
-            'Unexpected seller status error:',
-            error
-        );
-
-        showToast(
-            'Something went wrong.',
-            'error'
-        );
-    }
-}
-
-
-/* --------------------------------------------------------------------------
-   DELETE SELLER
-   -------------------------------------------------------------------------- */
-
-async function deleteSeller(sellerId) {
-    const seller = allSellers.find(
-        item => String(item.id) === String(sellerId)
-    );
-
-    if (!seller) {
-        showToast(
-            'Seller not found.',
-            'error'
-        );
-
-        return;
-    }
-
-    const name = sellerName(seller);
-
-    const confirmed = confirm(
-        'Are you sure you want to delete seller "' +
-        name +
-        '"?'
-    );
-
-    if (!confirmed) return;
-
-    try {
-        const { error } = await supabaseClient
-            .from('sellers')
-            .delete()
-            .eq('id', sellerId);
-
-        if (error) {
-            console.error(
-                'Delete seller error:',
-                error
-            );
-
-            showToast(
-                'Failed to delete seller.',
-                'error'
-            );
-
-            return;
-        }
-
-        showToast(
-            'Seller deleted successfully.',
-            'success'
-        );
-
-        await loadSellers();
-        await loadDashboardData();
-
-    } catch (error) {
-        console.error(
-            'Unexpected delete seller error:',
-            error
-        );
-
-        showToast(
-            'Something went wrong.',
-            'error'
-        );
-    }
-}
-/* ==========================================================================
-   CUSTOMERS
-   ========================================================================== */
-
-let allCustomers = [];
-
-
-/* --------------------------------------------------------------------------
-   CUSTOMER HELPERS
-   -------------------------------------------------------------------------- */
-
-function customerName(customer) {
-    return (
-        customer.full_name ||
-        customer.name ||
-        customer.username ||
-        customer.display_name ||
-        'Customer'
-    );
-}
-
-function customerEmail(customer) {
-    return customer.email || '-';
-}
-
-function customerPhone(customer) {
-    return (
-        customer.phone ||
-        customer.phone_number ||
-        '-'
-    );
-}
-
-function customerCity(customer) {
-    return (
-        customer.city ||
-        customer.address_city ||
-        '-'
-    );
-}
-
-
-/* --------------------------------------------------------------------------
-   LOAD CUSTOMERS
-   -------------------------------------------------------------------------- */
-
-async function loadCustomers() {
-    const tbody = $('customersTableBody');
-
-    if (!tbody) return;
-
-    showTableMessage(
-        tbody,
-        6,
-        'Loading customers...'
-    );
-
-    try {
-        const { data, error } = await supabaseClient
-            .from('profiles')
-            .select('*')
-            .eq('role', 'customer')
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            console.error(
-                'Load customers error:',
-                error
-            );
-
-            allCustomers = [];
-
-            showTableMessage(
-                tbody,
-                6,
-                'Unable to load customers.'
-            );
-
-            return;
-        }
-
-        allCustomers = data || [];
-
-        renderCustomers(allCustomers);
-
-    } catch (error) {
-        console.error(
-            'Unexpected customers error:',
-            error
-        );
-
-        allCustomers = [];
-
-        showTableMessage(
-            tbody,
-            6,
-            'Unable to load customers.'
-        );
-    }
-}
-
-
-/* --------------------------------------------------------------------------
-   RENDER CUSTOMERS
-   -------------------------------------------------------------------------- */
-
-function renderCustomers(customers = allCustomers) {
-    const tbody = $('customersTableBody');
-
-    if (!tbody) return;
-
-    if (!customers || customers.length === 0) {
-        showTableMessage(
-            tbody,
-            6,
-            'No customers found.'
-        );
-
-        return;
-    }
-
-    tbody.innerHTML = customers.map(customer => {
-        const name = customerName(customer);
-        const email = customerEmail(customer);
-        const phone = customerPhone(customer);
-        const city = customerCity(customer);
-
-        const customerId = customer.id || '';
-
-        return `
-            <tr class='border-b border-white/5 hover:bg-white/[0.02]'>
-
-                <td class='px-4 py-4'>
-                    <div class='flex items-center gap-3'>
-
-                        <div class='w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-400 font-bold'>
-                            ${escapeHTML(initials(name))}
-                        </div>
-
-                        <div>
-                            <div class='font-semibold text-white'>
-                                ${escapeHTML(name)}
-                            </div>
-
-                            <div class='text-xs text-gray-500'>
-                                ID: ${escapeHTML(String(customerId))}
-                            </div>
-                        </div>
-
-                    </div>
-                </td>
-
-                <td class='px-4 py-4 text-gray-300'>
-                    ${escapeHTML(email)}
-                </td>
-
-                <td class='px-4 py-4 text-gray-300'>
-                    ${escapeHTML(phone)}
-                </td>
-
-                <td class='px-4 py-4 text-gray-300'>
-                    ${escapeHTML(city)}
-                </td>
-
-                <td class='px-4 py-4 text-gray-400'>
-                    ${formatDate(customer.created_at)}
-                </td>
-
-                <td class='px-4 py-4'>
-
-                    <div class='flex items-center gap-2'>
-
-                        <button
-                            type='button'
-                            onclick='viewCustomer("${customerId}")'
-                            class='action-btn'
-                            title='View customer'
-                        >
-                            <span class='material-symbols-outlined'>
-                                visibility
-                            </span>
-                        </button>
-
-                        <button
-                            type='button'
-                            onclick='deleteCustomer("${customerId}")'
-                            class='action-btn danger'
-                            title='Delete customer'
-                        >
-                            <span class='material-symbols-outlined'>
-                                delete
-                            </span>
-                        </button>
-
-                    </div>
-
-                </td>
-
-            </tr>
-        `;
-    }).join('');
-}
-
-
-/* --------------------------------------------------------------------------
-   CUSTOMER SEARCH
-   -------------------------------------------------------------------------- */
-
-function initCustomerSearch() {
-    const searchInput = $('customerSearch');
-
-    if (!searchInput) return;
-
-    searchInput.addEventListener('input', () => {
-        const query = searchInput.value
-            .trim()
-            .toLowerCase();
-
-        if (!query) {
-            renderCustomers(allCustomers);
-            return;
-        }
-
-        const filtered = allCustomers.filter(customer => {
-            const name = customerName(customer)
-                .toLowerCase();
-
-            const email = customerEmail(customer)
-                .toLowerCase();
-
-            const phone = customerPhone(customer)
-                .toLowerCase();
-
-            const city = customerCity(customer)
-                .toLowerCase();
-
-            return (
-                name.includes(query) ||
-                email.includes(query) ||
-                phone.includes(query) ||
-                city.includes(query)
-            );
-        });
-
-        renderCustomers(filtered);
-    });
-}
-
-
-/* --------------------------------------------------------------------------
-   VIEW CUSTOMER
-   -------------------------------------------------------------------------- */
-
-function viewCustomer(customerId) {
-    const customer = allCustomers.find(
-        item =>
-            String(item.id) === String(customerId)
-    );
-
-    if (!customer) {
-        showToast(
-            'Customer not found.',
-            'error'
-        );
-
-        return;
-    }
-
-    const name = customerName(customer);
-    const email = customerEmail(customer);
-    const phone = customerPhone(customer);
-    const city = customerCity(customer);
-
-    alert(
-        'Customer Details\n\n' +
-        'Name: ' + name + '\n' +
-        'Email: ' + email + '\n' +
-        'Phone: ' + phone + '\n' +
-        'City: ' + city + '\n' +
-        'Joined: ' +
-        formatDate(customer.created_at)
-    );
-}
-
-
-/* --------------------------------------------------------------------------
-   DELETE CUSTOMER
-   -------------------------------------------------------------------------- */
-
-async function deleteCustomer(customerId) {
-    const customer = allCustomers.find(
-        item =>
-            String(item.id) === String(customerId)
-    );
-
-    if (!customer) {
-        showToast(
-            'Customer not found.',
-            'error'
-        );
-
-        return;
-    }
-
-    const name = customerName(customer);
-
-    const confirmed = confirm(
-        'Are you sure you want to delete customer "' +
-        name +
-        '"?'
-    );
-
-    if (!confirmed) return;
-
-    try {
-        const { error } = await supabaseClient
-            .from('profiles')
-            .delete()
-            .eq('id', customerId)
-            .eq('role', 'customer');
-
-        if (error) {
-            console.error(
-                'Delete customer error:',
-                error
-            );
-
-            showToast(
-                'Failed to delete customer.',
-                'error'
-            );
-
-            return;
-        }
-
-        showToast(
-            'Customer deleted successfully.',
-            'success'
-        );
-
-        await loadCustomers();
-        await loadDashboardData();
-
-    } catch (error) {
-        console.error(
-            'Unexpected delete customer error:',
-            error
-        );
-
-        showToast(
-            'Something went wrong.',
-            'error'
-        );
-    }
-}
-/* ==========================================================================
-   ORDERS
-   ========================================================================== */
-
-let allOrders = [];
-
-
-/* --------------------------------------------------------------------------
-   ORDER HELPERS
-   -------------------------------------------------------------------------- */
-
-function orderNumber(order) {
-    return (
-        order.order_number ||
-        order.order_no ||
-        order.order_id ||
-        order.id ||
-        '-'
-    );
-}
-
-function orderCustomer(order) {
-    return (
-        order.customer_name ||
-        order.full_name ||
-        order.customer_email ||
-        order.email ||
-        'Customer'
-    );
-}
-
-function orderTotal(order) {
-    const total =
-        order.total_amount ??
-        order.total ??
-        order.amount ??
-        0;
-
-    return formatMoney(total);
-}
-
-function orderStatus(order) {
-    return String(
-        order.status || 'pending'
-    ).toLowerCase();
-}
-
-
-/* --------------------------------------------------------------------------
-   LOAD ORDERS
-   -------------------------------------------------------------------------- */
-
-async function loadOrders() {
-    const tbody = $('ordersTableBody');
-
-    if (!tbody) return;
-
-    showTableMessage(
-        tbody,
-        6,
-        'Loading orders...'
-    );
-
-    try {
-        const { data, error } = await supabaseClient
-            .from('orders')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            console.error(
-                'Load orders error:',
-                error
-            );
-
-            allOrders = [];
-
-            showTableMessage(
-                tbody,
-                6,
-                'Unable to load orders.'
-            );
-
-            return;
-        }
-
-        allOrders = data || [];
-
-        renderOrders(allOrders);
-
-    } catch (error) {
-        console.error(
-            'Unexpected orders error:',
-            error
-        );
-
-        allOrders = [];
-
-        showTableMessage(
-            tbody,
-            6,
-            'Unable to load orders.'
-        );
-    }
-}
-
-
-/* --------------------------------------------------------------------------
-   RENDER ORDERS
-   -------------------------------------------------------------------------- */
-
-function renderOrders(orders = allOrders) {
-    const tbody = $('ordersTableBody');
-
-    if (!tbody) return;
-
-    if (!orders || orders.length === 0) {
-        showTableMessage(
-            tbody,
-            6,
-            'No orders found.'
-        );
-
-        return;
-    }
-
-    tbody.innerHTML = orders.map(order => {
-        const id = order.id || '';
-        const number = orderNumber(order);
-        const customer = orderCustomer(order);
-        const total = orderTotal(order);
-        const status = orderStatus(order);
-
-        let statusClass = 'status-pending';
-
-        if (
-            status === 'completed' ||
-            status === 'delivered' ||
-            status === 'approved'
-        ) {
-            statusClass = 'status-active';
-        } else if (
-            status === 'cancelled' ||
-            status === 'canceled' ||
-            status === 'rejected'
-        ) {
-            statusClass = 'status-inactive';
-        }
-
-        return `
-            <tr class='border-b border-white/5 hover:bg-white/[0.02]'>
-
-                <td class='px-4 py-4'>
-                    <div class='font-semibold text-white'>
-                        #${escapeHTML(String(number))}
-                    </div>
-
-                    <div class='text-xs text-gray-500'>
-                        ID: ${escapeHTML(String(id))}
-                    </div>
-                </td>
-
-                <td class='px-4 py-4 text-gray-300'>
-                    ${escapeHTML(String(customer))}
-                </td>
-
-                <td class='px-4 py-4 font-semibold text-white'>
-                    ${escapeHTML(String(total))}
-                </td>
-
-                <td class='px-4 py-4'>
-                    <span class='status-badge ${statusClass}'>
-                        ${escapeHTML(status)}
-                    </span>
-                </td>
-
-                <td class='px-4 py-4 text-gray-400'>
-                    ${formatDate(order.created_at)}
-                </td>
-
-                <td class='px-4 py-4'>
-
-                    <div class='flex items-center gap-2'>
-
-                        <button
-                            type='button'
-                            onclick='viewOrder("${id}")'
-                            class='action-btn'
-                            title='View order'
-                        >
-                            <span class='material-symbols-outlined'>
-                                visibility
-                            </span>
-                        </button>
-
-                        <button
-                            type='button'
-                            onclick='updateOrderStatus("${id}")'
-                            class='action-btn'
-                            title='Update status'
-                        >
-                            <span class='material-symbols-outlined'>
-                                edit
-                            </span>
-                        </button>
-
-                        <button
-                            type='button'
-                            onclick='deleteOrder("${id}")'
-                            class='action-btn danger'
-                            title='Delete order'
-                        >
-                            <span class='material-symbols-outlined'>
-                                delete
-                            </span>
-                        </button>
-
-                    </div>
-
-                </td>
-
-            </tr>
-        `;
-    }).join('');
-}
-
-
-/* --------------------------------------------------------------------------
-   ORDER SEARCH
-   -------------------------------------------------------------------------- */
-
-function initOrderSearch() {
-    const searchInput = $('orderSearch');
-
-    if (!searchInput) return;
-
-    searchInput.addEventListener('input', () => {
-        const query = searchInput.value
-            .trim()
-            .toLowerCase();
-
-        if (!query) {
-            renderOrders(allOrders);
-            return;
-        }
-
-        const filtered = allOrders.filter(order => {
-            const number = String(
-                orderNumber(order)
-            ).toLowerCase();
-
-            const customer = String(
-                orderCustomer(order)
-            ).toLowerCase();
-
-            const status = orderStatus(order)
-                .toLowerCase();
-
-            return (
-                number.includes(query) ||
-                customer.includes(query) ||
-                status.includes(query)
-            );
-        });
-
-        renderOrders(filtered);
-    });
-}
-
-
-/* --------------------------------------------------------------------------
-   VIEW ORDER
-   -------------------------------------------------------------------------- */
-
-function viewOrder(orderId) {
-    const order = allOrders.find(
-        item =>
-            String(item.id) === String(orderId)
-    );
-
-    if (!order) {
-        showToast(
-            'Order not found.',
-            'error'
-        );
-
-        return;
-    }
-
-    const number = orderNumber(order);
-    const customer = orderCustomer(order);
-    const total = orderTotal(order);
-    const status = orderStatus(order);
-
-    alert(
-        'Order Details\n\n' +
-        'Order: #' + number + '\n' +
-        'Customer: ' + customer + '\n' +
-        'Total: ' + total + '\n' +
-        'Status: ' + status + '\n' +
-        'Date: ' +
-        formatDate(order.created_at)
-    );
-}
-
-
-/* --------------------------------------------------------------------------
-   UPDATE ORDER STATUS
-   -------------------------------------------------------------------------- */
-
-async function updateOrderStatus(orderId) {
-    const order = allOrders.find(
-        item =>
-            String(item.id) === String(orderId)
-    );
-
-    if (!order) {
-        showToast(
-            'Order not found.',
-            'error'
-        );
-
-        return;
-    }
-
-    const currentStatus = orderStatus(order);
-
-    let newStatus = 'processing';
-
-    if (currentStatus === 'pending') {
-        newStatus = 'processing';
-    } else if (currentStatus === 'processing') {
-        newStatus = 'shipped';
-    } else if (currentStatus === 'shipped') {
-        newStatus = 'delivered';
-    } else if (currentStatus === 'delivered') {
-        newStatus = 'completed';
-    } else if (currentStatus === 'completed') {
-        newStatus = 'pending';
-    } else {
-        newStatus = 'processing';
-    }
-
-    const confirmed = confirm(
-        'Change order status to ' +
-        newStatus +
-        '?'
-    );
-
-    if (!confirmed) return;
-
-    try {
-        const { error } = await supabaseClient
-            .from('orders')
-            .update({
-                status: newStatus
-            })
-            .eq('id', orderId);
-
-        if (error) {
-            console.error(
-                'Update order status error:',
-                error
-            );
-
-            showToast(
-                'Failed to update order status.',
-                'error'
-            );
-
-            return;
-        }
-
-        showToast(
-            'Order status updated successfully.',
-            'success'
-        );
-
-        await loadOrders();
-
-    } catch (error) {
-        console.error(
-            'Unexpected order status error:',
-            error
-        );
-
-        showToast(
-            'Something went wrong.',
-            'error'
-        );
-    }
-}
-
-
-/* --------------------------------------------------------------------------
-   DELETE ORDER
-   -------------------------------------------------------------------------- */
-
-async function deleteOrder(orderId) {
-    const order = allOrders.find(
-        item =>
-            String(item.id) === String(orderId)
-    );
-
-    if (!order) {
-        showToast(
-            'Order not found.',
-            'error'
-        );
-
-        return;
-    }
-
-    const number = orderNumber(order);
-
-    const confirmed = confirm(
-        'Are you sure you want to delete order #' +
-        number +
-        '?'
-    );
-
-    if (!confirmed) return;
-
-    try {
-        const { error } = await supabaseClient
-            .from('orders')
-            .delete()
-            .eq('id', orderId);
-
-        if (error) {
-            console.error(
-                'Delete order error:',
-                error
-            );
-
-            showToast(
-                'Failed to delete order.',
-                'error'
-            );
-
-            return;
-        }
-
-        showToast(
-            'Order deleted successfully.',
-            'success'
-        );
-
-        await loadOrders();
-        await loadDashboardData();
-
-    } catch (error) {
-        console.error(
-            'Unexpected delete order error:',
-            error
-        );
-
-        showToast(
-            'Something went wrong.',
-            'error'
-        );
-    }
-}
-/* ==========================================================================
-   LOGOUT
-   ========================================================================== */
-
-async function logoutAdmin() {
-    try {
-        const confirmed = confirm(
-            'Are you sure you want to logout?'
-        );
-
-        if (!confirmed) return;
-
-        const { error } = await supabaseClient.auth.signOut();
-
-        if (error) {
-            console.error(
-                'Logout error:',
-                error
-            );
-
-            showToast(
-                'Logout failed.',
-                'error'
-            );
-
-            return;
-        }
-
-        localStorage.removeItem('khelzone_role');
-        localStorage.removeItem('khelzone_user_id');
-        localStorage.removeItem('khelzone_email');
-
-        window.location.href = 'login.html';
-
-    } catch (error) {
-        console.error(
-            'Unexpected logout error:',
-            error
-        );
-
-        showToast(
-            'Something went wrong during logout.',
-            'error'
-        );
-    }
-}
-
-
-/* --------------------------------------------------------------------------
-   LOGOUT BUTTON
-   -------------------------------------------------------------------------- */
-
-function initLogout() {
-    const logoutBtn = $('logoutBtn');
-
-    if (!logoutBtn) return;
-
-    logoutBtn.addEventListener(
-        'click',
-        logoutAdmin
-    );
-}
-
-
-/* ==========================================================================
-   KEYBOARD SHORTCUTS
-   ========================================================================== */
-
-function initKeyboard() {
-    document.addEventListener(
-        'keydown',
-        event => {
-
-            if (
-                (event.ctrlKey || event.metaKey) &&
-                event.key.toLowerCase() === 'k'
-            ) {
-                event.preventDefault();
-
-                const searchInput =
-                    document.querySelector(
-                        '#productSearch:not(.hidden), ' +
-                        '#sellerSearch:not(.hidden), ' +
-                        '#customerSearch:not(.hidden), ' +
-                        '#orderSearch:not(.hidden)'
-                    );
-
-                if (searchInput) {
-                    searchInput.focus();
-                }
-            }
-
-            if (event.key === 'Escape') {
-                closeMobileMenu();
-            }
-        }
-    );
-}
-
-
-/* ==========================================================================
-   AUTH LISTENER
-   ========================================================================== */
-
-function initAuthListener() {
+async function deleteProduct(productId) {
     if (
-        !supabaseClient ||
-        !supabaseClient.auth
+        !confirm(
+            "Are you sure you want to delete this product?"
+        )
     ) {
         return;
     }
 
-    supabaseClient.auth.onAuthStateChange(
-        (event, session) => {
+    try {
 
-            if (
-                event === 'SIGNED_OUT' ||
-                !session
-            ) {
-                localStorage.removeItem(
-                    'khelzone_role'
-                );
+        const { error } =
+            await withTimeout(
+                supabaseClient
+                    .from("products")
+                    .delete()
+                    .eq("id", productId),
+                DATA_TIMEOUT,
+                "Product deletion timed out."
+            );
 
-                localStorage.removeItem(
-                    'khelzone_user_id'
-                );
-
-                localStorage.removeItem(
-                    'khelzone_email'
-                );
-
-                window.location.href =
-                    'login.html';
-            }
+        if (error) {
+            throw error;
         }
+
+        alert(
+            "Product deleted successfully."
+        );
+
+        await loadProducts();
+        await loadDashboardCounts();
+
+    } catch (error) {
+
+        console.error(
+            "Delete product error:",
+            error
+        );
+
+        alert(
+            "Could not delete product."
+        );
+    }
+}
+
+/* ============================================================
+   SELLERS
+============================================================ */
+
+async function loadSellers() {
+    const tbody =
+        document.getElementById(
+            "sellersTableBody"
+        );
+
+    if (!tbody) {
+        return;
+    }
+
+    showTableMessage(
+        tbody,
+        6,
+        "Loading sellers..."
+    );
+
+    try {
+
+        const result =
+            await withTimeout(
+                supabaseClient
+                    .from("sellers")
+                    .select("*")
+                    .order("created_at", {
+                        ascending: false
+                    }),
+                DATA_TIMEOUT,
+                "Sellers request timed out."
+            );
+
+        if (result?.error) {
+            throw result.error;
+        }
+
+        allSellers =
+            Array.isArray(result?.data)
+                ? result.data
+                : [];
+
+        renderSellers(allSellers);
+
+    } catch (error) {
+
+        console.error(
+            "Sellers error:",
+            error
+        );
+
+        showTableMessage(
+            tbody,
+            6,
+            "Failed to load sellers."
+        );
+    }
+}
+
+function renderSellers(sellers) {
+    const tbody =
+        document.getElementById(
+            "sellersTableBody"
+        );
+
+    if (!tbody) {
+        return;
+    }
+
+    if (!Array.isArray(sellers) || !sellers.length) {
+        showTableMessage(
+            tbody,
+            6,
+            "No sellers found."
+        );
+
+        return;
+    }
+
+    tbody.innerHTML =
+        sellers.map(seller => {
+
+            const status =
+                seller.status || "pending";
+
+            return `
+                <tr class="border-b border-white/10 hover:bg-white/5">
+
+                    <td class="px-6 py-4">
+
+                        <div class="font-semibold text-white">
+                            ${escapeHTML(
+                                seller.business_name ||
+                                seller.shop_name ||
+                                "Unnamed Seller"
+                            )}
+                        </div>
+
+                        <div class="text-xs text-gray-500">
+                            ${escapeHTML(
+                                seller.owner_name || ""
+                            )}
+                        </div>
+
+                    </td>
+
+                    <td class="px-6 py-4 text-gray-300">
+                        ${escapeHTML(
+                            seller.email || "—"
+                        )}
+                    </td>
+
+                    <td class="px-6 py-4 text-gray-300">
+                        ${escapeHTML(
+                            seller.phone || "—"
+                        )}
+                    </td>
+
+                    <td class="px-6 py-4">
+
+                        <span
+                            class="px-3 py-1 rounded-full text-xs font-semibold ${getStatusClass(status)}"
+                        >
+                            ${escapeHTML(status)}
+                        </span>
+
+                    </td>
+
+                    <td class="px-6 py-4 text-gray-400">
+                        ${formatDate(
+                            seller.created_at
+                        )}
+                    </td>
+
+                    <td class="px-6 py-4">
+
+                        <div class="flex gap-2">
+
+                            <button
+                                type="button"
+                                onclick="viewSeller('${escapeHTML(seller.id)}')"
+                                class="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm"
+                            >
+                                View
+                            </button>
+
+                            <button
+                                type="button"
+                                onclick="updateSellerStatus('${escapeHTML(seller.id)}')"
+                                class="px-3 py-2 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 text-sm"
+                            >
+                                Status
+                            </button>
+
+                            <button
+                                type="button"
+                                onclick="deleteSeller('${escapeHTML(seller.id)}')"
+                                class="px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm"
+                            >
+                                Delete
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+            `;
+
+        }).join("");
+}
+
+function viewSeller(sellerId) {
+    const seller =
+        allSellers.find(
+            item =>
+                String(item.id) ===
+                String(sellerId)
+        );
+
+    if (!seller) {
+        return;
+    }
+
+    alert(
+        `SELLER DETAILS\n\n` +
+        `Business: ${seller.business_name || seller.shop_name || "—"}\n` +
+        `Owner: ${seller.owner_name || "—"}\n` +
+        `Email: ${seller.email || "—"}\n` +
+        `Phone: ${seller.phone || "—"}\n` +
+        `City: ${seller.city || "—"}\n` +
+        `Category: ${seller.category || "—"}\n` +
+        `Monthly Sales: ${seller.monthly_volume || "—"}\n` +
+        `Status: ${seller.status || "—"}`
     );
 }
 
+async function updateSellerStatus(sellerId) {
+    try {
 
-/* ==========================================================================
+        const seller =
+            allSellers.find(
+                item =>
+                    String(item.id) ===
+                    String(sellerId)
+            );
+
+        if (!seller) {
+            return;
+        }
+
+        const statuses = [
+            "pending",
+            "approved",
+            "rejected",
+            "active"
+        ];
+
+        const currentStatus =
+            String(
+                seller.status || "pending"
+            ).toLowerCase();
+
+        const currentIndex =
+            statuses.indexOf(currentStatus);
+
+        const nextIndex =
+            currentIndex >= 0
+                ? (currentIndex + 1) % statuses.length
+                : 0;
+
+        const newStatus =
+            statuses[nextIndex];
+
+        const { error } =
+            await withTimeout(
+                supabaseClient
+                    .from("sellers")
+                    .update({
+                        status: newStatus
+                    })
+                    .eq("id", sellerId),
+                DATA_TIMEOUT,
+                "Seller status update timed out."
+            );
+
+        if (error) {
+            throw error;
+        }
+
+        await loadSellers();
+
+    } catch (error) {
+
+        console.error(
+            "Seller status error:",
+            error
+        );
+
+        alert(
+            "Could not update seller status."
+        );
+    }
+}
+
+async function deleteSeller(sellerId) {
+    if (
+        !confirm(
+            "Are you sure you want to delete this seller?"
+        )
+    ) {
+        return;
+    }
+
+    try {
+
+        const { error } =
+            await withTimeout(
+                supabaseClient
+                    .from("sellers")
+                    .delete()
+                    .eq("id", sellerId),
+                DATA_TIMEOUT,
+                "Seller deletion timed out."
+            );
+
+        if (error) {
+            throw error;
+        }
+
+        alert(
+            "Seller deleted successfully."
+        );
+
+        await loadSellers();
+        await loadDashboardCounts();
+
+    } catch (error) {
+
+        console.error(
+            "Delete seller error:",
+            error
+        );
+
+        alert(
+            "Could not delete seller."
+        );
+    }
+}
+
+/* ============================================================
+   CUSTOMERS
+============================================================ */
+
+async function loadCustomers() {
+    const tbody =
+        document.getElementById(
+            "customersTableBody"
+        );
+
+    if (!tbody) {
+        return;
+    }
+
+    showTableMessage(
+        tbody,
+        6,
+        "Loading customers..."
+    );
+
+    try {
+
+        const result =
+            await withTimeout(
+                supabaseClient
+                    .from("profiles")
+                    .select("*")
+                    .eq("role", "customer")
+                    .order("created_at", {
+                        ascending: false
+                    }),
+                DATA_TIMEOUT,
+                "Customers request timed out."
+            );
+
+        if (result?.error) {
+            throw result.error;
+        }
+
+        allCustomers =
+            Array.isArray(result?.data)
+                ? result.data
+                : [];
+
+        renderCustomers(allCustomers);
+
+    } catch (error) {
+
+        console.error(
+            "Customers error:",
+            error
+        );
+
+        showTableMessage(
+            tbody,
+            6,
+            "Failed to load customers."
+        );
+    }
+}
+
+function renderCustomers(customers) {
+    const tbody =
+        document.getElementById(
+            "customersTableBody"
+        );
+
+    if (!tbody) {
+        return;
+    }
+
+    if (!Array.isArray(customers) || !customers.length) {
+        showTableMessage(
+            tbody,
+            6,
+            "No customers found."
+        );
+
+        return;
+    }
+
+    tbody.innerHTML =
+        customers.map(customer => {
+
+            return `
+                <tr class="border-b border-white/10 hover:bg-white/5">
+
+                    <td class="px-6 py-4 text-white font-semibold">
+                        ${escapeHTML(
+                            customer.full_name ||
+                            customer.name ||
+                            "—"
+                        )}
+                    </td>
+
+                    <td class="px-6 py-4 text-gray-300">
+                        ${escapeHTML(
+                            customer.email || "—"
+                        )}
+                    </td>
+
+                    <td class="px-6 py-4 text-gray-300">
+                        ${escapeHTML(
+                            customer.phone || "—"
+                        )}
+                    </td>
+
+                    <td class="px-6 py-4 text-gray-300">
+                        ${escapeHTML(
+                            customer.city || "—"
+                        )}
+                    </td>
+
+                    <td class="px-6 py-4 text-gray-400">
+                        ${formatDate(
+                            customer.created_at
+                        )}
+                    </td>
+
+                    <td class="px-6 py-4">
+
+                        <div class="flex gap-2">
+
+                            <button
+                                type="button"
+                                onclick="viewCustomer('${escapeHTML(customer.id)}')"
+                                class="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm"
+                            >
+                                View
+                            </button>
+
+                            <button
+                                type="button"
+                                onclick="deleteCustomer('${escapeHTML(customer.id)}')"
+                                class="px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm"
+                            >
+                                Delete
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+            `;
+
+        }).join("");
+}
+
+function viewCustomer(customerId) {
+    const customer =
+        allCustomers.find(
+            item =>
+                String(item.id) ===
+                String(customerId)
+        );
+
+    if (!customer) {
+        return;
+    }
+
+    alert(
+        `CUSTOMER DETAILS\n\n` +
+        `Name: ${customer.full_name || customer.name || "—"}\n` +
+        `Email: ${customer.email || "—"}\n` +
+        `Phone: ${customer.phone || "—"}\n` +
+        `City: ${customer.city || "—"}\n` +
+        `Joined: ${formatDate(customer.created_at)}`
+    );
+}
+
+async function deleteCustomer(customerId) {
+    if (
+        !confirm(
+            "Are you sure you want to delete this customer profile?"
+        )
+    ) {
+        return;
+    }
+
+    try {
+
+        const { error } =
+            await withTimeout(
+                supabaseClient
+                    .from("profiles")
+                    .delete()
+                    .eq("id", customerId),
+                DATA_TIMEOUT,
+                "Customer deletion timed out."
+            );
+
+        if (error) {
+            throw error;
+        }
+
+        alert(
+            "Customer deleted successfully."
+        );
+
+        await loadCustomers();
+        await loadDashboardCounts();
+
+    } catch (error) {
+
+        console.error(
+            "Delete customer error:",
+            error
+        );
+
+        alert(
+            "Could not delete customer."
+        );
+    }
+}
+
+/* ============================================================
+   ORDERS
+============================================================ */
+
+async function loadOrders() {
+    const tbody =
+        document.getElementById(
+            "ordersTableBody"
+        );
+
+    if (!tbody) {
+        return;
+    }
+
+    showTableMessage(
+        tbody,
+        6,
+        "Loading orders..."
+    );
+
+    try {
+
+        const result =
+            await withTimeout(
+                supabaseClient
+                    .from("orders")
+                    .select("*")
+                    .order("created_at", {
+                        ascending: false
+                    }),
+                DATA_TIMEOUT,
+                "Orders request timed out."
+            );
+
+        if (result?.error) {
+            throw result.error;
+        }
+
+        allOrders =
+            Array.isArray(result?.data)
+                ? result.data
+                : [];
+
+        renderOrders(allOrders);
+
+    } catch (error) {
+
+        console.error(
+            "Orders error:",
+            error
+        );
+
+        showTableMessage(
+            tbody,
+            6,
+            "Failed to load orders."
+        );
+    }
+}
+
+function renderOrders(orders) {
+    const tbody =
+        document.getElementById(
+            "ordersTableBody"
+        );
+
+    if (!tbody) {
+        return;
+    }
+
+    if (!Array.isArray(orders) || !orders.length) {
+        showTableMessage(
+            tbody,
+            6,
+            "No orders found."
+        );
+
+        return;
+    }
+
+    tbody.innerHTML =
+        orders.map(order => {
+
+            const status =
+                order.status || "pending";
+
+            return `
+                <tr class="border-b border-white/10 hover:bg-white/5">
+
+                    <td class="px-6 py-4">
+
+                        <div class="font-semibold text-white">
+                            #${escapeHTML(
+                                getOrderNumber(order)
+                            )}
+                        </div>
+
+                        <div class="text-xs text-gray-500">
+                            ${escapeHTML(
+                                order.id || ""
+                            )}
+                        </div>
+
+                    </td>
+
+                    <td class="px-6 py-4">
+
+                        <div class="font-semibold text-white">
+                            ${escapeHTML(
+                                getCustomerName(order)
+                            )}
+                        </div>
+
+                        <div class="text-xs text-gray-500">
+                            ${escapeHTML(
+                                order.customer_email ||
+                                order.email ||
+                                ""
+                            )}
+                        </div>
+
+                    </td>
+
+                    <td class="px-6 py-4 text-white font-semibold">
+                        ${formatCurrency(
+                            order.total_amount ||
+                            order.total
+                        )}
+                    </td>
+
+                    <td class="px-6 py-4">
+
+                        <span
+                            class="px-3 py-1 rounded-full text-xs font-semibold ${getStatusClass(status)}"
+                        >
+                            ${escapeHTML(status)}
+                        </span>
+
+                    </td>
+
+                    <td class="px-6 py-4 text-gray-400">
+                        ${formatDate(
+                            order.created_at
+                        )}
+                    </td>
+
+                    <td class="px-6 py-4">
+
+                        <div class="flex gap-2">
+
+                            <button
+                                type="button"
+                                onclick="viewOrder('${escapeHTML(order.id)}')"
+                                class="px-3 py-2 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 text-sm font-semibold"
+                            >
+                                View Order
+                            </button>
+
+                            <button
+                                type="button"
+                                onclick="openStatusMenu('${escapeHTML(order.id)}', this)"
+                                class="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm"
+                            >
+                                Status
+                            </button>
+
+                            <button
+                                type="button"
+                                onclick="deleteOrder('${escapeHTML(order.id)}')"
+                                class="px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm"
+                            >
+                                Delete
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+            `;
+
+        }).join("");
+}
+
+/* ============================================================
+   ORDER ITEMS
+============================================================ */
+
+function parseOrderItems(order) {
+    let items =
+        order?.items ||
+        order?.order_items ||
+        order?.cart_items ||
+        null;
+
+    if (typeof items === "string") {
+        try {
+            items = JSON.parse(items);
+        } catch (error) {
+            items = null;
+        }
+    }
+
+    if (
+        items &&
+        !Array.isArray(items) &&
+        typeof items === "object"
+    ) {
+        items = [items];
+    }
+
+    return Array.isArray(items)
+        ? items
+        : [];
+}
+
+/* ============================================================
+   VIEW ORDER
+============================================================ */
+
+async function fetchOrderItemsFromTable(orderId) {
+    const attempts = [
+        { table: "order_items", column: "order_id" },
+        { table: "order_items", column: "orderId" },
+        { table: "orderitems", column: "order_id" }
+    ];
+
+    for (const attempt of attempts) {
+        try {
+            const result = await withTimeout(
+                supabaseClient
+                    .from(attempt.table)
+                    .select("*")
+                    .eq(attempt.column, orderId),
+                DATA_TIMEOUT
+            );
+
+            if (
+                !result?.error &&
+                Array.isArray(result?.data) &&
+                result.data.length
+            ) {
+                return result.data;
+            }
+
+        } catch (error) {
+            /* try next attempt silently */
+        }
+    }
+
+    return [];
+}
+
+async function viewOrder(orderId) {
+    const order =
+        allOrders.find(
+            item =>
+                String(item.id) ===
+                String(orderId)
+        );
+
+    if (!order) {
+        alert("Order not found.");
+        return;
+    }
+
+    let items =
+        parseOrderItems(order);
+
+    if (!items.length) {
+        items =
+            await fetchOrderItemsFromTable(orderId);
+    }
+
+    let itemsText = "";
+
+    if (items.length) {
+
+        itemsText =
+            items.map((item, index) => {
+
+                const name =
+                    item.name ||
+                    item.product_name ||
+                    item.title ||
+                    "Product";
+
+                const quantity =
+                    item.quantity ||
+                    item.qty ||
+                    1;
+
+                const price =
+                    item.price ||
+                    item.unit_price ||
+                    0;
+
+                const size =
+                    item.size
+                        ? ` | Size: ${item.size}`
+                        : "";
+
+                const color =
+                    item.color
+                        ? ` | Color: ${item.color}`
+                        : "";
+
+                const brand =
+                    item.brand
+                        ? ` | Brand: ${item.brand}`
+                        : "";
+
+                return (
+                    `${index + 1}. ${name}` +
+                    `${brand}` +
+                    ` | Qty: ${quantity}` +
+                    ` | Price: ${formatCurrency(price)}` +
+                    `${size}` +
+                    `${color}`
+                );
+
+            }).join("\n");
+
+    } else {
+
+        itemsText =
+            "Order items are not saved in this order record.";
+    }
+
+    const customerName =
+        getCustomerName(order);
+
+    const phone =
+        order.shipping_phone ||
+        order.phone ||
+        "—";
+
+    const email =
+        order.customer_email ||
+        order.email ||
+        "—";
+
+    const city =
+        order.shipping_city ||
+        order.city ||
+        "—";
+
+    const postalCode =
+        order.shipping_postal_code ||
+        order.postal_code ||
+        "—";
+
+    const address =
+        order.shipping_address ||
+        order.address ||
+        "—";
+
+    const paymentMethod =
+        order.payment_method ||
+        "—";
+
+    const paymentReference =
+        order.payment_reference ||
+        "—";
+
+    const senderInfo =
+        order.payment_sender_info ||
+        "—";
+
+    const notes =
+        order.order_notes ||
+        order.notes ||
+        "—";
+
+    const total =
+        order.total_amount ||
+        order.total ||
+        0;
+
+    const details =
+        `KHELZONE ORDER DETAILS\n` +
+        `================================\n\n` +
+
+        `ORDER INFORMATION\n` +
+        `--------------------------------\n` +
+        `Order ID: ${order.id || "—"}\n` +
+        `Order Number: ${getOrderNumber(order)}\n` +
+        `Date: ${formatDate(order.created_at)}\n` +
+        `Status: ${order.status || "pending"}\n\n` +
+
+        `CUSTOMER INFORMATION\n` +
+        `--------------------------------\n` +
+        `Name: ${customerName}\n` +
+        `Phone: ${phone}\n` +
+        `Email: ${email}\n` +
+        `City: ${city}\n` +
+        `Postal Code: ${postalCode}\n` +
+        `Address: ${address}\n\n` +
+
+        `ORDER ITEMS\n` +
+        `--------------------------------\n` +
+        `${itemsText}\n\n` +
+
+        `PAYMENT INFORMATION\n` +
+        `--------------------------------\n` +
+        `Method: ${paymentMethod}\n` +
+        `Payment Reference: ${paymentReference}\n` +
+        `Sender Information: ${senderInfo}\n\n` +
+
+        `ORDER TOTAL\n` +
+        `--------------------------------\n` +
+        `Total: ${formatCurrency(total)}\n\n` +
+
+        `ORDER NOTES\n` +
+        `--------------------------------\n` +
+        `${notes}`;
+
+    alert(details);
+}
+
+/* ============================================================
+   ORDER STATUS — DROPDOWN MENU (FIXED / WORKING VERSION)
+============================================================ */
+
+const ORDER_STATUSES = [
+    "pending",
+    "processing",
+    "shipped",
+    "delivered",
+    "completed",
+    "cancelled"
+];
+
+function openStatusMenu(orderId, anchorButton) {
+    // close any already-open menu
+    document.querySelectorAll(".status-menu").forEach(el => el.remove());
+
+    const order = allOrders.find(
+        item => String(item.id) === String(orderId)
+    );
+
+    if (!order) {
+        alert("Order not found.");
+        return;
+    }
+
+    const currentStatus = String(order.status || "pending").toLowerCase();
+
+    const menu = document.createElement("div");
+    menu.className = "status-menu";
+    menu.style.cssText = `
+        position: absolute;
+        z-index: 99999;
+        background: #1b1b1b;
+        border: 1px solid #333;
+        border-radius: 10px;
+        padding: 6px;
+        box-shadow: 0 15px 40px rgba(0,0,0,.5);
+        min-width: 160px;
+    `;
+
+    ORDER_STATUSES.forEach(status => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.textContent =
+            status.charAt(0).toUpperCase() + status.slice(1);
+
+        item.style.cssText = `
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            background: ${status === currentStatus ? "rgba(255,90,0,.15)" : "transparent"};
+            color: ${status === currentStatus ? "#ff5a00" : "#ddd"};
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 13px;
+        `;
+
+        item.addEventListener("mouseenter", () => {
+            item.style.background = "rgba(255,90,0,.1)";
+        });
+
+        item.addEventListener("mouseleave", () => {
+            item.style.background =
+                status === currentStatus ? "rgba(255,90,0,.15)" : "transparent";
+        });
+
+        item.addEventListener("click", async () => {
+            menu.remove();
+            await setOrderStatus(orderId, status);
+        });
+
+        menu.appendChild(item);
+    });
+
+    document.body.appendChild(menu);
+
+    const rect = anchorButton.getBoundingClientRect();
+    menu.style.top = `${rect.bottom + window.scrollY + 6}px`;
+    menu.style.left = `${rect.left + window.scrollX}px`;
+
+    setTimeout(() => {
+        document.addEventListener("click", function closeMenu(e) {
+            if (!menu.contains(e.target) && e.target !== anchorButton) {
+                menu.remove();
+                document.removeEventListener("click", closeMenu);
+            }
+        });
+    }, 0);
+}
+
+async function setOrderStatus(orderId, newStatus) {
+    try {
+
+        const { error } =
+            await withTimeout(
+                supabaseClient
+                    .from("orders")
+                    .update({
+                        status: newStatus
+                    })
+                    .eq("id", orderId),
+                DATA_TIMEOUT,
+                "Order status update timed out."
+            );
+
+        if (error) {
+            throw error;
+        }
+
+        showToast(`Order status set to "${newStatus}".`, "success");
+
+        await loadOrders();
+        await loadDashboardCounts();
+
+    } catch (error) {
+
+        console.error(
+            "Order status error:",
+            error
+        );
+
+        showToast("Could not update order status.", "error");
+    }
+}
+
+/* ============================================================
+   DELETE ORDER
+============================================================ */
+
+async function deleteOrder(orderId) {
+    if (
+        !confirm(
+            "Are you sure you want to delete this order?"
+        )
+    ) {
+        return;
+    }
+
+    try {
+
+        const { error } =
+            await withTimeout(
+                supabaseClient
+                    .from("orders")
+                    .delete()
+                    .eq("id", orderId),
+                DATA_TIMEOUT,
+                "Order deletion timed out."
+            );
+
+        if (error) {
+            throw error;
+        }
+
+        alert(
+            "Order deleted successfully."
+        );
+
+        await loadOrders();
+        await loadDashboardCounts();
+
+    } catch (error) {
+
+        console.error(
+            "Delete order error:",
+            error
+        );
+
+        alert(
+            "Could not delete order."
+        );
+    }
+}
+
+/* ============================================================
+   SEARCH
+============================================================ */
+
+function initSearches() {
+
+    const productSearch =
+        document.getElementById(
+            "productSearch"
+        );
+
+    if (productSearch) {
+
+        productSearch.addEventListener(
+            "input",
+            () => {
+
+                const query =
+                    productSearch.value
+                        .trim()
+                        .toLowerCase();
+
+                const filtered =
+                    allProducts.filter(product => {
+
+                        return (
+                            String(product.name || "")
+                                .toLowerCase()
+                                .includes(query) ||
+
+                            String(product.category || "")
+                                .toLowerCase()
+                                .includes(query) ||
+
+                            String(product.seller_name || "")
+                                .toLowerCase()
+                                .includes(query) ||
+
+                            String(product.seller || "")
+                                .toLowerCase()
+                                .includes(query) ||
+
+                            String(product.brand || "")
+                                .toLowerCase()
+                                .includes(query)
+                        );
+                    });
+
+                renderProducts(filtered);
+            }
+        );
+    }
+
+    const sellerSearch =
+        document.getElementById(
+            "sellerSearch"
+        );
+
+    if (sellerSearch) {
+
+        sellerSearch.addEventListener(
+            "input",
+            () => {
+
+                const query =
+                    sellerSearch.value
+                        .trim()
+                        .toLowerCase();
+
+                const filtered =
+                    allSellers.filter(seller => {
+
+                        return (
+                            String(
+                                seller.business_name ||
+                                seller.shop_name ||
+                                ""
+                            )
+                                .toLowerCase()
+                                .includes(query) ||
+
+                            String(
+                                seller.owner_name || ""
+                            )
+                                .toLowerCase()
+                                .includes(query) ||
+
+                            String(
+                                seller.email || ""
+                            )
+                                .toLowerCase()
+                                .includes(query) ||
+
+                            String(
+                                seller.phone || ""
+                            )
+                                .toLowerCase()
+                                .includes(query) ||
+
+                            String(
+                                seller.status || ""
+                            )
+                                .toLowerCase()
+                                .includes(query)
+                        );
+                    });
+
+                renderSellers(filtered);
+            }
+        );
+    }
+
+    const customerSearch =
+        document.getElementById(
+            "customerSearch"
+        );
+
+    if (customerSearch) {
+
+        customerSearch.addEventListener(
+            "input",
+            () => {
+
+                const query =
+                    customerSearch.value
+                        .trim()
+                        .toLowerCase();
+
+                const filtered =
+                    allCustomers.filter(customer => {
+
+                        return (
+                            String(
+                                customer.full_name || ""
+                            )
+                                .toLowerCase()
+                                .includes(query) ||
+
+                            String(
+                                customer.name || ""
+                            )
+                                .toLowerCase()
+                                .includes(query) ||
+
+                            String(
+                                customer.email || ""
+                            )
+                                .toLowerCase()
+                                .includes(query) ||
+
+                            String(
+                                customer.phone || ""
+                            )
+                                .toLowerCase()
+                                .includes(query) ||
+
+                            String(
+                                customer.city || ""
+                            )
+                                .toLowerCase()
+                                .includes(query)
+                        );
+                    });
+
+                renderCustomers(filtered);
+            }
+        );
+    }
+
+    const orderSearch =
+        document.getElementById(
+            "orderSearch"
+        );
+
+    if (orderSearch) {
+
+        orderSearch.addEventListener(
+            "input",
+            () => {
+
+                const query =
+                    orderSearch.value
+                        .trim()
+                        .toLowerCase();
+
+                const filtered =
+                    allOrders.filter(order => {
+
+                        return (
+                            String(
+                                order.order_number || ""
+                            )
+                                .toLowerCase()
+                                .includes(query) ||
+
+                            String(
+                                order.order_id || ""
+                            )
+                                .toLowerCase()
+                                .includes(query) ||
+
+                            String(
+                                order.id || ""
+                            )
+                                .toLowerCase()
+                                .includes(query) ||
+
+                            String(
+                                getCustomerName(order)
+                            )
+                                .toLowerCase()
+                                .includes(query) ||
+
+                            String(
+                                order.customer_email ||
+                                order.email ||
+                                ""
+                            )
+                                .toLowerCase()
+                                .includes(query) ||
+
+                            String(
+                                order.status || ""
+                            )
+                                .toLowerCase()
+                                .includes(query)
+                        );
+                    });
+
+                renderOrders(filtered);
+            }
+        );
+    }
+}
+
+/* ============================================================
    GLOBAL FUNCTIONS
-   ========================================================================== */
-
-window.showSection = showSection;
-
-window.openMobileMenu =
-    openMobileMenu;
-
-window.closeMobileMenu =
-    closeMobileMenu;
-
-
-
-/* --------------------------------------------------------------------------
-   PRODUCT GLOBALS
-   -------------------------------------------------------------------------- */
+============================================================ */
 
 window.toggleBestSeller =
     toggleBestSeller;
 
-window.toggleProduct =
-    toggleProduct;
+window.toggleProductStatus =
+    toggleProductStatus;
 
 window.deleteProduct =
     deleteProduct;
-
-
-/* --------------------------------------------------------------------------
-   SELLER GLOBALS
-   -------------------------------------------------------------------------- */
 
 window.viewSeller =
     viewSeller;
@@ -2914,130 +2493,210 @@ window.updateSellerStatus =
 window.deleteSeller =
     deleteSeller;
 
-
-/* --------------------------------------------------------------------------
-   CUSTOMER GLOBALS
-   -------------------------------------------------------------------------- */
-
 window.viewCustomer =
     viewCustomer;
 
 window.deleteCustomer =
     deleteCustomer;
 
-
-/* --------------------------------------------------------------------------
-   ORDER GLOBALS
-   -------------------------------------------------------------------------- */
-
 window.viewOrder =
     viewOrder;
 
-window.updateOrderStatus =
-    updateOrderStatus;
+window.openStatusMenu =
+    openStatusMenu;
 
 window.deleteOrder =
     deleteOrder;
 
+/* ============================================================
+   EMERGENCY LOADING SAFETY
+============================================================ */
 
-/* --------------------------------------------------------------------------
-   LOGOUT GLOBAL
-   -------------------------------------------------------------------------- */
+let emergencyLoadingTimer = null;
 
-window.logoutAdmin =
-    logoutAdmin;
+function startEmergencyLoadingSafety() {
 
+    clearTimeout(emergencyLoadingTimer);
 
-/* ==========================================================================
-   MAIN DASHBOARD INITIALIZATION
-   ========================================================================== */
+    emergencyLoadingTimer =
+        setTimeout(() => {
 
-async function initAdminDashboard() {
+            const checkingScreen =
+                document.getElementById(
+                    "checkingScreen"
+                );
 
-    console.log(
-        'KHELZONE Admin Dashboard initializing...'
-    );
+            if (
+                checkingScreen &&
+                !checkingScreen.classList.contains("hidden")
+            ) {
 
+                console.error(
+                    "KHELZONE: Emergency loading timeout triggered."
+                );
 
-    /* ----------------------------------------------------------------------
-       CHECK ADMIN ACCESS
-       ---------------------------------------------------------------------- */
+                showAccessError(
+                    "Admin access check took too long. Please refresh and try again."
+                );
+            }
 
-    const isAdmin =
-        await checkAdminAccess();
-
-    if (!isAdmin) {
-        return;
-    }
-
-
-    /* ----------------------------------------------------------------------
-       INITIALIZE UI
-       ---------------------------------------------------------------------- */
-
-    initNavigation();
-
-    initMobileMenu();
-
-    initLogout();
-
-    initKeyboard();
-
-    initAuthListener();
-
-
-    /* ----------------------------------------------------------------------
-       INITIALIZE SEARCH
-       ---------------------------------------------------------------------- */
-
-    initProductSearch();
-
-    initSellerSearch();
-
-    initCustomerSearch();
-
-    initOrderSearch();
-
-
-    /* ----------------------------------------------------------------------
-       LOAD DASHBOARD DATA
-       ---------------------------------------------------------------------- */
-
-    await Promise.allSettled([
-        loadDashboardData(),
-        loadProducts(),
-        loadSellers(),
-        loadCustomers(),
-        loadOrders()
-    ]);
-
-
-    /* ----------------------------------------------------------------------
-       OPEN DASHBOARD SECTION
-       ---------------------------------------------------------------------- */
-
-    showSection(
-        'dashboardSection'
-    );
-
-
-    console.log(
-        'KHELZONE ADMIN DASHBOARD READY.'
-    );
+        }, 18000);
 }
 
+/* ============================================================
+   START DASHBOARD
+============================================================ */
 
-/* ==========================================================================
+async function startAdminDashboard() {
+
+    startEmergencyLoadingSafety();
+
+    try {
+
+        console.log(
+            "================================"
+        );
+
+        console.log(
+            "KHELZONE ADMIN DASHBOARD START"
+        );
+
+        console.log(
+            "================================"
+        );
+
+        const isAdmin =
+            await checkAdminAccess();
+
+        clearTimeout(
+            emergencyLoadingTimer
+        );
+
+        if (!isAdmin) {
+            return;
+        }
+
+        initNavigation();
+
+        initMobileMenu();
+
+        initLogout();
+
+        initSearches();
+
+        await Promise.allSettled([
+
+            loadDashboardCounts(),
+
+            loadProducts(),
+
+            loadSellers(),
+
+            loadCustomers(),
+
+            loadOrders()
+
+        ]);
+
+        showAdminDashboard();
+
+        showSection(
+            "dashboardSection"
+        );
+
+        console.log(
+            "KHELZONE ADMIN DASHBOARD READY"
+        );
+
+    } catch (error) {
+
+        clearTimeout(
+            emergencyLoadingTimer
+        );
+
+        console.error(
+            "KHELZONE STARTUP ERROR:",
+            error
+        );
+
+        showAccessError(
+            error?.message ||
+            "Could not start admin dashboard."
+        );
+    }
+}
+
+/* ============================================================
    DOM READY
-   ========================================================================== */
+============================================================ */
 
 if (
-    document.readyState === 'loading'
+    document.readyState ===
+    "loading"
 ) {
+
     document.addEventListener(
-        'DOMContentLoaded',
-        initAdminDashboard
+        "DOMContentLoaded",
+        startAdminDashboard
     );
+
 } else {
-    initAdminDashboard();
+
+    startAdminDashboard();
 }
+
+/* ============================================================
+   GLOBAL ERROR SAFETY
+============================================================ */
+
+window.addEventListener(
+    "error",
+    event => {
+
+        console.error(
+            "KHELZONE GLOBAL ERROR:",
+            event.error || event.message
+        );
+
+        const screen =
+            document.getElementById(
+                "checkingScreen"
+            );
+
+        if (
+            screen &&
+            !screen.classList.contains("hidden")
+        ) {
+
+            showAccessError(
+                "A dashboard error occurred. Please refresh the page."
+            );
+        }
+    }
+);
+
+window.addEventListener(
+    "unhandledrejection",
+    event => {
+
+        console.error(
+            "KHELZONE UNHANDLED PROMISE:",
+            event.reason
+        );
+
+        const screen =
+            document.getElementById(
+                "checkingScreen"
+            );
+
+        if (
+            screen &&
+            !screen.classList.contains("hidden")
+        ) {
+
+            showAccessError(
+                "Admin access check failed. Please refresh the page."
+            );
+        }
+    }
+);

@@ -377,7 +377,7 @@
                  LEFT
             ====================================================== -->
 
-            <div class="space-y-6">
+            <div class="space-y-7">
 
 
                 <!-- =================================================
@@ -414,10 +414,10 @@
 
                     <form id="checkoutForm" novalidate>
 
-                        <div class="grid sm:grid-cols-2 gap-5">
+                        <div class="grid sm:grid-cols-2 gap-x-5 gap-y-6">
 
 
-                            <!-- Name -->
+                            <!-- Full Name -->
 
                             <div class="sm:col-span-2">
 
@@ -437,7 +437,7 @@
 
                                 <p id="nameError"
                                     class="hidden text-red-400 text-xs mt-2">
-                                    Please enter your full name.
+                                    Full name is required.
                                 </p>
 
                             </div>
@@ -486,8 +486,9 @@
                                     class="input-field"
                                     placeholder="you@example.com">
 
-                                <p class="text-gray-600 text-[11px] mt-2">
-                                    Optional — useful for order updates.
+                                <p id="emailError"
+                                    class="hidden text-red-400 text-xs mt-2">
+                                    Please enter a valid email address.
                                 </p>
 
                             </div>
@@ -510,6 +511,11 @@
                                     class="input-field"
                                     placeholder="e.g. Karachi"
                                     required>
+
+                                <p id="cityError"
+                                    class="hidden text-red-400 text-xs mt-2">
+                                    City is required.
+                                </p>
 
                             </div>
 
@@ -534,13 +540,13 @@
                             </div>
 
 
-                            <!-- Address -->
+                            <!-- Delivery Address -->
 
                             <div class="sm:col-span-2">
 
                                 <label for="customerAddress"
                                     class="block text-xs uppercase tracking-wider font-bold text-gray-400 mb-2">
-                                    Complete Address *
+                                    Delivery Address *
                                 </label>
 
                                 <textarea
@@ -555,6 +561,12 @@
                                 <p id="addressError"
                                     class="hidden text-red-400 text-xs mt-2">
                                     Please enter your complete delivery address.
+                                </p>
+
+                                <p class="text-gray-600 text-[11px] mt-2">
+                                    This is where your order will be delivered. It's different from
+                                    "Shipping From", shown per product in your order summary, which is
+                                    where the seller ships each item from.
                                 </p>
 
                             </div>
@@ -843,10 +855,10 @@
                     </div>
 
 
-                    <!-- Dynamic Payment Details -->
+                    <!-- Dynamic Payment Details (rendered by payment.js) -->
 
                     <div id="paymentDetails"
-                        class="mt-5">
+                        class="mt-6">
                     </div>
 
                 </div>

@@ -35,12 +35,19 @@ let shipping = 0;
 let discount = 0;
 let grandTotal = 0;
 
+/*
+ * Loaded from the payment_settings table.
+ * No fake payment values are ever used.
+ */
+let paymentSettings = null;
+
 
 /* =========================================================
    HELPERS
    ========================================================= */
 
 function getElement(id) {
+
     return document.getElementById(id);
 }
 
@@ -72,6 +79,67 @@ function formatPrice(value) {
 }
 
 
+function setFieldError(
+    fieldId,
+    errorId,
+    message
+) {
+
+    const field =
+        getElement(fieldId);
+
+    const errorEl =
+        getElement(errorId);
+
+    if (field) {
+
+        field.classList.add(
+            "border-red-500"
+        );
+    }
+
+    if (errorEl) {
+
+        if (message) {
+
+            errorEl.textContent =
+                message;
+        }
+
+        errorEl.classList.remove(
+            "hidden"
+        );
+    }
+}
+
+
+function clearFieldError(
+    fieldId,
+    errorId
+) {
+
+    const field =
+        getElement(fieldId);
+
+    const errorEl =
+        getElement(errorId);
+
+    if (field) {
+
+        field.classList.remove(
+            "border-red-500"
+        );
+    }
+
+    if (errorEl) {
+
+        errorEl.classList.add(
+            "hidden"
+        );
+    }
+}
+
+
 /* =========================================================
    LOAD CART
    ========================================================= */
@@ -81,7 +149,9 @@ function loadCart() {
     try {
 
         const savedCart =
-            localStorage.getItem(CART_KEY);
+            localStorage.getItem(
+                CART_KEY
+            );
 
         if (!savedCart) {
 
@@ -185,6 +255,15 @@ function normalizeCartItem(
         item.productSize ??
         "";
 
+    const shippingOrigin =
+        item.seller_city ??
+        item.sellerCity ??
+        item.shipping_origin ??
+        item.shippingOrigin ??
+        item.shippingFrom ??
+        item.origin_city ??
+        null;
+
     return {
 
         id,
@@ -200,6 +279,8 @@ function normalizeCartItem(
         category,
 
         size,
+
+        shippingOrigin,
 
         total:
             price * quantity,
@@ -488,6 +569,27 @@ function renderOrderItems() {
             }
 
 
+            const shippingOriginHtml =
+                item.shippingOrigin
+                    ? `
+                        <p class="mt-1 text-[11px] text-white/40 flex items-center gap-1">
+
+                            <span class="material-symbols-outlined text-[13px]">
+                                local_shipping
+                            </span>
+
+                            Shipping from:
+                            ${escapeHtml(item.shippingOrigin)}
+
+                        </p>
+                    `
+                    : `
+                        <p class="mt-1 text-[11px] text-white/30 italic">
+                            Shipping origin unavailable
+                        </p>
+                    `;
+
+
             const itemHtml = `
 
                 <div
@@ -574,6 +676,9 @@ function renderOrderItems() {
                                         `
                                         : ""
                                 }
+
+
+                                ${shippingOriginHtml}
 
                             </div>
 
@@ -805,6 +910,7 @@ function updateCheckoutVisibility() {
         );
 
     if (!button) {
+
         return;
     }
 
@@ -899,17 +1005,6 @@ async function loadCurrentUser() {
             session.user;
 
 
-        console.log(
-            "Logged in user:",
-            currentUser
-        );
-
-        console.log(
-            "Authenticated UUID:",
-            currentUser.id
-        );
-
-
         return currentUser;
 
     } catch (error) {
@@ -922,6 +1017,60 @@ async function loadCurrentUser() {
         currentUser = null;
 
         return null;
+    }
+}
+
+
+/* =========================================================
+   PAYMENT SETTINGS
+   ========================================================= */
+
+async function loadPaymentSettings() {
+
+    if (!supabaseClient) {
+
+        paymentSettings = null;
+
+        return;
+    }
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from("payment_settings")
+                .select("*")
+                .limit(1)
+                .maybeSingle();
+
+
+        if (error) {
+
+            console.error(
+                "Payment settings load error:",
+                error
+            );
+
+            paymentSettings = null;
+
+            return;
+        }
+
+
+        paymentSettings =
+            data || null;
+
+    } catch (error) {
+
+        console.error(
+            "Payment settings exception:",
+            error
+        );
+
+        paymentSettings = null;
     }
 }
 
@@ -945,7 +1094,11 @@ function setupPaymentMethods() {
                 "change",
                 () => {
 
-                    updatePaymentDetails(
+                    highlightPaymentOption(
+                        radio.value
+                    );
+
+                    renderPaymentDetailsUI(
                         radio.value
                     );
                 }
@@ -962,68 +1115,1046 @@ function setupPaymentMethods() {
 
     if (selected) {
 
-        updatePaymentDetails(
+        highlightPaymentOption(
+            selected.value
+        );
+
+        renderPaymentDetailsUI(
             selected.value
         );
     }
 }
 
 
-function updatePaymentDetails(
+function highlightPaymentOption(
     method
 ) {
 
-    const cardDetails =
+    document
+        .querySelectorAll(
+            ".payment-option"
+        )
+        .forEach(
+            (el) => {
+
+                el.classList.toggle(
+                    "active",
+                    el.dataset.paymentOption === method
+                );
+            }
+        );
+}
+
+
+/* =========================================================
+   PAYMENT DETAILS UI
+   ========================================================= */
+
+function renderPaymentDetailsUI(
+    method
+) {
+
+    const container =
         getElement(
-            "cardDetails"
-        );
-
-    const cashDetails =
-        getElement(
-            "cashDetails"
+            "paymentDetails"
         );
 
 
-    if (cardDetails) {
+    if (!container) {
 
-        cardDetails.classList.add(
-            "hidden"
-        );
+        return;
     }
 
 
-    if (cashDetails) {
-
-        cashDetails.classList.add(
-            "hidden"
-        );
-    }
+    let html = "";
 
 
-    if (
-        method === "card"
-    ) {
+    if (method === "card") {
 
-        if (cardDetails) {
+        html =
+            cardDetailsTemplate();
 
-            cardDetails.classList.remove(
-                "hidden"
-            );
-        }
-    }
+    } else if (method === "bank") {
 
+        html =
+            bankDetailsTemplate();
 
-    if (
+    } else if (method === "easypaisa") {
+
+        html =
+            easypaisaDetailsTemplate();
+
+    } else if (method === "jazzcash") {
+
+        html =
+            jazzcashDetailsTemplate();
+
+    } else if (
         method === "cod" ||
         method === "cash_on_delivery"
     ) {
 
-        if (cashDetails) {
+        html =
+            codDetailsTemplate();
+    }
 
-            cashDetails.classList.remove(
-                "hidden"
-            );
-        }
+
+    container.innerHTML =
+        html;
+
+
+    attachDynamicFieldListeners();
+}
+
+
+/* =========================================================
+   DETAILS WRAPPER
+   ========================================================= */
+
+function detailsWrapper(
+    innerHtml
+) {
+
+    return `
+        <div class="rounded-2xl border border-orange-500/20 bg-orange-500/5 p-5 space-y-4">
+            ${innerHtml}
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   TRANSACTION REFERENCE
+   ========================================================= */
+
+function transactionReferenceFieldHtml() {
+
+    return `
+        <div>
+
+            <label
+                for="paymentReference"
+                class="
+                    block
+                    text-xs
+                    uppercase
+                    tracking-wider
+                    font-bold
+                    text-gray-400
+                    mb-2
+                "
+            >
+                Transaction ID / Reference *
+            </label>
+
+            <input
+                id="paymentReference"
+                type="text"
+                class="input-field"
+                placeholder="Enter the transaction ID after you complete the transfer"
+            >
+
+            <p
+                id="paymentReferenceError"
+                class="hidden text-red-400 text-xs mt-2"
+            >
+                Transaction ID / Reference is required.
+            </p>
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   BANK TRANSFER
+   ========================================================= */
+
+function bankDetailsTemplate() {
+
+    const s =
+        paymentSettings || {};
+
+
+    /*
+     * IMPORTANT:
+     * No "not configured" warning anymore.
+     *
+     * If admin has entered details,
+     * real details are shown.
+     *
+     * If a particular field is empty,
+     * only that field shows "—".
+     */
+
+    return detailsWrapper(`
+
+        <div
+            class="
+                text-xs
+                uppercase
+                tracking-wider
+                text-gray-400
+                font-bold
+            "
+        >
+            Bank Transfer Details
+        </div>
+
+
+        <div
+            class="
+                grid
+                sm:grid-cols-2
+                gap-4
+                text-sm
+            "
+        >
+
+            <div>
+
+                <div
+                    class="
+                        text-gray-500
+                        text-xs
+                        mb-1
+                    "
+                >
+                    Bank Name
+                </div>
+
+                <div class="font-bold">
+                    ${escapeHtml(
+                        s.bank_name || "—"
+                    )}
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <div
+                    class="
+                        text-gray-500
+                        text-xs
+                        mb-1
+                    "
+                >
+                    Account Title
+                </div>
+
+                <div class="font-bold">
+                    ${escapeHtml(
+                        s.account_title || "—"
+                    )}
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <div
+                    class="
+                        text-gray-500
+                        text-xs
+                        mb-1
+                    "
+                >
+                    Account Number
+                </div>
+
+                <div class="font-bold">
+                    ${escapeHtml(
+                        s.account_number || "—"
+                    )}
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <div
+                    class="
+                        text-gray-500
+                        text-xs
+                        mb-1
+                    "
+                >
+                    IBAN
+                </div>
+
+                <div class="font-bold">
+                    ${escapeHtml(
+                        s.iban || "—"
+                    )}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="h-px bg-white/10"></div>
+
+
+        <div
+            class="
+                text-xs
+                uppercase
+                tracking-wider
+                text-gray-400
+                font-bold
+            "
+        >
+            After you transfer, tell us who sent it
+        </div>
+
+
+        <div
+            class="
+                grid
+                sm:grid-cols-2
+                gap-4
+            "
+        >
+
+            <div>
+
+                <label
+                    for="senderAccountTitle"
+                    class="
+                        block
+                        text-xs
+                        uppercase
+                        tracking-wider
+                        font-bold
+                        text-gray-400
+                        mb-2
+                    "
+                >
+                    Your Account Title (sender) *
+                </label>
+
+                <input
+                    id="senderAccountTitle"
+                    type="text"
+                    class="input-field"
+                    placeholder="Name on the account you paid from"
+                >
+
+                <p
+                    id="senderAccountTitleError"
+                    class="
+                        hidden
+                        text-red-400
+                        text-xs
+                        mt-2
+                    "
+                >
+                    Please enter the account title you paid from.
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <label
+                    for="senderAccountNumber"
+                    class="
+                        block
+                        text-xs
+                        uppercase
+                        tracking-wider
+                        font-bold
+                        text-gray-400
+                        mb-2
+                    "
+                >
+                    Your Account Number (sender) *
+                </label>
+
+                <input
+                    id="senderAccountNumber"
+                    type="text"
+                    class="input-field"
+                    placeholder="Account number you paid from"
+                >
+
+                <p
+                    id="senderAccountNumberError"
+                    class="
+                        hidden
+                        text-red-400
+                        text-xs
+                        mt-2
+                    "
+                >
+                    Please enter the account number you paid from.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        ${transactionReferenceFieldHtml()}
+
+    `);
+}
+
+
+/* =========================================================
+   EASYPAISA
+   ========================================================= */
+
+function easypaisaDetailsTemplate() {
+
+    const s =
+        paymentSettings || {};
+
+
+    const hasEasypaisaDetails =
+        s.easypaisa_account_name &&
+        s.easypaisa_number;
+
+
+    const receivingDetailsHtml =
+        hasEasypaisaDetails
+            ? `
+
+                <div
+                    class="
+                        text-xs
+                        uppercase
+                        tracking-wider
+                        text-gray-400
+                        font-bold
+                    "
+                >
+                    Easypaisa Details
+                </div>
+
+
+                <div
+                    class="
+                        grid
+                        sm:grid-cols-2
+                        gap-4
+                        text-sm
+                    "
+                >
+
+                    <div>
+
+                        <div
+                            class="
+                                text-gray-500
+                                text-xs
+                                mb-1
+                            "
+                        >
+                            Account Name
+                        </div>
+
+                        <div class="font-bold">
+                            ${escapeHtml(
+                                s.easypaisa_account_name
+                            )}
+                        </div>
+
+                    </div>
+
+
+                    <div>
+
+                        <div
+                            class="
+                                text-gray-500
+                                text-xs
+                                mb-1
+                            "
+                        >
+                            Easypaisa Number
+                        </div>
+
+                        <div class="font-bold">
+                            ${escapeHtml(
+                                s.easypaisa_number
+                            )}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `
+            : `
+                <div
+                    class="
+                        text-sm
+                        text-gray-400
+                    "
+                >
+                    Easypaisa receiving details are currently unavailable.
+                </div>
+            `;
+
+
+    return detailsWrapper(`
+
+        ${receivingDetailsHtml}
+
+
+        <div class="h-px bg-white/10"></div>
+
+
+        <div>
+
+            <label
+                for="senderMobileNumber"
+                class="
+                    block
+                    text-xs
+                    uppercase
+                    tracking-wider
+                    font-bold
+                    text-gray-400
+                    mb-2
+                "
+            >
+                Your Easypaisa Number (the number you paid from) *
+            </label>
+
+            <input
+                id="senderMobileNumber"
+                type="tel"
+                class="input-field"
+                placeholder="03XX XXXXXXX"
+            >
+
+            <p
+                id="senderMobileNumberError"
+                class="
+                    hidden
+                    text-red-400
+                    text-xs
+                    mt-2
+                "
+            >
+                Please enter the Easypaisa number you paid from.
+            </p>
+
+        </div>
+
+
+        ${transactionReferenceFieldHtml()}
+
+    `);
+}
+
+
+/* =========================================================
+   JAZZCASH
+   ========================================================= */
+
+function jazzcashDetailsTemplate() {
+
+    const s =
+        paymentSettings || {};
+
+
+    /*
+     * IMPORTANT:
+     * No "not configured" warning anymore.
+     *
+     * Admin details are shown if available.
+     * Empty fields simply display "—".
+     */
+
+    return detailsWrapper(`
+
+        <div
+            class="
+                text-xs
+                uppercase
+                tracking-wider
+                text-gray-400
+                font-bold
+            "
+        >
+            JazzCash Details
+        </div>
+
+
+        <div
+            class="
+                grid
+                sm:grid-cols-2
+                gap-4
+                text-sm
+            "
+        >
+
+            <div>
+
+                <div
+                    class="
+                        text-gray-500
+                        text-xs
+                        mb-1
+                    "
+                >
+                    Account Name
+                </div>
+
+                <div class="font-bold">
+                    ${escapeHtml(
+                        s.jazzcash_account_name || "—"
+                    )}
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <div
+                    class="
+                        text-gray-500
+                        text-xs
+                        mb-1
+                    "
+                >
+                    JazzCash Number
+                </div>
+
+                <div class="font-bold">
+                    ${escapeHtml(
+                        s.jazzcash_number || "—"
+                    )}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="h-px bg-white/10"></div>
+
+
+        <div>
+
+            <label
+                for="senderMobileNumber"
+                class="
+                    block
+                    text-xs
+                    uppercase
+                    tracking-wider
+                    font-bold
+                    text-gray-400
+                    mb-2
+                "
+            >
+                Your JazzCash Number (the number you paid from) *
+            </label>
+
+            <input
+                id="senderMobileNumber"
+                type="tel"
+                class="input-field"
+                placeholder="03XX XXXXXXX"
+            >
+
+            <p
+                id="senderMobileNumberError"
+                class="
+                    hidden
+                    text-red-400
+                    text-xs
+                    mt-2
+                "
+            >
+                Please enter the JazzCash number you paid from.
+            </p>
+
+        </div>
+
+
+        ${transactionReferenceFieldHtml()}
+
+    `);
+}
+
+
+/* =========================================================
+   COD
+   ========================================================= */
+
+function codDetailsTemplate() {
+
+    return `
+        <div
+            class="
+                rounded-2xl
+                border
+                border-white/10
+                bg-white/5
+                p-5
+                text-sm
+                text-gray-400
+            "
+        >
+            Pay in cash when your order is delivered.
+            No advance payment required.
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
+function cardDetailsTemplate() {
+
+    return `
+        <div
+            class="
+                rounded-2xl
+                border
+                border-white/10
+                bg-white/5
+                p-5
+                space-y-4
+            "
+        >
+
+            <div>
+
+                <label
+                    for="cardNumber"
+                    class="
+                        block
+                        text-xs
+                        uppercase
+                        tracking-wider
+                        font-bold
+                        text-gray-400
+                        mb-2
+                    "
+                >
+                    Card Number *
+                </label>
+
+                <input
+                    id="cardNumber"
+                    type="text"
+                    inputmode="numeric"
+                    class="input-field"
+                    placeholder="1234 5678 9012 3456"
+                >
+
+                <p
+                    id="cardNumberError"
+                    class="
+                        hidden
+                        text-red-400
+                        text-xs
+                        mt-2
+                    "
+                >
+                    Please enter a valid card number.
+                </p>
+
+            </div>
+
+
+            <div
+                class="
+                    grid
+                    grid-cols-2
+                    gap-4
+                "
+            >
+
+                <div>
+
+                    <label
+                        for="expiry"
+                        class="
+                            block
+                            text-xs
+                            uppercase
+                            tracking-wider
+                            font-bold
+                            text-gray-400
+                            mb-2
+                        "
+                    >
+                        Expiry *
+                    </label>
+
+                    <input
+                        id="expiry"
+                        type="text"
+                        inputmode="numeric"
+                        class="input-field"
+                        placeholder="MM/YY"
+                    >
+
+                    <p
+                        id="expiryError"
+                        class="
+                            hidden
+                            text-red-400
+                            text-xs
+                            mt-2
+                        "
+                    >
+                        Enter expiry as MM/YY.
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <label
+                        for="cvv"
+                        class="
+                            block
+                            text-xs
+                            uppercase
+                            tracking-wider
+                            font-bold
+                            text-gray-400
+                            mb-2
+                        "
+                    >
+                        CVV *
+                    </label>
+
+                    <input
+                        id="cvv"
+                        type="text"
+                        inputmode="numeric"
+                        class="input-field"
+                        placeholder="123"
+                    >
+
+                    <p
+                        id="cvvError"
+                        class="
+                            hidden
+                            text-red-400
+                            text-xs
+                            mt-2
+                        "
+                    >
+                        CVV is required.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   DYNAMIC FIELD LISTENERS
+   ========================================================= */
+
+function attachDynamicFieldListeners() {
+
+    const cardNumber =
+        getElement("cardNumber");
+
+
+    if (cardNumber) {
+
+        cardNumber.addEventListener(
+            "input",
+            function () {
+
+                let value =
+                    this.value
+                        .replace(/\D/g, "")
+                        .slice(0, 16);
+
+
+                value =
+                    value.match(
+                        /.{1,4}/g
+                    )?.join(" ") || "";
+
+
+                this.value =
+                    value;
+
+
+                clearFieldError(
+                    "cardNumber",
+                    "cardNumberError"
+                );
+            }
+        );
+    }
+
+
+    const expiry =
+        getElement("expiry");
+
+
+    if (expiry) {
+
+        expiry.addEventListener(
+            "input",
+            function () {
+
+                let value =
+                    this.value
+                        .replace(/\D/g, "")
+                        .slice(0, 4);
+
+
+                if (
+                    value.length > 2
+                ) {
+
+                    value =
+                        value.slice(0, 2) +
+                        "/" +
+                        value.slice(2);
+                }
+
+
+                this.value =
+                    value;
+
+
+                clearFieldError(
+                    "expiry",
+                    "expiryError"
+                );
+            }
+        );
+    }
+
+
+    const cvv =
+        getElement("cvv");
+
+
+    if (cvv) {
+
+        cvv.addEventListener(
+            "input",
+            function () {
+
+                this.value =
+                    this.value
+                        .replace(/\D/g, "")
+                        .slice(0, 4);
+
+
+                clearFieldError(
+                    "cvv",
+                    "cvvError"
+                );
+            }
+        );
+    }
+
+
+    const paymentReference =
+        getElement(
+            "paymentReference"
+        );
+
+
+    if (paymentReference) {
+
+        paymentReference.addEventListener(
+            "input",
+            function () {
+
+                clearFieldError(
+                    "paymentReference",
+                    "paymentReferenceError"
+                );
+            }
+        );
+    }
+
+
+    const senderAccountTitle =
+        getElement(
+            "senderAccountTitle"
+        );
+
+
+    if (senderAccountTitle) {
+
+        senderAccountTitle.addEventListener(
+            "input",
+            function () {
+
+                clearFieldError(
+                    "senderAccountTitle",
+                    "senderAccountTitleError"
+                );
+            }
+        );
+    }
+
+
+    const senderAccountNumber =
+        getElement(
+            "senderAccountNumber"
+        );
+
+
+    if (senderAccountNumber) {
+
+        senderAccountNumber.addEventListener(
+            "input",
+            function () {
+
+                clearFieldError(
+                    "senderAccountNumber",
+                    "senderAccountNumberError"
+                );
+            }
+        );
+    }
+
+
+    const senderMobileNumber =
+        getElement(
+            "senderMobileNumber"
+        );
+
+
+    if (senderMobileNumber) {
+
+        senderMobileNumber.addEventListener(
+            "input",
+            function () {
+
+                clearFieldError(
+                    "senderMobileNumber",
+                    "senderMobileNumberError"
+                );
+            }
+        );
     }
 }
 
@@ -1041,11 +2172,13 @@ function getFormValue(...ids) {
         const element =
             getElement(id);
 
+
         if (element) {
 
             return element.value.trim();
         }
     }
+
 
     return "";
 }
@@ -1057,124 +2190,244 @@ function getFormValue(...ids) {
 
 function validateCustomerDetails() {
 
-    const form =
-        getElement(
-            "checkoutForm"
-        );
-
-
-    if (!form) {
-
-        return true;
-    }
-
-
-    const requiredFields =
-        form.querySelectorAll(
-            "input[required], select[required], textarea[required]"
-        );
-
-
     let valid = true;
 
-
-    requiredFields.forEach(
-        (field) => {
-
-            if (
-                !field.value.trim()
-            ) {
-
-                field.classList.add(
-                    "border-red-500"
-                );
-
-                valid = false;
-
-            } else {
-
-                field.classList.remove(
-                    "border-red-500"
-                );
-            }
-        }
-    );
+    let firstInvalid = null;
 
 
-    const email =
-        form.querySelector(
-            'input[type="email"]'
+    /* FULL NAME */
+
+    const name =
+        getElement(
+            "customerName"
         );
 
+    const trimmedName =
+        name
+            ? name.value.trim()
+            : "";
 
-    if (
-        email &&
-        email.value.trim()
+
+    if (!trimmedName) {
+
+        setFieldError(
+            "customerName",
+            "nameError",
+            "Full name is required."
+        );
+
+        valid = false;
+
+        firstInvalid =
+            firstInvalid ||
+            name;
+
+    } else if (
+        !/\s/.test(
+            trimmedName
+        )
     ) {
 
-        const emailRegex =
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        setFieldError(
+            "customerName",
+            "nameError",
+            "Please enter your full name (first and last name)."
+        );
 
+        valid = false;
 
-        if (
-            !emailRegex.test(
-                email.value.trim()
-            )
-        ) {
+        firstInvalid =
+            firstInvalid ||
+            name;
 
-            email.classList.add(
-                "border-red-500"
-            );
+    } else {
 
-            valid = false;
-        }
+        clearFieldError(
+            "customerName",
+            "nameError"
+        );
     }
 
 
+    /* PHONE */
+
     const phone =
-        form.querySelector(
-            'input[type="tel"]'
+        getElement(
+            "customerPhone"
         );
+
+    const phoneRegex =
+        /^(?:\+92|0092|0)3\d{9}$/;
 
 
     if (
-        phone &&
-        phone.value.trim()
+        !phone ||
+        !phone.value.trim()
     ) {
 
-        const cleanPhone =
+        setFieldError(
+            "customerPhone",
+            "phoneError",
+            "Phone number is required."
+        );
+
+        valid = false;
+
+        firstInvalid =
+            firstInvalid ||
+            phone;
+
+    } else if (
+        !phoneRegex.test(
             phone.value
                 .replace(
                     /[\s-]/g,
                     ""
                 )
-                .trim();
+                .trim()
+        )
+    ) {
 
+        setFieldError(
+            "customerPhone",
+            "phoneError",
+            "Please enter a valid Pakistani phone number."
+        );
 
-        const phoneRegex =
-            /^(?:\+92|0092|0)3\d{9}$/;
+        valid = false;
 
+        firstInvalid =
+            firstInvalid ||
+            phone;
 
-        if (
-            !phoneRegex.test(
-                cleanPhone
-            )
-        ) {
+    } else {
 
-            phone.classList.add(
-                "border-red-500"
-            );
-
-            valid = false;
-        }
+        clearFieldError(
+            "customerPhone",
+            "phoneError"
+        );
     }
 
 
-    if (!valid) {
+    /* EMAIL */
 
-        alert(
-            "Please fill all required customer details correctly."
+    const email =
+        getElement(
+            "customerEmail"
         );
+
+    const emailRegex =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+    if (
+        email &&
+        email.value.trim() &&
+        !emailRegex.test(
+            email.value.trim()
+        )
+    ) {
+
+        setFieldError(
+            "customerEmail",
+            "emailError",
+            "Please enter a valid email address."
+        );
+
+        valid = false;
+
+        firstInvalid =
+            firstInvalid ||
+            email;
+
+    } else {
+
+        clearFieldError(
+            "customerEmail",
+            "emailError"
+        );
+    }
+
+
+    /* CITY */
+
+    const city =
+        getElement(
+            "customerCity"
+        );
+
+
+    if (
+        !city ||
+        !city.value.trim()
+    ) {
+
+        setFieldError(
+            "customerCity",
+            "cityError",
+            "City is required."
+        );
+
+        valid = false;
+
+        firstInvalid =
+            firstInvalid ||
+            city;
+
+    } else {
+
+        clearFieldError(
+            "customerCity",
+            "cityError"
+        );
+    }
+
+
+    /* ADDRESS */
+
+    const address =
+        getElement(
+            "customerAddress"
+        );
+
+
+    if (
+        !address ||
+        !address.value.trim()
+    ) {
+
+        setFieldError(
+            "customerAddress",
+            "addressError",
+            "Please enter your complete delivery address."
+        );
+
+        valid = false;
+
+        firstInvalid =
+            firstInvalid ||
+            address;
+
+    } else {
+
+        clearFieldError(
+            "customerAddress",
+            "addressError"
+        );
+    }
+
+
+    if (
+        !valid &&
+        firstInvalid
+    ) {
+
+        firstInvalid.focus();
+
+        firstInvalid.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
     }
 
 
@@ -1208,6 +2461,13 @@ function validatePaymentMethod() {
         selected.value;
 
 
+    let valid = true;
+
+    let firstInvalid = null;
+
+
+    /* CARD */
+
     if (
         method === "card"
     ) {
@@ -1228,77 +2488,281 @@ function validatePaymentMethod() {
             );
 
 
+        const cardDigits =
+            cardNumber
+                ? cardNumber.value
+                    .replace(
+                        /\s/g,
+                        ""
+                    )
+                : "";
+
+
         if (
-            cardNumber &&
-            !cardNumber.value.trim()
+            !cardDigits ||
+            cardDigits.length < 13
         ) {
 
-            alert(
-                "Please enter card details."
+            setFieldError(
+                "cardNumber",
+                "cardNumberError",
+                "Please enter a valid card number."
             );
 
-            cardNumber.focus();
+            valid = false;
 
-            return false;
+            firstInvalid =
+                firstInvalid ||
+                cardNumber;
+
+        } else {
+
+            clearFieldError(
+                "cardNumber",
+                "cardNumberError"
+            );
+        }
+
+
+        const expiryRegex =
+            /^(0[1-9]|1[0-2])\/\d{2}$/;
+
+
+        if (
+            !expiry ||
+            !expiryRegex.test(
+                expiry.value.trim()
+            )
+        ) {
+
+            setFieldError(
+                "expiry",
+                "expiryError",
+                "Enter expiry as MM/YY."
+            );
+
+            valid = false;
+
+            firstInvalid =
+                firstInvalid ||
+                expiry;
+
+        } else {
+
+            clearFieldError(
+                "expiry",
+                "expiryError"
+            );
         }
 
 
         if (
-            expiry &&
-            !expiry.value.trim()
-        ) {
-
-            alert(
-                "Please enter card expiry."
-            );
-
-            expiry.focus();
-
-            return false;
-        }
-
-
-        if (
-            cvv &&
+            !cvv ||
             !cvv.value.trim()
         ) {
 
-            alert(
-                "Please enter CVV."
+            setFieldError(
+                "cvv",
+                "cvvError",
+                "CVV is required."
             );
 
-            cvv.focus();
+            valid = false;
 
-            return false;
-        }
+            firstInvalid =
+                firstInvalid ||
+                cvv;
 
+        } else {
 
-        if (expiry) {
-
-            const expiryRegex =
-                /^(0[1-9]|1[0-2])\/\d{2}$/;
-
-
-            if (
-                expiry.value.trim() &&
-                !expiryRegex.test(
-                    expiry.value.trim()
-                )
-            ) {
-
-                alert(
-                    "Expiry must be in MM/YY format."
-                );
-
-                expiry.focus();
-
-                return false;
-            }
+            clearFieldError(
+                "cvv",
+                "cvvError"
+            );
         }
     }
 
 
-    return true;
+    /* BANK / EASYPAISA / JAZZCASH */
+
+    if (
+        method === "bank" ||
+        method === "easypaisa" ||
+        method === "jazzcash"
+    ) {
+
+        const reference =
+            getElement(
+                "paymentReference"
+            );
+
+
+        if (
+            !reference ||
+            !reference.value.trim()
+        ) {
+
+            setFieldError(
+                "paymentReference",
+                "paymentReferenceError",
+                "Transaction ID / Reference is required."
+            );
+
+            valid = false;
+
+            firstInvalid =
+                firstInvalid ||
+                reference;
+
+        } else {
+
+            clearFieldError(
+                "paymentReference",
+                "paymentReferenceError"
+            );
+        }
+    }
+
+
+    /* BANK SENDER DETAILS */
+
+    if (
+        method === "bank"
+    ) {
+
+        const senderAccountTitle =
+            getElement(
+                "senderAccountTitle"
+            );
+
+
+        if (
+            !senderAccountTitle ||
+            !senderAccountTitle.value.trim()
+        ) {
+
+            setFieldError(
+                "senderAccountTitle",
+                "senderAccountTitleError",
+                "Please enter the account title you paid from."
+            );
+
+            valid = false;
+
+            firstInvalid =
+                firstInvalid ||
+                senderAccountTitle;
+
+        } else {
+
+            clearFieldError(
+                "senderAccountTitle",
+                "senderAccountTitleError"
+            );
+        }
+
+
+        const senderAccountNumber =
+            getElement(
+                "senderAccountNumber"
+            );
+
+
+        if (
+            !senderAccountNumber ||
+            !senderAccountNumber.value.trim()
+        ) {
+
+            setFieldError(
+                "senderAccountNumber",
+                "senderAccountNumberError",
+                "Please enter the account number you paid from."
+            );
+
+            valid = false;
+
+            firstInvalid =
+                firstInvalid ||
+                senderAccountNumber;
+
+        } else {
+
+            clearFieldError(
+                "senderAccountNumber",
+                "senderAccountNumberError"
+            );
+        }
+    }
+
+
+    /* EASYPAISA / JAZZCASH SENDER MOBILE */
+
+    if (
+        method === "easypaisa" ||
+        method === "jazzcash"
+    ) {
+
+        const senderMobileNumber =
+            getElement(
+                "senderMobileNumber"
+            );
+
+
+        const digitsOnly =
+            senderMobileNumber
+                ? senderMobileNumber.value
+                    .replace(
+                        /\D/g,
+                        ""
+                    )
+                : "";
+
+
+        if (
+            !senderMobileNumber ||
+            digitsOnly.length < 10
+        ) {
+
+            setFieldError(
+                "senderMobileNumber",
+                "senderMobileNumberError",
+
+                method === "jazzcash"
+                    ? "Please enter the JazzCash number you paid from."
+                    : "Please enter the Easypaisa number you paid from."
+            );
+
+            valid = false;
+
+            firstInvalid =
+                firstInvalid ||
+                senderMobileNumber;
+
+        } else {
+
+            clearFieldError(
+                "senderMobileNumber",
+                "senderMobileNumberError"
+            );
+        }
+    }
+
+
+    if (
+        !valid &&
+        firstInvalid
+    ) {
+
+        firstInvalid.focus();
+
+        firstInvalid.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+    }
+
+
+    return valid;
 }
 
 
@@ -1356,6 +2820,48 @@ function buildOrder() {
             : "cod";
 
 
+    const paymentReference =
+        getFormValue(
+            "paymentReference"
+        );
+
+
+    let paymentSenderInfo =
+        null;
+
+
+    if (
+        paymentMethod === "bank"
+    ) {
+
+        paymentSenderInfo = {
+
+            account_title:
+                getFormValue(
+                    "senderAccountTitle"
+                ),
+
+            account_number:
+                getFormValue(
+                    "senderAccountNumber"
+                )
+        };
+
+    } else if (
+        paymentMethod === "easypaisa" ||
+        paymentMethod === "jazzcash"
+    ) {
+
+        paymentSenderInfo = {
+
+            mobile_number:
+                getFormValue(
+                    "senderMobileNumber"
+                )
+        };
+    }
+
+
     const orderNumber =
         `KZ-${Date.now()}-${Math.floor(
             Math.random() * 1000
@@ -1367,10 +2873,12 @@ function buildOrder() {
         orderNumber,
 
         user_id:
-            currentUser?.id || null,
+            currentUser?.id ||
+            null,
 
         customer_id:
-            currentUser?.id || null,
+            currentUser?.id ||
+            null,
 
         customer_name:
             customerName,
@@ -1390,6 +2898,12 @@ function buildOrder() {
         payment_method:
             paymentMethod,
 
+        payment_reference:
+            paymentReference,
+
+        payment_sender_info:
+            paymentSenderInfo,
+
         items:
             cartItems.map(
                 (item) => ({
@@ -1401,33 +2915,52 @@ function buildOrder() {
                         item.name,
 
                     price:
-                        Number(item.price),
+                        Number(
+                            item.price
+                        ),
 
                     quantity:
-                        Number(item.quantity),
+                        Number(
+                            item.quantity
+                        ),
 
                     size:
-                        item.size || "",
+                        item.size ||
+                        "",
 
                     image_url:
-                        item.image || "",
+                        item.image ||
+                        "",
 
                     category:
-                        item.category || ""
+                        item.category ||
+                        "",
+
+                    shipping_origin:
+                        item.shippingOrigin ||
+                        null
                 })
             ),
 
         subtotal:
-            Number(subtotal),
+            Number(
+                subtotal
+            ),
 
         shipping:
-            Number(shipping),
+            Number(
+                shipping
+            ),
 
         discount:
-            Number(discount),
+            Number(
+                discount
+            ),
 
         total:
-            Number(grandTotal),
+            Number(
+                grandTotal
+            ),
 
         status:
             "pending",
@@ -1442,7 +2975,9 @@ function buildOrder() {
    SAVE LOCAL ORDER
    ========================================================= */
 
-function saveOrderLocally(order) {
+function saveOrderLocally(
+    order
+) {
 
     try {
 
@@ -1503,12 +3038,6 @@ async function saveOrderToSupabase(
 
     try {
 
-        /*
-         * IMPORTANT:
-         * Get the authenticated user directly
-         * from Supabase Auth.
-         */
-
         const {
             data,
             error
@@ -1557,27 +3086,6 @@ async function saveOrderToSupabase(
             user.id;
 
 
-        console.log(
-            "========== ORDER DEBUG =========="
-        );
-
-        console.log(
-            "AUTH USER ID:",
-            userId
-        );
-
-        console.log(
-            "CURRENT USER ID:",
-            currentUser?.id
-        );
-
-
-        /*
-         * IMPORTANT:
-         * user_id and customer_id are taken
-         * directly from auth.uid().
-         */
-
         const orderData = {
 
             user_id:
@@ -1587,7 +3095,9 @@ async function saveOrderToSupabase(
                 userId,
 
             total_amount:
-                Number(order.total),
+                Number(
+                    order.total
+                ),
 
             status:
                 "pending",
@@ -1604,29 +3114,53 @@ async function saveOrderToSupabase(
                 order.shipping_address ||
                 null,
 
+            shipping_city:
+                order.city ||
+                null,
+
+            customer_email:
+                order.customer_email ||
+                null,
+
+            payment_method:
+                order.payment_method ||
+                null,
+
+            payment_reference:
+                order.payment_reference ||
+                null,
+
+            payment_sender_info:
+                order.payment_sender_info ||
+                null,
+
             order_number:
-                order.orderNumber
+                order.orderNumber,
+
+            /*
+             * ------------------------------------------------
+             * FIX: This is the actual bug that caused the admin
+             * dashboard to always show "Order items are not
+             * saved in this order record."
+             *
+             * buildOrder() already computes a clean "items"
+             * array (product_id, name, price, quantity, size,
+             * image_url, category, shipping_origin) but this
+             * object — the one actually inserted into Supabase —
+             * never included it. So items were being thrown away
+             * right before saving, every single time.
+             *
+             * "items" must be a JSONB column on the "orders"
+             * table in Supabase for this insert to work. If that
+             * column does not exist yet, create it:
+             *
+             *   alter table orders add column items jsonb;
+             * ------------------------------------------------
+             */
+            items:
+                order.items || []
         };
 
-
-        console.log(
-            "ORDER DATA:",
-            orderData
-        );
-
-
-        /*
-         * IMPORTANT RLS FIX:
-         *
-         * DO NOT use:
-         *
-         * .select()
-         * .single()
-         *
-         * after INSERT.
-         *
-         * Customer only needs INSERT permission.
-         */
 
         const {
             error: insertError
@@ -1645,17 +3179,6 @@ async function saveOrderToSupabase(
                 insertError
             );
 
-            console.error(
-                "AUTH USER ID:",
-                userId
-            );
-
-            console.error(
-                "ORDER USER ID:",
-                orderData.user_id
-            );
-
-
             return {
 
                 success: false,
@@ -1667,11 +3190,6 @@ async function saveOrderToSupabase(
                     insertError
             };
         }
-
-
-        console.log(
-            "ORDER SUCCESSFULLY SAVED TO SUPABASE"
-        );
 
 
         return {
@@ -1798,10 +3316,6 @@ async function placeOrder(
 
     try {
 
-        /*
-         * Check login.
-         */
-
         const user =
             await loadCurrentUser();
 
@@ -1827,41 +3341,18 @@ async function placeOrder(
         }
 
 
-        /*
-         * Recalculate totals.
-         */
-
         calculateTotals();
 
-
-        /*
-         * Build order.
-         */
 
         const order =
             buildOrder();
 
-
-        console.log(
-            "FINAL ORDER:",
-            order
-        );
-
-
-        /*
-         * Save to Supabase FIRST.
-         */
 
         const result =
             await saveOrderToSupabase(
                 order
             );
 
-
-        /*
-         * If Supabase fails,
-         * DO NOT clear cart.
-         */
 
         if (
             !result ||
@@ -1897,27 +3388,10 @@ async function placeOrder(
         }
 
 
-        /*
-         * Supabase success.
-         */
-
-        console.log(
-            "Order saved successfully."
-        );
-
-
-        /*
-         * Local backup.
-         */
-
         saveOrderLocally(
             order
         );
 
-
-        /*
-         * Save last order.
-         */
 
         localStorage.setItem(
             "khz_last_order",
@@ -1927,16 +3401,8 @@ async function placeOrder(
         );
 
 
-        /*
-         * Clear cart.
-         */
-
         clearCart();
 
-
-        /*
-         * Redirect.
-         */
 
         window.location.href =
             `order-success.html?order=${encodeURIComponent(
@@ -2005,11 +3471,6 @@ function setupCheckoutForm() {
 
     if (button) {
 
-        /*
-         * Only manually submit if button
-         * is outside the form.
-         */
-
         if (
             !form.contains(
                 button
@@ -2021,148 +3482,6 @@ function setupCheckoutForm() {
                 placeOrder
             );
         }
-    }
-}
-
-
-/* =========================================================
-   INPUT FORMATTING
-   ========================================================= */
-
-function setupInputFormatting() {
-
-    const cardNumber =
-        getElement(
-            "cardNumber"
-        );
-
-
-    if (cardNumber) {
-
-        cardNumber.addEventListener(
-            "input",
-            function () {
-
-                let value =
-                    this.value
-                        .replace(
-                            /\D/g,
-                            ""
-                        )
-                        .slice(
-                            0,
-                            16
-                        );
-
-
-                value =
-                    value
-                        .match(
-                            /.{1,4}/g
-                        )
-                        ?.join(
-                            " "
-                        ) || "";
-
-
-                this.value =
-                    value;
-            }
-        );
-    }
-
-
-    const expiry =
-        getElement(
-            "expiry"
-        );
-
-
-    if (expiry) {
-
-        expiry.addEventListener(
-            "input",
-            function () {
-
-                let value =
-                    this.value
-                        .replace(
-                            /\D/g,
-                            ""
-                        )
-                        .slice(
-                            0,
-                            4
-                        );
-
-
-                if (
-                    value.length > 2
-                ) {
-
-                    value =
-                        value.slice(
-                            0,
-                            2
-                        ) +
-                        "/" +
-                        value.slice(
-                            2
-                        );
-                }
-
-
-                this.value =
-                    value;
-            }
-        );
-    }
-
-
-    const cvv =
-        getElement(
-            "cvv"
-        );
-
-
-    if (cvv) {
-
-        cvv.addEventListener(
-            "input",
-            function () {
-
-                this.value =
-                    this.value
-                        .replace(
-                            /\D/g,
-                            ""
-                        )
-                        .slice(
-                            0,
-                            4
-                        );
-            }
-        );
-    }
-
-
-    const phone =
-        getElement(
-            "customerPhone"
-        );
-
-
-    if (phone) {
-
-        phone.addEventListener(
-            "input",
-            function () {
-
-                this.classList.remove(
-                    "border-red-500"
-                );
-            }
-        );
     }
 }
 
@@ -2185,6 +3504,25 @@ function setupValidationFeedback() {
     }
 
 
+    const errorMap = {
+
+        customerName:
+            "nameError",
+
+        customerPhone:
+            "phoneError",
+
+        customerEmail:
+            "emailError",
+
+        customerCity:
+            "cityError",
+
+        customerAddress:
+            "addressError"
+    };
+
+
     const fields =
         form.querySelectorAll(
             "input, select, textarea"
@@ -2194,25 +3532,37 @@ function setupValidationFeedback() {
     fields.forEach(
         (field) => {
 
-            field.addEventListener(
-                "input",
-                function () {
+            const errorId =
+                errorMap[field.id];
 
-                    this.classList.remove(
+
+            const clear = () => {
+
+                if (errorId) {
+
+                    clearFieldError(
+                        field.id,
+                        errorId
+                    );
+
+                } else {
+
+                    field.classList.remove(
                         "border-red-500"
                     );
                 }
+            };
+
+
+            field.addEventListener(
+                "input",
+                clear
             );
 
 
             field.addEventListener(
                 "change",
-                function () {
-
-                    this.classList.remove(
-                        "border-red-500"
-                    );
-                }
+                clear
             );
         }
     );
@@ -2240,19 +3590,6 @@ function setupAuthListener() {
             currentUser =
                 session?.user ||
                 null;
-
-
-            console.log(
-                "Auth state:",
-                event
-            );
-
-
-            console.log(
-                "Current auth user:",
-                currentUser?.id ||
-                null
-            );
         }
     );
 }
@@ -2263,11 +3600,6 @@ function setupAuthListener() {
    ========================================================= */
 
 async function initializePaymentPage() {
-
-    console.log(
-        "KHELZONE payment page initializing..."
-    );
-
 
     /*
      * 1. Load cart
@@ -2319,24 +3651,24 @@ async function initializePaymentPage() {
 
 
     /*
-     * 8. Payment methods
+     * 8. Load admin payment settings
+     */
+
+    await loadPaymentSettings();
+
+
+    /*
+     * 9. Payment methods
      */
 
     setupPaymentMethods();
 
 
     /*
-     * 9. Checkout form
+     * 10. Checkout form
      */
 
     setupCheckoutForm();
-
-
-    /*
-     * 10. Formatting
-     */
-
-    setupInputFormatting();
 
 
     /*
@@ -2351,37 +3683,6 @@ async function initializePaymentPage() {
      */
 
     setupAuthListener();
-
-
-    console.log(
-        "Cart:",
-        cartItems
-    );
-
-
-    console.log(
-        "Subtotal:",
-        subtotal
-    );
-
-
-    console.log(
-        "Shipping:",
-        shipping
-    );
-
-
-    console.log(
-        "Grand total:",
-        grandTotal
-    );
-
-
-    console.log(
-        "Current user:",
-        currentUser?.id ||
-        null
-    );
 }
 
 

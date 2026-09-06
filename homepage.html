@@ -207,7 +207,7 @@
                  SELLER BUTTON
             ================================================== -->
 
-                <a href="seller.html"
+                <a id="becomeSellerDesktop" href="seller.html"
                     class="hidden xl:inline-flex ml-2 px-4 py-2.5 rounded-lg border border-orange-500/50 text-orange-400 text-xs font-bold uppercase tracking-wider hover:bg-orange-500 hover:text-black transition">
 
                     Become a Seller
@@ -275,7 +275,7 @@
                 </a>
 
 
-                <a class="mobile-link py-3 border-b border-white/5" href="seller.html">
+                <a id="becomeSellerMobile" class="mobile-link py-3 border-b border-white/5" href="seller.html">
 
                     Become a Seller
 
@@ -1053,7 +1053,7 @@
                         </a>
 
 
-                        <a href="seller.html"
+                        <a id="becomeSellerStory" href="seller.html"
                             class="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-sm font-bold transition">
 
                             Become a Seller
@@ -1228,7 +1228,7 @@
 
                     </a>
 
-                    <a class="block hover:text-orange-400" href="seller.html">
+                    <a id="becomeSellerFooter" class="block hover:text-orange-400" href="seller.html">
 
                         Become a Seller
 
@@ -2371,6 +2371,53 @@ grid.addEventListener('click', function (event) {
 
         const mobileAccountSection =
             document.getElementById("mobileAccountSection");
+            const becomeSellerDesktop =
+    document.getElementById("becomeSellerDesktop");
+
+const becomeSellerMobile =
+    document.getElementById("becomeSellerMobile");
+
+const becomeSellerStory =
+    document.getElementById("becomeSellerStory");
+
+const becomeSellerFooter =
+    document.getElementById("becomeSellerFooter");
+
+
+function hideBecomeSeller() {
+
+    [
+        becomeSellerDesktop,
+        becomeSellerMobile,
+        becomeSellerStory,
+        becomeSellerFooter
+    ].forEach(function (element) {
+
+        if (element) {
+            element.style.display = "none";
+        }
+
+    });
+
+}
+
+
+function showBecomeSeller() {
+
+    [
+        becomeSellerDesktop,
+        becomeSellerMobile,
+        becomeSellerStory,
+        becomeSellerFooter
+    ].forEach(function (element) {
+
+        if (element) {
+            element.style.display = "";
+        }
+
+    });
+
+}
 
 
         function hideAdminDashboard() {
@@ -2666,13 +2713,18 @@ grid.addEventListener('click', function (event) {
                 }
 
 
-                if (admin) {
+              if (admin) {
 
-                    showAdminDashboard();
+    showAdminDashboard();
+    hideBecomeSeller();
 
-                }
+} else {
 
-            }
+    showBecomeSeller();
+
+}
+
+            } 
 
             catch (error) {
 

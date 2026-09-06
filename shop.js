@@ -18,6 +18,12 @@
      table, return & warranty, ratings & reviews (with submission +
      validation), and seller/shop information — all loaded dynamically
      from Supabase, nothing hardcoded.
+
+   PRICE FILTER FIX:
+   - The price control is now a MINIMUM price filter (product.price >=
+     minimumPrice), using the raw database price for comparison — not the
+     formatted display string. An empty field applies no minimum-price
+     filtering at all. 10 is the lowest allowed minimum price.
    ========================================================================== */
 
 "use strict";
@@ -145,7 +151,9 @@ const state = {
   priceBuckets: new Set(),
 
   minRating: 0,
-  priceMax: 10000,
+
+  /* Minimum price filter. null = no filtering (field left empty). */
+  priceMin: null,
 
   sort: "featured",
   visibleCount: 12,
@@ -252,7 +260,7 @@ function normalizeProduct(product) {
        column, honour it verbatim instead of the auto-derived badge. */
     badge: product.badge || "",
 
-    /* NEW: seller-provided policy text, shown verbatim in Quick View */
+    /* Seller-provided policy text, shown verbatim in Quick View */
     returnPolicy: product.return_policy || product.returnPolicy || "",
     warranty: product.warranty || "",
 
@@ -443,35 +451,32 @@ function getFilteredProducts() {
 
 
   /* ================================================================
-     PRICE FILTER
-     Rs. 500 → Rs. 10,000
-     
-     Selected price is the MAXIMUM price.
+     MINIMUM PRICE FILTER
+
+     User enters a minimum price. Only products whose actual
+     database price (product.price — never the formatted/display
+     string produced by money()) is greater than or equal to that
+     value are shown. Exact comparison: product.price >= minimumPrice.
 
      Example:
-     Rs. 5,000 selected
-     → Rs. 500
-     → Rs. 1,000
-     → Rs. 3,500
-     → Rs. 5,000
+     10     -> Rs.10, Rs.50, Rs.500, Rs.1000 ...
+     100    -> Rs.100, Rs.150, Rs.1000 ... (nothing below Rs.100)
+     1000   -> Rs.1000, Rs.1500, Rs.5000 ... (nothing below Rs.1000)
+     10000  -> Rs.10000, Rs.12000, Rs.20000 ... (Rs.9999 excluded)
 
-     Rs. 5,000 se upar products nahi ayenge.
+     Empty field -> no minimum-price filtering applied.
+     10 is the lowest allowed minimum price.
      ================================================================ */
-  if (
-    state.priceMax !== null &&
-    state.priceMax !== undefined
-  ) {
-    const maxPrice = Number(state.priceMax);
+  if (state.priceMin !== null && state.priceMin !== undefined) {
+    const minimumPrice = Number(state.priceMin);
 
-    products = products.filter(product => {
-      const price = Number(product.price);
+    if (Number.isFinite(minimumPrice)) {
+      products = products.filter(product => {
+        const price = Number(product.price);
 
-      return (
-        Number.isFinite(price) &&
-        price >= 10 &&
-        price <= maxPrice
-      );
-    });
+        return Number.isFinite(price) && price >= minimumPrice;
+      });
+    }
   }
 
 
@@ -1841,9 +1846,18 @@ function wireRatingFilters() {
   });
 }
 
+/* ==========================================================================
+   MINIMUM PRICE FILTER — WIRING
+
+   The control (#priceRange) is a plain number input, not a two-ended
+   range slider. Its value is the MINIMUM price a product must have to
+   be shown (product.price >= minimumPrice). Leaving it empty removes
+   the filter entirely. 10 is the lowest allowed minimum price.
+   ========================================================================== */
+
 function wirePriceRange() {
-  const range = $("#priceRange") || $("[data-price-range]");
-  if (!range) return;
+  const priceInput = $("#priceRange") || $("[data-price-range]");
+  if (!priceInput) return;
 
   const output =
     $("#priceRangeLabel") ||
@@ -1851,33 +1865,63 @@ function wirePriceRange() {
     $("#priceValue") ||
     $("[data-price-value]");
 
-  // Price range: Rs. 500 - Rs. 10,000
-  const MIN_PRICE = 10;
-  const MAX_PRICE = 10000;
+  const MIN_ALLOWED_PRICE = 10;
 
-  range.min = MIN_PRICE;
-  range.max = MAX_PRICE;
-  range.step = 10;
-
-  // Default = maximum price
-  range.value = MAX_PRICE;
+  priceInput.min = MIN_ALLOWED_PRICE;
 
   const updatePrice = () => {
-    const selectedPrice = Number(range.value);
+    const rawValue = priceInput.value.trim();
 
-    state.priceMax = selectedPrice;
+    /* Empty field -> no minimum-price filtering applied. */
+    if (rawValue === "") {
+      state.priceMin = null;
+
+      if (output) {
+        output.textContent = "Showing all prices";
+      }
+
+      state.visibleCount = 12;
+      renderProducts();
+      return;
+    }
+
+    let minimumPrice = Number(rawValue);
+
+    if (!Number.isFinite(minimumPrice)) {
+      state.priceMin = null;
+
+      if (output) {
+        output.textContent = "Showing all prices";
+      }
+
+      state.visibleCount = 12;
+      renderProducts();
+      return;
+    }
+
+    if (minimumPrice < MIN_ALLOWED_PRICE) {
+      minimumPrice = MIN_ALLOWED_PRICE;
+      priceInput.value = MIN_ALLOWED_PRICE;
+    }
+
+    state.priceMin = minimumPrice;
 
     if (output) {
-      output.textContent = money(selectedPrice);
+      output.textContent = `Showing ${money(minimumPrice)} and above`;
     }
 
     state.visibleCount = 12;
     renderProducts();
   };
 
-  range.addEventListener("input", updatePrice);
+  priceInput.addEventListener("input", updatePrice);
 
-  updatePrice();
+  /* Starts empty -> no filter applied until the user types a value. */
+  state.priceMin = null;
+
+  if (output) {
+    output.textContent = "Showing all prices";
+  }
 }
 
 function wireSearch() {
@@ -2099,8 +2143,8 @@ function clearAllFilters() {
   state.priceBuckets.clear();
   state.minRating = 0;
 
-  const range = $("#priceRange") || $("[data-price-range]");
-  state.priceMax = Number(range?.max || 10000);
+  const priceInput = $("#priceRange") || $("[data-price-range]");
+  state.priceMin = null;
 
   state.sort = "featured";
   state.visibleCount = 12;
@@ -2120,14 +2164,14 @@ function clearAllFilters() {
   const searchClearBtn = $("#searchClearBtn");
   if (searchClearBtn) searchClearBtn.classList.add("hidden");
 
-  if (range) range.value = range.max || 10000;
+  if (priceInput) priceInput.value = "";
 
   const priceOutput =
     $("#priceRangeLabel") ||
     $("#priceRangeValue") ||
     $("#priceValue") ||
     $("[data-price-value]");
-  if (priceOutput) priceOutput.textContent = money(Number(range?.value || 10000));
+  if (priceOutput) priceOutput.textContent = "Showing all prices";
 
   const sortSelect = $("#sortSelect") || $("#sortProducts") || $("[data-sort]");
   if (sortSelect) sortSelect.value = "featured";

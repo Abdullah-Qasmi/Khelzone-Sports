@@ -1,858 +1,1334 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>KHELZONE | Create Account</title>
+
 
 <!-- Tailwind -->
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
+
 <!-- Google Font -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet"
+>
+
 
 <!-- Material Icons -->
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+    rel="stylesheet"
+>
+
 
 <!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+
 <style>
-* { box-sizing: border-box; }
+
+* {
+    box-sizing: border-box;
+}
+
 
 body {
+
     margin: 0;
+
     min-height: 100vh;
+
     font-family: "Inter", sans-serif;
+
     background:
-        radial-gradient(circle at top right, rgba(255, 90, 0, 0.18), transparent 35%),
-        radial-gradient(circle at bottom left, rgba(255, 90, 0, 0.08), transparent 30%),
+        radial-gradient(
+            circle at top right,
+            rgba(255, 90, 0, 0.18),
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at bottom left,
+            rgba(255, 90, 0, 0.08),
+            transparent 30%
+        ),
         #08090b;
+
     color: white;
 }
 
+
 .signup-card {
+
     background: rgba(18, 20, 24, 0.94);
+
     backdrop-filter: blur(18px);
+
     -webkit-backdrop-filter: blur(18px);
+
     border: 1px solid rgba(255, 255, 255, 0.09);
-    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.55), 0 0 40px rgba(255, 90, 0, 0.05);
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.55),
+        0 0 40px rgba(255, 90, 0, 0.05);
 }
+
 
 .orange-gradient {
-    background: linear-gradient(135deg, #ff5a00 0%, #d63f00 100%);
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff5a00 0%,
+            #d63f00 100%
+        );
 }
 
+
 .orange-gradient:hover {
-    background: linear-gradient(135deg, #ff6818 0%, #d63f00 100%);
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff6818 0%,
+            #d63f00 100%
+        );
 }
+
 
 .orange-gradient:disabled,
 button:disabled {
+
     cursor: not-allowed;
 }
 
+
 .input-box {
+
     background: rgba(255, 255, 255, 0.04) !important;
-    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.10) !important;
+
     color: white !important;
 }
 
+
 .input-box:focus {
+
     border-color: #ff5a00 !important;
-    box-shadow: 0 0 0 3px rgba(255, 90, 0, 0.12) !important;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(255, 90, 0, 0.12) !important;
 }
 
+
 .input-box::placeholder {
+
     color: #6b7280;
 }
 
+
 .spinner {
+
     width: 19px;
+
     height: 19px;
-    border: 2px solid rgba(255,255,255,0.35);
+
+    border:
+        2px solid
+        rgba(255,255,255,0.35);
+
     border-top-color: white;
+
     border-radius: 50%;
-    animation: spin 0.7s linear infinite;
+
+    animation:
+        spin 0.7s linear infinite;
 }
+
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-.otp-box {
-    text-align: center;
-    font-size: 1.5rem;
-    font-weight: 800;
-}
-
-.shake {
-    animation: shake 0.35s ease-in-out;
-}
-
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
-}
 </style>
+
 </head>
+
 
 <body class="flex items-center justify-center px-4 py-10">
 
+
 <main class="w-full max-w-md">
 
-<!-- LOGO -->
-<a href="homepage.html" class="block text-center mb-8">
-    <div class="text-4xl sm:text-5xl font-black tracking-tight text-orange-500">
+
+<!-- =====================================================
+     LOGO
+===================================================== -->
+
+<a
+    href="homepage.html"
+    class="block text-center mb-8"
+>
+
+    <div
+        class="text-4xl sm:text-5xl font-black tracking-tight text-orange-500"
+    >
         KHELZONE
     </div>
-    <div class="mt-2 text-[10px] sm:text-xs font-bold tracking-[0.28em] text-gray-500">
+
+    <div
+        class="mt-2 text-[10px] sm:text-xs font-bold tracking-[0.28em] text-gray-500"
+    >
         ENGINEERED FOR PERFORMANCE
     </div>
+
 </a>
 
-<!-- SIGNUP CARD -->
-<section id="signupCard" class="signup-card rounded-3xl p-6 sm:p-8">
 
-<!-- SIGNUP SCREEN -->
+
+<!-- =====================================================
+     SIGNUP CARD
+===================================================== -->
+
+<section
+    id="signupCard"
+    class="signup-card rounded-3xl p-6 sm:p-8"
+>
+
+
+<!-- =====================================================
+     SIGNUP SCREEN
+===================================================== -->
+
 <div id="signupScreen">
 
+
+    <!-- HEADER -->
+
     <div class="text-center mb-7">
-        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-500/10 border border-orange-500/20">
-            <span class="material-symbols-outlined text-orange-500 text-3xl">person_add</span>
+
+        <div
+            class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-500/10 border border-orange-500/20"
+        >
+
+            <span
+                class="material-symbols-outlined text-orange-500 text-3xl"
+            >
+                person_add
+            </span>
+
         </div>
-        <h1 class="mt-5 text-3xl font-black uppercase">Create Account</h1>
-        <p class="mt-2 text-sm text-gray-500">Join KHELZONE today</p>
+
+
+        <h1 class="mt-5 text-3xl font-black uppercase">
+            Create Account
+        </h1>
+
+
+        <p class="mt-2 text-sm text-gray-500">
+            Join KHELZONE today
+        </p>
+
     </div>
 
-    <form id="signupForm" class="space-y-5" novalidate>
+
+
+    <!-- =================================================
+         SIGNUP FORM
+    ================================================= -->
+
+    <form
+        id="signupForm"
+        class="space-y-5"
+        novalidate
+    >
+
 
         <!-- NAME -->
+
         <div>
-            <label for="fullName" class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-400">Full Name</label>
-            <input id="fullName" type="text" required autocomplete="name" placeholder="e.g. Abdullah Qasmi"
-                class="input-box w-full rounded-xl px-4 py-3.5 outline-none transition">
+
+            <label
+                for="fullName"
+                class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-400"
+            >
+                Full Name
+            </label>
+
+
+            <input
+                id="fullName"
+                type="text"
+                required
+                autocomplete="name"
+                placeholder="e.g. Abdullah Qasmi"
+                class="input-box w-full rounded-xl px-4 py-3.5 outline-none transition"
+            >
+
         </div>
+
+
 
         <!-- EMAIL -->
+
         <div>
-            <label for="email" class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-400">Email</label>
-            <input id="email" type="email" required autocomplete="email" placeholder="Enter your email"
-                class="input-box w-full rounded-xl px-4 py-3.5 outline-none transition">
-            <p id="emailHint" class="mt-2 hidden text-[11px]"></p>
+
+            <label
+                for="email"
+                class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-400"
+            >
+                Email
+            </label>
+
+
+            <input
+                id="email"
+                type="email"
+                required
+                autocomplete="email"
+                placeholder="Enter your email"
+                class="input-box w-full rounded-xl px-4 py-3.5 outline-none transition"
+            >
+
+
+            <p
+                id="emailHint"
+                class="mt-2 hidden text-[11px]"
+            ></p>
+
         </div>
+
+
 
         <!-- PASSWORD -->
+
         <div>
-            <label for="password" class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-400">Password</label>
+
+            <label
+                for="password"
+                class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-400"
+            >
+                Password
+            </label>
+
+
             <div class="relative">
-                <input id="password" type="password" required minlength="8" autocomplete="new-password" placeholder="Minimum 8 characters"
-                    class="input-box w-full rounded-xl px-4 py-3.5 pr-12 outline-none transition">
-                <button type="button" id="togglePassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white">
-                    <span id="passwordIcon" class="material-symbols-outlined">visibility</span>
+
+                <input
+                    id="password"
+                    type="password"
+                    required
+                    minlength="8"
+                    autocomplete="new-password"
+                    placeholder="Minimum 8 characters"
+                    class="input-box w-full rounded-xl px-4 py-3.5 pr-12 outline-none transition"
+                >
+
+
+                <button
+                    type="button"
+                    id="togglePassword"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white"
+                >
+
+                    <span
+                        id="passwordIcon"
+                        class="material-symbols-outlined"
+                    >
+                        visibility
+                    </span>
+
                 </button>
+
             </div>
-            <p class="mt-2 text-[11px] text-gray-600">At least 8 characters with 1 letter and 1 number.</p>
+
+
+            <p class="mt-2 text-[11px] text-gray-600">
+                At least 8 characters with 1 letter and 1 number.
+            </p>
+
         </div>
+
+
 
         <!-- CONFIRM PASSWORD -->
+
         <div>
-            <label for="confirmPassword" class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-400">Confirm Password</label>
-            <input id="confirmPassword" type="password" required minlength="8" autocomplete="new-password" placeholder="Confirm your password"
-                class="input-box w-full rounded-xl px-4 py-3.5 outline-none transition">
+
+            <label
+                for="confirmPassword"
+                class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-400"
+            >
+                Confirm Password
+            </label>
+
+
+            <input
+                id="confirmPassword"
+                type="password"
+                required
+                minlength="8"
+                autocomplete="new-password"
+                placeholder="Confirm your password"
+                class="input-box w-full rounded-xl px-4 py-3.5 outline-none transition"
+            >
+
         </div>
+
+
 
         <!-- MESSAGE -->
-        <div id="message" class="hidden rounded-xl border px-4 py-3 text-sm font-semibold"></div>
+
+        <div
+            id="message"
+            class="hidden rounded-xl border px-4 py-3 text-sm font-semibold"
+        ></div>
+
+
 
         <!-- SIGNUP BUTTON -->
-        <button id="signupBtn" type="submit"
-            class="orange-gradient w-full rounded-xl py-4 font-black uppercase tracking-wide text-white flex items-center justify-center gap-2 transition hover:scale-[1.01] active:scale-[0.99]">
-            <span id="signupBtnText">Create Account</span>
-            <span id="signupSpinner" class="spinner hidden"></span>
-            <span id="signupIcon" class="material-symbols-outlined">arrow_forward</span>
+
+        <button
+            id="signupBtn"
+            type="submit"
+            class="orange-gradient w-full rounded-xl py-4 font-black uppercase tracking-wide text-white flex items-center justify-center gap-2 transition hover:scale-[1.01] active:scale-[0.99]"
+        >
+
+            <span id="signupBtnText">
+                Create Account
+            </span>
+
+
+            <span
+                id="signupSpinner"
+                class="spinner hidden"
+            ></span>
+
+
+            <span
+                id="signupIcon"
+                class="material-symbols-outlined"
+            >
+                arrow_forward
+            </span>
+
         </button>
+
+
     </form>
+
+
+
+    <!-- LOGIN -->
 
     <div class="mt-7 text-center">
+
         <p class="text-sm text-gray-500">
+
             Already have an account?
-            <a href="index.html" class="font-bold text-orange-400 hover:text-orange-300">Login</a>
+
+            <a
+                href="index.html"
+                class="font-bold text-orange-400 hover:text-orange-300"
+            >
+                Login
+            </a>
+
         </p>
+
     </div>
 
+
+
+    <!-- BACK TO LOGIN -->
+
     <div class="mt-7 border-t border-white/10 pt-6">
-        <a href="index.html" class="flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-white">
-            <span class="material-symbols-outlined text-base">arrow_back</span>
+
+        <a
+            href="index.html"
+            class="flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-white"
+        >
+
+            <span
+                class="material-symbols-outlined text-base"
+            >
+                arrow_back
+            </span>
+
             Back to Login
+
         </a>
+
     </div>
+
 
 </div>
 
-<!-- OTP SCREEN -->
-<div id="otpScreen" class="hidden">
-
-    <div class="text-center mb-7">
-        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-500/10 border border-orange-500/20">
-            <span class="material-symbols-outlined text-orange-500 text-3xl">mark_email_read</span>
-        </div>
-        <h1 class="mt-5 text-3xl font-black uppercase">Verify Email</h1>
-        <p class="mt-2 text-sm text-gray-500 leading-6">
-            We sent a verification code to
-            <br>
-            <span id="otpEmail" class="text-orange-400 font-bold"></span>
-        </p>
-    </div>
-
-    <form id="otpForm" class="space-y-5" novalidate>
-
-        <div>
-            <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-400 text-center">Verification Code</label>
-
-            <div id="otpBoxesContainer" class="flex items-center justify-center gap-2 sm:gap-3">
-                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" data-index="0" aria-label="Digit 1"
-                    class="otp-box input-box w-12 h-14 sm:w-14 sm:h-16 rounded-xl outline-none transition">
-                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" data-index="1" aria-label="Digit 2"
-                    class="otp-box input-box w-12 h-14 sm:w-14 sm:h-16 rounded-xl outline-none transition">
-                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" data-index="2" aria-label="Digit 3"
-                    class="otp-box input-box w-12 h-14 sm:w-14 sm:h-16 rounded-xl outline-none transition">
-                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" data-index="3" aria-label="Digit 4"
-                    class="otp-box input-box w-12 h-14 sm:w-14 sm:h-16 rounded-xl outline-none transition">
-                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" data-index="4" aria-label="Digit 5"
-                    class="otp-box input-box w-12 h-14 sm:w-14 sm:h-16 rounded-xl outline-none transition">
-                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" data-index="5" aria-label="Digit 6"
-                    class="otp-box input-box w-12 h-14 sm:w-14 sm:h-16 rounded-xl outline-none transition">
-            </div>
-        </div>
-
-        <div id="otpMessage" class="hidden rounded-xl border px-4 py-3 text-sm font-semibold"></div>
-
-        <button id="verifyBtn" type="submit"
-            class="orange-gradient w-full rounded-xl py-4 font-black uppercase tracking-wide text-white flex items-center justify-center gap-2 transition hover:scale-[1.01] active:scale-[0.99]">
-            <span id="verifyBtnText">Verify Email</span>
-            <span id="verifySpinner" class="spinner hidden"></span>
-            <span id="verifyIcon" class="material-symbols-outlined">verified</span>
-        </button>
-    </form>
-
-    <div class="mt-6 text-center">
-        <p class="text-sm text-gray-500">Didn't receive the code?</p>
-        <button type="button" id="resendBtn" class="mt-2 font-bold text-orange-400 hover:text-orange-300">
-            Resend OTP
-        </button>
-    </div>
-
-    <div class="mt-7 border-t border-white/10 pt-6">
-        <a href="index.html" class="flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-white">
-            <span class="material-symbols-outlined text-base">arrow_back</span>
-            Back to Login
-        </a>
-    </div>
-
-</div>
 
 </section>
 
+
+
+<!-- COPYRIGHT -->
+
 <p class="mt-6 text-center text-[10px] text-gray-600">
+
     © 2026 KHELZONE. Engineered for Performance.
+
 </p>
+
 
 </main>
 
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
 <script>
+
 "use strict";
+
 
 /* =========================================================
    SUPABASE CONFIGURATION
 ========================================================= */
-const SUPABASE_URL = "https://antqexjhlsaynunlmzqa.supabase.co";
-const SUPABASE_KEY = "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL =
+    "https://antqexjhlsaynunlmzqa.supabase.co";
 
-/* =========================================================
-   SIGNUP ELEMENTS
-========================================================= */
-const signupForm = document.getElementById("signupForm");
-const fullNameInput = document.getElementById("fullName");
-const emailInput = document.getElementById("email");
-const emailHint = document.getElementById("emailHint");
-const passwordInput = document.getElementById("password");
-const confirmPasswordInput = document.getElementById("confirmPassword");
-const togglePassword = document.getElementById("togglePassword");
-const passwordIcon = document.getElementById("passwordIcon");
-const signupBtn = document.getElementById("signupBtn");
-const signupBtnText = document.getElementById("signupBtnText");
-const signupSpinner = document.getElementById("signupSpinner");
-const signupIcon = document.getElementById("signupIcon");
-const message = document.getElementById("message");
+
+const SUPABASE_KEY =
+    "sb_publishable_pGWCdhUgU9p4JTWUwSnj5g_1TosZQLu";
+
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
 
 /* =========================================================
-   OTP ELEMENTS
+   ELEMENTS
 ========================================================= */
-const signupScreen = document.getElementById("signupScreen");
-const otpScreen = document.getElementById("otpScreen");
-const otpEmail = document.getElementById("otpEmail");
-const otpForm = document.getElementById("otpForm");
-const otpBoxes = Array.from(document.querySelectorAll(".otp-box"));
-const otpMessage = document.getElementById("otpMessage");
-const verifyBtn = document.getElementById("verifyBtn");
-const verifyBtnText = document.getElementById("verifyBtnText");
-const verifySpinner = document.getElementById("verifySpinner");
-const verifyIcon = document.getElementById("verifyIcon");
-const resendBtn = document.getElementById("resendBtn");
 
-/* =========================================================
-   STATE
-========================================================= */
-let pendingEmail = "";
+const signupForm =
+    document.getElementById("signupForm");
+
+
+const fullNameInput =
+    document.getElementById("fullName");
+
+
+const emailInput =
+    document.getElementById("email");
+
+
+const emailHint =
+    document.getElementById("emailHint");
+
+
+const passwordInput =
+    document.getElementById("password");
+
+
+const confirmPasswordInput =
+    document.getElementById("confirmPassword");
+
+
+const togglePassword =
+    document.getElementById("togglePassword");
+
+
+const passwordIcon =
+    document.getElementById("passwordIcon");
+
+
+const signupBtn =
+    document.getElementById("signupBtn");
+
+
+const signupBtnText =
+    document.getElementById("signupBtnText");
+
+
+const signupSpinner =
+    document.getElementById("signupSpinner");
+
+
+const signupIcon =
+    document.getElementById("signupIcon");
+
+
+const message =
+    document.getElementById("message");
+
+
 let isSigningUp = false;
-let isVerifying = false;
-let otpAttempts = 0;
-const MAX_OTP_ATTEMPTS = 5;
-let resendCooldownTimer = null;
+
+
 
 /* =========================================================
-   MESSAGE HELPERS
-   (message text is always built from static strings we
-   control, so innerHTML here never carries user input)
+   MESSAGE
 ========================================================= */
-function showMessage(html, type = "error") {
-    message.innerHTML = html;
-    message.className = "rounded-xl border px-4 py-3 text-sm font-semibold";
+
+function showMessage(text, type = "error") {
+
+    message.textContent = text;
+
+    message.className =
+        "rounded-xl border px-4 py-3 text-sm font-semibold";
+
     message.classList.remove("hidden");
 
-    if (type === "success") {
-        message.classList.add("bg-green-500/10", "border-green-500/20", "text-green-300");
-    } else {
-        message.classList.add("bg-red-500/10", "border-red-500/20", "text-red-300");
-    }
-}
-
-function showOtpMessage(text, type = "error") {
-    otpMessage.textContent = text;
-    otpMessage.className = "rounded-xl border px-4 py-3 text-sm font-semibold";
-    otpMessage.classList.remove("hidden");
 
     if (type === "success") {
-        otpMessage.classList.add("bg-green-500/10", "border-green-500/20", "text-green-300");
+
+        message.classList.add(
+            "bg-green-500/10",
+            "border-green-500/20",
+            "text-green-300"
+        );
+
     } else {
-        otpMessage.classList.add("bg-red-500/10", "border-red-500/20", "text-red-300");
+
+        message.classList.add(
+            "bg-red-500/10",
+            "border-red-500/20",
+            "text-red-300"
+        );
+
     }
+
 }
+
+
 
 function hideMessage() {
+
     message.textContent = "";
+
     message.classList.add("hidden");
+
 }
 
-function hideOtpMessage() {
-    otpMessage.textContent = "";
-    otpMessage.classList.add("hidden");
-}
+
 
 /* =========================================================
-   LOADING STATES
+   LOADING
 ========================================================= */
+
 function setLoading(loading) {
+
     isSigningUp = loading;
+
     signupBtn.disabled = loading;
 
-    if (loading) {
-        signupBtnText.textContent = "Creating...";
-        signupSpinner.classList.remove("hidden");
-        signupIcon.classList.add("hidden");
-        signupBtn.classList.add("opacity-70", "cursor-not-allowed");
-    } else {
-        signupBtnText.textContent = "Create Account";
-        signupSpinner.classList.add("hidden");
-        signupIcon.classList.remove("hidden");
-        signupBtn.classList.remove("opacity-70", "cursor-not-allowed");
-    }
-}
-
-function setVerifyLoading(loading) {
-    isVerifying = loading;
-    verifyBtn.disabled = loading;
 
     if (loading) {
-        verifyBtnText.textContent = "Verifying...";
-        verifySpinner.classList.remove("hidden");
-        verifyIcon.classList.add("hidden");
-        verifyBtn.classList.add("opacity-70", "cursor-not-allowed");
+
+        signupBtnText.textContent =
+            "Creating...";
+
+        signupSpinner.classList.remove(
+            "hidden"
+        );
+
+        signupIcon.classList.add(
+            "hidden"
+        );
+
+
+        signupBtn.classList.add(
+            "opacity-70",
+            "cursor-not-allowed"
+        );
+
+
     } else {
-        verifyBtnText.textContent = "Verify Email";
-        verifySpinner.classList.add("hidden");
-        verifyIcon.classList.remove("hidden");
-        verifyBtn.classList.remove("opacity-70", "cursor-not-allowed");
+
+        signupBtnText.textContent =
+            "Create Account";
+
+        signupSpinner.classList.add(
+            "hidden"
+        );
+
+        signupIcon.classList.remove(
+            "hidden"
+        );
+
+
+        signupBtn.classList.remove(
+            "opacity-70",
+            "cursor-not-allowed"
+        );
+
     }
+
 }
+
+
 
 /* =========================================================
    PASSWORD SHOW / HIDE
 ========================================================= */
-togglePassword.addEventListener("click", function () {
-    if (passwordInput.type === "password") {
-        passwordInput.type = "text";
-        passwordIcon.textContent = "visibility_off";
-    } else {
-        passwordInput.type = "password";
-        passwordIcon.textContent = "visibility";
+
+togglePassword.addEventListener(
+    "click",
+    function () {
+
+        if (
+            passwordInput.type ===
+            "password"
+        ) {
+
+            passwordInput.type =
+                "text";
+
+            passwordIcon.textContent =
+                "visibility_off";
+
+
+        } else {
+
+            passwordInput.type =
+                "password";
+
+            passwordIcon.textContent =
+                "visibility";
+
+        }
+
     }
-});
+);
+
+
 
 /* =========================================================
    FULL NAME VALIDATION
 ========================================================= */
+
 function isValidFullName(name) {
-    const namePattern = /^[A-Za-z]+(?:[ '-][A-Za-z]+)+(?:\s+[A-Za-z]+(?:[ '-][A-Za-z]+)+)*$/;
-    return namePattern.test(name.trim());
+
+    const namePattern =
+        /^[A-Za-z]+(?:[ '-][A-Za-z]+)+(?:\s+[A-Za-z]+(?:[ '-][A-Za-z]+)+)*$/;
+
+    return namePattern.test(
+        name.trim()
+    );
+
 }
+
+
 
 /* =========================================================
    EMAIL VALIDATION
 ========================================================= */
+
 function isValidEmail(email) {
+
     if (!email) return false;
-    if (email.length > 254) return false;
-    if (/\s/.test(email)) return false;
 
-    const emailPattern = /^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$/;
-    if (!emailPattern.test(email)) return false;
+    if (email.length > 254)
+        return false;
 
-    const parts = email.split("@");
-    if (parts.length !== 2) return false;
+    if (/\s/.test(email))
+        return false;
 
-    const localPart = parts[0];
-    const domain = parts[1].toLowerCase();
 
-    if (!localPart || localPart.length > 64) return false;
-    if (domain.startsWith(".") || domain.endsWith(".") || domain.includes("..")) return false;
+    const emailPattern =
+        /^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$/;
 
-    // domain must have at least one dot and a valid TLD length
-    const domainParts = domain.split(".");
-    const tld = domainParts[domainParts.length - 1];
-    if (domainParts.length < 2 || tld.length < 2) return false;
 
-    return true;
+    return emailPattern.test(email);
+
 }
+
+
 
 /* =========================================================
-   DISPOSABLE / TEMPORARY EMAIL DOMAINS
+   DISPOSABLE EMAIL DOMAINS
 ========================================================= */
+
 const blockedEmailDomains = [
-    "tempmail.com", "10minutemail.com", "guerrillamail.com", "mailinator.com",
-    "yopmail.com", "throwawaymail.com", "temp-mail.org", "fakeinbox.com",
-    "sharklasers.com", "trashmail.com", "dispostable.com", "mintemail.com",
-    "getnada.com", "maildrop.cc", "mohmal.com", "tempinbox.com",
-    "moakt.com", "emailondeck.com", "spamgourmet.com", "mailnesia.com"
+
+    "tempmail.com",
+
+    "10minutemail.com",
+
+    "guerrillamail.com",
+
+    "mailinator.com",
+
+    "yopmail.com",
+
+    "throwawaymail.com",
+
+    "temp-mail.org",
+
+    "fakeinbox.com",
+
+    "sharklasers.com",
+
+    "trashmail.com",
+
+    "dispostable.com",
+
+    "mintemail.com",
+
+    "getnada.com",
+
+    "maildrop.cc",
+
+    "mohmal.com",
+
+    "tempinbox.com",
+
+    "moakt.com",
+
+    "emailondeck.com",
+
+    "spamgourmet.com",
+
+    "mailnesia.com"
+
 ];
 
+
+
 function isBlockedEmailDomain(email) {
-    const domain = email.split("@")[1]?.toLowerCase();
-    return blockedEmailDomains.includes(domain);
+
+    const domain =
+        email
+            .split("@")[1]
+            ?.toLowerCase();
+
+
+    return blockedEmailDomains.includes(
+        domain
+    );
+
 }
+
+
 
 /* =========================================================
    PASSWORD VALIDATION
 ========================================================= */
+
 function isValidPassword(password) {
-    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
-    return passwordPattern.test(password);
+
+    const passwordPattern =
+        /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+
+
+    return passwordPattern.test(
+        password
+    );
+
 }
+
+
 
 /* =========================================================
-   EMAIL LIVE CHECK (on blur)
+   EMAIL LIVE CHECK
 ========================================================= */
-emailInput.addEventListener("blur", function () {
-    const email = emailInput.value.trim().toLowerCase();
-    emailHint.classList.add("hidden");
 
-    if (!email) return;
+emailInput.addEventListener(
+    "blur",
+    function () {
 
-    if (/\s/.test(email)) {
-        emailHint.textContent = "Email address cannot contain spaces.";
-        emailHint.className = "mt-2 text-[11px] text-red-400";
-        return;
-    }
+        const email =
+            emailInput.value
+                .trim()
+                .toLowerCase();
 
-    if (!isValidEmail(email)) {
-        emailHint.textContent = "Please enter a valid email address.";
-        emailHint.className = "mt-2 text-[11px] text-red-400";
-        return;
-    }
 
-    if (isBlockedEmailDomain(email)) {
-        emailHint.textContent = "Temporary or disposable email addresses are not allowed.";
-        emailHint.className = "mt-2 text-[11px] text-red-400";
-        return;
-    }
+        emailHint.classList.add(
+            "hidden"
+        );
 
-    emailHint.textContent = "Looks good. We'll send a code to verify you own this inbox.";
-    emailHint.className = "mt-2 text-[11px] text-green-400";
-});
 
-/* =========================================================
-   OTP SCREEN HELPERS
-========================================================= */
-function showOtpScreen(email) {
-    pendingEmail = email;
-    otpEmail.textContent = email;
+        if (!email)
+            return;
 
-    signupScreen.classList.add("hidden");
-    otpScreen.classList.remove("hidden");
 
-    otpAttempts = 0;
-    clearOtpBoxes();
-    setOtpBoxesEnabled(true);
-    hideOtpMessage();
-    startResendCooldown(30);
+        if (!isValidEmail(email)) {
 
-    setTimeout(function () {
-        otpBoxes[0].focus();
-    }, 100);
-}
+            emailHint.textContent =
+                "Please enter a valid email address.";
 
-function getOtpValue() {
-    return otpBoxes.map(function (box) { return box.value; }).join("");
-}
+            emailHint.className =
+                "mt-2 text-[11px] text-red-400";
 
-function clearOtpBoxes() {
-    otpBoxes.forEach(function (box) { box.value = ""; });
-}
+            return;
 
-function shakeOtpBoxes() {
-    otpBoxes.forEach(function (box) { box.classList.add("shake"); });
-    setTimeout(function () {
-        otpBoxes.forEach(function (box) { box.classList.remove("shake"); });
-    }, 400);
-}
-
-function setOtpBoxesEnabled(enabled) {
-    otpBoxes.forEach(function (box) { box.disabled = !enabled; });
-}
-
-/* OTP box navigation, digits-only, paste support */
-otpBoxes.forEach(function (box, idx) {
-    box.addEventListener("input", function () {
-        this.value = this.value.replace(/\D/g, "").slice(0, 1);
-        if (this.value && idx < otpBoxes.length - 1) {
-            otpBoxes[idx + 1].focus();
-        }
-    });
-
-    box.addEventListener("keydown", function (e) {
-        if (e.key === "Backspace") {
-            if (!this.value && idx > 0) {
-                otpBoxes[idx - 1].focus();
-                otpBoxes[idx - 1].value = "";
-                e.preventDefault();
-            }
-        } else if (e.key === "ArrowLeft" && idx > 0) {
-            otpBoxes[idx - 1].focus();
-        } else if (e.key === "ArrowRight" && idx < otpBoxes.length - 1) {
-            otpBoxes[idx + 1].focus();
-        }
-    });
-
-    box.addEventListener("paste", function (e) {
-        e.preventDefault();
-        const pasted = (e.clipboardData || window.clipboardData)
-            .getData("text")
-            .replace(/\D/g, "")
-            .slice(0, otpBoxes.length);
-
-        if (!pasted) return;
-
-        pasted.split("").forEach(function (digit, i) {
-            if (otpBoxes[i]) otpBoxes[i].value = digit;
-        });
-
-        const nextIndex = Math.min(pasted.length, otpBoxes.length - 1);
-        otpBoxes[nextIndex].focus();
-    });
-});
-
-/* =========================================================
-   SIGNUP
-========================================================= */
-signupForm.addEventListener("submit", async function (event) {
-    event.preventDefault();
-
-    if (isSigningUp) return;
-
-    hideMessage();
-
-    const fullName = fullNameInput.value.trim().replace(/\s+/g, " ");
-    const email = emailInput.value.trim().toLowerCase();
-    const password = passwordInput.value;
-    const confirmPassword = confirmPasswordInput.value;
-
-    /* FULL NAME */
-    if (!fullName) {
-        showMessage("Enter your full name.");
-        fullNameInput.focus();
-        return;
-    }
-
-    if (!isValidFullName(fullName)) {
-        showMessage("Enter your full name correctly, e.g. Abdullah Qasmi.");
-        fullNameInput.focus();
-        return;
-    }
-
-    /* EMAIL */
-    if (!email) {
-        showMessage("Please enter your email address.");
-        emailInput.focus();
-        return;
-    }
-
-    if (/\s/.test(email)) {
-        showMessage("Email address cannot contain spaces.");
-        emailInput.focus();
-        return;
-    }
-
-    if (!isValidEmail(email)) {
-        showMessage("Please enter a valid email address.");
-        emailInput.focus();
-        return;
-    }
-
-    if (isBlockedEmailDomain(email)) {
-        showMessage("Temporary or disposable email addresses are not allowed.");
-        emailInput.focus();
-        return;
-    }
-
-    /* PASSWORD */
-    if (!isValidPassword(password)) {
-        showMessage("Password must be at least 8 characters and contain at least 1 letter and 1 number.");
-        passwordInput.focus();
-        return;
-    }
-
-    /* CONFIRM PASSWORD */
-    if (password !== confirmPassword) {
-        showMessage("Passwords do not match.");
-        confirmPasswordInput.focus();
-        return;
-    }
-
-    setLoading(true);
-
-    try {
-        const { data, error } = await supabaseClient.auth.signUp({
-            email: email,
-            password: password,
-            options: {
-                data: {
-                    full_name: fullName,
-                    role: "customer"
-                }
-            }
-        });
-
-        if (error) throw error;
-
-        if (!data || !data.user) {
-            throw new Error("Account could not be created.");
         }
 
-        setLoading(false);
-        showOtpScreen(email);
-
-    } catch (error) {
-        console.error("KHELZONE SIGNUP ERROR:", error);
-
-        let errorMessage = error?.message || "Account could not be created.";
-        const lower = errorMessage.toLowerCase();
-        const code = error?.code || "";
 
         if (
-            code === "user_already_exists" ||
-            lower.includes("user already registered") ||
-            lower.includes("already been registered") ||
-            lower.includes("already exists")
+            isBlockedEmailDomain(email)
         ) {
+
+            emailHint.textContent =
+                "Temporary or disposable email addresses are not allowed.";
+
+            emailHint.className =
+                "mt-2 text-[11px] text-red-400";
+
+            return;
+
+        }
+
+
+        emailHint.textContent =
+            "Email looks good.";
+
+        emailHint.className =
+            "mt-2 text-[11px] text-green-400";
+
+    }
+);
+
+
+
+/* =========================================================
+   CREATE ACCOUNT
+========================================================= */
+
+signupForm.addEventListener(
+    "submit",
+    async function (event) {
+
+        event.preventDefault();
+
+
+        if (isSigningUp)
+            return;
+
+
+        hideMessage();
+
+
+        const fullName =
+            fullNameInput.value
+                .trim()
+                .replace(/\s+/g, " ");
+
+
+        const email =
+            emailInput.value
+                .trim()
+                .toLowerCase();
+
+
+        const password =
+            passwordInput.value;
+
+
+        const confirmPassword =
+            confirmPasswordInput.value;
+
+
+
+        /* =================================================
+           NAME
+        ================================================= */
+
+        if (!fullName) {
+
             showMessage(
-                'This email already has an account. <a href="index.html" class="underline font-bold">Login instead</a>.'
+                "Enter your full name."
             );
+
+            fullNameInput.focus();
+
+            return;
+
+        }
+
+
+        if (!isValidFullName(fullName)) {
+
+            showMessage(
+                "Enter your full name correctly, e.g. Abdullah Qasmi."
+            );
+
+            fullNameInput.focus();
+
+            return;
+
+        }
+
+
+
+        /* =================================================
+           EMAIL
+        ================================================= */
+
+        if (!email) {
+
+            showMessage(
+                "Please enter your email address."
+            );
+
+            emailInput.focus();
+
+            return;
+
+        }
+
+
+        if (!isValidEmail(email)) {
+
+            showMessage(
+                "Please enter a valid email address."
+            );
+
+            emailInput.focus();
+
+            return;
+
+        }
+
+
+        if (
+            isBlockedEmailDomain(email)
+        ) {
+
+            showMessage(
+                "Temporary or disposable email addresses are not allowed."
+            );
+
+            emailInput.focus();
+
+            return;
+
+        }
+
+
+
+        /* =================================================
+           PASSWORD
+        ================================================= */
+
+        if (!isValidPassword(password)) {
+
+            showMessage(
+                "Password must be at least 8 characters and contain at least 1 letter and 1 number."
+            );
+
+            passwordInput.focus();
+
+            return;
+
+        }
+
+
+
+        /* =================================================
+           CONFIRM PASSWORD
+        ================================================= */
+
+        if (
+            password !==
+            confirmPassword
+        ) {
+
+            showMessage(
+                "Passwords do not match."
+            );
+
+            confirmPasswordInput.focus();
+
+            return;
+
+        }
+
+
+
+        /* =================================================
+           START ACCOUNT CREATION
+        ================================================= */
+
+        setLoading(true);
+
+
+        try {
+
+
+            const {
+                data,
+                error
+            } =
+                await supabaseClient.auth.signUp({
+
+                    email: email,
+
+                    password: password,
+
+                    options: {
+
+                        data: {
+
+                            full_name:
+                                fullName,
+
+                            role:
+                                "customer"
+
+                        }
+
+                    }
+
+                });
+
+
+
+            /* =================================================
+               SUPABASE ERROR
+            ================================================= */
+
+            if (error) {
+
+                throw error;
+
+            }
+
+
+
+            /* =================================================
+               CHECK USER
+            ================================================= */
+
+            if (
+                !data ||
+                !data.user
+            ) {
+
+                throw new Error(
+                    "Account could not be created."
+                );
+
+            }
+
+
+
+            /* =================================================
+               SUCCESS
+            ================================================= */
+
+            showMessage(
+                "Account created successfully! Redirecting to login...",
+                "success"
+            );
+
+
             setLoading(false);
-            return;
-        }
 
-        if (lower.includes("invalid email") || lower.includes("invalid format")) {
-            errorMessage = "Please enter a valid email address.";
-        } else if (lower.includes("password")) {
-            errorMessage = "Password must be at least 8 characters and contain 1 letter and 1 number.";
-        } else if (lower.includes("rate") || lower.includes("too many")) {
-            errorMessage = "Too many attempts. Please wait a little and try again.";
-        } else if (lower.includes("network") || lower.includes("fetch")) {
-            errorMessage = "Network error. Please check your internet connection and try again.";
-        }
 
-        showMessage(errorMessage, "error");
-        setLoading(false);
-    }
-});
 
-/* =========================================================
-   VERIFY OTP
-========================================================= */
-otpForm.addEventListener("submit", async function (event) {
-    event.preventDefault();
+            /* =================================================
+               LOGOUT CURRENT SESSION
+            ================================================= */
 
-    if (isVerifying) return;
+            await supabaseClient.auth.signOut();
 
-    hideOtpMessage();
 
-    const token = getOtpValue();
 
-    if (!/^\d{6}$/.test(token)) {
-        showOtpMessage("Enter the 6-digit verification code.");
-        shakeOtpBoxes();
-        otpBoxes[0].focus();
-        return;
-    }
+            /* =================================================
+               REDIRECT TO LOGIN
+            ================================================= */
 
-    setVerifyLoading(true);
+            setTimeout(
+                function () {
 
-    try {
-        const { data, error } = await supabaseClient.auth.verifyOtp({
-            email: pendingEmail,
-            token: token,
-            type: "signup"
-        });
+                    window.location.href =
+                        "index.html";
 
-        if (error) throw error;
+                },
+                1200
+            );
 
-        if (!data || !data.user) {
-            throw new Error("Email verification failed.");
-        }
 
-        showOtpMessage("Email verified successfully! Redirecting to login...", "success");
-        setOtpBoxesEnabled(false);
-        setVerifyLoading(false);
+        } catch (error) {
 
-        // Sign out so the user logs in fresh through the normal flow.
-        await supabaseClient.auth.signOut();
 
-        setTimeout(function () {
-            window.location.href = "index.html";
-        }, 1200);
+            console.error(
+                "KHELZONE SIGNUP ERROR:",
+                error
+            );
 
-    } catch (error) {
-        console.error("OTP VERIFICATION ERROR:", error);
 
-        let errorMessage = error?.message || "OTP verification failed.";
-        const lower = errorMessage.toLowerCase();
-        const code = error?.code || "";
+            let errorMessage =
+                error?.message ||
+                "Account could not be created.";
 
-        if (code === "otp_expired" || lower.includes("expired")) {
-            errorMessage = "This code has expired. Tap \"Resend OTP\" to get a new one.";
-            clearOtpBoxes();
-            otpBoxes[0].focus();
-        } else if (lower.includes("rate") || lower.includes("too many")) {
-            errorMessage = "Too many attempts. Please wait before trying again.";
-        } else {
-            otpAttempts++;
 
-            if (otpAttempts >= MAX_OTP_ATTEMPTS) {
-                errorMessage = "Too many incorrect attempts. Please resend a new code.";
-                setOtpBoxesEnabled(false);
-            } else {
-                errorMessage = "Incorrect code. Please check and try again.";
+            const lower =
+                errorMessage.toLowerCase();
+
+
+            const code =
+                error?.code || "";
+
+
+
+            /* =================================================
+               ALREADY REGISTERED
+            ================================================= */
+
+            if (
+
+                code ===
+                    "user_already_exists"
+
+                ||
+
+                lower.includes(
+                    "user already registered"
+                )
+
+                ||
+
+                lower.includes(
+                    "already been registered"
+                )
+
+                ||
+
+                lower.includes(
+                    "already exists"
+                )
+
+            ) {
+
+                errorMessage =
+                    "This email already has an account. Please login instead.";
+
             }
 
-            shakeOtpBoxes();
-            clearOtpBoxes();
-            if (otpAttempts < MAX_OTP_ATTEMPTS) {
-                otpBoxes[0].focus();
+
+
+            /* =================================================
+               INVALID EMAIL
+            ================================================= */
+
+            else if (
+
+                lower.includes(
+                    "invalid email"
+                )
+
+                ||
+
+                lower.includes(
+                    "invalid format"
+                )
+
+            ) {
+
+                errorMessage =
+                    "Please enter a valid email address.";
+
             }
+
+
+
+            /* =================================================
+               PASSWORD ERROR
+            ================================================= */
+
+            else if (
+                lower.includes("password")
+            ) {
+
+                errorMessage =
+                    "Password must be at least 8 characters and contain 1 letter and 1 number.";
+
+            }
+
+
+
+            /* =================================================
+               RATE LIMIT
+            ================================================= */
+
+            else if (
+
+                lower.includes("rate")
+
+                ||
+
+                lower.includes("too many")
+
+            ) {
+
+                errorMessage =
+                    "Too many attempts. Please wait a little and try again.";
+
+            }
+
+
+
+            /* =================================================
+               NETWORK ERROR
+            ================================================= */
+
+            else if (
+
+                lower.includes("network")
+
+                ||
+
+                lower.includes("fetch")
+
+            ) {
+
+                errorMessage =
+                    "Network error. Please check your internet connection and try again.";
+
+            }
+
+
+
+            /* =================================================
+               SHOW ERROR
+            ================================================= */
+
+            showMessage(
+                errorMessage,
+                "error"
+            );
+
+
+            setLoading(false);
+
         }
 
-        showOtpMessage(errorMessage, "error");
-        setVerifyLoading(false);
     }
-});
+);
 
-/* =========================================================
-   RESEND OTP
-========================================================= */
-function startResendCooldown(seconds) {
-    if (resendCooldownTimer) {
-        clearInterval(resendCooldownTimer);
-    }
-
-    let remaining = seconds;
-    resendBtn.disabled = true;
-    resendBtn.textContent = "Resend OTP (" + remaining + "s)";
-
-    resendCooldownTimer = setInterval(function () {
-        remaining--;
-
-        if (remaining <= 0) {
-            clearInterval(resendCooldownTimer);
-            resendCooldownTimer = null;
-            resendBtn.disabled = false;
-            resendBtn.textContent = "Resend OTP";
-            return;
-        }
-
-        resendBtn.textContent = "Resend OTP (" + remaining + "s)";
-    }, 1000);
-}
-
-resendBtn.addEventListener("click", async function () {
-    if (resendBtn.disabled) return;
-
-    hideOtpMessage();
-
-    if (!pendingEmail) {
-        showOtpMessage("Email not found. Please start signup again.");
-        return;
-    }
-
-    resendBtn.disabled = true;
-    resendBtn.textContent = "Sending...";
-
-    try {
-        const { error } = await supabaseClient.auth.resend({
-            type: "signup",
-            email: pendingEmail
-        });
-
-        if (error) throw error;
-
-        otpAttempts = 0;
-        clearOtpBoxes();
-        setOtpBoxesEnabled(true);
-        otpBoxes[0].focus();
-
-        showOtpMessage("A new verification code has been sent to your email.", "success");
-
-    } catch (error) {
-        console.error("RESEND OTP ERROR:", error);
-
-        let errorMessage = error?.message || "Could not resend OTP.";
-        const lower = errorMessage.toLowerCase();
-
-        if (lower.includes("rate") || lower.includes("too many")) {
-            errorMessage = "Too many requests. Please wait a little before requesting another OTP.";
-        }
-
-        showOtpMessage(errorMessage, "error");
-    }
-
-    startResendCooldown(30);
-});
 </script>
+
 
 </body>
 </html>

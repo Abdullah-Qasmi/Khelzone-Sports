@@ -2172,7 +2172,94 @@
         /* =========================================================
            START
         ========================================================== */
+/* =========================================================
+   BEST SELLER CARD → ADD TO CART
+========================================================= */
 
+grid.addEventListener('click', function (event) {
+
+    const button = event.target.closest('[data-action="addcart"]');
+
+    if (!button || button.disabled) return;
+
+    const productId = button.dataset.id;
+
+    const product = homepageProducts.get(String(productId));
+
+    if (!product) {
+        console.error('Product not found:', productId);
+        return;
+    }
+
+    let cart = [];
+
+    try {
+        cart = JSON.parse(localStorage.getItem('khz_cart') || '[]');
+
+        if (!Array.isArray(cart)) {
+            cart = [];
+        }
+
+    } catch (error) {
+        cart = [];
+    }
+
+    const existing = cart.find(function (item) {
+        return (
+            String(item.id) === String(product.id) &&
+            (item.size || 'Standard') === 'Standard'
+        );
+    });
+
+    if (existing) {
+        existing.qty = Number(existing.qty || 0) + 1;
+    } else {
+        cart.push({
+            id: product.id,
+            size: 'Standard',
+            qty: 1
+        });
+    }
+
+    localStorage.setItem(
+        'khz_cart',
+        JSON.stringify(cart)
+    );
+
+    const cartCount = document.getElementById('cartCount');
+
+    if (cartCount) {
+
+        const total = cart.reduce(function (sum, item) {
+            return sum + Number(item.qty || 0);
+        }, 0);
+
+        cartCount.textContent = total;
+    }
+
+    const toast = document.getElementById('toast');
+    const toastText = document.getElementById('toastText');
+
+    if (toast && toastText) {
+
+        toastText.textContent = 'Added to cart';
+
+        toast.classList.remove(
+            'translate-y-20',
+            'opacity-0'
+        );
+
+        setTimeout(function () {
+
+            toast.classList.add(
+                'translate-y-20',
+                'opacity-0'
+            );
+
+        }, 1800);
+    }
+
+});
         loadBestSellers();
 
     });

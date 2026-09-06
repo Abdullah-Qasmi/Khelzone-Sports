@@ -924,26 +924,22 @@
                         Price
                     </h4>
 
+                    <label for="priceRange" class="block text-xs text-white/40 mb-2">
+                        Minimum price (Rs.)
+                    </label>
+
                     <input
                         id="priceRange"
-                        type="range"
-                        min="500"
-                        max="100000"
-                        step="500"
-                        value="100000"
-                        class="khz-range w-full">
+                        type="number"
+                        inputmode="numeric"
+                        min="10"
+                        step="10"
+                        placeholder="e.g. 500"
+                        class="khz-range w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-orange-500 transition">
 
-                    <div class="flex justify-between text-xs mt-2 text-white/40">
-
-                        <span>
-                            Rs. 500
-                        </span>
-
-                        <span id="priceRangeLabel">
-                            Rs. 100,000
-                        </span>
-
-                    </div>
+                    <p id="priceRangeLabel" class="text-xs mt-2 text-white/40">
+                        Showing all prices
+                    </p>
 
                 </div>
 
